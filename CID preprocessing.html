@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -261,10 +260,15 @@
     .primary,.secondary{
       height:46px;
       border-radius:12px;
-      padding:0 15px;
+      padding:0 18px;
+      font-size:14px;
       font-weight:800;
       border:1px solid var(--line);
       white-space:nowrap;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      line-height:1;
     }
 
     .primary{
@@ -600,7 +604,7 @@
       data-mode="alignedRaw"
       data-i18n="alignRawBtn"
     >
-      Minimum Alignment: raw data plot
+      Alignment: raw data plot
     </button>
 
     <button
@@ -608,7 +612,7 @@
       data-mode="alignedH1"
       data-i18n="alignH1Btn"
     >
-      Minimum Alignment: raw + 1st harmonic plot
+      Alignment: 1st harmonic plot
     </button>
 
     <button
@@ -627,10 +631,6 @@
       <h1 data-i18n="module">
         CID preprocessing
       </h1>
-
-      <p data-i18n="subtitle">
-        Contact-sheet signal inspection and 1X-based preprocessing
-      </p>
     </div>
 
     <button
@@ -734,9 +734,9 @@
             <button
               id="folderBtn"
               class="secondary"
-              data-i18n="selectFolder"
+              data-i18n="browse"
             >
-              Select folder
+              Browse
             </button>
 
             <div
@@ -744,7 +744,7 @@
               class="filename"
               data-i18n="notSelected"
             >
-              Not selected · ZIP fallback
+              No folder selected
             </div>
 
           </div>
@@ -807,13 +807,6 @@
           <span data-i18n="corrected">1X-removed</span>
         </label>
 
-      </div>
-
-      <div
-        class="notice"
-        data-i18n="browserNote"
-      >
-        Files are processed locally in your browser. A selected save folder is used when the browser supports the File System Access API; otherwise Save creates a ZIP download.
       </div>
 
     </section>
@@ -897,12 +890,12 @@ const I18N={
   module:'CID preprocessing',
   dockHint:'Select a processing function.',
   back:'← Back',
-  home:'Homepage.',
+  home:'🏠 Homepage',
   analysis:'Analysis',
   rawBtn:'Raw data plot',
   h1Btn:'1st harmonic plot',
-  alignRawBtn:'Minimum Alignment: raw data plot',
-  alignH1Btn:'Minimum Alignment: raw + 1st harmonic plot',
+  alignRawBtn:'Alignment: raw data plot',
+  alignH1Btn:'Alignment: 1st harmonic plot',
   eccBtn:'Eccentricity Diagnostic & Correction',
   subtitle:'Contact-sheet signal inspection and 1X-based preprocessing',
   inputSetup:'Input & output setup',
@@ -912,15 +905,15 @@ const I18N={
   expectedSamples:'Measured samples',
   expectedPoints:'Points per sample',
   savePath:'Save path',
-  selectFolder:'Select folder',
-  notSelected:'Not selected · ZIP fallback',
+  selectFolder:'Browse',
+  notSelected:'No folder selected',
   readExcel:'Read Excel',
   ready:'Ready',
   plotColors:'Plot colors',
   rawBefore:'Raw before alignment',
   alignedRaw:'Aligned raw',
-  harmonic:'1X harmonic',
-  corrected:'1X-removed',
+  harmonic:'1st harmonic',
+  corrected:'Corrected',
   browserNote:'Files are processed locally in your browser. A selected save folder is used when the browser supports the File System Access API; otherwise Save creates a ZIP download.',
   result:'Processing result',
   chooseAnalysis:'Read an Excel file, then choose an analysis.',
@@ -942,24 +935,26 @@ const I18N={
   sampleMismatch:'Input sample count differs from detected count',
   pointMismatch:'Input point count differs from detected count',
   folderSelected:'Save folder selected',
-  folderUnsupported:'Folder selection is not supported in this browser. ZIP download mode will be used.',
-  needRead:'Read a valid Excel file first.',
+  folderUnsupported:'This browser does not support folder selection. Please use a browser that supports the File System Access API.',
+  needRead:'Select both an Excel workbook and a save folder, then read the Excel file.',
+  needFile:'Please select an Excel workbook.',
+  needFolder:'Please select a save folder.',
   rawTitle:'Raw data · all samples',
   h1Title:'1X harmonic fit · all samples',
-  alignRawTitle:'Minimum-aligned raw data · all samples',
-  alignH1Title:'Minimum-aligned raw + 1X fit · all samples',
+  alignRawTitle:'Minimum Alignment: raw data',
+  alignH1Title:'Minimum Alignment: 1st harmonic',
   eccOverlay:'Corrected data · all samples overlay',
-  eccMean:'Aligned raw vs corrected · mean ± SD',
-  eccSD:'SD before vs after 1X removal',
+  eccMean:'Mean ± SD graph',
+  eccSD:'Point-wise SD before/after correction',
   pointAxis:'Measurement Point',
-  alignedPointAxis:'Aligned Point (P1 = nearest 1X minimum)',
-  sensorAxis:'Sensor Value (Phase)',
+  alignedPointAxis:'Aligned Point',
+  sensorAxis:'Phase',
   sampleAxis:'Sample',
   sdAxis:'Point-wise SD',
   rawLegend:'Raw',
-  fitLegend:'1X fit',
+  fitLegend:'1st harmonic',
   alignedLegend:'Aligned raw',
-  correctedLegend:'1X-removed',
+  correctedLegend:'1st harmonic',
   meanLegend:'mean',
   sdLegend:'± SD',
   saving:'Generating files…',
@@ -970,8 +965,8 @@ const I18N={
   individualOff:'Individual sample export OFF',
   modeRaw:'Raw data',
   modeH1:'1st harmonic',
-  modeAlignedRaw:'Minimum-aligned raw data',
-  modeAlignedH1:'Minimum-aligned raw + 1X',
+  modeAlignedRaw:'Minimum Alignment: raw data',
+  modeAlignedH1:'Minimum Alignment: 1st harmonic',
   modeEcc:'Eccentricity Diagnostic & Correction',
   transparency:'SD shading = 70% transparent',
   analysisReady:'Plot generated. Use the toggle to include individual sample figures in Save.',
@@ -984,12 +979,12 @@ const I18N={
   module:'CID 전처리',
   dockHint:'처리 기능을 선택하세요.',
   back:'← 뒤로가기',
-  home:'홈페이지.',
+  home:'🏠 홈페이지',
   analysis:'분석',
   rawBtn:'Rawdata 플롯',
   h1Btn:'1차 하모닉 플롯',
-  alignRawBtn:'최솟값 Alignment: rawdata 플롯',
-  alignH1Btn:'최솟값 Alignment: rawdata 1차 하모닉 플롯',
+  alignRawBtn:'Alignment: rawdata 플롯',
+  alignH1Btn:'Alignment: 1차 하모닉 플롯',
   eccBtn:'Eccentricity Diagnostic & Correction',
   subtitle:'Contact 시트 신호 확인 및 1X 기반 전처리',
   inputSetup:'입력 및 저장 설정',
@@ -999,15 +994,15 @@ const I18N={
   expectedSamples:'측정 샘플 수',
   expectedPoints:'샘플당 포인트 수',
   savePath:'저장 경로',
-  selectFolder:'저장 폴더 선택',
-  notSelected:'미선택 · ZIP 다운로드 모드',
+  selectFolder:'Browse',
+  notSelected:'선택된 폴더 없음',
   readExcel:'Excel 리딩',
   ready:'준비 완료',
   plotColors:'그래프 색상',
   rawBefore:'정렬 전 rawdata',
   alignedRaw:'정렬 후 rawdata',
-  harmonic:'1X 하모닉',
-  corrected:'1X 제거 후',
+  harmonic:'1차 하모닉',
+  corrected:'보정 후',
   browserNote:'파일은 브라우저 내부에서 로컬 처리됩니다. 브라우저가 File System Access API를 지원하면 선택한 폴더에 직접 저장하고, 미지원 시 Save 버튼으로 ZIP 파일을 다운로드합니다.',
   result:'처리 결과',
   chooseAnalysis:'Excel을 읽은 뒤 분석 기능을 선택하세요.',
@@ -1029,24 +1024,26 @@ const I18N={
   sampleMismatch:'입력한 샘플 수와 실제 검출 수가 다릅니다',
   pointMismatch:'입력한 포인트 수와 실제 검출 수가 다릅니다',
   folderSelected:'저장 폴더 선택 완료',
-  folderUnsupported:'이 브라우저는 폴더 직접 저장을 지원하지 않아 ZIP 다운로드 모드를 사용합니다.',
-  needRead:'먼저 유효한 Excel 파일을 읽어주세요.',
+  folderUnsupported:'이 브라우저는 저장 폴더 선택을 지원하지 않습니다. File System Access API를 지원하는 브라우저를 사용해주세요.',
+  needRead:'읽을 Excel 파일과 저장 폴더를 모두 지정한 뒤 Excel을 읽어주세요.',
+  needFile:'읽을 Excel 파일을 선택해주세요.',
+  needFolder:'저장 폴더를 선택해주세요.',
   rawTitle:'Rawdata · 전체 샘플',
   h1Title:'1X 하모닉 핏 · 전체 샘플',
-  alignRawTitle:'최솟값 정렬 Rawdata · 전체 샘플',
-  alignH1Title:'최솟값 정렬 Rawdata + 1X 핏 · 전체 샘플',
+  alignRawTitle:'Minimum Alignment: raw data',
+  alignH1Title:'Minimum Alignment: 1st harmonic',
   eccOverlay:'보정 데이터 · 전체 샘플 오버레이',
-  eccMean:'정렬 Raw vs 보정 · 평균 ± 표준편차',
-  eccSD:'1X 제거 전후 SD',
+  eccMean:'Mean ± SD 그래프',
+  eccSD:'보정 전/후 각 샘플별 포인트 SD',
   pointAxis:'측정 포인트',
-  alignedPointAxis:'정렬 포인트 (P1 = 1X 최솟값 최근접점)',
-  sensorAxis:'Sensor Value (Phase)',
+  alignedPointAxis:'Aligned Point',
+  sensorAxis:'Phase',
   sampleAxis:'샘플',
   sdAxis:'포인트 방향 표준편차',
   rawLegend:'Raw',
-  fitLegend:'1X 핏',
+  fitLegend:'1st harmonic',
   alignedLegend:'정렬 Raw',
-  correctedLegend:'1X 제거',
+  correctedLegend:'1st harmonic',
   meanLegend:'평균',
   sdLegend:'± 표준편차',
   saving:'파일 생성 중…',
@@ -1057,8 +1054,8 @@ const I18N={
   individualOff:'개별 샘플 저장 OFF',
   modeRaw:'Rawdata',
   modeH1:'1차 하모닉',
-  modeAlignedRaw:'최솟값 정렬 Rawdata',
-  modeAlignedH1:'최솟값 정렬 Raw + 1X',
+  modeAlignedRaw:'Minimum Alignment: raw data',
+  modeAlignedH1:'Minimum Alignment: 1st harmonic',
   modeEcc:'Eccentricity Diagnostic & Correction',
   transparency:'SD 음영 = 투명도 70%',
   analysisReady:'플롯 생성 완료. 개별 샘플 파형 버튼을 켜면 Save 시 개별 그래프도 저장됩니다.',
@@ -1378,7 +1375,12 @@ el('folderBtn').onclick=async()=>{
 el('readBtn').onclick=async()=>{
 
  if(!state.file){
-  setStatus(tr('noFile'),'bad');
+  setStatus(tr('needFile'),'bad');
+  return;
+ }
+
+ if(!state.saveHandle){
+  setStatus(tr('needFolder'),'bad');
   return;
  }
 
@@ -1680,14 +1682,10 @@ const baseLayout=(
  title,
  xTitle
 )=>({
- title:{
-  text:title,
-  font:{size:18}
- },
  margin:{
   l:72,
   r:28,
-  t:70,
+  t:28,
   b:90
  },
  paper_bgcolor:'#fff',
@@ -1729,6 +1727,7 @@ const baseLayout=(
 const config={
  responsive:true,
  displaylogo:false,
+ modeBarButtonsToRemove:['select2d','lasso2d'],
  toImageButtonOptions:{
   format:'png',
   filename:'plot',
@@ -2044,7 +2043,7 @@ async function renderEccPlots(){
  const div2=
   addPlotCard(
    'plot-ecc-mean',
-   `${tr('eccMean')} · ${tr('transparency')}`
+   tr('eccMean')
   );
 
  const n=d.points.length;
@@ -2063,7 +2062,7 @@ async function renderEccPlots(){
 
   const cv=
    d.samples.map(
-    s=>p.corrected[s][i]
+    s=>p.alignedFit[s][i]
    );
 
   rawMean.push(mean(rv));
@@ -2079,7 +2078,7 @@ async function renderEccPlots(){
   el('colorAligned').value;
 
  const corC=
-  el('colorCorrected').value;
+  el('colorH1').value;
 
  const tracesMean=[
   {
@@ -2103,7 +2102,7 @@ async function renderEccPlots(){
    line:{width:0},
    fill:'tonexty',
    fillcolor:hexToRgba(rawC,.30),
-   name:`${tr('alignedLegend')} ${tr('sdLegend')}`,
+   name:'Aligned raw +/- SD',
    hoverinfo:'skip'
   },
   {
@@ -2111,7 +2110,7 @@ async function renderEccPlots(){
    y:rawMean,
    type:'scatter',
    mode:'lines',
-   name:`${tr('alignedLegend')} ${tr('meanLegend')}`,
+   name:'Aligned raw mean',
    line:{
     width:2.7,
     color:rawC
@@ -2138,7 +2137,7 @@ async function renderEccPlots(){
    line:{width:0},
    fill:'tonexty',
    fillcolor:hexToRgba(corC,.30),
-   name:`${tr('correctedLegend')} ${tr('sdLegend')}`,
+   name:'1st harmonic +/- SD',
    hoverinfo:'skip'
   },
   {
@@ -2146,7 +2145,7 @@ async function renderEccPlots(){
    y:corMean,
    type:'scatter',
    mode:'lines',
-   name:`${tr('correctedLegend')} ${tr('meanLegend')}`,
+   name:'1st harmonic mean',
    line:{
     width:2.7,
     color:corC
@@ -2253,11 +2252,11 @@ const modeInfo={
  },
  alignedRaw:{
   title:'modeAlignedRaw',
-  folder:'최솟값 Alignment - rawdata'
+  folder:'Alignment - rawdata'
  },
  alignedH1:{
   title:'modeAlignedH1',
-  folder:'최솟값 Alignment - 1차 하모닉'
+  folder:'Alignment - 1차 하모닉'
  },
  ecc:{
   title:'modeEcc',
@@ -2283,13 +2282,15 @@ async function runAnalysis(
  activate=true
 ){
 
- if(!state.dataset){
+ if(!state.file || !state.saveHandle || !state.dataset){
 
   if(activate){
    setStatus(
-    tr('needRead'),
+    !state.file ? tr('needFile') : (!state.saveHandle ? tr('needFolder') : tr('needRead')),
     'bad'
    );
+   el('plots').innerHTML=`<div class="empty">${tr('needRead')}</div>`;
+   el('actions').classList.remove('visible');
   }
 
   return;
@@ -2637,42 +2638,7 @@ async function saveEntries(
   );
 
  }else{
-
-  const zip=
-   new JSZip();
-
-  entries.forEach(
-   e=>
-    zip.file(
-     `${folder}/${e.path}`,
-     e.blob
-    )
-  );
-
-  const blob=
-   await zip.generateAsync(
-    {
-     type:'blob',
-     compression:'DEFLATE',
-     compressionOptions:{
-      level:6
-     }
-    },
-    m=>{
-     el('progress').textContent=
-      `${tr('saving')} ${Math.round(m.percent)}%`;
-    }
-   );
-
-  downloadBlob(
-   blob,
-   `${folder.replace(/[\\/:*?"<>|]+/g,'_')}.zip`
-  );
-
-  setStatus(
-   tr('zipSaved'),
-   'good'
-  );
+  throw new Error(tr('needFolder'));
  }
 }
 
@@ -3084,4 +3050,3 @@ el('saveBtn').onclick=async()=>{
 
 </body>
 </html>
-```
