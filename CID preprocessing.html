@@ -11,19 +11,15 @@
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
   <style>
     :root{
       --ink:#111827;
       --muted:#667085;
       --line:#e5e7eb;
-      --soft:#f7f8fa;
-      --panel:#fff;
       --green:#1f8a57;
       --green-soft:#eaf8f0;
       --danger:#b42318;
-      --danger-soft:#fff0ee;
       --shadow:0 12px 38px rgba(17,24,39,.08);
     }
 
@@ -86,12 +82,6 @@
       letter-spacing:-.03em;
     }
 
-    .title-wrap p{
-      margin:5px 0 0;
-      color:var(--muted);
-      font-size:13px;
-      font-weight:600;
-    }
 
     .lang-btn{
       width:46px;
@@ -192,7 +182,7 @@
       max-width:1700px;
     }
 
-    .setup-card,.plot-card,.info-card{
+    .setup-card,.plot-card{
       border:1px solid var(--line);
       border-radius:20px;
       background:rgba(255,255,255,.90);
@@ -492,17 +482,6 @@
 
     .progress.visible{display:block}
 
-    .notice{
-      margin-top:12px;
-      background:#f8f9fb;
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:12px 14px;
-      color:#475467;
-      font-size:11px;
-      line-height:1.55;
-      font-weight:600;
-    }
 
     @media(max-width:1050px){
       .dock{
@@ -898,7 +877,6 @@ const I18N={
   alignRawBtn:'Alignment: raw data plot',
   alignH1Btn:'Alignment: 1st harmonic plot',
   eccBtn:'Eccentricity Diagnostic & Correction',
-  subtitle:'Contact-sheet signal inspection and 1X-based preprocessing',
   inputSetup:'Input & output setup',
   excelFile:'Excel workbook',
   browse:'Browse',
@@ -906,7 +884,6 @@ const I18N={
   expectedSamples:'Measured samples',
   expectedPoints:'Points per sample',
   savePath:'Save path',
-  selectFolder:'Browse',
   notSelected:'No folder selected',
   readExcel:'Read Excel',
   ready:'Ready',
@@ -915,7 +892,6 @@ const I18N={
   alignedRaw:'Aligned raw',
   harmonic:'1st harmonic',
   corrected:'Corrected',
-  browserNote:'Files are processed locally in your browser. A selected save folder is used when the browser supports the File System Access API; otherwise Save creates a ZIP download.',
   result:'Processing result',
   chooseAnalysis:'Read an Excel file, then choose an analysis.',
   individual:'Individual sample waveforms',
@@ -946,12 +922,12 @@ const I18N={
   alignH1Title:'Minimum Alignment: 1st harmonic',
   eccOverlay:'Corrected data · all samples overlay',
   eccMean:'Mean ± SD graph',
-  eccSD:'Point-wise SD before/after correction',
+  eccSD:'Within-sample SD across points before/after correction',
   pointAxis:'Measurement Point',
   alignedPointAxis:'Aligned Point',
   sensorAxis:'Phase',
   sampleAxis:'Sample',
-  sdAxis:'Point-wise SD',
+  sdAxis:'SD across points',
   rawLegend:'Raw',
   fitLegend:'1st harmonic',
   alignedLegend:'Aligned raw',
@@ -960,7 +936,6 @@ const I18N={
   sdLegend:'± SD',
   saving:'Generating files…',
   saved:'Save completed.',
-  zipSaved:'ZIP download created.',
   saveFailed:'Save failed',
   individualOn:'Individual sample export ON',
   individualOff:'Individual sample export OFF',
@@ -969,9 +944,7 @@ const I18N={
   modeAlignedRaw:'Minimum Alignment: raw data',
   modeAlignedH1:'Minimum Alignment: 1st harmonic',
   modeEcc:'Eccentricity Diagnostic & Correction',
-  transparency:'SD shading = 70% transparent',
   analysisReady:'Plot generated. Use the toggle to include individual sample figures in Save.',
-  structure:'Workbook structure',
   actual:'actual',
   expected:'expected'
  },
@@ -987,7 +960,6 @@ const I18N={
   alignRawBtn:'Alignment: rawdata 플롯',
   alignH1Btn:'Alignment: 1차 하모닉 플롯',
   eccBtn:'Eccentricity Diagnostic & Correction',
-  subtitle:'Contact 시트 신호 확인 및 1X 기반 전처리',
   inputSetup:'입력 및 저장 설정',
   excelFile:'입력 Excel 파일',
   browse:'Browse',
@@ -995,7 +967,6 @@ const I18N={
   expectedSamples:'측정 샘플 수',
   expectedPoints:'샘플당 포인트 수',
   savePath:'저장 경로',
-  selectFolder:'Browse',
   notSelected:'선택된 폴더 없음',
   readExcel:'Excel 리딩',
   ready:'준비 완료',
@@ -1004,7 +975,6 @@ const I18N={
   alignedRaw:'정렬 후 rawdata',
   harmonic:'1차 하모닉',
   corrected:'보정 후',
-  browserNote:'파일은 브라우저 내부에서 로컬 처리됩니다. 브라우저가 File System Access API를 지원하면 선택한 폴더에 직접 저장하고, 미지원 시 Save 버튼으로 ZIP 파일을 다운로드합니다.',
   result:'처리 결과',
   chooseAnalysis:'Excel을 읽은 뒤 분석 기능을 선택하세요.',
   individual:'개별 샘플 파형',
@@ -1035,7 +1005,7 @@ const I18N={
   alignH1Title:'Minimum Alignment: 1st harmonic',
   eccOverlay:'보정 데이터 · 전체 샘플 오버레이',
   eccMean:'Mean ± SD 그래프',
-  eccSD:'보정 전/후 각 샘플별 포인트 SD',
+  eccSD:'보정 전/후 샘플별 포인트 방향 SD',
   pointAxis:'측정 포인트',
   alignedPointAxis:'Aligned Point',
   sensorAxis:'Phase',
@@ -1049,7 +1019,6 @@ const I18N={
   sdLegend:'± 표준편차',
   saving:'파일 생성 중…',
   saved:'저장이 완료되었습니다.',
-  zipSaved:'ZIP 다운로드 파일을 생성했습니다.',
   saveFailed:'저장 실패',
   individualOn:'개별 샘플 저장 ON',
   individualOff:'개별 샘플 저장 OFF',
@@ -1058,9 +1027,7 @@ const I18N={
   modeAlignedRaw:'Minimum Alignment: raw data',
   modeAlignedH1:'Minimum Alignment: 1st harmonic',
   modeEcc:'Eccentricity Diagnostic & Correction',
-  transparency:'SD 음영 = 투명도 70%',
   analysisReady:'플롯 생성 완료. 개별 샘플 파형 버튼을 켜면 Save 시 개별 그래프도 저장됩니다.',
-  structure:'Excel 구조',
   actual:'실제',
   expected:'입력'
  }
@@ -1134,6 +1101,42 @@ function naturalNum(s){
 function setStatus(text,kind=''){
  el('status').textContent=text;
  el('status').className='status '+kind;
+}
+
+function purgeCurrentPlots(){
+ for(const item of state.currentPlots){
+  if(item?.div){
+   try{
+    Plotly.purge(item.div);
+   }catch(_){
+   }
+  }
+ }
+ state.currentPlots=[];
+}
+
+function resetIndividualToggle(){
+ state.individual=false;
+ el('individualToggle').classList.remove('on');
+}
+
+function resetAnalysisView(resetIndividual=false){
+ purgeCurrentPlots();
+ state.currentMode=null;
+
+ document
+  .querySelectorAll('.analysis-btn')
+  .forEach(b=>b.classList.remove('active'));
+
+ el('actions').classList.remove('visible');
+ el('resultTitle').textContent=tr('result');
+ el('resultSub').textContent=tr('chooseAnalysis');
+ el('plots').innerHTML=
+  `<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;
+
+ if(resetIndividual){
+  resetIndividualToggle();
+ }
 }
 
 function hexToRgba(hex,a){
@@ -1356,30 +1359,8 @@ el('excelInput').addEventListener(
     :tr('noFile');
 
   state.dataset=null;
-  state.currentMode=null;
-  state.currentPlots=[];
-
-  document
-   .querySelectorAll('.analysis-btn')
-   .forEach(
-    b=>b.classList.remove('active')
-   );
-
-  el('actions')
-   .classList
-   .remove('visible');
-
+  resetAnalysisView(true);
   el('detected').innerHTML='';
-
-  el('resultTitle').textContent=
-   tr('result');
-
-  el('resultSub').textContent=
-   tr('chooseAnalysis');
-
-  el('plots').innerHTML=
-   `<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;
-
   setStatus(tr('ready'));
  }
 );
@@ -1626,6 +1607,7 @@ el('readBtn').onclick=async()=>{
    pointCol,
    samples,
    points,
+   plotPoints:points.map((_,i)=>`P${i+1}`),
    values,
    center,
    hasCenter
@@ -1663,50 +1645,13 @@ el('readBtn').onclick=async()=>{
    'good'
   );
 
-  el('resultSub').textContent=
-   tr('chooseAnalysis');
-
-  state.currentMode=null;
-
-  document
-   .querySelectorAll('.analysis-btn')
-   .forEach(
-    b=>b.classList.remove('active')
-   );
-
-  el('actions')
-   .classList
-   .remove('visible');
-
-  el('plots').innerHTML=
-   `<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;
+  resetAnalysisView(true);
 
  }catch(err){
 
   state.dataset=null;
-  state.currentMode=null;
-  state.currentPlots=[];
-
-  document
-   .querySelectorAll('.analysis-btn')
-   .forEach(
-    b=>b.classList.remove('active')
-   );
-
-  el('actions')
-   .classList
-   .remove('visible');
-
+  resetAnalysisView(true);
   el('detected').innerHTML='';
-
-  el('resultTitle').textContent=
-   tr('result');
-
-  el('resultSub').textContent=
-   tr('chooseAnalysis');
-
-  el('plots').innerHTML=
-   `<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;
 
   setStatus(
    err.message||String(err),
@@ -1751,10 +1696,21 @@ function renderDetected(
   chips.join('');
 }
 
-const baseLayout=(
- title,
- xTitle
-)=>({
+[
+ 'expectedSamples',
+ 'expectedPoints'
+].forEach(id=>{
+ el(id).addEventListener('input',()=>{
+  if(!state.dataset)return;
+
+  renderDetected(
+   Number(el('expectedSamples').value),
+   Number(el('expectedPoints').value)
+  );
+ });
+});
+
+const baseLayout=(xTitle)=>({
  margin:{
   l:72,
   r:28,
@@ -1811,9 +1767,7 @@ const config={
 };
 
 function pointLabels(){
- return state.dataset.points.map(
-  (_,i)=>`P${i+1}`
- );
+ return state.dataset.plotPoints;
 }
 
 function overlayTraces(
@@ -1905,6 +1859,10 @@ function addPlotCard(
  title
 ){
 
+ if(document.getElementById(id)){
+  throw new Error(`Duplicate plot container id: ${id}`);
+ }
+
  const card=
   document.createElement('div');
 
@@ -1923,9 +1881,8 @@ async function renderMainPlot(mode){
  const d=state.dataset;
  const p=d.processed;
 
+ purgeCurrentPlots();
  el('plots').innerHTML='';
-
- state.currentPlots=[];
 
  if(mode==='raw'){
 
@@ -1937,9 +1894,8 @@ async function renderMainPlot(mode){
 
   const layout=
    baseLayout(
-    tr('rawTitle'),
-    tr('pointAxis')
-   );
+     tr('pointAxis')
+    );
 
   await Plotly.newPlot(
    div,
@@ -1966,9 +1922,8 @@ async function renderMainPlot(mode){
 
   const layout=
    baseLayout(
-    tr('h1Title'),
-    tr('pointAxis')
-   );
+     tr('pointAxis')
+    );
 
   await Plotly.newPlot(
    div,
@@ -1995,9 +1950,8 @@ async function renderMainPlot(mode){
 
   const layout=
    baseLayout(
-    tr('alignRawTitle'),
-    tr('alignedPointAxis')
-   );
+     tr('alignedPointAxis')
+    );
 
   await Plotly.newPlot(
    div,
@@ -2021,6 +1975,10 @@ async function renderMainPlot(mode){
     'plot-main',
     tr('alignH1Title')
    );
+
+  if(!div){
+   throw new Error('Failed to create the Alignment: 1st harmonic plot container.');
+  }
 
   const traces=[];
 
@@ -2065,9 +2023,8 @@ async function renderMainPlot(mode){
 
   const layout=
    baseLayout(
-    tr('alignH1Title'),
-    tr('alignedPointAxis')
-   );
+     tr('alignedPointAxis')
+    );
 
   await Plotly.newPlot(
    div,
@@ -2102,9 +2059,8 @@ async function renderEccPlots(){
 
  let layout=
   baseLayout(
-   tr('eccOverlay'),
-   tr('alignedPointAxis')
-  );
+     tr('alignedPointAxis')
+    );
 
  await Plotly.newPlot(
   div1,
@@ -2121,8 +2077,8 @@ async function renderEccPlots(){
 
  const n=d.points.length;
 
- const rawMean=[];
- const rawSd=[];
+ const alignedMean=[];
+ const alignedSd=[];
  const corMean=[];
  const corSd=[];
 
@@ -2138,8 +2094,8 @@ async function renderEccPlots(){
     s=>p.corrected[s][i]
    );
 
-  rawMean.push(mean(rv));
-  rawSd.push(sd(rv));
+  alignedMean.push(mean(rv));
+  alignedSd.push(sd(rv));
 
   corMean.push(mean(cv));
   corSd.push(sd(cv));
@@ -2156,8 +2112,8 @@ async function renderEccPlots(){
  const tracesMean=[
   {
    x,
-   y:rawMean.map(
-    (m,i)=>m+rawSd[i]
+   y:alignedMean.map(
+    (m,i)=>m+alignedSd[i]
    ),
    type:'scatter',
    mode:'lines',
@@ -2167,23 +2123,23 @@ async function renderEccPlots(){
   },
   {
    x,
-   y:rawMean.map(
-    (m,i)=>m-rawSd[i]
+   y:alignedMean.map(
+    (m,i)=>m-alignedSd[i]
    ),
    type:'scatter',
    mode:'lines',
    line:{width:0},
    fill:'tonexty',
    fillcolor:hexToRgba(rawC,.30),
-   name:'Aligned raw +/- SD',
+   name:`${tr('alignedLegend')} ${tr('sdLegend')}`,
    hoverinfo:'skip'
   },
   {
    x,
-   y:rawMean,
+   y:alignedMean,
    type:'scatter',
    mode:'lines',
-   name:'Aligned raw mean',
+   name:`${tr('alignedLegend')} ${tr('meanLegend')}`,
    line:{
     width:2.7,
     color:rawC
@@ -2210,7 +2166,7 @@ async function renderEccPlots(){
    line:{width:0},
    fill:'tonexty',
    fillcolor:hexToRgba(corC,.30),
-   name:'Corrected +/- SD',
+   name:`${tr('correctedLegend')} ${tr('sdLegend')}`,
    hoverinfo:'skip'
   },
   {
@@ -2218,7 +2174,7 @@ async function renderEccPlots(){
    y:corMean,
    type:'scatter',
    mode:'lines',
-   name:'Corrected mean',
+   name:`${tr('correctedLegend')} ${tr('meanLegend')}`,
    line:{
     width:2.7,
     color:corC
@@ -2228,9 +2184,8 @@ async function renderEccPlots(){
 
  layout=
   baseLayout(
-   tr('eccMean'),
-   tr('alignedPointAxis')
-  );
+     tr('alignedPointAxis')
+    );
 
  await Plotly.newPlot(
   div2,
@@ -2259,9 +2214,8 @@ async function renderEccPlots(){
 
  layout=
   baseLayout(
-   tr('eccSD'),
-   tr('sampleAxis')
-  );
+     tr('sampleAxis')
+    );
 
  layout.yaxis.title.text=
   tr('sdAxis');
@@ -2499,23 +2453,25 @@ async function imageFromSpec(
 
  document.body.appendChild(tmp);
 
- await Plotly.newPlot(
-  tmp,
-  traces,
-  layout,
-  {
-   displayModeBar:false,
-   staticPlot:true
+ try{
+  await Plotly.newPlot(
+   tmp,
+   traces,
+   layout,
+   {
+    displayModeBar:false,
+    staticPlot:true
+   }
+  );
+
+  return await plotDivToBlob(tmp);
+ }finally{
+  try{
+   Plotly.purge(tmp);
+  }catch(_){
   }
- );
-
- const blob=
-  await plotDivToBlob(tmp);
-
- Plotly.purge(tmp);
- tmp.remove();
-
- return blob;
+  tmp.remove();
+ }
 }
 
 function workbookBlob(
@@ -2655,32 +2611,6 @@ async function writeBlob(
  await w.close();
 }
 
-function downloadBlob(
- blob,
- name
-){
-
- const a=
-  document.createElement('a');
-
- a.href=
-  URL.createObjectURL(blob);
-
- a.download=name;
-
- document.body.appendChild(a);
-
- a.click();
-
- setTimeout(
-  ()=>{
-   URL.revokeObjectURL(a.href);
-   a.remove();
-  },
-  1500
- );
-}
-
 async function saveEntries(
  folder,
  entries
@@ -2804,7 +2734,6 @@ async function buildIndividualEntries(mode){
 
    layout=
     baseLayout(
-     `${tr('modeRaw')} · ${s}`,
      tr('pointAxis')
     );
 
@@ -2821,7 +2750,6 @@ async function buildIndividualEntries(mode){
 
    layout=
     baseLayout(
-     `${tr('modeH1')} · ${s}`,
      tr('pointAxis')
     );
 
@@ -2847,7 +2775,6 @@ async function buildIndividualEntries(mode){
 
    layout=
     baseLayout(
-     `${tr('modeAlignedRaw')} · ${s}`,
      tr('alignedPointAxis')
     );
 
@@ -2864,7 +2791,6 @@ async function buildIndividualEntries(mode){
 
    layout=
     baseLayout(
-     `${tr('modeAlignedH1')} · ${s}`,
      tr('alignedPointAxis')
     );
 
@@ -2914,7 +2840,6 @@ async function buildIndividualEntries(mode){
 
    layout=
     baseLayout(
-     `${tr('modeEcc')} · ${s}`,
      tr('alignedPointAxis')
     );
 
@@ -2973,6 +2898,10 @@ el('saveBtn').onclick=async()=>{
    const p
    of state.currentPlots
   ){
+
+   if(!p?.div || !document.body.contains(p.div)){
+    throw new Error('The current plot is not available. Please run the analysis again.');
+   }
 
    entries.push({
     path:p.filename,
@@ -3043,31 +2972,23 @@ el('saveBtn').onclick=async()=>{
   if(mode==='ecc'){
 
    const eccRows=
-    d.samples.map(
-     s=>({
+    d.samples.map(s=>{
+     const alignedSd=sd(pr.aligned[s]);
+     const correctedSd=sd(pr.corrected[s]);
+     const h1=firstHarmonic(pr.aligned[s]);
+
+     return{
       Sample:s,
-      Aligned_Raw_SD:
-       sd(pr.aligned[s]),
-      Corrected_SD:
-       sd(pr.corrected[s]),
+      Aligned_Raw_SD:alignedSd,
+      Corrected_SD:correctedSd,
       SD_Reduction_pct:
-       sd(pr.aligned[s])>0
-        ?100*(
-          1-
-          sd(pr.corrected[s])/
-          sd(pr.aligned[s])
-         )
+       alignedSd>0
+        ?100*(1-correctedSd/alignedSd)
         :NaN,
-      H1_Amplitude:
-       firstHarmonic(
-        pr.aligned[s]
-       ).amp,
-      H1_R2:
-       firstHarmonic(
-        pr.aligned[s]
-       ).r2
-     })
-    );
+      H1_Amplitude:h1.amp,
+      H1_R2:h1.r2
+     };
+    });
 
    entries.push({
     path:'Corrected_Data.xlsx',
