@@ -232,7 +232,7 @@
     }
 
     .file-line{display:flex;gap:8px;align-items:center}
-    #fileInput{display:none}
+    .file-line input[type=file]{display:none}
 
     .primary,.secondary{
       height:46px;
@@ -498,8 +498,21 @@
         <div class="field">
           <label data-i18n="excelFile">Excel workbook</label>
           <div class="file-line">
-            <label id="dropzone" class="secondary" for="fileInput" data-i18n="browse">Browse</label>
-            <input id="fileInput" type="file" accept=".xlsx,.xls" />
+            <button
+              id="excelBrowseBtn"
+              type="button"
+              class="secondary"
+              data-i18n="browse"
+            >
+              Browse
+            </button>
+
+            <input
+              id="excelInput"
+              type="file"
+              accept=".xlsx,.xlsm,.xls"
+            >
+
             <div id="fileName" class="filename" data-i18n="noFile">No file selected.</div>
           </div>
         </div>
@@ -871,8 +884,8 @@
     let conditionColors = {};
 
     const els = {
-      fileInput: document.getElementById("fileInput"),
-      dropzone: document.getElementById("dropzone"),
+      excelInput: document.getElementById("excelInput"),
+      excelBrowseBtn: document.getElementById("excelBrowseBtn"),
       fileName: document.getElementById("fileName"),
       validateBtn: document.getElementById("validateBtn"),
       expectedSamples: document.getElementById("expectedSamples"),
@@ -1049,36 +1062,14 @@
       }
     }
 
-    els.fileInput.addEventListener("change", (e) => {
+    els.excelBrowseBtn.addEventListener("click", () => {
+      els.excelInput.click();
+    });
+
+    els.excelInput.addEventListener("change", (e) => {
       const file = e.target.files?.[0];
-      if (file) loadWorkbook(file);
-    });
-
-    ["dragenter", "dragover"].forEach(name => {
-      els.dropzone.addEventListener(name, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        els.dropzone.classList.add("dragover");
-      });
-    });
-
-    ["dragleave", "drop"].forEach(name => {
-      els.dropzone.addEventListener(name, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        els.dropzone.classList.remove("dragover");
-      });
-    });
-
-    els.dropzone.addEventListener("drop", (e) => {
-      const file = e.dataTransfer.files?.[0];
       if (file) {
-        const lower = file.name.toLowerCase();
-        if (lower.endsWith(".xlsx") || lower.endsWith(".xls")) {
-          loadWorkbook(file);
-        } else {
-          setStatus("error", "Please choose an .xlsx or .xls file.");
-        }
+        loadWorkbook(file);
       }
     });
 
