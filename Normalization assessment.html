@@ -1,1 +1,2450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Normalization assessment · INNEREYE</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+  <style>
+    :root {
+      --ink: #111827;
+      --muted: #667085;
+      --line: #e5e7eb;
+      --line-strong: #d0d5dd;
+      --soft: #f7f8fa;
+      --white: #ffffff;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --success: #18794e;
+      --success-soft: #ecfdf3;
+      --warning: #b54708;
+      --warning-soft: #fffaeb;
+      --danger: #b42318;
+      --danger-soft: #fef3f2;
+      --shadow: 0 12px 36px rgba(17, 24, 39, 0.09);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background: #fff;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(
+          rgba(255, 255, 255, 0.62),
+          rgba(255, 255, 255, 0.62)
+        ),
+        url("./Normalization%20assessment.jpeg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0.20;
+      filter:
+        saturate(0.72)
+        brightness(1.08)
+        contrast(0.92);
+      z-index: -2;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.28);
+      z-index: -1;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    .shell {
+      min-height: 100vh;
+      padding: 28px 32px 48px;
+    }
+
+    .topbar {
+      max-width: 1500px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-btn,
+    .home-btn {
+      height: 46px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 7px 24px rgba(17, 24, 39, 0.07);
+      cursor: pointer;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .icon-btn:hover,
+    .home-btn:hover {
+      transform: translateY(-1px);
+      border-color: #c9cdd5;
+      box-shadow: 0 10px 28px rgba(17, 24, 39, 0.10);
+    }
+
+    .icon-btn {
+      width: 46px;
+      border-radius: 50%;
+      font-size: 20px;
+    }
+
+    .home-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .hero {
+      max-width: 1500px;
+      margin: 54px auto 26px;
+    }
+
+    .eyebrow {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 10px 0 12px;
+      font-size: clamp(36px, 5vw, 66px);
+      line-height: 1;
+      letter-spacing: -0.045em;
+      font-weight: 800;
+    }
+
+    .hero p {
+      max-width: 900px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.7;
+      font-weight: 600;
+    }
+
+    .workspace {
+      max-width: 1500px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid rgba(229, 231, 235, .95);
+      border-radius: var(--radius-xl);
+      background: rgba(255, 255, 255, .93);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .sidebar {
+      padding: 20px;
+      position: sticky;
+      top: 20px;
+    }
+
+    .main-panel {
+      overflow: hidden;
+    }
+
+    .section-title {
+      margin: 0 0 6px;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .section-desc {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      font-weight: 600;
+    }
+
+    .divider {
+      height: 1px;
+      margin: 18px 0;
+      background: var(--line);
+    }
+
+    .dropzone {
+      border: 1.5px dashed var(--line-strong);
+      border-radius: 18px;
+      padding: 20px 16px;
+      text-align: center;
+      background: rgba(247, 248, 250, .78);
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+
+    .dropzone:hover,
+    .dropzone.dragover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      transform: translateY(-1px);
+    }
+
+    .drop-icon {
+      width: 42px;
+      height: 42px;
+      margin: 0 auto 10px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .drop-title {
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .drop-sub {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .file-name {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 700;
+      word-break: break-all;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .field {
+      min-width: 0;
+    }
+
+    .field label {
+      display: block;
+      margin: 0 0 7px;
+      color: #344054;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      height: 42px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: #fff;
+      padding: 0 12px;
+      color: var(--ink);
+      outline: none;
+      font-weight: 700;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .10);
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      width: 100%;
+      min-height: 44px;
+      border-radius: 13px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+      transition: transform .18s ease, opacity .18s ease, border-color .18s ease;
+    }
+
+    .primary-btn {
+      margin-top: 12px;
+      border: 1px solid #111827;
+      background: #111827;
+      color: #fff;
+    }
+
+    .secondary-btn {
+      border: 1px solid var(--line-strong);
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .primary-btn:hover,
+    .secondary-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary-btn:disabled,
+    .secondary-btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status {
+      margin-top: 12px;
+      border-radius: 13px;
+      padding: 11px 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      font-weight: 700;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      color: var(--muted);
+    }
+
+    .status.success {
+      border-color: #abefc6;
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .status.warning {
+      border-color: #fedf89;
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+
+    .status.error {
+      border-color: #fecdca;
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .sheet-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .sheet-btn {
+      min-height: 42px;
+      border-radius: 12px;
+      border: 1px solid var(--line-strong);
+      background: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .sheet-btn.active {
+      border-color: #111827;
+      background: #111827;
+      color: #fff;
+    }
+
+    .sheet-btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .summary-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 34px;
+      border-bottom: 1px solid #f0f1f3;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .summary-row:last-child {
+      border-bottom: 0;
+    }
+
+    .summary-row span:first-child {
+      color: var(--muted);
+    }
+
+    .summary-row span:last-child {
+      text-align: right;
+    }
+
+    .content-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, .75);
+    }
+
+    .content-tab {
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .content-tab.active {
+      border-color: #111827;
+      background: #111827;
+      color: #fff;
+    }
+
+    .tab-page {
+      display: none;
+      padding: 18px;
+    }
+
+    .tab-page.active {
+      display: block;
+    }
+
+    .empty-state {
+      min-height: 520px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--muted);
+      padding: 30px;
+    }
+
+    .empty-state-inner {
+      max-width: 480px;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+      font-size: 17px;
+    }
+
+    .analysis-shell.hidden,
+    .empty-state.hidden {
+      display: none;
+    }
+
+    .control-strip {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .control-left,
+    .control-right {
+      display: flex;
+      align-items: end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .inline-field label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .inline-field input,
+    .inline-field select {
+      height: 40px;
+      min-width: 120px;
+      border: 1px solid var(--line-strong);
+      border-radius: 11px;
+      background: #fff;
+      padding: 0 10px;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .mini-btn {
+      height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--line-strong);
+      border-radius: 11px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .chart-card,
+    .table-card,
+    .metric-card,
+    .selection-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,.88);
+    }
+
+    .chart-card {
+      padding: 10px 10px 4px;
+    }
+
+    .chart {
+      width: 100%;
+      min-height: 520px;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 16px 0;
+    }
+
+    .card-head h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .card-head p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    .color-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 42px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      min-width: 0;
+    }
+
+    .color-item input[type="color"] {
+      width: 29px;
+      height: 29px;
+      padding: 0;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+
+    .color-item span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .table-card {
+      margin-top: 14px;
+      overflow: hidden;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th,
+    td {
+      padding: 11px 12px;
+      border-top: 1px solid var(--line);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th {
+      color: #475467;
+      background: #fafafa;
+      font-weight: 800;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+    }
+
+    .normal-grid {
+      display: grid;
+      grid-template-columns: minmax(250px, 320px) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .selection-card {
+      padding: 16px;
+      position: sticky;
+      top: 20px;
+    }
+
+    .selection-card h3 {
+      margin: 0 0 5px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .selection-card p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+
+    .control-group-title {
+      margin: 16px 0 8px;
+      color: #344054;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .condition-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .reference-btn {
+      width: 100%;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .reference-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #d0d5dd;
+      flex: 0 0 auto;
+      box-shadow: 0 0 0 3px transparent;
+    }
+
+    .reference-btn.active {
+      border-color: #93c5fd;
+      background: var(--accent-soft);
+      color: #1d4ed8;
+    }
+
+    .reference-btn.active .reference-dot {
+      background: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .13);
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 36px;
+      padding: 6px 8px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #fff;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .check-row input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+    }
+
+    .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      flex: 0 0 auto;
+    }
+
+    .normal-right {
+      min-width: 0;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .metric-card {
+      padding: 14px;
+      min-width: 0;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      margin-top: 7px;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      word-break: break-word;
+    }
+
+    .metric-sub {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      padding: 0 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .badge.ok {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .badge.warn {
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+
+    .badge.bad {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .note {
+      margin-top: 12px;
+      padding: 12px 13px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #fafafa;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.55;
+      font-weight: 600;
+    }
+
+    @media (max-width: 1100px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+
+      .normal-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .selection-card {
+        position: static;
+      }
+
+      .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        padding: 20px 14px 34px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .brand {
+        max-width: 180px;
+        line-height: 1.5;
+      }
+
+      .hero {
+        margin-top: 38px;
+      }
+
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .content-tabs {
+        flex-direction: column;
+      }
+
+      .content-tab {
+        width: 100%;
+      }
+
+      .tab-page {
+        padding: 12px;
+      }
+
+      .chart {
+        min-height: 430px;
+      }
+
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .home-btn {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">INNEREYE · DATA PROCESSING</div>
+
+      <div class="top-actions">
+        <a class="home-btn" href="./index.html" data-i18n="home">Homepage</a>
+        <button id="langBtn" class="icon-btn" aria-label="Change language" title="Language">🌐</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow" data-i18n="eyebrow">CID · Distribution analysis</div>
+      <h1 data-i18n="title">Normalization assessment.</h1>
+      <p data-i18n="desc">
+        Validate Notch and Center sheets, summarize phase values by burst-pressure condition,
+        and assess whether the condition distributions can be separated using a selected ±Nσ reference range.
+      </p>
+    </section>
+
+    <section class="workspace">
+      <aside class="panel sidebar">
+        <h2 class="section-title" data-i18n="loadTitle">1. Load workbook</h2>
+        <p class="section-desc" data-i18n="loadDesc">
+          Required sheets: Notch and Center. Column A contains Sample IDs; columns B onward contain burst-pressure groups.
+        </p>
+
+        <label id="dropzone" class="dropzone" for="fileInput">
+          <div class="drop-icon">↥</div>
+          <div class="drop-title" data-i18n="dropTitle">Choose an Excel workbook</div>
+          <div class="drop-sub" data-i18n="dropSub">.xlsx or .xls · processed locally in your browser</div>
+        </label>
+        <input id="fileInput" type="file" accept=".xlsx,.xls" />
+        <div id="fileName" class="file-name" data-i18n="noFile">No file selected.</div>
+
+        <div class="divider"></div>
+
+        <h2 class="section-title" data-i18n="validateTitle">2. Validate structure</h2>
+        <p class="section-desc" data-i18n="validateDesc">
+          Enter the expected number of samples and burst-pressure conditions, then compare them with both sheets.
+        </p>
+
+        <div class="field-grid">
+          <div class="field">
+            <label for="expectedSamples" data-i18n="sampleCount">Samples</label>
+            <input id="expectedSamples" type="number" min="1" step="1" value="30" />
+          </div>
+
+          <div class="field">
+            <label for="expectedConditions" data-i18n="conditionCount">Pressure conditions</label>
+            <input id="expectedConditions" type="number" min="1" step="1" value="3" />
+          </div>
+        </div>
+
+        <button id="validateBtn" class="primary-btn" disabled data-i18n="validateBtn">
+          Validate workbook
+        </button>
+
+        <div id="statusBox" class="status" data-i18n="statusIdle">
+          Load a workbook to begin validation.
+        </div>
+
+        <div class="divider"></div>
+
+        <h2 class="section-title" data-i18n="sheetTitle">3. Active sheet</h2>
+        <div class="sheet-buttons">
+          <button class="sheet-btn active" data-sheet="Notch" disabled>Notch</button>
+          <button class="sheet-btn" data-sheet="Center" disabled>Center</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="summary-list">
+          <div class="summary-row">
+            <span data-i18n="detectedSamples">Detected samples</span>
+            <span id="summarySamples">—</span>
+          </div>
+          <div class="summary-row">
+            <span data-i18n="detectedConditions">Detected conditions</span>
+            <span id="summaryConditions">—</span>
+          </div>
+          <div class="summary-row">
+            <span data-i18n="activeSheet">Active sheet</span>
+            <span id="summarySheet">—</span>
+          </div>
+          <div class="summary-row">
+            <span data-i18n="numericValues">Numeric values</span>
+            <span id="summaryValues">—</span>
+          </div>
+        </div>
+
+        <button id="exportBtn" class="secondary-btn" style="margin-top:14px" disabled data-i18n="exportBtn">
+          Export assessment CSV
+        </button>
+      </aside>
+
+      <section class="panel main-panel">
+        <div class="content-tabs">
+          <button class="content-tab active" data-tab="basic" data-i18n="basicTab">Basic plot</button>
+          <button class="content-tab" data-tab="normal" data-i18n="normalTab">Normalization assessment</button>
+        </div>
+
+        <div id="emptyState" class="empty-state">
+          <div class="empty-state-inner">
+            <strong data-i18n="emptyTitle">Workbook validation is required.</strong>
+            <span data-i18n="emptyDesc">
+              Load the Excel file, enter the expected structure, and run validation. Analysis controls will appear after both sheets pass.
+            </span>
+          </div>
+        </div>
+
+        <div id="analysisShell" class="analysis-shell hidden">
+          <div id="basicPage" class="tab-page active">
+            <div class="control-strip">
+              <div class="control-left">
+                <div>
+                  <div class="section-title" style="margin-bottom:4px" data-i18n="basicTitle">Phase summary by burst pressure</div>
+                  <div class="section-desc" style="margin:0" data-i18n="basicDesc">
+                    Bars show the group mean and error bars show ±1 SD.
+                  </div>
+                </div>
+              </div>
+
+              <div class="control-right">
+                <button id="resetColorsBtn" class="mini-btn" data-i18n="resetColors">Reset colors</button>
+              </div>
+            </div>
+
+            <div id="colorGrid" class="color-grid"></div>
+
+            <div class="chart-card">
+              <div id="basicChart" class="chart"></div>
+            </div>
+
+            <div class="table-card">
+              <div class="card-head">
+                <div>
+                  <h3 data-i18n="descriptiveTitle">Descriptive statistics</h3>
+                  <p data-i18n="descriptiveDesc">Summary of valid numeric phase values in the selected sheet.</p>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th data-i18n="thCondition">Condition</th>
+                      <th>n</th>
+                      <th>Mean</th>
+                      <th>SD</th>
+                      <th>Median</th>
+                      <th>Min</th>
+                      <th>Max</th>
+                    </tr>
+                  </thead>
+                  <tbody id="basicTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div id="normalPage" class="tab-page">
+            <div class="normal-grid">
+              <aside class="selection-card">
+                <h3 data-i18n="normalControls">Distribution controls</h3>
+                <p data-i18n="normalControlsDesc">
+                  Choose the reference pressure, the visible distributions, and the sigma envelope applied to the reference group.
+                </p>
+
+                <div class="inline-field">
+                  <label for="sigmaInput" data-i18n="sigmaLabel">Reference range (±Nσ)</label>
+                  <input id="sigmaInput" type="number" min="0.1" max="10" step="0.1" value="3" />
+                </div>
+
+                <div class="control-group-title" data-i18n="referenceGroup">Reference group</div>
+                <div id="referenceList" class="condition-list"></div>
+
+                <div class="control-group-title" data-i18n="visibleGroups">Visible groups</div>
+                <div style="display:flex; gap:7px; margin-bottom:8px">
+                  <button id="selectAllBtn" class="mini-btn" style="flex:1" data-i18n="selectAll">All</button>
+                  <button id="selectRefOnlyBtn" class="mini-btn" style="flex:1" data-i18n="refOnly">Reference only</button>
+                </div>
+                <div id="visibleList" class="condition-list"></div>
+
+                <div class="note" data-i18n="normalityNote">
+                  Gaussian curves are fitted from each group mean and sample SD. Jarque–Bera p-values are shown only as an exploratory normality check; they do not prove normality, especially for small n.
+                </div>
+              </aside>
+
+              <div class="normal-right">
+                <div class="metric-grid">
+                  <div class="metric-card">
+                    <div class="metric-label" data-i18n="metricReference">Reference</div>
+                    <div id="metricReference" class="metric-value">—</div>
+                    <div id="metricReferenceSub" class="metric-sub">—</div>
+                  </div>
+
+                  <div class="metric-card">
+                    <div class="metric-label" data-i18n="metricBounds">Sigma bounds</div>
+                    <div id="metricBounds" class="metric-value">—</div>
+                    <div id="metricBoundsSub" class="metric-sub">—</div>
+                  </div>
+
+                  <div class="metric-card">
+                    <div class="metric-label" data-i18n="metricVisible">Visible groups</div>
+                    <div id="metricVisible" class="metric-value">—</div>
+                    <div id="metricVisibleSub" class="metric-sub">—</div>
+                  </div>
+
+                  <div class="metric-card">
+                    <div class="metric-label" data-i18n="metricClosest">Closest mean</div>
+                    <div id="metricClosest" class="metric-value">—</div>
+                    <div id="metricClosestSub" class="metric-sub">—</div>
+                  </div>
+                </div>
+
+                <div class="chart-card">
+                  <div id="normalChart" class="chart"></div>
+                </div>
+
+                <div class="table-card">
+                  <div class="card-head">
+                    <div>
+                      <h3 data-i18n="assessmentTitle">Sigma separation assessment</h3>
+                      <p data-i18n="assessmentDesc">
+                        Mean distance is expressed in reference-group σ units. In-range percentages use the reference group's ±Nσ interval.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="table-wrap">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th data-i18n="thCondition">Condition</th>
+                          <th>n</th>
+                          <th>Mean</th>
+                          <th>SD</th>
+                          <th data-i18n="thSigmaDistance">|Δμ| / σref</th>
+                          <th data-i18n="thEmpiricalInside">Observed inside ref range</th>
+                          <th data-i18n="thExpectedInside">Gaussian expected inside</th>
+                          <th data-i18n="thJB">JB p</th>
+                          <th data-i18n="thStatus">Mean position</th>
+                        </tr>
+                      </thead>
+                      <tbody id="assessmentTableBody"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const T = {
+      en: {
+        home: "Homepage",
+        eyebrow: "CID · Distribution analysis",
+        title: "Normalization assessment.",
+        desc: "Validate Notch and Center sheets, summarize phase values by burst-pressure condition, and assess whether the condition distributions can be separated using a selected ±Nσ reference range.",
+        loadTitle: "1. Load workbook",
+        loadDesc: "Required sheets: Notch and Center. Column A contains Sample IDs; columns B onward contain burst-pressure groups.",
+        dropTitle: "Choose an Excel workbook",
+        dropSub: ".xlsx or .xls · processed locally in your browser",
+        noFile: "No file selected.",
+        validateTitle: "2. Validate structure",
+        validateDesc: "Enter the expected number of samples and burst-pressure conditions, then compare them with both sheets.",
+        sampleCount: "Samples",
+        conditionCount: "Pressure conditions",
+        validateBtn: "Validate workbook",
+        statusIdle: "Load a workbook to begin validation.",
+        sheetTitle: "3. Active sheet",
+        detectedSamples: "Detected samples",
+        detectedConditions: "Detected conditions",
+        activeSheet: "Active sheet",
+        numericValues: "Numeric values",
+        exportBtn: "Export assessment CSV",
+        basicTab: "Basic plot",
+        normalTab: "Normalization assessment",
+        emptyTitle: "Workbook validation is required.",
+        emptyDesc: "Load the Excel file, enter the expected structure, and run validation. Analysis controls will appear after both sheets pass.",
+        basicTitle: "Phase summary by burst pressure",
+        basicDesc: "Bars show the group mean and error bars show ±1 SD.",
+        resetColors: "Reset colors",
+        descriptiveTitle: "Descriptive statistics",
+        descriptiveDesc: "Summary of valid numeric phase values in the selected sheet.",
+        thCondition: "Condition",
+        normalControls: "Distribution controls",
+        normalControlsDesc: "Choose the reference pressure, the visible distributions, and the sigma envelope applied to the reference group.",
+        sigmaLabel: "Reference range (±Nσ)",
+        referenceGroup: "Reference group",
+        visibleGroups: "Visible groups",
+        selectAll: "All",
+        refOnly: "Reference only",
+        normalityNote: "Gaussian curves are fitted from each group mean and sample SD. Jarque–Bera p-values are shown only as an exploratory normality check; they do not prove normality, especially for small n.",
+        metricReference: "Reference",
+        metricBounds: "Sigma bounds",
+        metricVisible: "Visible groups",
+        metricClosest: "Closest mean",
+        assessmentTitle: "Sigma separation assessment",
+        assessmentDesc: "Mean distance is expressed in reference-group σ units. In-range percentages use the reference group's ±Nσ interval.",
+        thSigmaDistance: "|Δμ| / σref",
+        thEmpiricalInside: "Observed inside ref range",
+        thExpectedInside: "Gaussian expected inside",
+        thJB: "JB p",
+        thStatus: "Mean position",
+        statusLoaded: "Workbook loaded. Enter the expected counts and validate.",
+        statusSuccess: "Validation passed. Notch and Center have matching sample IDs and pressure-condition headers.",
+        statusNoWorkbook: "Load an Excel workbook first.",
+        statusMissingSheets: "Both 'Notch' and 'Center' sheets are required.",
+        statusSampleMismatch: "Sample count does not match the expected value.",
+        statusConditionMismatch: "Pressure-condition count does not match the expected value.",
+        statusHeaderMismatch: "Notch and Center condition headers do not match.",
+        statusSampleIdMismatch: "Notch and Center sample IDs do not match.",
+        statusDuplicateSample: "Duplicate Sample IDs were detected.",
+        statusDuplicateCondition: "Duplicate pressure-condition headers were detected.",
+        statusSampleHeader: "Cell A1 must be exactly \"Sample\" in both sheets.",
+        statusInsufficientGroup: "Each pressure condition needs at least two numeric phase values in both sheets.",
+        statusInvalidExpected: "Expected sample and condition counts must be positive integers.",
+        statusParseError: "Could not parse the workbook structure.",
+        meanInside: "Inside",
+        meanOutside: "Outside",
+        notAvailable: "N/A",
+        exportDone: "Assessment CSV exported."
+      },
+      ko: {
+        home: "홈페이지",
+        eyebrow: "CID · 분포 분석",
+        title: "정규분포 평가.",
+        desc: "Notch 및 Center 시트 구조를 검증하고 파열압 조건별 페이즈 값을 요약한 뒤, 선택한 기준군의 ±Nσ 범위를 이용해 조건 간 분리 가능성을 평가합니다.",
+        loadTitle: "1. 엑셀 불러오기",
+        loadDesc: "필수 시트는 Notch와 Center입니다. A열은 Sample ID, B열 이후는 파열압 조건입니다.",
+        dropTitle: "엑셀 파일 선택",
+        dropSub: ".xlsx 또는 .xls · 브라우저 내부에서만 처리",
+        noFile: "선택된 파일이 없습니다.",
+        validateTitle: "2. 구조 검증",
+        validateDesc: "예상 샘플 수와 파열압 조건 수를 입력하고 두 시트의 실제 구조와 비교합니다.",
+        sampleCount: "샘플 수",
+        conditionCount: "파열압 조건 수",
+        validateBtn: "엑셀 구조 검증",
+        statusIdle: "엑셀 파일을 불러오면 검증을 시작할 수 있습니다.",
+        sheetTitle: "3. 분석 시트",
+        detectedSamples: "검출 샘플 수",
+        detectedConditions: "검출 조건 수",
+        activeSheet: "현재 시트",
+        numericValues: "숫자 데이터 수",
+        exportBtn: "평가 결과 CSV 저장",
+        basicTab: "Basic plot",
+        normalTab: "정규분포 평가",
+        emptyTitle: "엑셀 구조 검증이 필요합니다.",
+        emptyDesc: "엑셀 파일을 불러오고 예상 구조를 입력한 뒤 검증을 실행하세요. 두 시트가 모두 통과하면 분석 기능이 활성화됩니다.",
+        basicTitle: "파열압별 페이즈 요약",
+        basicDesc: "막대는 그룹 평균, 오차막대는 ±1 SD(표준편차)를 표시합니다.",
+        resetColors: "색상 초기화",
+        descriptiveTitle: "기술통계",
+        descriptiveDesc: "현재 시트의 유효한 숫자 페이즈 값에 대한 요약입니다.",
+        thCondition: "파열압 조건",
+        normalControls: "분포 설정",
+        normalControlsDesc: "기준 파열압, 표시할 분포, 기준군에 적용할 시그마 범위를 선택합니다.",
+        sigmaLabel: "기준 범위 (±Nσ)",
+        referenceGroup: "기준 그룹",
+        visibleGroups: "표시할 그룹",
+        selectAll: "전체",
+        refOnly: "기준만",
+        normalityNote: "각 곡선은 그룹 평균과 표본 SD로 적합한 정규분포 PDF입니다. Jarque–Bera p값은 탐색적 정규성 확인용이며, 특히 n이 작을 때 정규성을 보장하지 않습니다.",
+        metricReference: "기준 그룹",
+        metricBounds: "시그마 경계",
+        metricVisible: "표시 그룹",
+        metricClosest: "가장 가까운 평균",
+        assessmentTitle: "시그마 분리도 평가",
+        assessmentDesc: "평균 거리는 기준 그룹의 σ 단위로 표시합니다. 범위 내 비율은 기준 그룹의 ±Nσ 구간을 사용합니다.",
+        thSigmaDistance: "|Δμ| / σref",
+        thEmpiricalInside: "실측값 기준범위 포함률",
+        thExpectedInside: "정규분포 예상 포함률",
+        thJB: "JB p",
+        thStatus: "평균 위치",
+        statusLoaded: "엑셀을 불러왔습니다. 예상 샘플 수와 조건 수를 입력한 뒤 검증하세요.",
+        statusSuccess: "검증 완료. Notch와 Center의 Sample ID 및 파열압 조건 헤더가 서로 일치합니다.",
+        statusNoWorkbook: "먼저 엑셀 파일을 불러오세요.",
+        statusMissingSheets: "'Notch'와 'Center' 시트가 모두 필요합니다.",
+        statusSampleMismatch: "실제 샘플 수가 입력한 예상값과 일치하지 않습니다.",
+        statusConditionMismatch: "실제 파열압 조건 수가 입력한 예상값과 일치하지 않습니다.",
+        statusHeaderMismatch: "Notch와 Center의 파열압 조건 헤더가 서로 다릅니다.",
+        statusSampleIdMismatch: "Notch와 Center의 Sample ID 구성이 서로 다릅니다.",
+        statusDuplicateSample: "중복된 Sample ID가 검출되었습니다.",
+        statusDuplicateCondition: "중복된 파열압 조건 헤더가 검출되었습니다.",
+        statusSampleHeader: "두 시트 모두 A1 셀의 열 라벨은 정확히 \"Sample\"이어야 합니다.",
+        statusInsufficientGroup: "각 파열압 조건에는 두 시트 모두 최소 2개의 유효한 숫자 페이즈 값이 필요합니다.",
+        statusInvalidExpected: "예상 샘플 수와 조건 수는 1 이상의 정수여야 합니다.",
+        statusParseError: "엑셀 구조를 해석하지 못했습니다.",
+        meanInside: "범위 내부",
+        meanOutside: "범위 외부",
+        notAvailable: "계산 불가",
+        exportDone: "평가 결과 CSV를 저장했습니다."
+      }
+    };
+
+    const palette = [
+      "#2563eb", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6",
+      "#06b6d4", "#f97316", "#84cc16", "#ec4899", "#64748b"
+    ];
+
+    let lang = localStorage.getItem("innereye_lang") || "en";
+    let workbook = null;
+    let rawFileName = "";
+    let parsed = null;
+    let validated = false;
+    let activeSheet = "Notch";
+    let activeTab = "basic";
+    let referenceCondition = null;
+    let visibleConditions = new Set();
+    let conditionColors = {};
+
+    const els = {
+      fileInput: document.getElementById("fileInput"),
+      dropzone: document.getElementById("dropzone"),
+      fileName: document.getElementById("fileName"),
+      validateBtn: document.getElementById("validateBtn"),
+      expectedSamples: document.getElementById("expectedSamples"),
+      expectedConditions: document.getElementById("expectedConditions"),
+      statusBox: document.getElementById("statusBox"),
+      analysisShell: document.getElementById("analysisShell"),
+      emptyState: document.getElementById("emptyState"),
+      summarySamples: document.getElementById("summarySamples"),
+      summaryConditions: document.getElementById("summaryConditions"),
+      summarySheet: document.getElementById("summarySheet"),
+      summaryValues: document.getElementById("summaryValues"),
+      exportBtn: document.getElementById("exportBtn"),
+      colorGrid: document.getElementById("colorGrid"),
+      basicTableBody: document.getElementById("basicTableBody"),
+      referenceList: document.getElementById("referenceList"),
+      visibleList: document.getElementById("visibleList"),
+      sigmaInput: document.getElementById("sigmaInput"),
+      assessmentTableBody: document.getElementById("assessmentTableBody")
+    };
+
+    function tr(key) {
+      return T[lang]?.[key] ?? T.en[key] ?? key;
+    }
+
+    function renderLanguage() {
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.dataset.i18n;
+        if (T[lang] && T[lang][key]) el.textContent = T[lang][key];
+      });
+
+      if (!rawFileName) {
+        els.fileName.textContent = tr("noFile");
+      }
+      if (validated) {
+        setStatus("success", tr("statusSuccess"));
+        renderAll();
+      }
+    }
+
+    document.getElementById("langBtn").addEventListener("click", () => {
+      lang = lang === "en" ? "ko" : "en";
+      localStorage.setItem("innereye_lang", lang);
+      renderLanguage();
+    });
+
+    function setStatus(type, message) {
+      els.statusBox.className = "status" + (type ? " " + type : "");
+      els.statusBox.textContent = message;
+    }
+
+    function isPositiveInteger(v) {
+      return Number.isInteger(v) && v > 0;
+    }
+
+    function numericValue(v) {
+      if (typeof v === "number" && Number.isFinite(v)) return v;
+      if (typeof v !== "string") return null;
+      const cleaned = v.trim().replace(/,/g, "");
+      if (!cleaned) return null;
+      const n = Number(cleaned);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function normalizeHeader(v) {
+      return String(v ?? "").trim();
+    }
+
+    function parseSheet(sheetName) {
+      const ws = workbook.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(ws, {
+        header: 1,
+        raw: true,
+        defval: null,
+        blankrows: false
+      });
+
+      if (!rows.length) {
+        throw new Error(`${sheetName}: empty sheet`);
+      }
+
+      const header = rows[0] || [];
+      const sampleHeader = normalizeHeader(header[0]);
+
+      const conditionColumns = [];
+      for (let c = 1; c < header.length; c++) {
+        const label = normalizeHeader(header[c]);
+        if (label !== "") {
+          conditionColumns.push({ index: c, label });
+        }
+      }
+
+      const sampleIds = [];
+      const rowRecords = [];
+      for (let r = 1; r < rows.length; r++) {
+        const row = rows[r] || [];
+        const sample = normalizeHeader(row[0]);
+        if (!sample) continue;
+
+        sampleIds.push(sample);
+
+        const values = {};
+        for (const col of conditionColumns) {
+          const n = numericValue(row[col.index]);
+          values[col.label] = n;
+        }
+
+        rowRecords.push({
+          sample,
+          excelRow: r + 1,
+          values
+        });
+      }
+
+      const groups = {};
+      for (const col of conditionColumns) {
+        groups[col.label] = [];
+      }
+
+      for (const row of rowRecords) {
+        for (const col of conditionColumns) {
+          const v = row.values[col.label];
+          if (v !== null) groups[col.label].push(v);
+        }
+      }
+
+      return {
+        sheetName,
+        sampleHeader,
+        conditions: conditionColumns.map(d => d.label),
+        sampleIds,
+        rows: rowRecords,
+        groups
+      };
+    }
+
+    function duplicates(arr) {
+      const seen = new Set();
+      const dup = new Set();
+      for (const x of arr) {
+        if (seen.has(x)) dup.add(x);
+        seen.add(x);
+      }
+      return [...dup];
+    }
+
+    function sameStringArray(a, b) {
+      return a.length === b.length && a.every((x, i) => x === b[i]);
+    }
+
+    function sameStringSet(a, b) {
+      if (a.length !== b.length) return false;
+      const sa = [...a].sort();
+      const sb = [...b].sort();
+      return sa.every((x, i) => x === sb[i]);
+    }
+
+    async function loadWorkbook(file) {
+      rawFileName = file.name;
+      els.fileName.textContent = rawFileName;
+      validated = false;
+      parsed = null;
+      resetAnalysisUI();
+
+      try {
+        const buffer = await file.arrayBuffer();
+        workbook = XLSX.read(buffer, { type: "array" });
+        els.validateBtn.disabled = false;
+        setStatus("", tr("statusLoaded"));
+      } catch (err) {
+        workbook = null;
+        els.validateBtn.disabled = true;
+        setStatus("error", tr("statusParseError") + " " + err.message);
+      }
+    }
+
+    els.fileInput.addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (file) loadWorkbook(file);
+    });
+
+    ["dragenter", "dragover"].forEach(name => {
+      els.dropzone.addEventListener(name, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        els.dropzone.classList.add("dragover");
+      });
+    });
+
+    ["dragleave", "drop"].forEach(name => {
+      els.dropzone.addEventListener(name, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        els.dropzone.classList.remove("dragover");
+      });
+    });
+
+    els.dropzone.addEventListener("drop", (e) => {
+      const file = e.dataTransfer.files?.[0];
+      if (file) {
+        const lower = file.name.toLowerCase();
+        if (lower.endsWith(".xlsx") || lower.endsWith(".xls")) {
+          loadWorkbook(file);
+        } else {
+          setStatus("error", "Please choose an .xlsx or .xls file.");
+        }
+      }
+    });
+
+    function validateWorkbook() {
+      if (!workbook) {
+        setStatus("error", tr("statusNoWorkbook"));
+        return;
+      }
+
+      const expectedSamples = Number(els.expectedSamples.value);
+      const expectedConditions = Number(els.expectedConditions.value);
+
+      if (!isPositiveInteger(expectedSamples) || !isPositiveInteger(expectedConditions)) {
+        setStatus("error", tr("statusInvalidExpected"));
+        return;
+      }
+
+      if (!workbook.SheetNames.includes("Notch") || !workbook.SheetNames.includes("Center")) {
+        setStatus("error", tr("statusMissingSheets"));
+        return;
+      }
+
+      try {
+        const notch = parseSheet("Notch");
+        const center = parseSheet("Center");
+
+        if (notch.sampleHeader !== "Sample" || center.sampleHeader !== "Sample") {
+          setStatus(
+            "error",
+            `${tr("statusSampleHeader")} Notch A1="${notch.sampleHeader || "—"}" / Center A1="${center.sampleHeader || "—"}"`
+          );
+          return;
+        }
+
+        const duplicateSamplesNotch = duplicates(notch.sampleIds);
+        const duplicateSamplesCenter = duplicates(center.sampleIds);
+        if (duplicateSamplesNotch.length || duplicateSamplesCenter.length) {
+          setStatus("error", `${tr("statusDuplicateSample")} Notch: ${duplicateSamplesNotch.join(", ") || "—"} / Center: ${duplicateSamplesCenter.join(", ") || "—"}`);
+          return;
+        }
+
+        const duplicateConditionsNotch = duplicates(notch.conditions);
+        const duplicateConditionsCenter = duplicates(center.conditions);
+        if (duplicateConditionsNotch.length || duplicateConditionsCenter.length) {
+          setStatus("error", `${tr("statusDuplicateCondition")} Notch: ${duplicateConditionsNotch.join(", ") || "—"} / Center: ${duplicateConditionsCenter.join(", ") || "—"}`);
+          return;
+        }
+
+        if (notch.sampleIds.length !== expectedSamples || center.sampleIds.length !== expectedSamples) {
+          setStatus(
+            "error",
+            `${tr("statusSampleMismatch")} Expected ${expectedSamples}; Notch ${notch.sampleIds.length}; Center ${center.sampleIds.length}.`
+          );
+          return;
+        }
+
+        if (notch.conditions.length !== expectedConditions || center.conditions.length !== expectedConditions) {
+          setStatus(
+            "error",
+            `${tr("statusConditionMismatch")} Expected ${expectedConditions}; Notch ${notch.conditions.length}; Center ${center.conditions.length}.`
+          );
+          return;
+        }
+
+        if (!sameStringArray(notch.conditions, center.conditions)) {
+          setStatus(
+            "error",
+            `${tr("statusHeaderMismatch")} Notch: [${notch.conditions.join(", ")}] / Center: [${center.conditions.join(", ")}]`
+          );
+          return;
+        }
+
+        if (!sameStringSet(notch.sampleIds, center.sampleIds)) {
+          setStatus("error", tr("statusSampleIdMismatch"));
+          return;
+        }
+
+        const insufficient = [];
+        for (const condition of notch.conditions) {
+          const nNotch = notch.groups[condition].length;
+          const nCenter = center.groups[condition].length;
+          if (nNotch < 2 || nCenter < 2) {
+            insufficient.push(`${condition} (Notch n=${nNotch}, Center n=${nCenter})`);
+          }
+        }
+
+        if (insufficient.length) {
+          setStatus(
+            "error",
+            `${tr("statusInsufficientGroup")} ${insufficient.join("; ")}`
+          );
+          return;
+        }
+
+        parsed = { Notch: notch, Center: center };
+        validated = true;
+        activeSheet = "Notch";
+
+        const conditions = notch.conditions;
+        conditionColors = {};
+        conditions.forEach((c, i) => {
+          conditionColors[c] = palette[i % palette.length];
+        });
+
+        referenceCondition = conditions[0] || null;
+        visibleConditions = new Set(conditions);
+
+        setStatus("success", tr("statusSuccess"));
+        activateAnalysisUI();
+        renderAll();
+      } catch (err) {
+        console.error(err);
+        setStatus("error", tr("statusParseError") + " " + err.message);
+      }
+    }
+
+    els.validateBtn.addEventListener("click", validateWorkbook);
+
+    function resetAnalysisUI() {
+      els.analysisShell.classList.add("hidden");
+      els.emptyState.classList.remove("hidden");
+      els.exportBtn.disabled = true;
+
+      document.querySelectorAll(".sheet-btn").forEach(btn => {
+        btn.disabled = true;
+        btn.classList.toggle("active", btn.dataset.sheet === "Notch");
+      });
+
+      els.summarySamples.textContent = "—";
+      els.summaryConditions.textContent = "—";
+      els.summarySheet.textContent = "—";
+      els.summaryValues.textContent = "—";
+    }
+
+    function activateAnalysisUI() {
+      els.analysisShell.classList.remove("hidden");
+      els.emptyState.classList.add("hidden");
+      els.exportBtn.disabled = false;
+      document.querySelectorAll(".sheet-btn").forEach(btn => btn.disabled = false);
+      switchSheet("Notch");
+    }
+
+    function getCurrentData() {
+      return parsed?.[activeSheet] || null;
+    }
+
+    function countNumericValues(sheetData) {
+      return sheetData.conditions.reduce((sum, c) => sum + sheetData.groups[c].length, 0);
+    }
+
+    function updateSidebarSummary() {
+      const d = getCurrentData();
+      if (!d) return;
+      els.summarySamples.textContent = String(d.sampleIds.length);
+      els.summaryConditions.textContent = String(d.conditions.length);
+      els.summarySheet.textContent = activeSheet;
+      els.summaryValues.textContent = String(countNumericValues(d));
+    }
+
+    function switchSheet(sheetName) {
+      if (!validated || !parsed?.[sheetName]) return;
+      activeSheet = sheetName;
+
+      document.querySelectorAll(".sheet-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.sheet === sheetName);
+      });
+
+      updateSidebarSummary();
+      renderAll();
+    }
+
+    document.querySelectorAll(".sheet-btn").forEach(btn => {
+      btn.addEventListener("click", () => switchSheet(btn.dataset.sheet));
+    });
+
+    document.querySelectorAll(".content-tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        activeTab = btn.dataset.tab;
+        document.querySelectorAll(".content-tab").forEach(x => x.classList.toggle("active", x === btn));
+        document.getElementById("basicPage").classList.toggle("active", activeTab === "basic");
+        document.getElementById("normalPage").classList.toggle("active", activeTab === "normal");
+        setTimeout(() => {
+          if (activeTab === "basic") Plotly.Plots.resize(document.getElementById("basicChart"));
+          else Plotly.Plots.resize(document.getElementById("normalChart"));
+        }, 0);
+      });
+    });
+
+    function mean(arr) {
+      if (!arr.length) return NaN;
+      return arr.reduce((a, b) => a + b, 0) / arr.length;
+    }
+
+    function sampleSD(arr) {
+      if (arr.length < 2) return NaN;
+      const m = mean(arr);
+      const ss = arr.reduce((s, x) => s + (x - m) ** 2, 0);
+      return Math.sqrt(ss / (arr.length - 1));
+    }
+
+    function median(arr) {
+      if (!arr.length) return NaN;
+      const a = [...arr].sort((x, y) => x - y);
+      const mid = Math.floor(a.length / 2);
+      return a.length % 2 ? a[mid] : (a[mid - 1] + a[mid]) / 2;
+    }
+
+    function descriptive(arr) {
+      if (!arr.length) {
+        return {
+          n: 0, mean: NaN, sd: NaN, median: NaN, min: NaN, max: NaN
+        };
+      }
+
+      return {
+        n: arr.length,
+        mean: mean(arr),
+        sd: sampleSD(arr),
+        median: median(arr),
+        min: Math.min(...arr),
+        max: Math.max(...arr)
+      };
+    }
+
+    function fmt(x, digits = 4) {
+      if (!Number.isFinite(x)) return "—";
+      return Number(x).toLocaleString(undefined, {
+        maximumFractionDigits: digits
+      });
+    }
+
+    function percent(x, digits = 1) {
+      if (!Number.isFinite(x)) return "—";
+      return `${(x * 100).toFixed(digits)}%`;
+    }
+
+    function renderColorControls() {
+      const d = getCurrentData();
+      if (!d) return;
+
+      els.colorGrid.innerHTML = "";
+      for (const condition of d.conditions) {
+        const wrap = document.createElement("label");
+        wrap.className = "color-item";
+
+        const input = document.createElement("input");
+        input.type = "color";
+        input.value = conditionColors[condition] || "#2563eb";
+        input.addEventListener("input", () => {
+          conditionColors[condition] = input.value;
+          renderBasicChart();
+          renderNormalControls();
+          renderNormalAssessment();
+        });
+
+        const text = document.createElement("span");
+        text.textContent = condition;
+
+        wrap.appendChild(input);
+        wrap.appendChild(text);
+        els.colorGrid.appendChild(wrap);
+      }
+    }
+
+    document.getElementById("resetColorsBtn").addEventListener("click", () => {
+      const d = getCurrentData();
+      if (!d) return;
+
+      d.conditions.forEach((c, i) => {
+        conditionColors[c] = palette[i % palette.length];
+      });
+
+      renderAll();
+    });
+
+    function renderBasicChart() {
+      const d = getCurrentData();
+      if (!d) return;
+
+      const stats = d.conditions.map(c => descriptive(d.groups[c]));
+
+      const trace = {
+        type: "bar",
+        x: d.conditions,
+        y: stats.map(s => s.mean),
+        marker: {
+          color: d.conditions.map(c => conditionColors[c]),
+          line: { color: "rgba(17,24,39,.15)", width: 1 }
+        },
+        error_y: {
+          type: "data",
+          array: stats.map(s => Number.isFinite(s.sd) ? s.sd : 0),
+          visible: true,
+          thickness: 1.5,
+          width: 7,
+          color: "#111827"
+        },
+        hovertemplate:
+          "<b>%{x}</b><br>" +
+          "Mean=%{y:.4f}<br>" +
+          "<extra></extra>"
+      };
+
+      const layout = {
+        margin: { l: 70, r: 28, t: 42, b: 72 },
+        paper_bgcolor: "rgba(0,0,0,0)",
+        plot_bgcolor: "rgba(255,255,255,.78)",
+        font: { family: "Inter, sans-serif", color: "#111827" },
+        xaxis: {
+          title: { text: lang === "ko" ? "파열압 조건 (Kgf)" : "Burst-pressure condition (Kgf)", standoff: 18 },
+          tickfont: { size: 12 },
+          gridcolor: "rgba(229,231,235,.35)"
+        },
+        yaxis: {
+          title: { text: lang === "ko" ? "페이즈 값" : "Phase value", standoff: 14 },
+          zeroline: false,
+          gridcolor: "#eef0f2"
+        },
+        bargap: 0.32,
+        showlegend: false,
+        hoverlabel: { bgcolor: "#111827", font: { color: "#fff" } }
+      };
+
+      Plotly.react("basicChart", [trace], layout, {
+        responsive: true,
+        displaylogo: false,
+        modeBarButtonsToRemove: ["lasso2d", "select2d"]
+      });
+    }
+
+    function renderBasicTable() {
+      const d = getCurrentData();
+      if (!d) return;
+
+      els.basicTableBody.innerHTML = "";
+      for (const condition of d.conditions) {
+        const s = descriptive(d.groups[condition]);
+        const trEl = document.createElement("tr");
+        trEl.innerHTML = `
+          <td><strong>${escapeHtml(condition)}</strong></td>
+          <td>${s.n}</td>
+          <td>${fmt(s.mean)}</td>
+          <td>${fmt(s.sd)}</td>
+          <td>${fmt(s.median)}</td>
+          <td>${fmt(s.min)}</td>
+          <td>${fmt(s.max)}</td>
+        `;
+        els.basicTableBody.appendChild(trEl);
+      }
+    }
+
+    function renderNormalControls() {
+      const d = getCurrentData();
+      if (!d) return;
+
+      if (!d.conditions.includes(referenceCondition)) {
+        referenceCondition = d.conditions[0] || null;
+      }
+
+      const validVisible = new Set([...visibleConditions].filter(c => d.conditions.includes(c)));
+      if (!validVisible.size && referenceCondition) validVisible.add(referenceCondition);
+      if (referenceCondition) validVisible.add(referenceCondition);
+      visibleConditions = validVisible;
+
+      els.referenceList.innerHTML = "";
+      els.visibleList.innerHTML = "";
+
+      for (const condition of d.conditions) {
+        const refBtn = document.createElement("button");
+        refBtn.className = "reference-btn" + (condition === referenceCondition ? " active" : "");
+        refBtn.type = "button";
+        refBtn.innerHTML = `
+          <span class="reference-dot"></span>
+          <span>${escapeHtml(condition)}</span>
+        `;
+        refBtn.addEventListener("click", () => {
+          referenceCondition = condition;
+          visibleConditions.add(condition);
+          renderNormalControls();
+          renderNormalAssessment();
+        });
+        els.referenceList.appendChild(refBtn);
+
+        const row = document.createElement("label");
+        row.className = "check-row";
+
+        const check = document.createElement("input");
+        check.type = "checkbox";
+        check.checked = visibleConditions.has(condition);
+        check.disabled = condition === referenceCondition;
+        check.addEventListener("change", () => {
+          if (check.checked) visibleConditions.add(condition);
+          else visibleConditions.delete(condition);
+          renderNormalAssessment();
+        });
+
+        const swatch = document.createElement("span");
+        swatch.className = "swatch";
+        swatch.style.background = conditionColors[condition] || "#2563eb";
+
+        const text = document.createElement("span");
+        text.textContent = condition;
+
+        row.append(check, swatch, text);
+        els.visibleList.appendChild(row);
+      }
+    }
+
+    document.getElementById("selectAllBtn").addEventListener("click", () => {
+      const d = getCurrentData();
+      if (!d) return;
+      visibleConditions = new Set(d.conditions);
+      renderNormalControls();
+      renderNormalAssessment();
+    });
+
+    document.getElementById("selectRefOnlyBtn").addEventListener("click", () => {
+      if (!referenceCondition) return;
+      visibleConditions = new Set([referenceCondition]);
+      renderNormalControls();
+      renderNormalAssessment();
+    });
+
+    els.sigmaInput.addEventListener("input", () => {
+      const value = Number(els.sigmaInput.value);
+      if (Number.isFinite(value) && value > 0) renderNormalAssessment();
+    });
+
+    function gaussianPdf(x, mu, sd) {
+      if (!Number.isFinite(sd) || sd <= 0) return NaN;
+      const z = (x - mu) / sd;
+      return Math.exp(-0.5 * z * z) / (sd * Math.sqrt(2 * Math.PI));
+    }
+
+    function erf(x) {
+      const sign = x >= 0 ? 1 : -1;
+      x = Math.abs(x);
+      const a1 = 0.254829592;
+      const a2 = -0.284496736;
+      const a3 = 1.421413741;
+      const a4 = -1.453152027;
+      const a5 = 1.061405429;
+      const p = 0.3275911;
+      const t = 1 / (1 + p * x);
+      const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+      return sign * y;
+    }
+
+    function normalCdf(x, mu, sd) {
+      if (!Number.isFinite(sd) || sd <= 0) {
+        return x < mu ? 0 : 1;
+      }
+      return 0.5 * (1 + erf((x - mu) / (sd * Math.sqrt(2))));
+    }
+
+    function jarqueBera(arr) {
+      const n = arr.length;
+      if (n < 4) return { jb: NaN, p: NaN, skew: NaN, excess: NaN };
+
+      const m = mean(arr);
+      const centered = arr.map(x => x - m);
+      const m2 = centered.reduce((s, x) => s + x ** 2, 0) / n;
+      if (!(m2 > 0)) return { jb: NaN, p: NaN, skew: 0, excess: -3 };
+
+      const m3 = centered.reduce((s, x) => s + x ** 3, 0) / n;
+      const m4 = centered.reduce((s, x) => s + x ** 4, 0) / n;
+      const skew = m3 / Math.pow(m2, 1.5);
+      const kurt = m4 / (m2 * m2);
+      const excess = kurt - 3;
+      const jb = (n / 6) * (skew ** 2 + (excess ** 2) / 4);
+
+      // Under the asymptotic JB null, JB ~ chi-square(df=2),
+      // whose upper-tail probability equals exp(-JB/2).
+      const p = Math.exp(-jb / 2);
+      return { jb, p, skew, excess };
+    }
+
+    function normalAssessmentRows() {
+      const d = getCurrentData();
+      if (!d || !referenceCondition) return [];
+
+      const sigmaN = Number(els.sigmaInput.value);
+      const ref = descriptive(d.groups[referenceCondition]);
+      const lower = ref.mean - sigmaN * ref.sd;
+      const upper = ref.mean + sigmaN * ref.sd;
+
+      return d.conditions
+        .filter(c => visibleConditions.has(c))
+        .map(condition => {
+          const values = d.groups[condition];
+          const s = descriptive(values);
+          const deltaSigma =
+            Number.isFinite(ref.sd) && ref.sd > 0 && Number.isFinite(s.mean)
+              ? Math.abs(s.mean - ref.mean) / ref.sd
+              : NaN;
+
+          const observedInside =
+            values.length && Number.isFinite(lower) && Number.isFinite(upper)
+              ? values.filter(v => v >= lower && v <= upper).length / values.length
+              : NaN;
+
+          const expectedInside =
+            Number.isFinite(s.mean) && Number.isFinite(s.sd) && s.sd > 0 &&
+            Number.isFinite(lower) && Number.isFinite(upper)
+              ? normalCdf(upper, s.mean, s.sd) - normalCdf(lower, s.mean, s.sd)
+              : NaN;
+
+          const jb = jarqueBera(values);
+          const meanInside =
+            Number.isFinite(s.mean) && Number.isFinite(lower) && Number.isFinite(upper)
+              ? s.mean >= lower && s.mean <= upper
+              : null;
+
+          return {
+            condition,
+            values,
+            stats: s,
+            deltaSigma,
+            observedInside,
+            expectedInside,
+            jb,
+            meanInside
+          };
+        });
+    }
+
+    function renderNormalChart() {
+      const d = getCurrentData();
+      if (!d || !referenceCondition) return;
+
+      const sigmaN = Number(els.sigmaInput.value);
+      const rows = normalAssessmentRows();
+      const ref = descriptive(d.groups[referenceCondition]);
+      const lower = ref.mean - sigmaN * ref.sd;
+      const upper = ref.mean + sigmaN * ref.sd;
+
+      const selectedValues = rows.flatMap(r => r.values);
+      let xMin = selectedValues.length ? Math.min(...selectedValues) : ref.mean - 1;
+      let xMax = selectedValues.length ? Math.max(...selectedValues) : ref.mean + 1;
+
+      if (Number.isFinite(lower)) xMin = Math.min(xMin, lower);
+      if (Number.isFinite(upper)) xMax = Math.max(xMax, upper);
+
+      const selectedStats = rows.map(r => r.stats);
+      const maxSd = Math.max(
+        ...selectedStats.map(s => Number.isFinite(s.sd) ? s.sd : 0),
+        Number.isFinite(ref.sd) ? ref.sd : 0,
+        1e-9
+      );
+
+      const pad = Math.max((xMax - xMin) * 0.12, maxSd * 0.8, 1e-6);
+      xMin -= pad;
+      xMax += pad;
+
+      if (!(xMax > xMin)) {
+        xMin -= 1;
+        xMax += 1;
+      }
+
+      const x = [];
+      const steps = 420;
+      for (let i = 0; i < steps; i++) {
+        x.push(xMin + (xMax - xMin) * i / (steps - 1));
+      }
+
+      const traces = [];
+
+      for (const row of rows) {
+        const { condition, stats, values } = row;
+        const color = conditionColors[condition] || "#2563eb";
+        const isRef = condition === referenceCondition;
+
+        if (Number.isFinite(stats.sd) && stats.sd > 0) {
+          traces.push({
+            type: "scatter",
+            mode: "lines",
+            x,
+            y: x.map(v => gaussianPdf(v, stats.mean, stats.sd)),
+            name: condition,
+            line: {
+              color,
+              width: isRef ? 4 : 2.5
+            },
+            fill: isRef ? "tozeroy" : "none",
+            fillcolor: isRef ? hexToRgba(color, 0.10) : undefined,
+            hovertemplate:
+              `<b>${escapeHtml(condition)}</b><br>x=%{x:.4f}<br>PDF=%{y:.4f}<extra></extra>`
+          });
+        } else if (Number.isFinite(stats.mean)) {
+          traces.push({
+            type: "scatter",
+            mode: "markers",
+            x: [stats.mean],
+            y: [0],
+            name: condition,
+            marker: { color, size: isRef ? 12 : 9, symbol: "diamond" }
+          });
+        }
+
+        traces.push({
+          type: "scatter",
+          mode: "markers",
+          x: values,
+          y: values.map(() => 0),
+          name: `${condition} raw`,
+          legendgroup: condition,
+          showlegend: false,
+          marker: {
+            color,
+            size: isRef ? 8 : 6,
+            opacity: .65,
+            symbol: "line-ns-open"
+          },
+          hovertemplate:
+            `<b>${escapeHtml(condition)}</b><br>Phase=%{x:.4f}<extra></extra>`
+        });
+      }
+
+      const shapes = [];
+      const annotations = [];
+
+      if (Number.isFinite(ref.mean)) {
+        shapes.push({
+          type: "line",
+          x0: ref.mean, x1: ref.mean,
+          y0: 0, y1: 1,
+          yref: "paper",
+          line: { color: "#111827", width: 2, dash: "dot" }
+        });
+      }
+
+      if (Number.isFinite(lower)) {
+        shapes.push({
+          type: "line",
+          x0: lower, x1: lower,
+          y0: 0, y1: 1,
+          yref: "paper",
+          line: { color: conditionColors[referenceCondition] || "#2563eb", width: 4, dash: "dash" }
+        });
+        annotations.push({
+          x: lower, y: 1.02, yref: "paper",
+          text: `−${fmt(sigmaN, 2)}σ`,
+          showarrow: false,
+          font: { color: conditionColors[referenceCondition] || "#2563eb", size: 12 }
+        });
+      }
+
+      if (Number.isFinite(upper)) {
+        shapes.push({
+          type: "line",
+          x0: upper, x1: upper,
+          y0: 0, y1: 1,
+          yref: "paper",
+          line: { color: conditionColors[referenceCondition] || "#2563eb", width: 4, dash: "dash" }
+        });
+        annotations.push({
+          x: upper, y: 1.02, yref: "paper",
+          text: `+${fmt(sigmaN, 2)}σ`,
+          showarrow: false,
+          font: { color: conditionColors[referenceCondition] || "#2563eb", size: 12 }
+        });
+      }
+
+      const layout = {
+        margin: { l: 76, r: 30, t: 64, b: 68 },
+        paper_bgcolor: "rgba(0,0,0,0)",
+        plot_bgcolor: "rgba(255,255,255,.82)",
+        font: { family: "Inter, sans-serif", color: "#111827" },
+        xaxis: {
+          title: { text: lang === "ko" ? "페이즈 값" : "Phase value", standoff: 16 },
+          zeroline: false,
+          gridcolor: "#eef0f2"
+        },
+        yaxis: {
+          title: { text: lang === "ko" ? "정규분포 확률밀도" : "Normal probability density", standoff: 16 },
+          rangemode: "tozero",
+          zeroline: false,
+          gridcolor: "#eef0f2"
+        },
+        legend: {
+          orientation: "h",
+          yanchor: "bottom",
+          y: 1.10,
+          xanchor: "left",
+          x: 0
+        },
+        shapes,
+        annotations,
+        hovermode: "closest",
+        hoverlabel: { bgcolor: "#111827", font: { color: "#fff" } }
+      };
+
+      Plotly.react("normalChart", traces, layout, {
+        responsive: true,
+        displaylogo: false,
+        modeBarButtonsToRemove: ["lasso2d", "select2d"]
+      });
+    }
+
+    function renderNormalMetrics() {
+      const d = getCurrentData();
+      if (!d || !referenceCondition) return;
+
+      const sigmaN = Number(els.sigmaInput.value);
+      const ref = descriptive(d.groups[referenceCondition]);
+      const lower = ref.mean - sigmaN * ref.sd;
+      const upper = ref.mean + sigmaN * ref.sd;
+
+      document.getElementById("metricReference").textContent = referenceCondition;
+      document.getElementById("metricReferenceSub").textContent =
+        `μ = ${fmt(ref.mean)} · σ = ${fmt(ref.sd)} · n = ${ref.n}`;
+
+      document.getElementById("metricBounds").textContent =
+        Number.isFinite(lower) && Number.isFinite(upper)
+          ? `${fmt(lower)} ~ ${fmt(upper)}`
+          : "—";
+      document.getElementById("metricBoundsSub").textContent = `±${fmt(sigmaN, 2)}σ`;
+
+      document.getElementById("metricVisible").textContent = String(visibleConditions.size);
+      document.getElementById("metricVisibleSub").textContent =
+        [...visibleConditions].join(" · ") || "—";
+
+      const candidates = d.conditions
+        .filter(c => visibleConditions.has(c) && c !== referenceCondition)
+        .map(c => {
+          const s = descriptive(d.groups[c]);
+          const ds = Number.isFinite(ref.sd) && ref.sd > 0 ? Math.abs(s.mean - ref.mean) / ref.sd : NaN;
+          return { c, ds };
+        })
+        .filter(x => Number.isFinite(x.ds))
+        .sort((a, b) => a.ds - b.ds);
+
+      if (candidates.length) {
+        document.getElementById("metricClosest").textContent = candidates[0].c;
+        document.getElementById("metricClosestSub").textContent =
+          `${fmt(candidates[0].ds, 3)} σref`;
+      } else {
+        document.getElementById("metricClosest").textContent = "—";
+        document.getElementById("metricClosestSub").textContent = tr("notAvailable");
+      }
+    }
+
+    function renderAssessmentTable() {
+      const rows = normalAssessmentRows();
+      els.assessmentTableBody.innerHTML = "";
+
+      for (const row of rows) {
+        const jbP = row.jb.p;
+        const statusText =
+          row.meanInside === null
+            ? tr("notAvailable")
+            : row.meanInside
+              ? tr("meanInside")
+              : tr("meanOutside");
+
+        const badgeClass =
+          row.meanInside === null ? "warn" : row.meanInside ? "ok" : "bad";
+
+        const trEl = document.createElement("tr");
+        trEl.innerHTML = `
+          <td><strong>${escapeHtml(row.condition)}</strong></td>
+          <td>${row.stats.n}</td>
+          <td>${fmt(row.stats.mean)}</td>
+          <td>${fmt(row.stats.sd)}</td>
+          <td>${fmt(row.deltaSigma, 3)}</td>
+          <td>${percent(row.observedInside)}</td>
+          <td>${percent(row.expectedInside)}</td>
+          <td>${Number.isFinite(jbP) ? jbP.toFixed(4) : "—"}</td>
+          <td><span class="badge ${badgeClass}">${statusText}</span></td>
+        `;
+        els.assessmentTableBody.appendChild(trEl);
+      }
+    }
+
+    function renderNormalAssessment() {
+      if (!validated) return;
+      renderNormalMetrics();
+      renderNormalChart();
+      renderAssessmentTable();
+    }
+
+    function renderAll() {
+      if (!validated) return;
+      updateSidebarSummary();
+      renderColorControls();
+      renderBasicChart();
+      renderBasicTable();
+      renderNormalControls();
+      renderNormalAssessment();
+    }
+
+    function hexToRgba(hex, alpha) {
+      const h = hex.replace("#", "");
+      const r = parseInt(h.substring(0, 2), 16);
+      const g = parseInt(h.substring(2, 4), 16);
+      const b = parseInt(h.substring(4, 6), 16);
+      return `rgba(${r},${g},${b},${alpha})`;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function csvEscape(v) {
+      const s = String(v ?? "");
+      if (/[",\n]/.test(s)) return `"${s.replaceAll('"', '""')}"`;
+      return s;
+    }
+
+    function exportCsv() {
+      const d = getCurrentData();
+      if (!d || !referenceCondition) return;
+
+      const sigmaN = Number(els.sigmaInput.value);
+      const ref = descriptive(d.groups[referenceCondition]);
+      const lower = ref.mean - sigmaN * ref.sd;
+      const upper = ref.mean + sigmaN * ref.sd;
+      const rows = normalAssessmentRows();
+
+      const lines = [];
+      lines.push([
+        "Sheet",
+        "ReferenceCondition",
+        "SigmaN",
+        "ReferenceMean",
+        "ReferenceSD",
+        "LowerBound",
+        "UpperBound"
+      ].map(csvEscape).join(","));
+
+      lines.push([
+        activeSheet,
+        referenceCondition,
+        sigmaN,
+        ref.mean,
+        ref.sd,
+        lower,
+        upper
+      ].map(csvEscape).join(","));
+
+      lines.push("");
+      lines.push([
+        "Condition",
+        "n",
+        "Mean",
+        "SD",
+        "Median",
+        "Min",
+        "Max",
+        "AbsDeltaMean_over_SigmaRef",
+        "ObservedInsideRefRange",
+        "GaussianExpectedInsideRefRange",
+        "JarqueBera",
+        "JarqueBera_p",
+        "MeanInsideRefRange"
+      ].map(csvEscape).join(","));
+
+      for (const row of rows) {
+        lines.push([
+          row.condition,
+          row.stats.n,
+          row.stats.mean,
+          row.stats.sd,
+          row.stats.median,
+          row.stats.min,
+          row.stats.max,
+          row.deltaSigma,
+          row.observedInside,
+          row.expectedInside,
+          row.jb.jb,
+          row.jb.p,
+          row.meanInside
+        ].map(csvEscape).join(","));
+      }
+
+      const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Normalization_Assessment_${activeSheet}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    els.exportBtn.addEventListener("click", exportCsv);
+
+    window.addEventListener("resize", () => {
+      if (!validated) return;
+      if (activeTab === "basic") Plotly.Plots.resize(document.getElementById("basicChart"));
+      else Plotly.Plots.resize(document.getElementById("normalChart"));
+    });
+
+    renderLanguage();
+  </script>
+</body>
+</html>
