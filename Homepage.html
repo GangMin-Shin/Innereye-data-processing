@@ -1,1 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Homepage.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink:#111827; --muted:#667085; --line:#e5e7eb; --soft:#f7f8fa; --accent:#111827; }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:#fff; color:var(--ink); font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif; position:relative; }
+    body::before { content:""; position:fixed; inset:0; background-image:linear-gradient(rgba(255,255,255,.62), rgba(255,255,255,.62)), url("Homepage.jpg"); background-size:cover; background-position:center; background-repeat:no-repeat; opacity:.20; filter:saturate(.72) brightness(1.08) contrast(.92); z-index:-2; }
+    body::after { content:""; position:fixed; inset:0; background:rgba(255,255,255,.22); z-index:-1; }
+    .shell { min-height:100vh; padding:44px 52px; position:relative; overflow:hidden; }
+    .brand { font-size:15px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+    .lang-btn { position:fixed; top:28px; right:32px; width:48px; height:48px; border:1px solid var(--line); border-radius:50%; background:#fff; cursor:pointer; font-size:22px; box-shadow:0 7px 24px rgba(17,24,39,.07); }
+    .hero { max-width:920px; margin:15vh auto 0; text-align:center; }
+    .eyebrow { color:var(--muted); font-size:14px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+    h1 { margin:16px 0 18px; font-size:clamp(44px,6vw,82px); line-height:.98; letter-spacing:-.055em; font-weight:800; }
+    .hero p { max-width:680px; margin:0 auto; color:var(--muted); font-size:18px; line-height:1.7; font-weight:600; }
+    .tabs { position:fixed; left:40px; bottom:36px; display:flex; gap:12px; flex-wrap:wrap; max-width:calc(100vw - 80px); }
+    .tab { display:inline-flex; align-items:center; gap:10px; min-height:58px; padding:0 22px; border:1px solid var(--line); border-radius:16px; background:#fff; color:var(--ink); text-decoration:none; font-size:16px; font-weight:800; box-shadow:0 10px 32px rgba(17,24,39,.08); transition:.2s ease; }
+    .tab:hover { transform:translateY(-2px); border-color:#c9cdd5; box-shadow:0 14px 38px rgba(17,24,39,.12); }
+    .tab .dot { width:9px; height:9px; border-radius:50%; background:#1f7a4d; }
+    @media (max-width:720px){ .shell{padding:28px 22px}.hero{margin-top:18vh}.tabs{left:20px;bottom:22px;max-width:calc(100vw - 40px)}.lang-btn{right:20px;top:20px} }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="brand">INNEREYE · DATA PROCESSING</div>
+    <button id="langBtn" class="lang-btn" aria-label="Change language" title="Language">🌐</button>
 
+    <section class="hero">
+      <div class="eyebrow" data-i18n="eyebrow">Homepage.</div>
+      <h1 data-i18n="title">Homepage.</h1>
+      <p data-i18n="desc">Open a processing module, load a standardized measurement workbook, inspect the signal, and export processed results directly from your browser.</p>
+    </section>
+
+    <nav class="tabs" aria-label="Processing modules">
+      <a class="tab" href="CID%20preprocessing.html"><span class="dot"></span><span data-i18n="cid">CID preprocessing</span></a>
+    </nav>
+  </main>
+
+  <script>
+    const T = {
+      en:{eyebrow:'Homepage.',title:'Homepage.',desc:'Open a processing module, load a standardized measurement workbook, inspect the signal, and export processed results directly from your browser.',cid:'CID preprocessing'},
+      ko:{eyebrow:'홈페이지.',title:'홈페이지.',desc:'처리 모듈을 열고 표준화된 측정 엑셀을 불러온 뒤 신호를 확인하고 전처리 결과를 브라우저에서 바로 저장합니다.',cid:'CID 전처리'}
+    };
+    let lang = localStorage.getItem('innereye_lang') || 'en';
+    function renderLanguage(){ document.documentElement.lang=lang; document.querySelectorAll('[data-i18n]').forEach(el=>{ const k=el.dataset.i18n; if(T[lang][k]) el.textContent=T[lang][k]; }); }
+    document.getElementById('langBtn').addEventListener('click',()=>{ lang=lang==='en'?'ko':'en'; localStorage.setItem('innereye_lang',lang); renderLanguage(); });
+    renderLanguage();
+  </script>
+</body>
+</html>
