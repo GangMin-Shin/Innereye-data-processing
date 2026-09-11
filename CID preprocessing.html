@@ -2067,7 +2067,7 @@ async function renderEccPlots(){
 
   const cv=
    d.samples.map(
-    s=>p.alignedFit[s][i]
+    s=>p.corrected[s][i]
    );
 
   rawMean.push(mean(rv));
@@ -2083,7 +2083,7 @@ async function renderEccPlots(){
   el('colorAligned').value;
 
  const corC=
-  el('colorH1').value;
+  el('colorCorrected').value;
 
  const tracesMean=[
   {
@@ -2142,7 +2142,7 @@ async function renderEccPlots(){
    line:{width:0},
    fill:'tonexty',
    fillcolor:hexToRgba(corC,.30),
-   name:'1st harmonic +/- SD',
+   name:'Corrected +/- SD',
    hoverinfo:'skip'
   },
   {
@@ -2150,7 +2150,7 @@ async function renderEccPlots(){
    y:corMean,
    type:'scatter',
    mode:'lines',
-   name:'1st harmonic mean',
+   name:'Corrected mean',
    line:{
     width:2.7,
     color:corC
