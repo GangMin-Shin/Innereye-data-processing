@@ -389,13 +389,20 @@
     .plot-card{padding:16px;min-height:460px}
     .chart{width:100%;height:520px}
 
-    .table-card{margin-top:18px;overflow:hidden}
+    .table-card{margin-top:18px;overflow:visible;padding-bottom:18px}
     .card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 18px 0}
     .card-head h3{margin:0;font-size:15px;font-weight:800}
     .card-head p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.5;font-weight:600}
-    .table-wrap{overflow-x:auto;margin-top:12px}
-    table{width:100%;border-collapse:collapse;font-size:12px;background:#fff}
+    .table-wrap{
+      overflow-x:auto;
+      margin:12px 18px 0;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+    }
+    table{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;background:#fff}
     th,td{padding:11px 12px;border-top:1px solid var(--line);text-align:right;white-space:nowrap}
+    thead th{border-top:0}
     th{color:#475467;background:#fafafa;font-weight:800}
     th:first-child,td:first-child{text-align:left}
 
@@ -460,6 +467,7 @@
       .chart{height:420px}
       .result-header{align-items:flex-start;flex-direction:column}
       .metric-grid{grid-template-columns:1fr}
+      .table-wrap{margin:12px 12px 0}
     }
   </style>
 </head>
@@ -637,7 +645,7 @@
               </div>
               <div id="visibleList" class="condition-list"></div>
 
-              <div class="note" data-i18n="normalityNote">Gaussian curves are fitted from each group mean and sample SD. Jarque–Bera p-values are shown only as an exploratory normality check; they do not prove normality, especially for small n.</div>
+              <div class="note" data-i18n="normalityNote">Gaussian curves are fitted from each group mean and sample SD. The fitted curves are descriptive and should be interpreted together with the observed raw values.</div>
             </aside>
 
             <div class="normal-right">
@@ -672,7 +680,7 @@
                 <div class="card-head">
                   <div>
                     <h3 data-i18n="assessmentTitle">Sigma separation assessment</h3>
-                    <p data-i18n="assessmentDesc">Mean distance is expressed in reference-group σ units. In-range percentages use the reference group's ±Nσ interval.</p>
+                    <p data-i18n="assessmentDesc">In-range percentages use the reference group's ±Nσ interval. Mean position indicates whether each group's mean lies inside that reference range.</p>
                   </div>
                 </div>
                 <div class="table-wrap">
@@ -683,10 +691,8 @@
                         <th>n</th>
                         <th>Mean</th>
                         <th>SD</th>
-                        <th data-i18n="thSigmaDistance">|Δμ| / σref</th>
                         <th data-i18n="thEmpiricalInside">Observed inside ref range</th>
                         <th data-i18n="thExpectedInside">Gaussian expected inside</th>
-                        <th data-i18n="thJB">JB p</th>
                         <th data-i18n="thStatus">Mean position</th>
                       </tr>
                     </thead>
@@ -753,13 +759,13 @@
         visibleGroups: "Visible groups",
         selectAll: "All",
         refOnly: "Reference only",
-        normalityNote: "Gaussian curves are fitted from each group mean and sample SD. Jarque–Bera p-values are shown only as an exploratory normality check; they do not prove normality, especially for small n.",
+        normalityNote: "Gaussian curves are fitted from each group mean and sample SD. The fitted curves are descriptive and should be interpreted together with the observed raw values.",
         metricReference: "Reference",
         metricBounds: "Sigma bounds",
         metricVisible: "Visible groups",
         metricClosest: "Closest mean",
         assessmentTitle: "Sigma separation assessment",
-        assessmentDesc: "Mean distance is expressed in reference-group σ units. In-range percentages use the reference group's ±Nσ interval.",
+        assessmentDesc: "In-range percentages use the reference group's ±Nσ interval. Mean position indicates whether each group's mean lies inside that reference range.",
         thSigmaDistance: "|Δμ| / σref",
         thEmpiricalInside: "Observed inside ref range",
         thExpectedInside: "Gaussian expected inside",
@@ -834,13 +840,13 @@
         visibleGroups: "표시할 그룹",
         selectAll: "전체",
         refOnly: "기준만",
-        normalityNote: "각 곡선은 그룹 평균과 표본 SD로 적합한 정규분포 PDF입니다. Jarque–Bera p값은 탐색적 정규성 확인용이며, 특히 n이 작을 때 정규성을 보장하지 않습니다.",
+        normalityNote: "각 곡선은 그룹 평균과 표본 SD로 적합한 정규분포 PDF입니다. 적합 곡선은 기술적 비교용이며 실제 관측값과 함께 해석해야 합니다.",
         metricReference: "기준 그룹",
         metricBounds: "시그마 경계",
         metricVisible: "표시 그룹",
         metricClosest: "가장 가까운 평균",
         assessmentTitle: "시그마 분리도 평가",
-        assessmentDesc: "평균 거리는 기준 그룹의 σ 단위로 표시합니다. 범위 내 비율은 기준 그룹의 ±Nσ 구간을 사용합니다.",
+        assessmentDesc: "범위 내 비율은 기준 그룹의 ±Nσ 구간을 사용합니다. 평균 위치는 각 그룹 평균이 해당 기준 범위 안에 있는지를 표시합니다.",
         thSigmaDistance: "|Δμ| / σref",
         thEmpiricalInside: "실측값 기준범위 포함률",
         thExpectedInside: "정규분포 예상 포함률",
@@ -1828,7 +1834,6 @@
       els.assessmentTableBody.innerHTML = "";
 
       for (const row of rows) {
-        const jbP = row.jb.p;
         const statusText =
           row.meanInside === null
             ? tr("notAvailable")
@@ -1845,10 +1850,8 @@
           <td>${row.stats.n}</td>
           <td>${fmt(row.stats.mean)}</td>
           <td>${fmt(row.stats.sd)}</td>
-          <td>${fmt(row.deltaSigma, 3)}</td>
           <td>${percent(row.observedInside)}</td>
           <td>${percent(row.expectedInside)}</td>
-          <td>${Number.isFinite(jbP) ? jbP.toFixed(4) : "—"}</td>
           <td><span class="badge ${badgeClass}">${statusText}</span></td>
         `;
         els.assessmentTableBody.appendChild(trEl);
