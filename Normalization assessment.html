@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Normalization assessment · INNEREYE</title>
+  <title>Normalization assessment</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,1172 +16,695 @@
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 
   <style>
-    :root {
-      --ink: #111827;
-      --muted: #667085;
-      --line: #e5e7eb;
-      --line-strong: #d0d5dd;
-      --soft: #f7f8fa;
-      --white: #ffffff;
-      --accent: #2563eb;
-      --accent-soft: #eff6ff;
-      --success: #18794e;
-      --success-soft: #ecfdf3;
-      --warning: #b54708;
-      --warning-soft: #fffaeb;
-      --danger: #b42318;
-      --danger-soft: #fef3f2;
-      --shadow: 0 12px 36px rgba(17, 24, 39, 0.09);
-      --radius-xl: 24px;
-      --radius-lg: 18px;
-      --radius-md: 14px;
+    :root{
+      --ink:#111827;
+      --muted:#667085;
+      --line:#e5e7eb;
+      --soft:#f7f8fa;
+      --panel:#fff;
+      --green:#1f8a57;
+      --green-soft:#eaf8f0;
+      --warning:#9a6700;
+      --warning-soft:#fff7e8;
+      --danger:#b42318;
+      --danger-soft:#fff0ee;
+      --accent:#2563eb;
+      --accent-soft:#eff6ff;
+      --shadow:0 12px 38px rgba(17,24,39,.08);
     }
 
-    * {
-      box-sizing: border-box;
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      background:#fff;
+      color:var(--ink);
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+      position:relative;
     }
 
-    html,
-    body {
-      margin: 0;
-      min-height: 100%;
-    }
-
-    body {
-      min-height: 100vh;
-      margin: 0;
-      color: var(--ink);
-      background: #fff;
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
-      position: relative;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
       background-image:
-        linear-gradient(
-          rgba(255, 255, 255, 0.62),
-          rgba(255, 255, 255, 0.62)
-        ),
+        linear-gradient(rgba(255,255,255,.60), rgba(255,255,255,.60)),
         url("./Normalization%20assessment.jpeg");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      opacity: 0.20;
-      filter:
-        saturate(0.72)
-        brightness(1.08)
-        contrast(0.92);
-      z-index: -2;
-    }
-
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: rgba(255, 255, 255, 0.28);
-      z-index: -1;
-    }
-
-    button,
-    input,
-    select {
-      font: inherit;
-    }
-
-    button {
-      color: inherit;
-    }
-
-    .shell {
-      min-height: 100vh;
-      padding: 28px 32px 48px;
-    }
-
-    .topbar {
-      max-width: 1500px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .brand {
-      font-size: 15px;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .top-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .icon-btn,
-    .home-btn {
-      height: 46px;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.94);
-      box-shadow: 0 7px 24px rgba(17, 24, 39, 0.07);
-      cursor: pointer;
-      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
-    }
-
-    .icon-btn:hover,
-    .home-btn:hover {
-      transform: translateY(-1px);
-      border-color: #c9cdd5;
-      box-shadow: 0 10px 28px rgba(17, 24, 39, 0.10);
-    }
-
-    .icon-btn {
-      width: 46px;
-      border-radius: 50%;
-      font-size: 20px;
-    }
-
-    .home-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 16px;
-      border-radius: 14px;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--ink);
-    }
-
-    .hero {
-      max-width: 1500px;
-      margin: 54px auto 26px;
-    }
-
-    .eyebrow {
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      margin: 10px 0 12px;
-      font-size: clamp(36px, 5vw, 66px);
-      line-height: 1;
-      letter-spacing: -0.045em;
-      font-weight: 800;
-    }
-
-    .hero p {
-      max-width: 900px;
-      margin: 0;
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.7;
-      font-weight: 600;
-    }
-
-    .workspace {
-      max-width: 1500px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
-      gap: 20px;
-      align-items: start;
-    }
-
-    .panel {
-      border: 1px solid rgba(229, 231, 235, .95);
-      border-radius: var(--radius-xl);
-      background: rgba(255, 255, 255, .93);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
-    }
-
-    .sidebar {
-      padding: 20px;
-      position: sticky;
-      top: 20px;
-    }
-
-    .main-panel {
-      overflow: hidden;
-    }
-
-    .section-title {
-      margin: 0 0 6px;
-      font-size: 16px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .section-desc {
-      margin: 0 0 16px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.6;
-      font-weight: 600;
-    }
-
-    .divider {
-      height: 1px;
-      margin: 18px 0;
-      background: var(--line);
-    }
-
-    .dropzone {
-      border: 1.5px dashed var(--line-strong);
-      border-radius: 18px;
-      padding: 20px 16px;
-      text-align: center;
-      background: rgba(247, 248, 250, .78);
-      cursor: pointer;
-      transition: border-color .18s ease, background .18s ease, transform .18s ease;
-    }
-
-    .dropzone:hover,
-    .dropzone.dragover {
-      border-color: var(--accent);
-      background: var(--accent-soft);
-      transform: translateY(-1px);
-    }
-
-    .drop-icon {
-      width: 42px;
-      height: 42px;
-      margin: 0 auto 10px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      background: #fff;
-      border: 1px solid var(--line);
-      font-size: 19px;
-      font-weight: 800;
-    }
-
-    .drop-title {
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    .drop-sub {
-      margin-top: 5px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 600;
-      line-height: 1.5;
-    }
-
-    #fileInput {
-      display: none;
-    }
-
-    .file-name {
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-      font-weight: 700;
-      word-break: break-all;
-    }
-
-    .field-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .field {
-      min-width: 0;
-    }
-
-    .field label {
-      display: block;
-      margin: 0 0 7px;
-      color: #344054;
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .field input,
-    .field select {
-      width: 100%;
-      height: 42px;
-      border: 1px solid var(--line-strong);
-      border-radius: 12px;
-      background: #fff;
-      padding: 0 12px;
-      color: var(--ink);
-      outline: none;
-      font-weight: 700;
-      transition: border-color .15s ease, box-shadow .15s ease;
-    }
-
-    .field input:focus,
-    .field select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, .10);
-    }
-
-    .primary-btn,
-    .secondary-btn {
-      width: 100%;
-      min-height: 44px;
-      border-radius: 13px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 800;
-      transition: transform .18s ease, opacity .18s ease, border-color .18s ease;
-    }
-
-    .primary-btn {
-      margin-top: 12px;
-      border: 1px solid #111827;
-      background: #111827;
-      color: #fff;
-    }
-
-    .secondary-btn {
-      border: 1px solid var(--line-strong);
-      background: #fff;
-      color: var(--ink);
-    }
-
-    .primary-btn:hover,
-    .secondary-btn:hover {
-      transform: translateY(-1px);
-    }
-
-    .primary-btn:disabled,
-    .secondary-btn:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .status {
-      margin-top: 12px;
-      border-radius: 13px;
-      padding: 11px 12px;
-      font-size: 12px;
-      line-height: 1.5;
-      font-weight: 700;
-      border: 1px solid var(--line);
-      background: var(--soft);
-      color: var(--muted);
-    }
-
-    .status.success {
-      border-color: #abefc6;
-      background: var(--success-soft);
-      color: var(--success);
-    }
-
-    .status.warning {
-      border-color: #fedf89;
-      background: var(--warning-soft);
-      color: var(--warning);
-    }
-
-    .status.error {
-      border-color: #fecdca;
-      background: var(--danger-soft);
-      color: var(--danger);
-    }
-
-    .sheet-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .sheet-btn {
-      min-height: 42px;
-      border-radius: 12px;
-      border: 1px solid var(--line-strong);
-      background: #fff;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    .sheet-btn.active {
-      border-color: #111827;
-      background: #111827;
-      color: #fff;
-    }
-
-    .sheet-btn:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-    }
-
-    .summary-list {
-      display: grid;
-      gap: 8px;
-    }
-
-    .summary-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      min-height: 34px;
-      border-bottom: 1px solid #f0f1f3;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .summary-row:last-child {
-      border-bottom: 0;
-    }
-
-    .summary-row span:first-child {
-      color: var(--muted);
-    }
-
-    .summary-row span:last-child {
-      text-align: right;
-    }
-
-    .content-tabs {
-      display: flex;
-      gap: 8px;
-      padding: 14px;
-      border-bottom: 1px solid var(--line);
-      background: rgba(255, 255, 255, .75);
-    }
-
-    .content-tab {
-      min-height: 44px;
-      padding: 0 16px;
-      border: 1px solid var(--line);
-      border-radius: 13px;
-      background: #fff;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    .content-tab.active {
-      border-color: #111827;
-      background: #111827;
-      color: #fff;
-    }
-
-    .tab-page {
-      display: none;
-      padding: 18px;
-    }
-
-    .tab-page.active {
-      display: block;
-    }
-
-    .empty-state {
-      min-height: 520px;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      color: var(--muted);
-      padding: 30px;
-    }
-
-    .empty-state-inner {
-      max-width: 480px;
-    }
-
-    .empty-state strong {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--ink);
-      font-size: 17px;
-    }
-
-    .analysis-shell.hidden,
-    .empty-state.hidden {
-      display: none;
-    }
-
-    .control-strip {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 14px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
-
-    .control-left,
-    .control-right {
-      display: flex;
-      align-items: end;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .inline-field label {
-      display: block;
-      margin-bottom: 6px;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 800;
-    }
-
-    .inline-field input,
-    .inline-field select {
-      height: 40px;
-      min-width: 120px;
-      border: 1px solid var(--line-strong);
-      border-radius: 11px;
-      background: #fff;
-      padding: 0 10px;
-      font-weight: 700;
-      outline: none;
-    }
-
-    .mini-btn {
-      height: 40px;
-      padding: 0 12px;
-      border: 1px solid var(--line-strong);
-      border-radius: 11px;
-      background: #fff;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .chart-card,
-    .table-card,
-    .metric-card,
-    .selection-card {
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(255,255,255,.88);
-    }
-
-    .chart-card {
-      padding: 10px 10px 4px;
-    }
-
-    .chart {
-      width: 100%;
-      min-height: 520px;
-    }
-
-    .card-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 16px 16px 0;
-    }
-
-    .card-head h3 {
-      margin: 0;
-      font-size: 15px;
-      font-weight: 800;
-    }
-
-    .card-head p {
-      margin: 5px 0 0;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-      font-weight: 600;
-    }
-
-    .color-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 8px;
-      margin: 14px 0;
-    }
-
-    .color-item {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      min-height: 42px;
-      padding: 8px 10px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fff;
-      font-size: 12px;
-      font-weight: 800;
-      min-width: 0;
-    }
-
-    .color-item input[type="color"] {
-      width: 29px;
-      height: 29px;
-      padding: 0;
-      border: 0;
-      border-radius: 8px;
-      background: transparent;
-      cursor: pointer;
-      flex: 0 0 auto;
-    }
-
-    .color-item span {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .table-card {
-      margin-top: 14px;
-      overflow: hidden;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-      margin-top: 12px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-    }
-
-    th,
-    td {
-      padding: 11px 12px;
-      border-top: 1px solid var(--line);
-      text-align: right;
-      white-space: nowrap;
-    }
-
-    th {
-      color: #475467;
-      background: #fafafa;
-      font-weight: 800;
-    }
-
-    th:first-child,
-    td:first-child {
-      text-align: left;
-    }
-
-    .normal-grid {
-      display: grid;
-      grid-template-columns: minmax(250px, 320px) minmax(0, 1fr);
-      gap: 14px;
-      align-items: start;
-    }
-
-    .selection-card {
-      padding: 16px;
-      position: sticky;
-      top: 20px;
-    }
-
-    .selection-card h3 {
-      margin: 0 0 5px;
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    .selection-card p {
-      margin: 0 0 14px;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.5;
-      font-weight: 600;
-    }
-
-    .control-group-title {
-      margin: 16px 0 8px;
-      color: #344054;
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-    }
-
-    .condition-list {
-      display: grid;
-      gap: 7px;
-    }
-
-    .reference-btn {
-      width: 100%;
-      min-height: 40px;
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 7px 10px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fff;
-      cursor: pointer;
-      text-align: left;
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .reference-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #d0d5dd;
-      flex: 0 0 auto;
-      box-shadow: 0 0 0 3px transparent;
-    }
-
-    .reference-btn.active {
-      border-color: #93c5fd;
-      background: var(--accent-soft);
-      color: #1d4ed8;
-    }
-
-    .reference-btn.active .reference-dot {
-      background: var(--accent);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, .13);
-    }
-
-    .check-row {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      min-height: 36px;
-      padding: 6px 8px;
-      border: 1px solid var(--line);
-      border-radius: 11px;
-      background: #fff;
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .check-row input {
-      width: 16px;
-      height: 16px;
-      accent-color: var(--accent);
-    }
-
-    .swatch {
-      width: 10px;
-      height: 10px;
-      border-radius: 3px;
-      flex: 0 0 auto;
-    }
-
-    .normal-right {
-      min-width: 0;
-    }
-
-    .metric-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .metric-card {
-      padding: 14px;
-      min-width: 0;
-    }
-
-    .metric-label {
-      color: var(--muted);
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: .05em;
-      text-transform: uppercase;
-    }
-
-    .metric-value {
-      margin-top: 7px;
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      word-break: break-word;
-    }
-
-    .metric-sub {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 10px;
-      line-height: 1.4;
-      font-weight: 600;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      min-height: 25px;
-      padding: 0 8px;
-      border-radius: 999px;
-      font-size: 10px;
-      font-weight: 800;
-    }
-
-    .badge.ok {
-      background: var(--success-soft);
-      color: var(--success);
-    }
-
-    .badge.warn {
-      background: var(--warning-soft);
-      color: var(--warning);
-    }
-
-    .badge.bad {
-      background: var(--danger-soft);
-      color: var(--danger);
-    }
-
-    .note {
-      margin-top: 12px;
-      padding: 12px 13px;
-      border: 1px solid var(--line);
-      border-radius: 13px;
-      background: #fafafa;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.55;
-      font-weight: 600;
-    }
-
-    @media (max-width: 1100px) {
-      .workspace {
-        grid-template-columns: 1fr;
-      }
-
-      .sidebar {
-        position: static;
-      }
-
-      .normal-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .selection-card {
-        position: static;
-      }
-
-      .metric-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 720px) {
-      .shell {
-        padding: 20px 14px 34px;
-      }
-
-      .topbar {
-        align-items: flex-start;
-      }
-
-      .brand {
-        max-width: 180px;
-        line-height: 1.5;
-      }
-
-      .hero {
-        margin-top: 38px;
-      }
-
-      .field-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .content-tabs {
-        flex-direction: column;
-      }
-
-      .content-tab {
-        width: 100%;
-      }
-
-      .tab-page {
-        padding: 12px;
-      }
-
-      .chart {
-        min-height: 430px;
-      }
-
-      .metric-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .home-btn {
-        display: none;
-      }
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      opacity:.20;
+      filter:saturate(.72) brightness(1.08) contrast(.92);
+      z-index:-2;
+    }
+
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:rgba(255,255,255,.24);
+      z-index:-1;
+    }
+
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:30;
+      height:82px;
+      background:rgba(255,255,255,.88);
+      backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 34px 0 330px;
+    }
+
+    .title-wrap h1{
+      font-size:24px;
+      margin:0;
+      font-weight:800;
+      letter-spacing:-.03em;
+    }
+
+    .lang-btn{
+      width:46px;
+      height:46px;
+      border:1px solid var(--line);
+      border-radius:50%;
+      background:#fff;
+      font-size:21px;
+      box-shadow:0 6px 18px rgba(17,24,39,.06);
+    }
+
+    .dock{
+      position:fixed;
+      z-index:40;
+      left:22px;
+      bottom:22px;
+      width:280px;
+      max-height:calc(100vh - 44px);
+      overflow:auto;
+      background:rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:14px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(10px);
+    }
+
+    .dock-head{padding:8px 8px 12px}
+    .dock-head strong{display:block;font-size:15px}
+    .dock-head span{display:block;font-size:12px;color:var(--muted);margin-top:4px;line-height:1.45}
+
+    .nav-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-bottom:10px;
+    }
+
+    .nav-btn,.analysis-btn{
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--ink);
+      border-radius:12px;
+      font-weight:800;
+    }
+
+    .nav-btn{height:42px}
+
+    .analysis-btn{
+      width:100%;
+      text-align:left;
+      padding:13px 14px;
+      margin-top:8px;
+      line-height:1.35;
+      font-size:13px;
+      transition:.18s ease;
+    }
+
+    .analysis-btn:hover{transform:translateY(-1px);border-color:#bdc3cc}
+    .analysis-btn.active{background:#111827;color:#fff;border-color:#111827}
+
+    .dock hr{border:0;border-top:1px solid var(--line);margin:10px 0}
+    .dock-label{
+      font-size:11px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.1em;
+      font-weight:800;
+      padding:4px 8px;
+    }
+
+    .workspace{
+      margin-left:316px;
+      padding:30px 36px 80px;
+      max-width:1700px;
+    }
+
+    .setup-card,.plot-card,.table-card,.metric-card,.selection-card{
+      border:1px solid var(--line);
+      border-radius:20px;
+      background:rgba(255,255,255,.90);
+      box-shadow:0 8px 28px rgba(17,24,39,.05);
+      backdrop-filter:blur(8px);
+    }
+
+    .setup-card{padding:24px;margin-bottom:22px}
+
+    .section-title{
+      font-size:18px;
+      font-weight:800;
+      margin:0 0 18px;
+      letter-spacing:-.02em;
+    }
+
+    .section-desc{
+      margin:5px 0 0;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.55;
+      font-weight:600;
+    }
+
+    .setup-grid{
+      display:grid;
+      grid-template-columns:
+        minmax(270px,1.4fr)
+        minmax(170px,.7fr)
+        minmax(170px,.7fr)
+        minmax(270px,1.2fr);
+      gap:14px;
+      align-items:end;
+    }
+
+    .field{min-width:0}
+    .field label{
+      display:block;
+      font-size:12px;
+      font-weight:800;
+      color:#344054;
+      margin-bottom:7px;
+    }
+
+    .field input[type="number"],
+    .field input[type="text"],
+    .field select{
+      width:100%;
+      height:46px;
+      border:1px solid #d9dde4;
+      border-radius:12px;
+      padding:0 12px;
+      background:#fff;
+      color:var(--ink);
+      outline:none;
+    }
+
+    .field input:focus,.field select:focus{
+      border-color:#88909d;
+      box-shadow:0 0 0 3px #f0f2f5;
+    }
+
+    .file-line{display:flex;gap:8px;align-items:center}
+    #fileInput{display:none}
+
+    .primary,.secondary{
+      height:46px;
+      border-radius:12px;
+      padding:0 18px;
+      font-size:14px;
+      font-weight:800;
+      border:1px solid var(--line);
+      white-space:nowrap;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      line-height:1;
+      cursor:pointer;
+    }
+
+    .primary{background:#111827;color:#fff;border-color:#111827}
+    .secondary{background:#fff;color:#111827}
+    .secondary:hover{background:#f8f9fb}
+    .primary:disabled,.secondary:disabled{opacity:.45;cursor:not-allowed}
+
+    .filename{
+      flex:1;
+      height:46px;
+      display:flex;
+      align-items:center;
+      padding:0 12px;
+      border:1px dashed #cfd4dc;
+      border-radius:12px;
+      color:var(--muted);
+      font-size:12px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      min-width:0;
+    }
+
+    .filename.static{border-style:solid;background:#fafafa;color:#344054;font-weight:700}
+
+    .read-row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-top:15px;
+      flex-wrap:wrap;
+    }
+
+    .status{font-size:12px;font-weight:700;color:var(--muted)}
+    .status.success,.status.good{color:var(--green)}
+    .status.warning{color:var(--warning)}
+    .status.error,.status.bad{color:var(--danger)}
+
+    .detected{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+    .badge{
+      padding:7px 10px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      font-size:11px;
+      font-weight:800;
+      color:#344054;
+      background:#fafafa;
+    }
+    .badge.good,.badge.ok{background:var(--green-soft);color:#16653f;border-color:#ccebd9}
+    .badge.warn{background:var(--warning-soft);color:var(--warning);border-color:#f4dfad}
+    .badge.bad{background:var(--danger-soft);color:var(--danger);border-color:#fecdca}
+
+    .colors{
+      margin-top:18px;
+      padding-top:18px;
+      border-top:1px solid var(--line);
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .colors-title{font-size:11px;font-weight:800;color:#344054;white-space:nowrap}
+    .color-grid{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+    .color-item{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;color:#475467}
+    .color-item input[type="color"]{width:30px;height:30px;padding:0;border:0;background:none;cursor:pointer}
+
+    .result-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      margin:28px 0 14px;
+    }
+
+    .result-header h2{margin:0;font-size:21px;font-weight:800;letter-spacing:-.03em}
+    .result-header .sub{font-size:12px;color:var(--muted);font-weight:600;margin-top:5px}
+
+    .actions{display:none;align-items:center;gap:10px;flex-wrap:wrap}
+    .actions.visible{display:flex}
+
+    .sheet-btn,.mini-btn{
+      height:44px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      padding:0 13px;
+      font-size:12px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .sheet-btn.active{background:#111827;color:#fff;border-color:#111827}
+    .sheet-btn:disabled{opacity:.45;cursor:not-allowed}
+    .mini-btn:hover,.sheet-btn:not(:disabled):hover{background:#f8f9fb}
+    .sheet-btn.active:hover{background:#111827}
+
+    .save-btn{
+      height:44px;
+      border:0;
+      border-radius:12px;
+      background:#111827;
+      color:#fff;
+      padding:0 17px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .save-btn:disabled{opacity:.45;cursor:not-allowed}
+
+    .empty{
+      min-height:500px;
+      border:1px dashed #d5dae1;
+      border-radius:20px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      color:var(--muted);
+      font-weight:700;
+      line-height:1.6;
+      padding:30px;
+      background:rgba(255,255,255,.26);
+    }
+    .empty strong{display:block;color:var(--ink);font-size:17px;margin-bottom:6px}
+
+    .analysis-shell.hidden,.empty.hidden{display:none}
+    .tab-page{display:none}
+    .tab-page.active{display:block}
+
+    .control-strip{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .control-left,.control-right{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
+    .control-strip .section-title{font-size:18px;margin:0}
+
+    .plot-card{padding:16px;min-height:460px}
+    .chart{width:100%;height:520px}
+
+    .table-card{margin-top:18px;overflow:hidden}
+    .card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 18px 0}
+    .card-head h3{margin:0;font-size:15px;font-weight:800}
+    .card-head p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.5;font-weight:600}
+    .table-wrap{overflow-x:auto;margin-top:12px}
+    table{width:100%;border-collapse:collapse;font-size:12px;background:#fff}
+    th,td{padding:11px 12px;border-top:1px solid var(--line);text-align:right;white-space:nowrap}
+    th{color:#475467;background:#fafafa;font-weight:800}
+    th:first-child,td:first-child{text-align:left}
+
+    .normal-grid{
+      display:grid;
+      grid-template-columns:minmax(250px,320px) minmax(0,1fr);
+      gap:18px;
+      align-items:start;
+    }
+
+    .selection-card{padding:18px;position:sticky;top:98px}
+    .selection-card h3{margin:0 0 5px;font-size:14px;font-weight:800}
+    .selection-card p{margin:0 0 14px;color:var(--muted);font-size:11px;line-height:1.5;font-weight:600}
+
+    .inline-field label{display:block;margin-bottom:6px;color:#344054;font-size:11px;font-weight:800}
+    .inline-field input,.inline-field select{
+      width:100%;height:42px;border:1px solid #d9dde4;border-radius:11px;background:#fff;padding:0 10px;font-weight:700;outline:none
+    }
+    .inline-field input:focus,.inline-field select:focus{border-color:#88909d;box-shadow:0 0 0 3px #f0f2f5}
+
+    .control-group-title{margin:16px 0 8px;color:#344054;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+    .condition-list{display:grid;gap:7px}
+    .reference-btn{
+      width:100%;min-height:40px;display:flex;align-items:center;gap:9px;padding:7px 10px;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;text-align:left;font-size:12px;font-weight:800
+    }
+    .reference-dot{width:10px;height:10px;border-radius:50%;background:#d0d5dd;flex:0 0 auto;box-shadow:0 0 0 3px transparent}
+    .reference-btn.active{border-color:#93c5fd;background:var(--accent-soft);color:#1d4ed8}
+    .reference-btn.active .reference-dot{background:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.13)}
+
+    .check-row{
+      display:flex;align-items:center;gap:9px;min-height:36px;padding:6px 8px;border:1px solid var(--line);border-radius:11px;background:#fff;font-size:12px;font-weight:800
+    }
+    .check-row input{width:16px;height:16px;accent-color:var(--accent)}
+    .swatch{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+
+    .normal-right{min-width:0}
+    .metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:18px}
+    .metric-card{padding:14px;min-width:0}
+    .metric-label{color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+    .metric-value{margin-top:7px;font-size:20px;font-weight:800;letter-spacing:-.03em;word-break:break-word}
+    .metric-sub{margin-top:4px;color:var(--muted);font-size:10px;line-height:1.4;font-weight:600}
+
+    .normal-right .plot-card{margin-bottom:0}
+    .note{margin-top:12px;padding:12px 13px;border:1px solid var(--line);border-radius:13px;background:#fafafa;color:var(--muted);font-size:11px;line-height:1.55;font-weight:600}
+
+    @media(max-width:1050px){
+      .dock{position:static;width:auto;max-height:none;margin:18px}
+      .topbar{padding-left:24px}
+      .workspace{margin-left:0;padding:12px 18px 60px}
+      .setup-grid{grid-template-columns:1fr 1fr}
+      .analysis-btn{font-size:12px}
+      .normal-grid{grid-template-columns:1fr}
+      .selection-card{position:static}
+      .metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+
+    @media(max-width:650px){
+      .setup-grid{grid-template-columns:1fr}
+      .topbar{height:auto;padding:16px 18px}
+      .title-wrap h1{font-size:19px}
+      .workspace{padding:10px 12px 50px}
+      .chart{height:420px}
+      .result-header{align-items:flex-start;flex-direction:column}
+      .metric-grid{grid-template-columns:1fr}
     }
   </style>
 </head>
 
 <body>
-  <main class="shell">
-    <header class="topbar">
-      <div class="brand">INNEREYE · DATA PROCESSING</div>
+  <aside class="dock">
+    <div class="dock-head">
+      <strong data-i18n="title">Normalization assessment</strong>
+      <span data-i18n="dockHint">Select an assessment function.</span>
+    </div>
 
-      <div class="top-actions">
-        <a class="home-btn" href="./index.html" data-i18n="home">Homepage</a>
-        <button id="langBtn" class="icon-btn" aria-label="Change language" title="Language">🌐</button>
+    <div class="nav-row">
+      <button class="nav-btn" onclick="history.back()" data-i18n="back">← Back</button>
+      <button class="nav-btn" onclick="location.href='./'" data-i18n="homeShort">🏠 Home</button>
+    </div>
+
+    <hr>
+    <div class="dock-label" data-i18n="analysis">Analysis</div>
+
+    <button class="analysis-btn content-tab active" data-tab="basic" data-i18n="basicTab">Basic plot</button>
+    <button class="analysis-btn content-tab" data-tab="normal" data-i18n="normalTab">Normalization assessment</button>
+  </aside>
+
+  <header class="topbar">
+    <div class="title-wrap">
+      <h1 data-i18n="title">Normalization assessment</h1>
+    </div>
+    <button id="langBtn" class="lang-btn" aria-label="Change language" title="Language">🌐</button>
+  </header>
+
+  <main class="workspace">
+    <section class="setup-card">
+      <h2 class="section-title" data-i18n="inputSetup">Input & validation setup</h2>
+
+      <div class="setup-grid">
+        <div class="field">
+          <label data-i18n="excelFile">Excel workbook</label>
+          <div class="file-line">
+            <label id="dropzone" class="secondary" for="fileInput" data-i18n="browse">Browse</label>
+            <input id="fileInput" type="file" accept=".xlsx,.xls" />
+            <div id="fileName" class="filename" data-i18n="noFile">No file selected.</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="expectedSamples" data-i18n="sampleCount">Samples</label>
+          <input id="expectedSamples" type="number" min="1" step="1" value="30" />
+        </div>
+
+        <div class="field">
+          <label for="expectedConditions" data-i18n="conditionCount">Pressure conditions</label>
+          <input id="expectedConditions" type="number" min="1" step="1" value="3" />
+        </div>
+
+        <div class="field">
+          <label data-i18n="requiredSheets">Required sheets</label>
+          <div class="filename static">Notch + Center</div>
+        </div>
       </div>
-    </header>
 
-    <section class="hero">
-      <div class="eyebrow" data-i18n="eyebrow">CID · Distribution analysis</div>
-      <h1 data-i18n="title">Normalization assessment.</h1>
-      <p data-i18n="desc">
-        Validate Notch and Center sheets, summarize phase values by burst-pressure condition,
-        and assess whether the condition distributions can be separated using a selected ±Nσ reference range.
-      </p>
+      <div class="read-row">
+        <button id="validateBtn" class="primary" disabled data-i18n="validateBtn">Validate workbook</button>
+        <span id="statusBox" class="status" data-i18n="statusIdle">Load a workbook to begin validation.</span>
+      </div>
+
+      <div class="detected">
+        <span class="badge"><span data-i18n="detectedSamples">Detected samples</span>: <span id="summarySamples">—</span></span>
+        <span class="badge"><span data-i18n="detectedConditions">Detected conditions</span>: <span id="summaryConditions">—</span></span>
+        <span class="badge"><span data-i18n="activeSheet">Active sheet</span>: <span id="summarySheet">—</span></span>
+        <span class="badge"><span data-i18n="numericValues">Numeric values</span>: <span id="summaryValues">—</span></span>
+      </div>
+
+      <div class="colors">
+        <span class="colors-title" data-i18n="plotColors">Plot colors</span>
+        <div id="colorGrid" class="color-grid"></div>
+      </div>
     </section>
 
-    <section class="workspace">
-      <aside class="panel sidebar">
-        <h2 class="section-title" data-i18n="loadTitle">1. Load workbook</h2>
-        <p class="section-desc" data-i18n="loadDesc">
-          Required sheets: Notch and Center. Column A contains Sample IDs; columns B onward contain burst-pressure groups.
-        </p>
-
-        <label id="dropzone" class="dropzone" for="fileInput">
-          <div class="drop-icon">↥</div>
-          <div class="drop-title" data-i18n="dropTitle">Choose an Excel workbook</div>
-          <div class="drop-sub" data-i18n="dropSub">.xlsx or .xls · processed locally in your browser</div>
-        </label>
-        <input id="fileInput" type="file" accept=".xlsx,.xls" />
-        <div id="fileName" class="file-name" data-i18n="noFile">No file selected.</div>
-
-        <div class="divider"></div>
-
-        <h2 class="section-title" data-i18n="validateTitle">2. Validate structure</h2>
-        <p class="section-desc" data-i18n="validateDesc">
-          Enter the expected number of samples and burst-pressure conditions, then compare them with both sheets.
-        </p>
-
-        <div class="field-grid">
-          <div class="field">
-            <label for="expectedSamples" data-i18n="sampleCount">Samples</label>
-            <input id="expectedSamples" type="number" min="1" step="1" value="30" />
-          </div>
-
-          <div class="field">
-            <label for="expectedConditions" data-i18n="conditionCount">Pressure conditions</label>
-            <input id="expectedConditions" type="number" min="1" step="1" value="3" />
-          </div>
+    <section>
+      <div class="result-header">
+        <div>
+          <h2 data-i18n="result">Processing result</h2>
+          <div class="sub" data-i18n="chooseAnalysis">Validate the workbook, then choose an analysis.</div>
         </div>
 
-        <button id="validateBtn" class="primary-btn" disabled data-i18n="validateBtn">
-          Validate workbook
-        </button>
-
-        <div id="statusBox" class="status" data-i18n="statusIdle">
-          Load a workbook to begin validation.
-        </div>
-
-        <div class="divider"></div>
-
-        <h2 class="section-title" data-i18n="sheetTitle">3. Active sheet</h2>
-        <div class="sheet-buttons">
+        <div id="actions" class="actions">
           <button class="sheet-btn active" data-sheet="Notch" disabled>Notch</button>
           <button class="sheet-btn" data-sheet="Center" disabled>Center</button>
+          <button id="exportBtn" class="save-btn" disabled data-i18n="exportBtn">Export assessment CSV</button>
         </div>
+      </div>
 
-        <div class="divider"></div>
-
-        <div class="summary-list">
-          <div class="summary-row">
-            <span data-i18n="detectedSamples">Detected samples</span>
-            <span id="summarySamples">—</span>
-          </div>
-          <div class="summary-row">
-            <span data-i18n="detectedConditions">Detected conditions</span>
-            <span id="summaryConditions">—</span>
-          </div>
-          <div class="summary-row">
-            <span data-i18n="activeSheet">Active sheet</span>
-            <span id="summarySheet">—</span>
-          </div>
-          <div class="summary-row">
-            <span data-i18n="numericValues">Numeric values</span>
-            <span id="summaryValues">—</span>
-          </div>
+      <div id="emptyState" class="empty">
+        <div>
+          <strong data-i18n="emptyTitle">Workbook validation is required.</strong>
+          <span data-i18n="emptyDesc">Load the Excel file, enter the expected structure, and run validation. Analysis controls will appear after both sheets pass.</span>
         </div>
+      </div>
 
-        <button id="exportBtn" class="secondary-btn" style="margin-top:14px" disabled data-i18n="exportBtn">
-          Export assessment CSV
-        </button>
-      </aside>
-
-      <section class="panel main-panel">
-        <div class="content-tabs">
-          <button class="content-tab active" data-tab="basic" data-i18n="basicTab">Basic plot</button>
-          <button class="content-tab" data-tab="normal" data-i18n="normalTab">Normalization assessment</button>
-        </div>
-
-        <div id="emptyState" class="empty-state">
-          <div class="empty-state-inner">
-            <strong data-i18n="emptyTitle">Workbook validation is required.</strong>
-            <span data-i18n="emptyDesc">
-              Load the Excel file, enter the expected structure, and run validation. Analysis controls will appear after both sheets pass.
-            </span>
-          </div>
-        </div>
-
-        <div id="analysisShell" class="analysis-shell hidden">
-          <div id="basicPage" class="tab-page active">
-            <div class="control-strip">
-              <div class="control-left">
-                <div>
-                  <div class="section-title" style="margin-bottom:4px" data-i18n="basicTitle">Phase summary by burst pressure</div>
-                  <div class="section-desc" style="margin:0" data-i18n="basicDesc">
-                    Bars show the group mean and error bars show ±1 SD.
-                  </div>
-                </div>
-              </div>
-
-              <div class="control-right">
-                <button id="resetColorsBtn" class="mini-btn" data-i18n="resetColors">Reset colors</button>
+      <div id="analysisShell" class="analysis-shell hidden">
+        <div id="basicPage" class="tab-page active">
+          <div class="control-strip">
+            <div class="control-left">
+              <div>
+                <div class="section-title" data-i18n="basicTitle">Phase summary by burst pressure</div>
+                <div class="section-desc" data-i18n="basicDesc">Bars show the group mean and error bars show ±1 SD.</div>
               </div>
             </div>
-
-            <div id="colorGrid" class="color-grid"></div>
-
-            <div class="chart-card">
-              <div id="basicChart" class="chart"></div>
-            </div>
-
-            <div class="table-card">
-              <div class="card-head">
-                <div>
-                  <h3 data-i18n="descriptiveTitle">Descriptive statistics</h3>
-                  <p data-i18n="descriptiveDesc">Summary of valid numeric phase values in the selected sheet.</p>
-                </div>
-              </div>
-              <div class="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th data-i18n="thCondition">Condition</th>
-                      <th>n</th>
-                      <th>Mean</th>
-                      <th>SD</th>
-                      <th>Median</th>
-                      <th>Min</th>
-                      <th>Max</th>
-                    </tr>
-                  </thead>
-                  <tbody id="basicTableBody"></tbody>
-                </table>
-              </div>
+            <div class="control-right">
+              <button id="resetColorsBtn" class="mini-btn" data-i18n="resetColors">Reset colors</button>
             </div>
           </div>
 
-          <div id="normalPage" class="tab-page">
-            <div class="normal-grid">
-              <aside class="selection-card">
-                <h3 data-i18n="normalControls">Distribution controls</h3>
-                <p data-i18n="normalControlsDesc">
-                  Choose the reference pressure, the visible distributions, and the sigma envelope applied to the reference group.
-                </p>
+          <div class="plot-card">
+            <div id="basicChart" class="chart"></div>
+          </div>
 
-                <div class="inline-field">
-                  <label for="sigmaInput" data-i18n="sigmaLabel">Reference range (±Nσ)</label>
-                  <input id="sigmaInput" type="number" min="0.1" max="10" step="0.1" value="3" />
+          <div class="table-card">
+            <div class="card-head">
+              <div>
+                <h3 data-i18n="descriptiveTitle">Descriptive statistics</h3>
+                <p data-i18n="descriptiveDesc">Summary of valid numeric phase values in the selected sheet.</p>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-i18n="thCondition">Condition</th>
+                    <th>n</th>
+                    <th>Mean</th>
+                    <th>SD</th>
+                    <th>Median</th>
+                    <th>Min</th>
+                    <th>Max</th>
+                  </tr>
+                </thead>
+                <tbody id="basicTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="normalPage" class="tab-page">
+          <div class="normal-grid">
+            <aside class="selection-card">
+              <h3 data-i18n="normalControls">Distribution controls</h3>
+              <p data-i18n="normalControlsDesc">Choose the reference pressure, the visible distributions, and the sigma envelope applied to the reference group.</p>
+
+              <div class="inline-field">
+                <label for="sigmaInput" data-i18n="sigmaLabel">Reference range (±Nσ)</label>
+                <input id="sigmaInput" type="number" min="0.1" max="10" step="0.1" value="3" />
+              </div>
+
+              <div class="control-group-title" data-i18n="referenceGroup">Reference group</div>
+              <div id="referenceList" class="condition-list"></div>
+
+              <div class="control-group-title" data-i18n="visibleGroups">Visible groups</div>
+              <div style="display:flex;gap:7px;margin-bottom:8px">
+                <button id="selectAllBtn" class="mini-btn" style="flex:1" data-i18n="selectAll">All</button>
+                <button id="selectRefOnlyBtn" class="mini-btn" style="flex:1" data-i18n="refOnly">Reference only</button>
+              </div>
+              <div id="visibleList" class="condition-list"></div>
+
+              <div class="note" data-i18n="normalityNote">Gaussian curves are fitted from each group mean and sample SD. Jarque–Bera p-values are shown only as an exploratory normality check; they do not prove normality, especially for small n.</div>
+            </aside>
+
+            <div class="normal-right">
+              <div class="metric-grid">
+                <div class="metric-card">
+                  <div class="metric-label" data-i18n="metricReference">Reference</div>
+                  <div id="metricReference" class="metric-value">—</div>
+                  <div id="metricReferenceSub" class="metric-sub">—</div>
                 </div>
-
-                <div class="control-group-title" data-i18n="referenceGroup">Reference group</div>
-                <div id="referenceList" class="condition-list"></div>
-
-                <div class="control-group-title" data-i18n="visibleGroups">Visible groups</div>
-                <div style="display:flex; gap:7px; margin-bottom:8px">
-                  <button id="selectAllBtn" class="mini-btn" style="flex:1" data-i18n="selectAll">All</button>
-                  <button id="selectRefOnlyBtn" class="mini-btn" style="flex:1" data-i18n="refOnly">Reference only</button>
+                <div class="metric-card">
+                  <div class="metric-label" data-i18n="metricBounds">Sigma bounds</div>
+                  <div id="metricBounds" class="metric-value">—</div>
+                  <div id="metricBoundsSub" class="metric-sub">—</div>
                 </div>
-                <div id="visibleList" class="condition-list"></div>
-
-                <div class="note" data-i18n="normalityNote">
-                  Gaussian curves are fitted from each group mean and sample SD. Jarque–Bera p-values are shown only as an exploratory normality check; they do not prove normality, especially for small n.
+                <div class="metric-card">
+                  <div class="metric-label" data-i18n="metricVisible">Visible groups</div>
+                  <div id="metricVisible" class="metric-value">—</div>
+                  <div id="metricVisibleSub" class="metric-sub">—</div>
                 </div>
-              </aside>
+                <div class="metric-card">
+                  <div class="metric-label" data-i18n="metricClosest">Closest mean</div>
+                  <div id="metricClosest" class="metric-value">—</div>
+                  <div id="metricClosestSub" class="metric-sub">—</div>
+                </div>
+              </div>
 
-              <div class="normal-right">
-                <div class="metric-grid">
-                  <div class="metric-card">
-                    <div class="metric-label" data-i18n="metricReference">Reference</div>
-                    <div id="metricReference" class="metric-value">—</div>
-                    <div id="metricReferenceSub" class="metric-sub">—</div>
-                  </div>
+              <div class="plot-card">
+                <div id="normalChart" class="chart"></div>
+              </div>
 
-                  <div class="metric-card">
-                    <div class="metric-label" data-i18n="metricBounds">Sigma bounds</div>
-                    <div id="metricBounds" class="metric-value">—</div>
-                    <div id="metricBoundsSub" class="metric-sub">—</div>
-                  </div>
-
-                  <div class="metric-card">
-                    <div class="metric-label" data-i18n="metricVisible">Visible groups</div>
-                    <div id="metricVisible" class="metric-value">—</div>
-                    <div id="metricVisibleSub" class="metric-sub">—</div>
-                  </div>
-
-                  <div class="metric-card">
-                    <div class="metric-label" data-i18n="metricClosest">Closest mean</div>
-                    <div id="metricClosest" class="metric-value">—</div>
-                    <div id="metricClosestSub" class="metric-sub">—</div>
+              <div class="table-card">
+                <div class="card-head">
+                  <div>
+                    <h3 data-i18n="assessmentTitle">Sigma separation assessment</h3>
+                    <p data-i18n="assessmentDesc">Mean distance is expressed in reference-group σ units. In-range percentages use the reference group's ±Nσ interval.</p>
                   </div>
                 </div>
-
-                <div class="chart-card">
-                  <div id="normalChart" class="chart"></div>
-                </div>
-
-                <div class="table-card">
-                  <div class="card-head">
-                    <div>
-                      <h3 data-i18n="assessmentTitle">Sigma separation assessment</h3>
-                      <p data-i18n="assessmentDesc">
-                        Mean distance is expressed in reference-group σ units. In-range percentages use the reference group's ±Nσ interval.
-                      </p>
-                    </div>
-                  </div>
-                  <div class="table-wrap">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th data-i18n="thCondition">Condition</th>
-                          <th>n</th>
-                          <th>Mean</th>
-                          <th>SD</th>
-                          <th data-i18n="thSigmaDistance">|Δμ| / σref</th>
-                          <th data-i18n="thEmpiricalInside">Observed inside ref range</th>
-                          <th data-i18n="thExpectedInside">Gaussian expected inside</th>
-                          <th data-i18n="thJB">JB p</th>
-                          <th data-i18n="thStatus">Mean position</th>
-                        </tr>
-                      </thead>
-                      <tbody id="assessmentTableBody"></tbody>
-                    </table>
-                  </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th data-i18n="thCondition">Condition</th>
+                        <th>n</th>
+                        <th>Mean</th>
+                        <th>SD</th>
+                        <th data-i18n="thSigmaDistance">|Δμ| / σref</th>
+                        <th data-i18n="thEmpiricalInside">Observed inside ref range</th>
+                        <th data-i18n="thExpectedInside">Gaussian expected inside</th>
+                        <th data-i18n="thJB">JB p</th>
+                        <th data-i18n="thStatus">Mean position</th>
+                      </tr>
+                    </thead>
+                    <tbody id="assessmentTableBody"></tbody>
+                  </table>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
     </section>
   </main>
 
-  <script>
+<script>
     const T = {
       en: {
         home: "Homepage",
+        dockHint: "Select an assessment function.",
+        back: "← Back",
+        homeShort: "🏠 Home",
+        analysis: "Analysis",
+        inputSetup: "Input & validation setup",
+        excelFile: "Excel workbook",
+        browse: "Browse",
+        requiredSheets: "Required sheets",
+        plotColors: "Plot colors",
+        result: "Processing result",
+        chooseAnalysis: "Validate the workbook, then choose an analysis.",
         eyebrow: "CID · Distribution analysis",
-        title: "Normalization assessment.",
+        title: "Normalization assessment",
         desc: "Validate Notch and Center sheets, summarize phase values by burst-pressure condition, and assess whether the condition distributions can be separated using a selected ±Nσ reference range.",
         loadTitle: "1. Load workbook",
         loadDesc: "Required sheets: Notch and Center. Column A contains Sample IDs; columns B onward contain burst-pressure groups.",
@@ -1250,8 +773,19 @@
       },
       ko: {
         home: "홈페이지",
+        dockHint: "평가 기능을 선택하세요.",
+        back: "← 뒤로가기",
+        homeShort: "🏠 Home",
+        analysis: "분석",
+        inputSetup: "입력 및 검증 설정",
+        excelFile: "입력 Excel 파일",
+        browse: "Browse",
+        requiredSheets: "필수 시트",
+        plotColors: "그래프 색상",
+        result: "처리 결과",
+        chooseAnalysis: "엑셀 구조를 검증한 뒤 분석 기능을 선택하세요.",
         eyebrow: "CID · 분포 분석",
-        title: "정규분포 평가.",
+        title: "정규분포 평가",
         desc: "Notch 및 Center 시트 구조를 검증하고 파열압 조건별 페이즈 값을 요약한 뒤, 선택한 기준군의 ±Nσ 범위를 이용해 조건 간 분리 가능성을 평가합니다.",
         loadTitle: "1. 엑셀 불러오기",
         loadDesc: "필수 시트는 Notch와 Center입니다. A열은 Sample ID, B열 이후는 파열압 조건입니다.",
@@ -1667,6 +1201,7 @@
       els.analysisShell.classList.add("hidden");
       els.emptyState.classList.remove("hidden");
       els.exportBtn.disabled = true;
+      document.getElementById("actions").classList.remove("visible");
 
       document.querySelectorAll(".sheet-btn").forEach(btn => {
         btn.disabled = true;
@@ -1683,6 +1218,7 @@
       els.analysisShell.classList.remove("hidden");
       els.emptyState.classList.add("hidden");
       els.exportBtn.disabled = false;
+      document.getElementById("actions").classList.add("visible");
       document.querySelectorAll(".sheet-btn").forEach(btn => btn.disabled = false);
       switchSheet("Notch");
     }
@@ -1850,18 +1386,23 @@
 
       const layout = {
         margin: { l: 70, r: 28, t: 42, b: 72 },
-        paper_bgcolor: "rgba(0,0,0,0)",
-        plot_bgcolor: "rgba(255,255,255,.78)",
+        paper_bgcolor: "#fff",
+        plot_bgcolor: "#fff",
         font: { family: "Inter, sans-serif", color: "#111827" },
         xaxis: {
           title: { text: lang === "ko" ? "파열압 조건 (Kgf)" : "Burst-pressure condition (Kgf)", standoff: 18 },
           tickfont: { size: 12 },
-          gridcolor: "rgba(229,231,235,.35)"
+          showgrid: false,
+          zeroline: false,
+          linecolor: "#9aa1ad",
+          linewidth: 1.3
         },
         yaxis: {
           title: { text: lang === "ko" ? "페이즈 값" : "Phase value", standoff: 14 },
           zeroline: false,
-          gridcolor: "#eef0f2"
+          showgrid: false,
+          linecolor: "#9aa1ad",
+          linewidth: 1.3
         },
         bargap: 0.32,
         showlegend: false,
@@ -2210,19 +1751,23 @@
 
       const layout = {
         margin: { l: 76, r: 30, t: 64, b: 68 },
-        paper_bgcolor: "rgba(0,0,0,0)",
-        plot_bgcolor: "rgba(255,255,255,.82)",
+        paper_bgcolor: "#fff",
+        plot_bgcolor: "#fff",
         font: { family: "Inter, sans-serif", color: "#111827" },
         xaxis: {
           title: { text: lang === "ko" ? "페이즈 값" : "Phase value", standoff: 16 },
           zeroline: false,
-          gridcolor: "#eef0f2"
+          showgrid: false,
+          linecolor: "#9aa1ad",
+          linewidth: 1.3
         },
         yaxis: {
           title: { text: lang === "ko" ? "정규분포 확률밀도" : "Normal probability density", standoff: 16 },
           rangemode: "tozero",
           zeroline: false,
-          gridcolor: "#eef0f2"
+          showgrid: false,
+          linecolor: "#9aa1ad",
+          linewidth: 1.3
         },
         legend: {
           orientation: "h",
