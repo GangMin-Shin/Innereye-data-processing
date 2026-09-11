@@ -665,13 +665,14 @@
 
           <div class="file-line">
 
-            <label
+            <button
+              id="excelBrowseBtn"
+              type="button"
               class="secondary"
-              for="excelInput"
               data-i18n="browse"
             >
               Browse
-            </label>
+            </button>
 
             <input
               id="excelInput"
@@ -1317,6 +1318,10 @@ function processDataset(ds){
   metrics
  };
 }
+
+el('excelBrowseBtn').onclick=()=>{
+ el('excelInput').click();
+};
 
 el('excelInput').addEventListener(
  'change',
