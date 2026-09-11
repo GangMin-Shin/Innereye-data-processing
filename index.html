@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -200,6 +199,11 @@
       border-radius: 50%;
 
       background: #1f7a4d;
+      flex: 0 0 auto;
+    }
+
+    .tab.normalization .dot {
+      background: #2563eb;
     }
 
     @media (max-width: 720px) {
@@ -216,6 +220,12 @@
         bottom: 22px;
 
         max-width: calc(100vw - 40px);
+      }
+
+      .tab {
+        min-height: 52px;
+        padding: 0 18px;
+        font-size: 14px;
       }
 
       .lang-btn {
@@ -279,6 +289,17 @@
         </span>
       </a>
 
+      <a
+        class="tab normalization"
+        href="./Normalization%20assessment.html"
+      >
+        <span class="dot"></span>
+
+        <span data-i18n="normalization">
+          Normalization assessment
+        </span>
+      </a>
+
     </nav>
 
   </main>
@@ -289,14 +310,16 @@
         eyebrow: "Homepage.",
         title: "Homepage.",
         desc: "Open a processing module, load a standardized measurement workbook, inspect the signal, and export processed results directly from your browser.",
-        cid: "CID preprocessing"
+        cid: "CID preprocessing",
+        normalization: "Normalization assessment"
       },
 
       ko: {
         eyebrow: "홈페이지.",
         title: "홈페이지.",
         desc: "처리 모듈을 열고 표준화된 측정 엑셀을 불러온 뒤 신호를 확인하고 전처리 결과를 브라우저에서 바로 저장합니다.",
-        cid: "CID 전처리"
+        cid: "CID 전처리",
+        normalization: "정규분포 평가"
       }
     };
 
@@ -335,4 +358,3 @@
 
 </body>
 </html>
-```
