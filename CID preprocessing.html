@@ -800,12 +800,12 @@
 
         <label class="color-opt">
           <input id="colorH1" type="color" value="#7c3aed">
-          <span data-i18n="harmonic">1X harmonic</span>
+          <span data-i18n="harmonic">1st harmonic</span>
         </label>
 
         <label class="color-opt">
           <input id="colorCorrected" type="color" value="#16a34a">
-          <span data-i18n="corrected">1X-removed</span>
+          <span data-i18n="corrected">Corrected</span>
         </label>
 
       </div>
@@ -941,7 +941,7 @@ const I18N={
   needFile:'Please select an Excel workbook.',
   needFolder:'Please select a save folder.',
   rawTitle:'Raw data · all samples',
-  h1Title:'1X harmonic fit · all samples',
+  h1Title:'1st harmonic fit · all samples',
   alignRawTitle:'Minimum Alignment: raw data',
   alignH1Title:'Minimum Alignment: 1st harmonic',
   eccOverlay:'Corrected data · all samples overlay',
@@ -955,7 +955,7 @@ const I18N={
   rawLegend:'Raw',
   fitLegend:'1st harmonic',
   alignedLegend:'Aligned raw',
-  correctedLegend:'1st harmonic',
+  correctedLegend:'Corrected',
   meanLegend:'mean',
   sdLegend:'± SD',
   saving:'Generating files…',
@@ -1030,7 +1030,7 @@ const I18N={
   needFile:'읽을 Excel 파일을 선택해주세요.',
   needFolder:'저장 폴더를 선택해주세요.',
   rawTitle:'Rawdata · 전체 샘플',
-  h1Title:'1X 하모닉 핏 · 전체 샘플',
+  h1Title:'1차 하모닉 핏 · 전체 샘플',
   alignRawTitle:'Minimum Alignment: raw data',
   alignH1Title:'Minimum Alignment: 1st harmonic',
   eccOverlay:'보정 데이터 · 전체 샘플 오버레이',
@@ -1044,7 +1044,7 @@ const I18N={
   rawLegend:'Raw',
   fitLegend:'1st harmonic',
   alignedLegend:'정렬 Raw',
-  correctedLegend:'1st harmonic',
+  correctedLegend:'보정 후',
   meanLegend:'평균',
   sdLegend:'± 표준편차',
   saving:'파일 생성 중…',
@@ -1091,7 +1091,29 @@ function applyLanguage(){
   }
  });
 
+ if(state.file){
+  el('filename').textContent=state.file.name;
+ }
+
+ if(state.saveHandle){
+  el('folderName').textContent=state.saveHandle.name;
+ }
+
+ if(state.dataset){
+  setStatus(tr('readSuccess'),'good');
+ }else if(state.saveHandle){
+  setStatus(tr('folderSelected'),'good');
+ }else{
+  setStatus(tr('ready'));
+ }
+
  if(state.currentMode){
+  el('resultTitle').textContent=
+   tr(modeInfo[state.currentMode].title);
+
+  el('resultSub').textContent=
+   tr('analysisReady');
+
   runAnalysis(state.currentMode,false);
  }
 }
@@ -1334,6 +1356,29 @@ el('excelInput').addEventListener(
     :tr('noFile');
 
   state.dataset=null;
+  state.currentMode=null;
+  state.currentPlots=[];
+
+  document
+   .querySelectorAll('.analysis-btn')
+   .forEach(
+    b=>b.classList.remove('active')
+   );
+
+  el('actions')
+   .classList
+   .remove('visible');
+
+  el('detected').innerHTML='';
+
+  el('resultTitle').textContent=
+   tr('result');
+
+  el('resultSub').textContent=
+   tr('chooseAnalysis');
+
+  el('plots').innerHTML=
+   `<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;
 
   setStatus(tr('ready'));
  }
@@ -1639,6 +1684,29 @@ el('readBtn').onclick=async()=>{
  }catch(err){
 
   state.dataset=null;
+  state.currentMode=null;
+  state.currentPlots=[];
+
+  document
+   .querySelectorAll('.analysis-btn')
+   .forEach(
+    b=>b.classList.remove('active')
+   );
+
+  el('actions')
+   .classList
+   .remove('visible');
+
+  el('detected').innerHTML='';
+
+  el('resultTitle').textContent=
+   tr('result');
+
+  el('resultSub').textContent=
+   tr('chooseAnalysis');
+
+  el('plots').innerHTML=
+   `<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;
 
   setStatus(
    err.message||String(err),
