@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CID multi point analysis</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+  <style>
+    :root{
+      --ink:#111827;
+      --muted:#667085;
+      --line:#e5e7eb;
+      --green:#1f8a57;
+      --green-soft:#eaf8f0;
+      --danger:#b42318;
+      --warn:#9a6700;
+      --shadow:0 12px 38px rgba(17,24,39,.08);
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:#fff;
+      color:var(--ink);
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+      position:relative;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.60),rgba(255,255,255,.60)),
+        url("./CID%20multi%20point%20analysis.jpeg");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      opacity:.20;
+      filter:saturate(.72) brightness(1.08) contrast(.92);
+      z-index:-2;
+    }
+
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:rgba(255,255,255,.24);
+      z-index:-1;
+    }
+
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:30;
+      height:82px;
+      background:rgba(255,255,255,.88);
+      backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 34px 0 330px;
+    }
+
+    .title-wrap h1{font-size:24px;margin:0;font-weight:800;letter-spacing:-.03em}
+    .lang-btn{
+      width:46px;height:46px;border:1px solid var(--line);border-radius:50%;background:#fff;
+      font-size:21px;box-shadow:0 6px 18px rgba(17,24,39,.06)
+    }
+
+    .dock{
+      position:fixed;
+      z-index:40;
+      left:22px;
+      bottom:22px;
+      width:280px;
+      max-height:calc(100vh - 44px);
+      overflow:auto;
+      background:rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:14px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(10px);
+    }
+
+    .dock-head{padding:8px 8px 12px}
+    .dock-head strong{display:block;font-size:15px}
+    .dock-head span{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+    .nav-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+    .nav-btn,.analysis-btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;font-weight:800}
+    .nav-btn{height:42px}
+    .analysis-btn{
+      width:100%;text-align:left;padding:13px 14px;margin-top:8px;line-height:1.35;font-size:13px;transition:.18s ease
+    }
+    .analysis-btn:hover{transform:translateY(-1px);border-color:#bdc3cc}
+    .analysis-btn.active{background:#111827;color:#fff;border-color:#111827}
+    .dock hr{border:0;border-top:1px solid var(--line);margin:10px 0}
+    .dock-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:800;padding:4px 8px}
+
+    .workspace{margin-left:316px;padding:30px 36px 80px;max-width:1700px}
+    .setup-card,.plot-card,.table-card{
+      border:1px solid var(--line);border-radius:20px;background:rgba(255,255,255,.90);
+      box-shadow:0 8px 28px rgba(17,24,39,.05);backdrop-filter:blur(8px)
+    }
+    .setup-card{padding:24px;margin-bottom:22px}
+    .section-title{font-size:18px;font-weight:800;margin:0 0 18px;letter-spacing:-.02em}
+
+    .setup-grid{
+      display:grid;
+      grid-template-columns:minmax(270px,1.4fr) repeat(5,minmax(120px,.58fr)) minmax(270px,1.2fr);
+      gap:14px;
+      align-items:end;
+    }
+
+    .field label{display:block;font-size:12px;font-weight:800;color:#344054;margin-bottom:7px}
+    .field input[type="number"],.field input[type="text"],.field select{
+      width:100%;height:46px;border:1px solid #d9dde4;border-radius:12px;padding:0 12px;background:#fff;color:var(--ink);outline:none
+    }
+    .field input:focus,.field select:focus{border-color:#88909d;box-shadow:0 0 0 3px #f0f2f5}
+    .file-line{display:flex;gap:8px;align-items:center}
+    .file-line input[type=file]{display:none}
+
+    .primary,.secondary{
+      height:46px;border-radius:12px;padding:0 18px;font-size:14px;font-weight:800;border:1px solid var(--line);
+      white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;line-height:1
+    }
+    .primary{background:#111827;color:#fff;border-color:#111827}
+    .secondary{background:#fff;color:#111827}
+    .secondary:hover{background:#f8f9fb}
+    .filename{
+      flex:1;height:46px;display:flex;align-items:center;padding:0 12px;border:1px dashed #cfd4dc;border-radius:12px;
+      color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+    }
+
+    .read-row{display:flex;gap:10px;align-items:center;margin-top:15px;flex-wrap:wrap}
+    .status{font-size:12px;font-weight:700;color:var(--muted)}
+    .status.good{color:var(--green)}
+    .status.bad{color:var(--danger)}
+    .detected{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+    .badge{padding:7px 10px;border:1px solid var(--line);border-radius:999px;font-size:11px;font-weight:800;color:#344054;background:#fafafa}
+    .badge.good{background:var(--green-soft);color:#16653f;border-color:#ccebd9}
+    .badge.warn{background:#fff7e8;color:var(--warn);border-color:#f4dfad}
+
+    .note{
+      margin-top:16px;padding:12px 14px;border:1px solid #e7e9ee;border-radius:12px;background:#fafbfc;
+      font-size:11px;line-height:1.55;color:#475467;font-weight:650
+    }
+
+    .colors{margin-top:18px;padding-top:18px;border-top:1px solid var(--line);display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+    .color-opt{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;color:#475467}
+    .color-opt input{width:30px;height:30px;padding:0;border:0;background:none}
+
+    .result-header{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin:28px 0 14px}
+    .result-header h2{margin:0;font-size:21px;font-weight:800;letter-spacing:-.03em}
+    .result-header .sub{font-size:12px;color:var(--muted);font-weight:600;margin-top:5px}
+    .result-controls{display:flex;align-items:end;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .mini-field label{display:block;font-size:11px;font-weight:800;color:#475467;margin-bottom:6px}
+    .mini-field select{height:44px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:0 12px;min-width:150px;font-weight:700}
+    .actions{display:none;align-items:center;gap:10px;flex-wrap:wrap}
+    .actions.visible{display:flex}
+    .toggle{height:44px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:0 13px;display:flex;gap:9px;align-items:center;font-size:12px;font-weight:800}
+    .lamp{width:11px;height:11px;border-radius:50%;background:#c7cbd1;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+    .toggle.on .lamp{background:#24b26b;box-shadow:0 0 0 4px rgba(36,178,107,.12)}
+    .save-btn{height:44px;border:0;border-radius:12px;background:#111827;color:#fff;padding:0 17px;font-weight:800}
+    .save-btn:disabled{opacity:.45;cursor:not-allowed}
+
+    .plots{display:grid;gap:18px}
+    .plot-card{padding:16px;min-height:460px}
+    .plot-title{display:flex;align-items:center;justify-content:space-between;padding:3px 4px 10px;font-size:13px;font-weight:800}
+    .plot{width:100%;height:520px}
+    .empty{min-height:500px;border:1px dashed #d5dae1;border-radius:20px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-weight:700;line-height:1.6;padding:30px}
+    .progress{display:none;margin-top:10px;font-size:12px;font-weight:700;color:var(--muted)}
+    .progress.visible{display:block}
+
+    .table-card{padding:18px;overflow:hidden}
+    .table-wrap{overflow:auto;max-height:620px;border:1px solid var(--line);border-radius:14px;background:#fff}
+    table{border-collapse:separate;border-spacing:0;width:100%;min-width:760px;font-size:12px}
+    th,td{padding:10px 12px;border-right:1px solid #eceef2;border-bottom:1px solid #eceef2;text-align:right;white-space:nowrap}
+    th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:#fff;z-index:2}
+    thead th{position:sticky;top:0;background:#f8f9fb;z-index:3;font-weight:800;color:#344054}
+    thead th:first-child{z-index:4;background:#f8f9fb}
+    tr:last-child td{border-bottom:0}
+    th:last-child,td:last-child{border-right:0}
+
+    @media(max-width:1450px){.setup-grid{grid-template-columns:repeat(4,1fr)}}
+    @media(max-width:1050px){
+      .dock{position:static;width:auto;max-height:none;margin:18px}
+      .topbar{padding-left:24px}
+      .workspace{margin-left:0;padding:12px 18px 60px}
+      .setup-grid{grid-template-columns:1fr 1fr}
+      .analysis-btn{font-size:12px}
+      .nav-row{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:650px){
+      .setup-grid{grid-template-columns:1fr}
+      .topbar{height:auto;padding:16px 18px}
+      .title-wrap h1{font-size:19px}
+      .workspace{padding:10px 12px 50px}
+      .plot{height:420px}
+      .result-header{align-items:flex-start;flex-direction:column}
+      .result-controls{justify-content:flex-start;width:100%}
+    }
+  </style>
+</head>
+
+<body>
+  <aside class="dock">
+    <div class="dock-head">
+      <strong data-i18n="module">CID multi point analysis</strong>
+      <span data-i18n="dockHint">Select an analysis function.</span>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" onclick="history.back()" data-i18n="back">← Back</button>
+      <button class="nav-btn" onclick="location.href='./'" data-i18n="home">Home</button>
+    </div>
+
+    <hr>
+    <div class="dock-label" data-i18n="analysis">Analysis</div>
+
+    <button class="analysis-btn" data-mode="organize" data-i18n="organizeBtn">Organized data by radius</button>
+    <button class="analysis-btn" data-mode="raw" data-i18n="rawBtn">Raw data plot</button>
+    <button class="analysis-btn" data-mode="h1" data-i18n="h1Btn">1st harmonic plot</button>
+    <button class="analysis-btn" data-mode="alignedRaw" data-i18n="alignRawBtn">Alignment: raw data plot</button>
+    <button class="analysis-btn" data-mode="alignedH1" data-i18n="alignH1Btn">Alignment: 1st harmonic plot</button>
+    <button class="analysis-btn" data-mode="ecc" data-i18n="eccBtn">Eccentricity Diagnostic & Correction</button>
+    <button class="analysis-btn" data-mode="radiusProfile" data-i18n="radiusBtn">Radius profile</button>
+  </aside>
+
+  <header class="topbar">
+    <div class="title-wrap"><h1 data-i18n="module">CID multi point analysis</h1></div>
+    <button id="langBtn" class="lang-btn" title="Language" aria-label="Change language">🌐</button>
+  </header>
+
+  <main class="workspace">
+    <section class="setup-card">
+      <h2 class="section-title" data-i18n="inputSetup">Input & output setup</h2>
+
+      <div class="setup-grid">
+        <div class="field">
+          <label data-i18n="excelFile">Excel workbook</label>
+          <div class="file-line">
+            <button id="excelBrowseBtn" type="button" class="secondary" data-i18n="browse">Browse</button>
+            <input id="excelInput" type="file" accept=".xlsx,.xlsm,.xls">
+            <div id="filename" class="filename" data-i18n="noFile">No file selected</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label data-i18n="startRadius">Start radius (mm)</label>
+          <input id="startRadius" type="number" min="0" step="0.001" value="0.1">
+        </div>
+
+        <div class="field">
+          <label data-i18n="endRadius">End radius (mm)</label>
+          <input id="endRadius" type="number" min="0" step="0.001" value="7">
+        </div>
+
+        <div class="field">
+          <label data-i18n="radiusStep">Radius interval (mm)</label>
+          <input id="radiusStep" type="number" min="0.000001" step="0.001" value="0.1">
+        </div>
+
+        <div class="field">
+          <label data-i18n="expectedPoints">Points per radius</label>
+          <input id="expectedPoints" type="number" min="3" step="1" value="4">
+        </div>
+
+        <div class="field">
+          <label data-i18n="expectedSamples">Measured samples</label>
+          <input id="expectedSamples" type="number" min="1" step="1" value="30">
+        </div>
+
+        <div class="field">
+          <label data-i18n="savePath">Save path</label>
+          <div class="file-line">
+            <button id="folderBtn" class="secondary" data-i18n="browse">Browse</button>
+            <div id="folderName" class="filename" data-i18n="notSelected">No folder selected</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="read-row">
+        <button id="readBtn" class="primary" data-i18n="readExcel">Validate & analyze</button>
+        <span id="status" class="status" data-i18n="ready">Ready</span>
+      </div>
+
+      <div id="detected" class="detected"></div>
+
+      <div class="note" data-i18n="pointOrderNote">
+        Harmonic analysis assumes P1 → P2 → ... follows the circular direction at equal angular spacing. For 4 points, the angular interval is 90°.
+      </div>
+
+      <div class="colors">
+        <span style="font-size:11px;font-weight:800;color:#344054" data-i18n="plotColors">Plot colors</span>
+        <label class="color-opt"><input id="colorRaw" type="color" value="#111827"><span data-i18n="rawBefore">Raw before alignment</span></label>
+        <label class="color-opt"><input id="colorAligned" type="color" value="#2563eb"><span data-i18n="alignedRaw">Aligned raw</span></label>
+        <label class="color-opt"><input id="colorH1" type="color" value="#7c3aed"><span data-i18n="harmonic">1st harmonic</span></label>
+        <label class="color-opt"><input id="colorCorrected" type="color" value="#16a34a"><span data-i18n="corrected">Corrected</span></label>
+        <label class="color-opt"><input id="colorCenter" type="color" value="#dc2626"><span data-i18n="centerColor">Center</span></label>
+      </div>
+    </section>
+
+    <section>
+      <div class="result-header">
+        <div>
+          <h2 id="resultTitle" data-i18n="result">Processing result</h2>
+          <div id="resultSub" class="sub" data-i18n="chooseAnalysis">Validate the workbook, then choose an analysis.</div>
+        </div>
+
+        <div class="result-controls">
+          <div id="radiusControl" class="mini-field" style="display:none">
+            <label data-i18n="viewRadius">View radius</label>
+            <select id="radiusSelect"></select>
+          </div>
+
+          <div id="actions" class="actions">
+            <button id="individualToggle" class="toggle"><span class="lamp"></span><span data-i18n="individual">Individual sample waveforms</span></button>
+            <button id="saveBtn" class="save-btn" data-i18n="save">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="plots" class="plots">
+        <div class="empty" data-i18n="empty">No result yet.<br>Load and validate a workbook, then select a function from the lower-left panel.</div>
+      </div>
+
+      <div id="progress" class="progress"></div>
+    </section>
+  </main>
+
+<script>
+const I18N={
+  en:{
+    module:'CID multi point analysis', dockHint:'Select an analysis function.', back:'← Back', home:'🏠 Home', analysis:'Analysis',
+    organizeBtn:'Organized data by radius', rawBtn:'Raw data plot', h1Btn:'1st harmonic plot', alignRawBtn:'Alignment: raw data plot',
+    alignH1Btn:'Alignment: 1st harmonic plot', eccBtn:'Eccentricity Diagnostic & Correction', radiusBtn:'Radius profile',
+    inputSetup:'Input & output setup', excelFile:'Excel workbook', browse:'Browse', noFile:'No file selected',
+    startRadius:'Start radius (mm)', endRadius:'End radius (mm)', radiusStep:'Radius interval (mm)', expectedPoints:'Points per radius',
+    expectedSamples:'Measured samples', savePath:'Save path', notSelected:'No folder selected', readExcel:'Validate & analyze', ready:'Ready',
+    pointOrderNote:'Harmonic analysis assumes P1 → P2 → ... follows the circular direction at equal angular spacing. For 4 points, the angular interval is 90°.',
+    plotColors:'Plot colors', rawBefore:'Raw before alignment', alignedRaw:'Aligned raw', harmonic:'1st harmonic', corrected:'Corrected', centerColor:'Center',
+    result:'Processing result', chooseAnalysis:'Validate the workbook, then choose an analysis.', viewRadius:'View radius', individual:'Individual sample waveforms',
+    save:'Save', empty:'No result yet.\nLoad and validate a workbook, then select a function from the lower-left panel.',
+    needFile:'Please select an Excel workbook.', needFolder:'Please select a save folder.', needParams:'Please enter valid radius, point, and sample parameters.',
+    folderSelected:'Save folder selected', folderUnsupported:'This browser does not support folder selection. Use a browser supporting the File System Access API.',
+    reading:'Validating workbook structure…', readSuccess:'Workbook structure validated and analysis data prepared.',
+    invalidRange:'End radius must be greater than or equal to start radius, and interval must be positive.',
+    rangeDiv:'The radius range is not divisible by the entered interval.',
+    missingSheet:'Required sheet is missing', extraPointSheets:'Detected P-sheet count differs from the entered point count.',
+    badHeader:'A1 must be exactly “(mm)”', badCenterLabel:'Center!A2 must be exactly “Center”.',
+    sampleMismatch:'Sample headers do not match the entered sample count or S1…Sn structure.', radiusMismatch:'Radius rows do not match the entered start/end/interval.',
+    radiusOrder:'Radius values in each P-sheet must be in descending order from end radius to start radius.', nonnumeric:'Nonnumeric or missing measurement value detected.',
+    detSheets:'Point sheets', detSamples:'Samples', detRadii:'Radii', detCenter:'Center sheet', found:'found',
+    modeOrganize:'Organized data by radius', modeRaw:'Raw data', modeH1:'1st harmonic', modeAlignedRaw:'Minimum Alignment: raw data',
+    modeAlignedH1:'Minimum Alignment: 1st harmonic', modeEcc:'Eccentricity Diagnostic & Correction', modeRadius:'Radius profile',
+    analysisReady:'Result generated. Select a radius where applicable and use Save to export.',
+    organizeTitle:'Radius-organized preview', organizeSub:'Each radius workbook contains P1…Pn rows and a final Center row.',
+    rawTitle:'Raw data · all samples', h1Title:'1st harmonic fit · all samples', alignRawTitle:'Minimum Alignment: raw data',
+    alignH1Title:'Minimum Alignment: 1st harmonic', eccOverlay:'Corrected data · all samples overlay', eccMean:'Mean ± SD graph',
+    eccSD:'Within-sample SD across points before/after correction', radiusMean:'Point mean and Center vs radius', radiusDelta:'MeanMinusCenter vs radius',
+    pointAxis:'Measurement Point', alignedPointAxis:'Aligned Point', sensorAxis:'Phase', sampleAxis:'Sample', sdAxis:'SD across points', radiusAxis:'Radius (mm)',
+    rawLegend:'Raw', fitLegend:'1st harmonic', alignedLegend:'Aligned raw', correctedLegend:'Corrected', centerLegend:'Center', meanLegend:'mean', sdLegend:'± SD',
+    saving:'Generating files…', saved:'Save completed.', saveFailed:'Save failed', individualOn:'Individual sample export ON', individualOff:'Individual sample export OFF',
+    radius:'Radius', points:'Points', samples:'Samples', center:'Center', pointMean:'Point mean', meanMinusCenter:'MeanMinusCenter',
+    preview:'Preview', actual:'actual', expected:'expected'
+  },
+  ko:{
+    module:'CID 멀티 포인트 분석', dockHint:'분석 기능을 선택하세요.', back:'← 뒤로가기', home:'🏠 Home', analysis:'분석',
+    organizeBtn:'반지름별 데이터 정리', rawBtn:'Rawdata 플롯', h1Btn:'1차 하모닉 플롯', alignRawBtn:'Alignment: rawdata 플롯',
+    alignH1Btn:'Alignment: 1차 하모닉 플롯', eccBtn:'Eccentricity Diagnostic & Correction', radiusBtn:'반지름 프로파일',
+    inputSetup:'입력 및 저장 설정', excelFile:'입력 Excel 파일', browse:'Browse', noFile:'선택된 파일 없음',
+    startRadius:'시작 반지름 (mm)', endRadius:'종료 반지름 (mm)', radiusStep:'반지름 간격 (mm)', expectedPoints:'반지름당 포인트 수',
+    expectedSamples:'측정 샘플 수', savePath:'저장 경로', notSelected:'선택된 폴더 없음', readExcel:'유효성 검사 및 분석', ready:'준비 완료',
+    pointOrderNote:'하모닉 분석은 P1 → P2 → ...가 원주 방향으로 등각 간격 순서라고 가정합니다. 4포인트이면 포인트 간 각도는 90°입니다.',
+    plotColors:'그래프 색상', rawBefore:'정렬 전 rawdata', alignedRaw:'정렬 후 rawdata', harmonic:'1차 하모닉', corrected:'보정 후', centerColor:'Center',
+    result:'처리 결과', chooseAnalysis:'Excel 구조를 검증한 뒤 분석 기능을 선택하세요.', viewRadius:'표시 반지름', individual:'개별 샘플 파형',
+    save:'세이브', empty:'아직 결과가 없습니다.\nExcel을 불러와 유효성 검사를 완료한 뒤 왼쪽 아래에서 기능을 선택하세요.',
+    needFile:'읽을 Excel 파일을 선택해주세요.', needFolder:'저장 폴더를 선택해주세요.', needParams:'반지름, 포인트 수, 샘플 수 입력값을 확인해주세요.',
+    folderSelected:'저장 폴더 선택 완료', folderUnsupported:'이 브라우저는 저장 폴더 선택을 지원하지 않습니다. File System Access API를 지원하는 브라우저를 사용해주세요.',
+    reading:'Excel 구조를 검증하는 중…', readSuccess:'Excel 구조 검증을 완료했고 분석 데이터를 준비했습니다.',
+    invalidRange:'종료 반지름은 시작 반지름 이상이어야 하며 간격은 0보다 커야 합니다.',
+    rangeDiv:'입력한 시작/종료 반지름 범위가 반지름 간격으로 정확히 나누어지지 않습니다.',
+    missingSheet:'필수 시트가 없습니다', extraPointSheets:'검출된 P 시트 수가 입력한 포인트 수와 다릅니다.',
+    badHeader:'A1 셀은 정확하게 “(mm)”이어야 합니다.', badCenterLabel:'Center!A2 셀은 정확하게 “Center”이어야 합니다.',
+    sampleMismatch:'샘플 열이 입력한 샘플 수 또는 S1…Sn 구조와 일치하지 않습니다.', radiusMismatch:'반지름 행이 입력한 시작/종료/간격과 일치하지 않습니다.',
+    radiusOrder:'각 P 시트의 반지름 값은 종료 반지름부터 시작 반지름까지 내림차순이어야 합니다.', nonnumeric:'숫자가 아니거나 비어 있는 측정값이 있습니다.',
+    detSheets:'포인트 시트', detSamples:'샘플', detRadii:'반지름', detCenter:'Center 시트', found:'있음',
+    modeOrganize:'반지름별 데이터 정리', modeRaw:'Rawdata', modeH1:'1차 하모닉', modeAlignedRaw:'Minimum Alignment: raw data',
+    modeAlignedH1:'Minimum Alignment: 1st harmonic', modeEcc:'Eccentricity Diagnostic & Correction', modeRadius:'반지름 프로파일',
+    analysisReady:'결과 생성 완료. 필요한 경우 표시 반지름을 변경하고 Save로 저장하세요.',
+    organizeTitle:'반지름별 정리 미리보기', organizeSub:'각 반지름 엑셀에는 P1…Pn 행과 마지막 Center 행이 저장됩니다.',
+    rawTitle:'Rawdata · 전체 샘플', h1Title:'1차 하모닉 핏 · 전체 샘플', alignRawTitle:'Minimum Alignment: raw data',
+    alignH1Title:'Minimum Alignment: 1st harmonic', eccOverlay:'보정 데이터 · 전체 샘플 오버레이', eccMean:'Mean ± SD 그래프',
+    eccSD:'보정 전/후 샘플별 포인트 방향 SD', radiusMean:'포인트 평균 및 Center · 반지름별', radiusDelta:'MeanMinusCenter · 반지름별',
+    pointAxis:'측정 포인트', alignedPointAxis:'Aligned Point', sensorAxis:'Phase', sampleAxis:'샘플', sdAxis:'포인트 방향 표준편차', radiusAxis:'반지름 (mm)',
+    rawLegend:'Raw', fitLegend:'1차 하모닉', alignedLegend:'정렬 Raw', correctedLegend:'보정 후', centerLegend:'Center', meanLegend:'평균', sdLegend:'± 표준편차',
+    saving:'파일 생성 중…', saved:'저장이 완료되었습니다.', saveFailed:'저장 실패', individualOn:'개별 샘플 저장 ON', individualOff:'개별 샘플 저장 OFF',
+    radius:'반지름', points:'포인트', samples:'샘플', center:'Center', pointMean:'포인트 평균', meanMinusCenter:'MeanMinusCenter',
+    preview:'미리보기', actual:'실제', expected:'입력'
+  }
+};
+
+let lang=localStorage.getItem('innereye_lang')||'en';
+const el=id=>document.getElementById(id);
+const tr=k=>I18N[lang][k]||k;
+
+const state={
+  file:null,
+  saveHandle:null,
+  dataset:null,
+  currentMode:null,
+  individual:false,
+  currentPlots:[],
+  selectedRadiusKey:null
+};
+
+function setStatus(text,kind=''){
+  el('status').textContent=text;
+  el('status').className='status '+kind;
+}
+
+function mean(arr){return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:NaN}
+function sd(arr){if(arr.length<2)return 0;const m=mean(arr);return Math.sqrt(arr.reduce((s,v)=>s+(v-m)**2,0)/(arr.length-1))}
+function rotateLeft(arr,k){const n=arr.length;k=((k%n)+n)%n;return arr.slice(k).concat(arr.slice(0,k))}
+function hexToRgba(hex,a){let h=hex.replace('#','');if(h.length===3)h=h.split('').map(x=>x+x).join('');const n=parseInt(h,16);return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`}
+function sampleColor(i,n){const hue=Math.round((i*300/Math.max(1,n-1)+205)%360);return `hsl(${hue} 66% 47%)`}
+function radiusKey(v){return Number(v).toFixed(6)}
+function radiusLabel(v){return Number(v).toFixed(6).replace(/0+$/,'').replace(/\.$/,'')}
+
+function firstHarmonic(y){
+  const n=y.length;
+  if(n<3)throw new Error('At least 3 points are required.');
+  const c0=mean(y);
+  let a=0,b=0;
+  for(let i=0;i<n;i++){
+    const th=2*Math.PI*i/n;
+    a+=y[i]*Math.cos(th);
+    b+=y[i]*Math.sin(th);
+  }
+  a*=2/n;b*=2/n;
+  const fit=[];
+  for(let i=0;i<n;i++){
+    const th=2*Math.PI*i/n;
+    fit.push(c0+a*Math.cos(th)+b*Math.sin(th));
+  }
+  const amp=Math.hypot(a,b);
+  const peak=((Math.atan2(b,a)*180/Math.PI)%360+360)%360;
+  const ssRes=y.reduce((s,v,i)=>s+(v-fit[i])**2,0);
+  const ssTot=y.reduce((s,v)=>s+(v-c0)**2,0);
+  const r2=ssTot>0?1-ssRes/ssTot:NaN;
+  return{mean:c0,a,b,amp,peak,r2,fit};
+}
+
+function alignByH1(y){
+  const h=firstHarmonic(y);
+  const n=y.length;
+  const step=360/n;
+  const threshold=1e-10*Math.max(1,...y.map(v=>Math.abs(v)));
+  const valid=h.amp>threshold;
+  const minAngle=valid?(h.peak+180)%360:NaN;
+  const shift=valid?Math.round(minAngle/step)%n:0;
+  return{aligned:rotateLeft(y,shift),shift,minAngle,valid,h1:h};
+}
+
+function processRadiusBlock(block,points,samples){
+  const aligned={},rawFit={},alignedFit={},corrected={},metrics=[];
+  for(const s of samples){
+    const y=block.values[s];
+    const rawH=firstHarmonic(y);
+    const al=alignByH1(y);
+    const alH=firstHarmonic(al.aligned);
+    const corr=al.aligned.map((v,i)=>v-(alH.fit[i]-alH.mean));
+    aligned[s]=al.aligned;
+    rawFit[s]=rawH.fit;
+    alignedFit[s]=alH.fit;
+    corrected[s]=corr;
+    metrics.push({
+      Sample:s,
+      H1_Mean:rawH.mean,
+      H1_Cos:rawH.a,
+      H1_Sin:rawH.b,
+      H1_Amplitude:rawH.amp,
+      H1_PeakAngle_deg:rawH.peak,
+      H1_R2:rawH.r2,
+      H1_Continuous_MinAngle_deg:al.minAngle,
+      Shift_Points:al.shift,
+      Original_Start_Point:points[al.shift],
+      Original_Start_Angle_deg:al.shift*(360/points.length),
+      Alignment_Status:al.valid?'Aligned':'Undefined_H1_Amplitude'
+    });
+  }
+  return{aligned,rawFit,alignedFit,corrected,metrics};
+}
+
+function readParams(){
+  const start=Number(el('startRadius').value);
+  const end=Number(el('endRadius').value);
+  const step=Number(el('radiusStep').value);
+  const points=Number(el('expectedPoints').value);
+  const samples=Number(el('expectedSamples').value);
+  if(!Number.isFinite(start)||!Number.isFinite(end)||!Number.isFinite(step)||!Number.isInteger(points)||!Number.isInteger(samples)||points<3||samples<1||step<=0)throw new Error(tr('needParams'));
+  if(end<start)throw new Error(tr('invalidRange'));
+  const span=end-start;
+  const nFloat=span/step;
+  const n=Math.round(nFloat);
+  if(Math.abs(nFloat-n)>1e-7)throw new Error(tr('rangeDiv'));
+  const radii=[];
+  for(let i=0;i<=n;i++)radii.push(Number((start+i*step).toFixed(10)));
+  return{start,end,step,points,samples,radii};
+}
+
+function exactSampleNames(n){return Array.from({length:n},(_,i)=>`S${i+1}`)}
+function exactPointNames(n){return Array.from({length:n},(_,i)=>`P${i+1}`)}
+
+function validateHeaders(aoa,params,sheetName){
+  if(String(aoa?.[0]?.[0]??'').trim()!=='(mm)')throw new Error(`${sheetName}: ${tr('badHeader')}`);
+  const actual=(aoa[0]||[]).slice(1).map(v=>String(v??'').trim()).filter(v=>v!=='');
+  const expected=exactSampleNames(params.samples);
+  if(actual.length!==expected.length||actual.some((v,i)=>v!==expected[i])){
+    throw new Error(`${sheetName}: ${tr('sampleMismatch')} (${tr('expected')} ${expected.join(', ')})`);
+  }
+  return expected;
+}
+
+function parsePointSheet(wb,sheetName,params){
+  const aoa=XLSX.utils.sheet_to_json(wb.Sheets[sheetName],{header:1,defval:null,raw:true});
+  const samples=validateHeaders(aoa,params,sheetName);
+  const actualRadii=[];
+  for(let r=1;r<aoa.length;r++){
+    const first=aoa[r]?.[0];
+    if(first===null||first==='')continue;
+    const rv=Number(first);
+    if(!Number.isFinite(rv))throw new Error(`${sheetName}: ${tr('radiusMismatch')} (row ${r+1})`);
+    actualRadii.push({row:r,value:rv});
+  }
+  const expectedDesc=[...params.radii].reverse();
+  if(actualRadii.length!==expectedDesc.length)throw new Error(`${sheetName}: ${tr('radiusMismatch')} (${tr('expected')} ${expectedDesc.length}, ${tr('actual')} ${actualRadii.length})`);
+  for(let i=0;i<actualRadii.length;i++){
+    if(i>0&&!(actualRadii[i-1].value>actualRadii[i].value))throw new Error(`${sheetName}: ${tr('radiusOrder')}`);
+    if(Math.abs(actualRadii[i].value-expectedDesc[i])>Math.max(1e-8,params.step*1e-6)){
+      throw new Error(`${sheetName}: ${tr('radiusMismatch')} (row ${actualRadii[i].row+1}: ${actualRadii[i].value} ≠ ${expectedDesc[i]})`);
+    }
+  }
+  const byRadius={};
+  for(const rr of actualRadii){
+    const key=radiusKey(rr.value);
+    byRadius[key]={};
+    for(let j=0;j<samples.length;j++){
+      const v=Number(aoa[rr.row]?.[j+1]);
+      if(!Number.isFinite(v))throw new Error(`${sheetName}: ${tr('nonnumeric')} (${radiusLabel(rr.value)} mm, ${samples[j]})`);
+      byRadius[key][samples[j]]=v;
+    }
+  }
+  return{aoa,samples,byRadius};
+}
+
+function parseCenterSheet(wb,params){
+  const sheetName='Center';
+  const aoa=XLSX.utils.sheet_to_json(wb.Sheets[sheetName],{header:1,defval:null,raw:true});
+  const samples=validateHeaders(aoa,params,sheetName);
+  if(String(aoa?.[1]?.[0]??'').trim()!=='Center')throw new Error(tr('badCenterLabel'));
+  const center={};
+  for(let j=0;j<samples.length;j++){
+    const v=Number(aoa?.[1]?.[j+1]);
+    if(!Number.isFinite(v))throw new Error(`Center: ${tr('nonnumeric')} (${samples[j]})`);
+    center[samples[j]]=v;
+  }
+  return{aoa,center};
+}
+
+function buildDataset(wb,params){
+  const pointNames=exactPointNames(params.points);
+  const detectedP=wb.SheetNames.filter(n=>/^P\d+$/.test(n)).sort((a,b)=>Number(a.slice(1))-Number(b.slice(1)));
+  if(detectedP.length!==params.points||detectedP.some((v,i)=>v!==pointNames[i]))throw new Error(tr('extraPointSheets'));
+  for(const s of [...pointNames,'Center'])if(!wb.SheetNames.includes(s))throw new Error(`${tr('missingSheet')}: ${s}`);
+
+  const parsed={};
+  for(const p of pointNames)parsed[p]=parsePointSheet(wb,p,params);
+  const centerParsed=parseCenterSheet(wb,params);
+  const samples=exactSampleNames(params.samples);
+  const dataByRadius={};
+
+  for(const r of params.radii){
+    const key=radiusKey(r);
+    const values={};
+    for(const s of samples){
+      values[s]=pointNames.map(p=>parsed[p].byRadius[key][s]);
+    }
+    const block={radius:r,values,center:{...centerParsed.center}};
+    block.processed=processRadiusBlock(block,pointNames,samples);
+    dataByRadius[key]=block;
+  }
+
+  const summary=[];
+  for(const r of params.radii){
+    const block=dataByRadius[radiusKey(r)];
+    for(const s of samples){
+      const raw=block.values[s];
+      const m=mean(raw);
+      const c=block.center[s];
+      const p=block.processed;
+      const h=firstHarmonic(raw);
+      summary.push({
+        Radius_mm:r,
+        Sample:s,
+        Point_Mean:m,
+        Center:c,
+        MeanMinusCenter:m-c,
+        Raw_Point_SD:sd(raw),
+        H1_Amplitude:h.amp,
+        H1_R2:h.r2,
+        Shift_Points:p.metrics.find(x=>x.Sample===s)?.Shift_Points ?? NaN,
+        Aligned_Point_SD:sd(p.aligned[s]),
+        Corrected_Point_SD:sd(p.corrected[s])
+      });
+    }
+  }
+
+  return{workbook:wb,params,points:pointNames,samples,radii:params.radii,dataByRadius,summary};
+}
+
+function purgeCurrentPlots(){
+  for(const item of state.currentPlots){
+    if(item?.div){try{Plotly.purge(item.div)}catch(_){}}
+  }
+  state.currentPlots=[];
+}
+
+function resetIndividualToggle(){state.individual=false;el('individualToggle').classList.remove('on')}
+
+function resetAnalysisView(resetIndividual=false){
+  purgeCurrentPlots();
+  state.currentMode=null;
+  document.querySelectorAll('.analysis-btn').forEach(b=>b.classList.remove('active'));
+  el('actions').classList.remove('visible');
+  el('radiusControl').style.display='none';
+  el('resultTitle').textContent=tr('result');
+  el('resultSub').textContent=tr('chooseAnalysis');
+  el('plots').innerHTML=`<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;
+  if(resetIndividual)resetIndividualToggle();
+}
+
+function renderDetected(){
+  const d=state.dataset;
+  el('detected').innerHTML=[
+    `<span class="badge good">${tr('detSheets')}: ${d.points.length}</span>`,
+    `<span class="badge good">${tr('detSamples')}: ${d.samples.length}</span>`,
+    `<span class="badge good">${tr('detRadii')}: ${d.radii.length}</span>`,
+    `<span class="badge good">${tr('detCenter')}: ${tr('found')}</span>`
+  ].join('');
+}
+
+function populateRadiusSelect(){
+  const select=el('radiusSelect');
+  select.innerHTML='';
+  for(const r of state.dataset.radii){
+    const o=document.createElement('option');
+    o.value=radiusKey(r);
+    o.textContent=`${radiusLabel(r)} mm`;
+    select.appendChild(o);
+  }
+  state.selectedRadiusKey=radiusKey(state.dataset.radii[state.dataset.radii.length-1]);
+  select.value=state.selectedRadiusKey;
+}
+
+function applyLanguage(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll('[data-i18n]').forEach(node=>{
+    const k=node.dataset.i18n;
+    if(I18N[lang][k])node.innerHTML=I18N[lang][k].replace(/\n/g,'<br>');
+  });
+  if(state.file)el('filename').textContent=state.file.name;
+  if(state.saveHandle)el('folderName').textContent=state.saveHandle.name;
+  if(state.dataset){setStatus(tr('readSuccess'),'good');renderDetected()}
+  else if(state.saveHandle)setStatus(tr('folderSelected'),'good');
+  else setStatus(tr('ready'));
+  if(state.currentMode){
+    el('resultTitle').textContent=tr(modeInfo[state.currentMode].title);
+    el('resultSub').textContent=tr('analysisReady');
+    runAnalysis(state.currentMode,false);
+  }
+}
+
+el('langBtn').onclick=()=>{lang=lang==='en'?'ko':'en';localStorage.setItem('innereye_lang',lang);applyLanguage()};
+applyLanguage();
+
+el('excelBrowseBtn').onclick=()=>el('excelInput').click();
+el('excelInput').addEventListener('change',e=>{
+  state.file=e.target.files[0]||null;
+  el('filename').textContent=state.file?state.file.name:tr('noFile');
+  state.dataset=null;
+  el('detected').innerHTML='';
+  resetAnalysisView(true);
+  setStatus(tr('ready'));
+});
+
+el('folderBtn').onclick=async()=>{
+  if(!window.showDirectoryPicker){setStatus(tr('folderUnsupported'),'bad');return}
+  try{
+    state.saveHandle=await window.showDirectoryPicker({mode:'readwrite',id:'innereye-cid-multipoint-output'});
+    el('folderName').textContent=state.saveHandle.name;
+    setStatus(tr('folderSelected'),'good');
+  }catch(e){if(e.name!=='AbortError')setStatus(String(e.message||e),'bad')}
+};
+
+el('readBtn').onclick=async()=>{
+  if(!state.file){setStatus(tr('needFile'),'bad');return}
+  if(!state.saveHandle){setStatus(tr('needFolder'),'bad');return}
+  setStatus(tr('reading'));
+  try{
+    const params=readParams();
+    const buf=await state.file.arrayBuffer();
+    const wb=XLSX.read(buf,{type:'array'});
+    state.dataset=buildDataset(wb,params);
+    populateRadiusSelect();
+    renderDetected();
+    setStatus(tr('readSuccess'),'good');
+    resetAnalysisView(true);
+  }catch(err){
+    state.dataset=null;
+    el('detected').innerHTML='';
+    resetAnalysisView(true);
+    setStatus(err.message||String(err),'bad');
+  }
+};
+
+['startRadius','endRadius','radiusStep','expectedPoints','expectedSamples'].forEach(id=>{
+  el(id).addEventListener('input',()=>{
+    if(state.dataset){
+      state.dataset=null;
+      el('detected').innerHTML='';
+      resetAnalysisView(true);
+      setStatus(tr('ready'));
+    }
+  });
+});
+
+const config={
+  responsive:true,displaylogo:false,modeBarButtonsToRemove:['select2d','lasso2d'],
+  toImageButtonOptions:{format:'png',filename:'plot',height:900,width:1600,scale:2}
+};
+
+const baseLayout=(xTitle)=>({
+  margin:{l:72,r:28,t:28,b:90},paper_bgcolor:'#fff',plot_bgcolor:'#fff',font:{family:'Inter, sans-serif',color:'#111827'},
+  xaxis:{title:{text:xTitle,font:{size:13}},tickangle:-45,showgrid:false,zeroline:false,linecolor:'#9aa1ad',linewidth:1.3},
+  yaxis:{title:{text:tr('sensorAxis'),font:{size:13}},showgrid:false,zeroline:false,linecolor:'#9aa1ad',linewidth:1.3},
+  legend:{orientation:'h',y:-.24,x:.5,xanchor:'center'},hovermode:'closest'
+});
+
+function addPlotCard(id,title){
+  const card=document.createElement('div');
+  card.className='plot-card';
+  card.innerHTML=`<div class="plot-title"><span>${title}</span></div><div id="${id}" class="plot"></div>`;
+  el('plots').appendChild(card);
+  return el(id);
+}
+
+function selectedBlock(){return state.dataset.dataByRadius[state.selectedRadiusKey]}
+function pointLabels(){return state.dataset.points}
+
+function overlayTraces(matrix){
+  const d=state.dataset;
+  return d.samples.map((s,i)=>({
+    x:pointLabels(),y:matrix[s],type:'scatter',mode:'lines+markers',name:s,
+    line:{width:1.45,color:sampleColor(i,d.samples.length)},marker:{size:5,color:sampleColor(i,d.samples.length)},opacity:.82
+  }));
+}
+
+function rawVsFitTraces(sample,aligned=false){
+  const block=selectedBlock();
+  const p=block.processed;
+  const raw=aligned?p.aligned[sample]:block.values[sample];
+  const fit=aligned?p.alignedFit[sample]:p.rawFit[sample];
+  return[
+    {x:pointLabels(),y:raw,type:'scatter',mode:'lines+markers',name:aligned?tr('alignedLegend'):tr('rawLegend'),line:{width:2,color:aligned?el('colorAligned').value:el('colorRaw').value},marker:{size:6}},
+    {x:pointLabels(),y:fit,type:'scatter',mode:'lines',name:tr('fitLegend'),line:{width:2.6,color:el('colorH1').value}}
+  ];
+}
+
+function summaryByRadius(){
+  const d=state.dataset;
+  return d.radii.map(r=>{
+    const block=d.dataByRadius[radiusKey(r)];
+    const pm=d.samples.map(s=>mean(block.values[s]));
+    const centers=d.samples.map(s=>block.center[s]);
+    const delta=d.samples.map(s=>mean(block.values[s])-block.center[s]);
+    return{radius:r,pointMean:mean(pm),pointSd:sd(pm),centerMean:mean(centers),centerSd:sd(centers),deltaMean:mean(delta),deltaSd:sd(delta)};
+  });
+}
+
+function renderOrganizePreview(){
+  const d=state.dataset;
+  const r=d.radii[d.radii.length-1];
+  const block=d.dataByRadius[radiusKey(r)];
+  el('plots').innerHTML='';
+  const card=document.createElement('div');
+  card.className='table-card';
+  const header=['Point',...d.samples];
+  const rows=d.points.map((p,i)=>[p,...d.samples.map(s=>block.values[s][i])]);
+  rows.push(['Center',...d.samples.map(s=>block.center[s])]);
+  card.innerHTML=`
+    <div class="plot-title"><span>${tr('organizeTitle')} · ${radiusLabel(r)} mm ${tr('preview')}</span></div>
+    <div class="table-wrap"><table><thead><tr>${header.map(x=>`<th>${x}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(row=>`<tr>${row.map((x,i)=>`<td>${i===0?x:Number(x).toPrecision(8)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  el('plots').appendChild(card);
+  state.currentPlots=[];
+}
+
+async function renderEccPlots(){
+  const d=state.dataset;
+  const block=selectedBlock();
+  const p=block.processed;
+
+  const div1=addPlotCard('plot-ecc-overlay',tr('eccOverlay'));
+  await Plotly.newPlot(div1,overlayTraces(p.corrected),baseLayout(tr('alignedPointAxis')),config);
+
+  const n=d.points.length;
+  const alignedMean=[],alignedSd=[],corMean=[],corSd=[];
+  for(let i=0;i<n;i++){
+    const rv=d.samples.map(s=>p.aligned[s][i]);
+    const cv=d.samples.map(s=>p.corrected[s][i]);
+    alignedMean.push(mean(rv));alignedSd.push(sd(rv));corMean.push(mean(cv));corSd.push(sd(cv));
+  }
+
+  const div2=addPlotCard('plot-ecc-mean',tr('eccMean'));
+  const x=pointLabels();
+  const rawC=el('colorAligned').value,corC=el('colorCorrected').value;
+  const tracesMean=[
+    {x,y:alignedMean.map((m,i)=>m+alignedSd[i]),type:'scatter',mode:'lines',line:{width:0},showlegend:false,hoverinfo:'skip'},
+    {x,y:alignedMean.map((m,i)=>m-alignedSd[i]),type:'scatter',mode:'lines',line:{width:0},fill:'tonexty',fillcolor:hexToRgba(rawC,.30),name:`${tr('alignedLegend')} ${tr('sdLegend')}`,hoverinfo:'skip'},
+    {x,y:alignedMean,type:'scatter',mode:'lines+markers',name:`${tr('alignedLegend')} ${tr('meanLegend')}`,line:{width:2.7,color:rawC}},
+    {x,y:corMean.map((m,i)=>m+corSd[i]),type:'scatter',mode:'lines',line:{width:0},showlegend:false,hoverinfo:'skip'},
+    {x,y:corMean.map((m,i)=>m-corSd[i]),type:'scatter',mode:'lines',line:{width:0},fill:'tonexty',fillcolor:hexToRgba(corC,.30),name:`${tr('correctedLegend')} ${tr('sdLegend')}`,hoverinfo:'skip'},
+    {x,y:corMean,type:'scatter',mode:'lines+markers',name:`${tr('correctedLegend')} ${tr('meanLegend')}`,line:{width:2.7,color:corC}}
+  ];
+  await Plotly.newPlot(div2,tracesMean,baseLayout(tr('alignedPointAxis')),config);
+
+  const div3=addPlotCard('plot-ecc-sd',tr('eccSD'));
+  const rawSDs=d.samples.map(s=>sd(p.aligned[s]));
+  const corSDs=d.samples.map(s=>sd(p.corrected[s]));
+  const layout=baseLayout(tr('sampleAxis'));
+  layout.yaxis.title.text=tr('sdAxis');
+  layout.xaxis.tickangle=-45;
+  await Plotly.newPlot(div3,[
+    {x:d.samples,y:rawSDs,type:'scatter',mode:'lines+markers',name:tr('alignedLegend'),line:{color:rawC,width:2.2}},
+    {x:d.samples,y:corSDs,type:'scatter',mode:'lines+markers',name:tr('correctedLegend'),line:{color:corC,width:2.2}}
+  ],layout,config);
+
+  state.currentPlots=[
+    {div:div1,filename:`R_${radiusLabel(block.radius)}mm_Corrected_All_Samples_Overlay.png`},
+    {div:div2,filename:`R_${radiusLabel(block.radius)}mm_Raw_vs_Corrected_Mean_SD.png`},
+    {div:div3,filename:`R_${radiusLabel(block.radius)}mm_SD_Before_After.png`}
+  ];
+}
+
+async function renderRadiusProfile(){
+  const rows=summaryByRadius();
+  const x=rows.map(v=>v.radius);
+  const rawC=el('colorRaw').value;
+  const centerC=el('colorCenter').value;
+  const corC=el('colorCorrected').value;
+
+  const div1=addPlotCard('plot-radius-main',tr('radiusMean'));
+  const layout1=baseLayout(tr('radiusAxis'));
+  layout1.xaxis.tickangle=0;
+  await Plotly.newPlot(div1,[
+    {x,y:rows.map(v=>v.pointMean+v.pointSd),type:'scatter',mode:'lines',line:{width:0},showlegend:false,hoverinfo:'skip'},
+    {x,y:rows.map(v=>v.pointMean-v.pointSd),type:'scatter',mode:'lines',line:{width:0},fill:'tonexty',fillcolor:hexToRgba(rawC,.22),name:`${tr('pointMean')} ${tr('sdLegend')}`,hoverinfo:'skip'},
+    {x,y:rows.map(v=>v.pointMean),type:'scatter',mode:'lines+markers',name:tr('pointMean'),line:{width:2.6,color:rawC}},
+    {x,y:rows.map(v=>v.centerMean+v.centerSd),type:'scatter',mode:'lines',line:{width:0},showlegend:false,hoverinfo:'skip'},
+    {x,y:rows.map(v=>v.centerMean-v.centerSd),type:'scatter',mode:'lines',line:{width:0},fill:'tonexty',fillcolor:hexToRgba(centerC,.18),name:`${tr('centerLegend')} ${tr('sdLegend')}`,hoverinfo:'skip'},
+    {x,y:rows.map(v=>v.centerMean),type:'scatter',mode:'lines+markers',name:tr('centerLegend'),line:{width:2.6,color:centerC}}
+  ],layout1,config);
+
+  const div2=addPlotCard('plot-radius-delta',tr('radiusDelta'));
+  const layout2=baseLayout(tr('radiusAxis'));
+  layout2.xaxis.tickangle=0;
+  layout2.yaxis.title.text=tr('meanMinusCenter');
+  await Plotly.newPlot(div2,[
+    {x,y:rows.map(v=>v.deltaMean+v.deltaSd),type:'scatter',mode:'lines',line:{width:0},showlegend:false,hoverinfo:'skip'},
+    {x,y:rows.map(v=>v.deltaMean-v.deltaSd),type:'scatter',mode:'lines',line:{width:0},fill:'tonexty',fillcolor:hexToRgba(corC,.22),name:tr('sdLegend'),hoverinfo:'skip'},
+    {x,y:rows.map(v=>v.deltaMean),type:'scatter',mode:'lines+markers',name:tr('meanMinusCenter'),line:{width:2.7,color:corC}}
+  ],layout2,config);
+
+  state.currentPlots=[
+    {div:div1,filename:'Radius_Profile_PointMean_Center.png'},
+    {div:div2,filename:'Radius_Profile_MeanMinusCenter.png'}
+  ];
+}
+
+async function renderMainPlot(mode){
+  const d=state.dataset;
+  purgeCurrentPlots();
+  el('plots').innerHTML='';
+
+  if(mode==='organize'){renderOrganizePreview();return}
+  if(mode==='radiusProfile'){await renderRadiusProfile();return}
+
+  const block=selectedBlock();
+  const p=block.processed;
+
+  if(mode==='raw'){
+    const div=addPlotCard('plot-main',`${tr('rawTitle')} · ${radiusLabel(block.radius)} mm`);
+    await Plotly.newPlot(div,overlayTraces(block.values),baseLayout(tr('pointAxis')),config);
+    state.currentPlots=[{div,filename:`R_${radiusLabel(block.radius)}mm_ALL_SAMPLES_RAW_OVERLAY.png`}];
+  }
+
+  if(mode==='h1'){
+    const div=addPlotCard('plot-main',`${tr('h1Title')} · ${radiusLabel(block.radius)} mm`);
+    await Plotly.newPlot(div,overlayTraces(p.rawFit),baseLayout(tr('pointAxis')),config);
+    state.currentPlots=[{div,filename:`R_${radiusLabel(block.radius)}mm_ALL_SAMPLES_1X_FIT_OVERLAY.png`}];
+  }
+
+  if(mode==='alignedRaw'){
+    const div=addPlotCard('plot-main',`${tr('alignRawTitle')} · ${radiusLabel(block.radius)} mm`);
+    await Plotly.newPlot(div,overlayTraces(p.aligned),baseLayout(tr('alignedPointAxis')),config);
+    state.currentPlots=[{div,filename:`R_${radiusLabel(block.radius)}mm_ALL_SAMPLES_ALIGNED_RAW_OVERLAY.png`}];
+  }
+
+  if(mode==='alignedH1'){
+    const div=addPlotCard('plot-main',`${tr('alignH1Title')} · ${radiusLabel(block.radius)} mm`);
+    const traces=[];
+    d.samples.forEach((s,i)=>{
+      const c=sampleColor(i,d.samples.length);
+      traces.push({x:pointLabels(),y:p.aligned[s],type:'scatter',mode:'lines',name:`${s} raw`,showlegend:false,line:{width:1,color:c},opacity:.25});
+      traces.push({x:pointLabels(),y:p.alignedFit[s],type:'scatter',mode:'lines+markers',name:s,line:{width:1.8,color:c},opacity:.9});
+    });
+    await Plotly.newPlot(div,traces,baseLayout(tr('alignedPointAxis')),config);
+    state.currentPlots=[{div,filename:`R_${radiusLabel(block.radius)}mm_ALL_SAMPLES_ALIGNED_RAW_1X_OVERLAY.png`}];
+  }
+
+  if(mode==='ecc')await renderEccPlots();
+}
+
+const modeInfo={
+  organize:{title:'modeOrganize',folder:'01_Organized_by_Radius'},
+  raw:{title:'modeRaw',folder:'02_Rawdata'},
+  h1:{title:'modeH1',folder:'03_1st_Harmonic'},
+  alignedRaw:{title:'modeAlignedRaw',folder:'04_Alignment_Rawdata'},
+  alignedH1:{title:'modeAlignedH1',folder:'05_Alignment_1st_Harmonic'},
+  ecc:{title:'modeEcc',folder:'06_Eccentricity_Diagnostic_Correction'},
+  radiusProfile:{title:'modeRadius',folder:'07_Radius_Profile'}
+};
+
+function modeUsesRadius(mode){return !['organize','radiusProfile'].includes(mode)}
+
+document.querySelectorAll('.analysis-btn').forEach(btn=>btn.addEventListener('click',()=>runAnalysis(btn.dataset.mode,true)));
+
+async function runAnalysis(mode,activate=true){
+  if(!state.file||!state.saveHandle||!state.dataset){
+    if(activate){setStatus(!state.file?tr('needFile'):(!state.saveHandle?tr('needFolder'):tr('chooseAnalysis')),'bad')}
+    return;
+  }
+
+  state.currentMode=mode;
+  if(activate){
+    document.querySelectorAll('.analysis-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
+    el('actions').classList.add('visible');
+    el('resultTitle').textContent=tr(modeInfo[mode].title);
+    el('resultSub').textContent=mode==='organize'?tr('organizeSub'):tr('analysisReady');
+  }
+  el('radiusControl').style.display=modeUsesRadius(mode)?'block':'none';
+  await renderMainPlot(mode);
+}
+
+el('radiusSelect').addEventListener('change',()=>{
+  state.selectedRadiusKey=el('radiusSelect').value;
+  if(state.currentMode&&modeUsesRadius(state.currentMode))runAnalysis(state.currentMode,false);
+});
+
+el('individualToggle').onclick=()=>{
+  state.individual=!state.individual;
+  el('individualToggle').classList.toggle('on',state.individual);
+  setStatus(state.individual?tr('individualOn'):tr('individualOff'),state.individual?'good':'');
+};
+
+['colorRaw','colorAligned','colorH1','colorCorrected','colorCenter'].forEach(id=>el(id).addEventListener('change',()=>{if(state.currentMode)runAnalysis(state.currentMode,false)}));
+
+function dataURLtoBlob(dataURL){
+  const [meta,b64]=dataURL.split(',');
+  const mime=meta.match(/:(.*?);/)[1];
+  const bin=atob(b64);const arr=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+  return new Blob([arr],{type:mime});
+}
+
+async function plotDivToBlob(div){
+  const url=await Plotly.toImage(div,{format:'png',width:1600,height:900,scale:2});
+  return dataURLtoBlob(url);
+}
+
+async function imageFromSpec(traces,layout){
+  const tmp=document.createElement('div');
+  tmp.style.cssText='position:fixed;left:-10000px;top:0;width:1400px;height:800px;background:#fff';
+  document.body.appendChild(tmp);
+  try{
+    await Plotly.newPlot(tmp,traces,layout,{displayModeBar:false,staticPlot:true});
+    return await plotDivToBlob(tmp);
+  }finally{try{Plotly.purge(tmp)}catch(_){}tmp.remove()}
+}
+
+async function ensureDirPath(root,path){
+  let h=root;
+  for(const part of path.split('/').filter(Boolean))h=await h.getDirectoryHandle(part,{create:true});
+  return h;
+}
+
+async function writeBlob(root,path,blob){
+  const parts=path.split('/').filter(Boolean);const name=parts.pop();
+  const dir=await ensureDirPath(root,parts.join('/'));
+  const fh=await dir.getFileHandle(name,{create:true});
+  const w=await fh.createWritable();await w.write(blob);await w.close();
+}
+
+function aoaWorkbookBlob(aoa,sheetName='Data'){
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),sheetName.slice(0,31));
+  const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+  return new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+
+function jsonWorkbookBlob(sheets){
+  const wb=XLSX.utils.book_new();
+  for(const [name,rows] of Object.entries(sheets)){
+    const ws=Array.isArray(rows)&&rows.length&&Array.isArray(rows[0])?XLSX.utils.aoa_to_sheet(rows):XLSX.utils.json_to_sheet(rows||[]);
+    XLSX.utils.book_append_sheet(wb,ws,name.slice(0,31));
+  }
+  const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+  return new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+
+function organizedAoaForRadius(r){
+  const d=state.dataset;const block=d.dataByRadius[radiusKey(r)];
+  const aoa=[['Point',...d.samples]];
+  d.points.forEach((p,i)=>aoa.push([p,...d.samples.map(s=>block.values[s][i])]));
+  aoa.push(['Center',...d.samples.map(s=>block.center[s])]);
+  return aoa;
+}
+
+function matrixAoaForRadius(r,matrixName){
+  const d=state.dataset;const block=d.dataByRadius[radiusKey(r)];const p=block.processed;
+  let matrix=block.values;
+  if(matrixName==='rawFit')matrix=p.rawFit;
+  if(matrixName==='aligned')matrix=p.aligned;
+  if(matrixName==='alignedFit')matrix=p.alignedFit;
+  if(matrixName==='corrected')matrix=p.corrected;
+  const aoa=[['Point',...d.samples]];
+  d.points.forEach((pt,i)=>aoa.push([pt,...d.samples.map(s=>matrix[s][i])]));
+  aoa.push(['Center',...d.samples.map(s=>block.center[s])]);
+  return aoa;
+}
+
+function allMetricsRows(){
+  const d=state.dataset;const rows=[];
+  for(const r of d.radii){
+    const block=d.dataByRadius[radiusKey(r)];
+    for(const m of block.processed.metrics)rows.push({Radius_mm:r,...m});
+  }
+  return rows;
+}
+
+function processedWorkbookBlob(mode){
+  const d=state.dataset;
+  const sheets={Summary:d.summary,H1_Metrics:allMetricsRows()};
+  let matrixName='values';
+  if(mode==='h1')matrixName='rawFit';
+  if(mode==='alignedRaw')matrixName='aligned';
+  if(mode==='alignedH1')matrixName='alignedFit';
+  if(mode==='ecc')matrixName='corrected';
+  for(const r of d.radii)sheets[`R_${radiusLabel(r)}mm`]=matrixAoaForRadius(r,matrixName);
+  return jsonWorkbookBlob(sheets);
+}
+
+function radiusSummaryWorkbookBlob(){
+  return jsonWorkbookBlob({Radius_Summary:summaryByRadius(),Sample_Level:state.dataset.summary,H1_Metrics:allMetricsRows()});
+}
+
+async function buildIndividualEntries(mode){
+  if(!modeUsesRadius(mode))return[];
+  const d=state.dataset;const block=selectedBlock();const p=block.processed;const entries=[];
+  for(let i=0;i<d.samples.length;i++){
+    const s=d.samples[i];
+    el('progress').textContent=`${tr('saving')} ${s} (${i+1}/${d.samples.length})`;
+    let traces,layout,name;
+    if(mode==='raw'){
+      traces=[
+        {x:pointLabels(),y:block.values[s],type:'scatter',mode:'lines+markers',name:s,line:{width:2.2,color:el('colorRaw').value},marker:{size:6}},
+        {x:pointLabels(),y:pointLabels().map(()=>block.center[s]),type:'scatter',mode:'lines',name:tr('centerLegend'),line:{width:2,color:el('colorCenter').value,dash:'dash'}}
+      ];
+      layout=baseLayout(tr('pointAxis'));name=`Individual/R_${radiusLabel(block.radius)}mm_${s}.png`;
+    }else if(mode==='h1'){
+      traces=rawVsFitTraces(s,false);
+      traces.push({x:pointLabels(),y:pointLabels().map(()=>block.center[s]),type:'scatter',mode:'lines',name:tr('centerLegend'),line:{width:2,color:el('colorCenter').value,dash:'dash'}});
+      layout=baseLayout(tr('pointAxis'));name=`Individual/R_${radiusLabel(block.radius)}mm_${s}_Raw_vs_1X.png`;
+    }else if(mode==='alignedRaw'){
+      traces=[{x:pointLabels(),y:p.aligned[s],type:'scatter',mode:'lines+markers',name:s,line:{width:2.2,color:el('colorAligned').value},marker:{size:6}}];
+      layout=baseLayout(tr('alignedPointAxis'));name=`Individual/R_${radiusLabel(block.radius)}mm_${s}_Aligned.png`;
+    }else if(mode==='alignedH1'){
+      traces=rawVsFitTraces(s,true);layout=baseLayout(tr('alignedPointAxis'));name=`Individual/R_${radiusLabel(block.radius)}mm_${s}_Aligned_Raw_vs_1X.png`;
+    }else{
+      traces=[
+        {x:pointLabels(),y:block.values[s],type:'scatter',mode:'lines+markers',name:tr('rawBefore'),line:{width:2,color:el('colorRaw').value},marker:{size:5}},
+        {x:pointLabels(),y:p.aligned[s],type:'scatter',mode:'lines+markers',name:tr('alignedRaw'),line:{width:2,color:el('colorAligned').value},marker:{size:5}},
+        {x:pointLabels(),y:p.corrected[s],type:'scatter',mode:'lines+markers',name:tr('corrected'),line:{width:2.2,color:el('colorCorrected').value},marker:{size:5}}
+      ];
+      layout=baseLayout(tr('alignedPointAxis'));name=`Individual/R_${radiusLabel(block.radius)}mm_${s}_Raw_Aligned_Corrected.png`;
+    }
+    entries.push({path:name,blob:await imageFromSpec(traces,layout)});
+  }
+  return entries;
+}
+
+async function saveOrganizedByRadius(){
+  const d=state.dataset;
+  for(let i=0;i<d.radii.length;i++){
+    const r=d.radii[i];
+    el('progress').textContent=`${tr('saving')} ${i+1}/${d.radii.length}`;
+    await writeBlob(state.saveHandle,`${modeInfo.organize.folder}/Radius_${radiusLabel(r)}mm.xlsx`,aoaWorkbookBlob(organizedAoaForRadius(r),'Contact'));
+  }
+}
+
+el('saveBtn').onclick=async()=>{
+  if(!state.dataset||!state.currentMode){setStatus(tr('chooseAnalysis'),'bad');return}
+  el('saveBtn').disabled=true;
+  el('progress').classList.add('visible');
+  el('progress').textContent=tr('saving');
+  try{
+    const mode=state.currentMode;
+    const folder=modeInfo[mode].folder;
+    if(mode==='organize'){
+      await saveOrganizedByRadius();
+    }else{
+      for(let i=0;i<state.currentPlots.length;i++){
+        const p=state.currentPlots[i];
+        el('progress').textContent=`${tr('saving')} ${i+1}/${state.currentPlots.length}`;
+        await writeBlob(state.saveHandle,`${folder}/${p.filename}`,await plotDivToBlob(p.div));
+      }
+      if(mode==='radiusProfile'){
+        await writeBlob(state.saveHandle,`${folder}/Radius_Profile_Data.xlsx`,radiusSummaryWorkbookBlob());
+      }else{
+        await writeBlob(state.saveHandle,`${folder}/All_Radii_Processed_Data.xlsx`,processedWorkbookBlob(mode));
+      }
+      if(state.individual){
+        const entries=await buildIndividualEntries(mode);
+        for(let i=0;i<entries.length;i++){
+          el('progress').textContent=`${tr('saving')} ${i+1}/${entries.length}`;
+          await writeBlob(state.saveHandle,`${folder}/${entries[i].path}`,entries[i].blob);
+        }
+      }
+    }
+    setStatus(tr('saved'),'good');
+  }catch(err){
+    console.error(err);
+    setStatus(`${tr('saveFailed')}: ${err.message||err}`,'bad');
+  }finally{
+    el('saveBtn').disabled=false;
+    el('progress').classList.remove('visible');
+  }
+};
+</script>
+</body>
+</html>
