@@ -536,8 +536,19 @@
         </div>
 
         <div class="field">
-          <label data-i18n="requiredSheets">Required sheets</label>
-          <div class="filename static">Notch + Center</div>
+          <label data-i18n="savePath">Save path</label>
+          <div class="file-line">
+            <button
+              id="folderBtn"
+              type="button"
+              class="secondary"
+              data-i18n="browse"
+            >
+              Browse
+            </button>
+
+            <div id="folderName" class="filename" data-i18n="notSelected">No folder selected</div>
+          </div>
         </div>
       </div>
 
@@ -719,6 +730,13 @@
         excelFile: "Excel workbook",
         browse: "Browse",
         requiredSheets: "Required sheets",
+        savePath: "Save path",
+        notSelected: "No folder selected",
+        folderSelected: "Save folder selected.",
+        folderUnsupported: "This browser does not support folder selection. Please use a browser that supports the File System Access API.",
+        needFolder: "Select a save folder before exporting.",
+        exportSaving: "Saving assessment CSV…",
+        exportFailed: "Assessment CSV save failed.",
         plotColors: "Plot colors",
         result: "Processing result",
         chooseAnalysis: "Validate the workbook, then choose an analysis.",
@@ -788,7 +806,7 @@
         meanInside: "Inside",
         meanOutside: "Outside",
         notAvailable: "N/A",
-        exportDone: "Assessment CSV exported."
+        exportDone: "Assessment CSV saved to the selected folder."
       },
       ko: {
         home: "홈페이지",
@@ -800,6 +818,13 @@
         excelFile: "입력 Excel 파일",
         browse: "Browse",
         requiredSheets: "필수 시트",
+        savePath: "저장 경로",
+        notSelected: "선택된 폴더 없음",
+        folderSelected: "저장 폴더를 선택했습니다.",
+        folderUnsupported: "이 브라우저는 저장 폴더 선택을 지원하지 않습니다. File System Access API를 지원하는 브라우저를 사용해주세요.",
+        needFolder: "저장하기 전에 저장 폴더를 선택해주세요.",
+        exportSaving: "평가 결과 CSV 저장 중…",
+        exportFailed: "평가 결과 CSV 저장에 실패했습니다.",
         plotColors: "그래프 색상",
         result: "처리 결과",
         chooseAnalysis: "엑셀 구조를 검증한 뒤 분석 기능을 선택하세요.",
@@ -869,7 +894,7 @@
         meanInside: "범위 내부",
         meanOutside: "범위 외부",
         notAvailable: "계산 불가",
-        exportDone: "평가 결과 CSV를 저장했습니다."
+        exportDone: "평가 결과 CSV를 선택한 폴더에 저장했습니다."
       }
     };
 
@@ -888,11 +913,14 @@
     let referenceCondition = null;
     let visibleConditions = new Set();
     let conditionColors = {};
+    let saveHandle = null;
 
     const els = {
       excelInput: document.getElementById("excelInput"),
       excelBrowseBtn: document.getElementById("excelBrowseBtn"),
       fileName: document.getElementById("fileName"),
+      folderBtn: document.getElementById("folderBtn"),
+      folderName: document.getElementById("folderName"),
       validateBtn: document.getElementById("validateBtn"),
       expectedSamples: document.getElementById("expectedSamples"),
       expectedConditions: document.getElementById("expectedConditions"),
@@ -925,6 +953,11 @@
 
       if (!rawFileName) {
         els.fileName.textContent = tr("noFile");
+      }
+      if (saveHandle) {
+        els.folderName.textContent = saveHandle.name;
+      } else {
+        els.folderName.textContent = tr("notSelected");
       }
       if (validated) {
         setStatus("success", tr("statusSuccess"));
@@ -1079,6 +1112,33 @@
       }
     });
 
+    function updateExportAvailability() {
+      els.exportBtn.disabled = !(validated && saveHandle);
+    }
+
+    els.folderBtn.addEventListener("click", async () => {
+      if (!window.showDirectoryPicker) {
+        setStatus("error", tr("folderUnsupported"));
+        return;
+      }
+
+      try {
+        saveHandle = await window.showDirectoryPicker({
+          mode: "readwrite",
+          id: "innereye-normalization-output"
+        });
+
+        els.folderName.textContent = saveHandle.name;
+        setStatus("success", tr("folderSelected"));
+        updateExportAvailability();
+      } catch (err) {
+        if (err?.name !== "AbortError") {
+          console.error(err);
+          setStatus("error", `${tr("exportFailed")} ${err?.message || err}`);
+        }
+      }
+    });
+
     function validateWorkbook() {
       if (!workbook) {
         setStatus("error", tr("statusNoWorkbook"));
@@ -1214,7 +1274,7 @@
     function activateAnalysisUI() {
       els.analysisShell.classList.remove("hidden");
       els.emptyState.classList.add("hidden");
-      els.exportBtn.disabled = false;
+      updateExportAvailability();
       document.getElementById("actions").classList.add("visible");
       document.querySelectorAll(".sheet-btn").forEach(btn => btn.disabled = false);
       switchSheet("Notch");
@@ -1898,9 +1958,15 @@
       return s;
     }
 
-    function exportCsv() {
+    async function exportCsv() {
       const d = getCurrentData();
       if (!d || !referenceCondition) return;
+
+      if (!saveHandle) {
+        setStatus("error", tr("needFolder"));
+        updateExportAvailability();
+        return;
+      }
 
       const sigmaN = Number(els.sigmaInput.value);
       const ref = descriptive(d.groups[referenceCondition]);
@@ -1964,15 +2030,34 @@
         ].map(csvEscape).join(","));
       }
 
-      const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `Normalization_Assessment_${activeSheet}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      const fileName = `Normalization_Assessment_${activeSheet}.csv`;
+      const blob = new Blob(
+        ["\uFEFF" + lines.join("\n")],
+        { type: "text/csv;charset=utf-8" }
+      );
+
+      els.exportBtn.disabled = true;
+      setStatus("", tr("exportSaving"));
+
+      try {
+        const fileHandle = await saveHandle.getFileHandle(fileName, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+
+        setStatus("success", `${tr("exportDone")} (${fileName})`);
+      } catch (err) {
+        console.error(err);
+
+        if (err?.name === "NotAllowedError") {
+          saveHandle = null;
+          els.folderName.textContent = tr("notSelected");
+        }
+
+        setStatus("error", `${tr("exportFailed")} ${err?.message || err}`);
+      } finally {
+        updateExportAvailability();
+      }
     }
 
     els.exportBtn.addEventListener("click", exportCsv);
