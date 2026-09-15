@@ -328,7 +328,7 @@
           </div>
 
           <div id="actions" class="actions">
-            <button id="individualToggle" class="toggle"><span class="lamp"></span><span data-i18n="individual">Individual sample waveforms</span></button>
+            <button id="individualToggle" class="toggle"><span class="lamp"></span><span data-i18n="individual">All-radius sample overlay waveforms</span></button>
             <button id="saveBtn" class="save-btn" data-i18n="save">Save</button>
           </div>
         </div>
@@ -353,7 +353,7 @@ const I18N={
     expectedSamples:'Measured samples', savePath:'Save path', notSelected:'No folder selected', readExcel:'Validate & analyze', ready:'Ready',
     pointOrderNote:'Harmonic analysis assumes P1 → P2 → ... follows the circular direction at equal angular spacing. For 4 points, the angular interval is 90°.',
     plotColors:'Plot colors', rawBefore:'Raw before alignment', alignedRaw:'Aligned raw', harmonic:'1st harmonic', corrected:'Corrected', centerColor:'Center',
-    result:'Processing result', chooseAnalysis:'Validate the workbook, then choose an analysis.', viewRadius:'View radius', individual:'Individual sample waveforms',
+    result:'Processing result', chooseAnalysis:'Validate the workbook, then choose an analysis.', viewRadius:'View radius', individual:'All-radius sample overlay waveforms',
     save:'Save', empty:'No result yet.\nLoad and validate a workbook, then select a function from the lower-left panel.',
     needFile:'Please select an Excel workbook.', needFolder:'Please select a save folder.', needParams:'Please enter valid radius, point, and sample parameters.',
     folderSelected:'Save folder selected', folderUnsupported:'This browser does not support folder selection. Use a browser supporting the File System Access API.',
@@ -374,7 +374,7 @@ const I18N={
     eccSD:'Within-sample SD across points before/after correction', radiusMean:'Point mean and Center vs radius', radiusDelta:'MeanMinusCenter vs radius',
     pointAxis:'Measurement Point', alignedPointAxis:'Aligned Point', sensorAxis:'Phase', sampleAxis:'Sample', sdAxis:'SD across points', radiusAxis:'Radius (mm)',
     rawLegend:'Raw', fitLegend:'1st harmonic', alignedLegend:'Aligned raw', correctedLegend:'Corrected', centerLegend:'Center', meanLegend:'mean', sdLegend:'± SD',
-    saving:'Generating files…', saved:'Save completed.', saveFailed:'Save failed', individualOn:'Individual sample export ON', individualOff:'Individual sample export OFF',
+    saving:'Generating files…', saved:'Save completed.', saveFailed:'Save failed', individualOn:'All-radius sample overlay export ON', individualOff:'All-radius sample overlay export OFF',
     radius:'Radius', points:'Points', samples:'Samples', center:'Center', pointMean:'Point mean', meanMinusCenter:'MeanMinusCenter',
     preview:'Preview', actual:'actual', expected:'expected'
   },
@@ -387,7 +387,7 @@ const I18N={
     expectedSamples:'측정 샘플 수', savePath:'저장 경로', notSelected:'선택된 폴더 없음', readExcel:'유효성 검사 및 분석', ready:'준비 완료',
     pointOrderNote:'하모닉 분석은 P1 → P2 → ...가 원주 방향으로 등각 간격 순서라고 가정합니다. 4포인트이면 포인트 간 각도는 90°입니다.',
     plotColors:'그래프 색상', rawBefore:'정렬 전 rawdata', alignedRaw:'정렬 후 rawdata', harmonic:'1차 하모닉', corrected:'보정 후', centerColor:'Center',
-    result:'처리 결과', chooseAnalysis:'Excel 구조를 검증한 뒤 분석 기능을 선택하세요.', viewRadius:'표시 반지름', individual:'개별 샘플 파형',
+    result:'처리 결과', chooseAnalysis:'Excel 구조를 검증한 뒤 분석 기능을 선택하세요.', viewRadius:'표시 반지름', individual:'반지름별 전체 샘플 파형',
     save:'세이브', empty:'아직 결과가 없습니다.\nExcel을 불러와 유효성 검사를 완료한 뒤 왼쪽 아래에서 기능을 선택하세요.',
     needFile:'읽을 Excel 파일을 선택해주세요.', needFolder:'저장 폴더를 선택해주세요.', needParams:'반지름, 포인트 수, 샘플 수 입력값을 확인해주세요.',
     folderSelected:'저장 폴더 선택 완료', folderUnsupported:'이 브라우저는 저장 폴더 선택을 지원하지 않습니다. File System Access API를 지원하는 브라우저를 사용해주세요.',
@@ -408,7 +408,7 @@ const I18N={
     eccSD:'보정 전/후 샘플별 포인트 방향 SD', radiusMean:'포인트 평균 및 Center · 반지름별', radiusDelta:'MeanMinusCenter · 반지름별',
     pointAxis:'측정 포인트', alignedPointAxis:'Aligned Point', sensorAxis:'Phase', sampleAxis:'샘플', sdAxis:'포인트 방향 표준편차', radiusAxis:'반지름 (mm)',
     rawLegend:'Raw', fitLegend:'1차 하모닉', alignedLegend:'정렬 Raw', correctedLegend:'보정 후', centerLegend:'Center', meanLegend:'평균', sdLegend:'± 표준편차',
-    saving:'파일 생성 중…', saved:'저장이 완료되었습니다.', saveFailed:'저장 실패', individualOn:'개별 샘플 저장 ON', individualOff:'개별 샘플 저장 OFF',
+    saving:'파일 생성 중…', saved:'저장이 완료되었습니다.', saveFailed:'저장 실패', individualOn:'반지름별 전체 샘플 파형 저장 ON', individualOff:'반지름별 전체 샘플 파형 저장 OFF',
     radius:'반지름', points:'포인트', samples:'샘플', center:'Center', pointMean:'포인트 평균', meanMinusCenter:'MeanMinusCenter',
     preview:'미리보기', actual:'실제', expected:'입력'
   }
@@ -461,7 +461,7 @@ function firstHarmonic(y){
   const peak=((Math.atan2(b,a)*180/Math.PI)%360+360)%360;
   const ssRes=y.reduce((s,v,i)=>s+(v-fit[i])**2,0);
   const ssTot=y.reduce((s,v)=>s+(v-c0)**2,0);
-  const r2=ssTot>0?1-ssRes/ssTot:NaN;
+  const r2=ssTot>0?1-ssRes/ssTot:null;
   return{mean:c0,a,b,amp,peak,r2,fit};
 }
 
@@ -471,7 +471,7 @@ function alignByH1(y){
   const step=360/n;
   const threshold=1e-10*Math.max(1,...y.map(v=>Math.abs(v)));
   const valid=h.amp>threshold;
-  const minAngle=valid?(h.peak+180)%360:NaN;
+  const minAngle=valid?(h.peak+180)%360:null;
   const shift=valid?Math.round(minAngle/step)%n:0;
   return{aligned:rotateLeft(y,shift),shift,minAngle,valid,h1:h};
 }
@@ -623,7 +623,7 @@ function buildDataset(wb,params){
         Raw_Point_SD:sd(raw),
         H1_Amplitude:h.amp,
         H1_R2:h.r2,
-        Shift_Points:p.metrics.find(x=>x.Sample===s)?.Shift_Points ?? NaN,
+        Shift_Points:p.metrics.find(x=>x.Sample===s)?.Shift_Points ?? null,
         Aligned_Point_SD:sd(p.aligned[s]),
         Corrected_Point_SD:sd(p.corrected[s])
       });
@@ -998,18 +998,70 @@ function dataURLtoBlob(dataURL){
   return new Blob([arr],{type:mime});
 }
 
-async function plotDivToBlob(div){
+function deepClonePlotObject(obj){
+  return JSON.parse(JSON.stringify(obj));
+}
+
+function exportLayout(layout){
+  const out=deepClonePlotObject(layout||{});
+  out.width=1600;
+  out.height=900;
+  out.autosize=false;
+  out.paper_bgcolor='#ffffff';
+  out.plot_bgcolor='#ffffff';
+  out.font={...(out.font||{}),family:'Inter, Arial, sans-serif',size:18,color:'#000000'};
+  out.margin={l:125,r:55,t:55,b:135,...(out.margin||{})};
+  out.margin.l=Math.max(125,Number(out.margin.l)||0);
+  out.margin.r=Math.max(55,Number(out.margin.r)||0);
+  out.margin.t=Math.max(55,Number(out.margin.t)||0);
+  out.margin.b=Math.max(135,Number(out.margin.b)||0);
+
+  const strengthenAxis=axis=>{
+    const a={...(axis||{})};
+    const titleText=typeof a.title==='string'?a.title:(a.title?.text||'');
+    a.title={...(typeof a.title==='object'&&a.title?a.title:{}),text:titleText?`<b>${titleText}</b>`:'',font:{...(a.title?.font||{}),family:'Arial Black, Inter, Segoe UI, sans-serif',size:24,color:'#000000'}};
+    a.tickfont={...(a.tickfont||{}),family:'Arial Black, Inter, Segoe UI, sans-serif',size:19,color:'#000000'};
+    a.showline=true;
+    a.linecolor='#000000';
+    a.linewidth=3;
+    a.ticks='outside';
+    a.tickcolor='#000000';
+    a.tickwidth=2;
+    a.ticklen=8;
+    a.zeroline=false;
+    return a;
+  };
+
+  out.xaxis=strengthenAxis(out.xaxis);
+  out.yaxis=strengthenAxis(out.yaxis);
+  out.legend={...(out.legend||{}),font:{...(out.legend?.font||{}),family:'Inter, Arial, sans-serif',size:18,color:'#000000'}};
+  return out;
+}
+
+async function directPlotDivToBlob(div){
   const url=await Plotly.toImage(div,{format:'png',width:1600,height:900,scale:2});
   return dataURLtoBlob(url);
 }
 
-async function imageFromSpec(traces,layout){
+async function plotDivToBlob(div){
   const tmp=document.createElement('div');
-  tmp.style.cssText='position:fixed;left:-10000px;top:0;width:1400px;height:800px;background:#fff';
+  tmp.style.cssText='position:fixed;left:-10000px;top:0;width:1600px;height:900px;background:#fff';
   document.body.appendChild(tmp);
   try{
-    await Plotly.newPlot(tmp,traces,layout,{displayModeBar:false,staticPlot:true});
-    return await plotDivToBlob(tmp);
+    const traces=deepClonePlotObject(div.data||[]);
+    const layout=exportLayout(div.layout||{});
+    await Plotly.newPlot(tmp,traces,layout,{displayModeBar:false,staticPlot:true,responsive:false});
+    return await directPlotDivToBlob(tmp);
+  }finally{try{Plotly.purge(tmp)}catch(_){}tmp.remove()}
+}
+
+async function imageFromSpec(traces,layout){
+  const tmp=document.createElement('div');
+  tmp.style.cssText='position:fixed;left:-10000px;top:0;width:1600px;height:900px;background:#fff';
+  document.body.appendChild(tmp);
+  try{
+    await Plotly.newPlot(tmp,deepClonePlotObject(traces),exportLayout(layout),{displayModeBar:false,staticPlot:true,responsive:false});
+    return await directPlotDivToBlob(tmp);
   }finally{try{Plotly.purge(tmp)}catch(_){}tmp.remove()}
 }
 
@@ -1026,20 +1078,42 @@ async function writeBlob(root,path,blob){
   const w=await fh.createWritable();await w.write(blob);await w.close();
 }
 
+function sanitizeExcelValue(v){
+  if(typeof v==='number')return Number.isFinite(v)?v:null;
+  if(v===undefined)return null;
+  return v;
+}
+
+function sanitizeAoaForExcel(aoa){
+  return (aoa||[]).map(row=>(row||[]).map(sanitizeExcelValue));
+}
+
+function sanitizeJsonRowsForExcel(rows){
+  return (rows||[]).map(row=>{
+    const clean={};
+    for(const [k,v] of Object.entries(row||{}))clean[k]=sanitizeExcelValue(v);
+    return clean;
+  });
+}
+
 function aoaWorkbookBlob(aoa,sheetName='Data'){
   const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),sheetName.slice(0,31));
-  const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+  const cleanAoa=sanitizeAoaForExcel(aoa);
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(cleanAoa),sheetName.slice(0,31));
+  const out=XLSX.write(wb,{bookType:'xlsx',type:'array',compression:true});
   return new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 }
 
 function jsonWorkbookBlob(sheets){
   const wb=XLSX.utils.book_new();
   for(const [name,rows] of Object.entries(sheets)){
-    const ws=Array.isArray(rows)&&rows.length&&Array.isArray(rows[0])?XLSX.utils.aoa_to_sheet(rows):XLSX.utils.json_to_sheet(rows||[]);
+    const isAoa=Array.isArray(rows)&&rows.length&&Array.isArray(rows[0]);
+    const ws=isAoa
+      ?XLSX.utils.aoa_to_sheet(sanitizeAoaForExcel(rows))
+      :XLSX.utils.json_to_sheet(sanitizeJsonRowsForExcel(rows||[]));
     XLSX.utils.book_append_sheet(wb,ws,name.slice(0,31));
   }
-  const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+  const out=XLSX.write(wb,{bookType:'xlsx',type:'array',compression:true});
   return new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 }
 
@@ -1089,36 +1163,45 @@ function radiusSummaryWorkbookBlob(){
   return jsonWorkbookBlob({Radius_Summary:summaryByRadius(),Sample_Level:state.dataset.summary,H1_Metrics:allMetricsRows()});
 }
 
-async function buildIndividualEntries(mode){
+async function buildAllRadiusOverlayEntries(mode){
   if(!modeUsesRadius(mode))return[];
-  const d=state.dataset;const block=selectedBlock();const p=block.processed;const entries=[];
-  for(let i=0;i<d.samples.length;i++){
-    const s=d.samples[i];
-    el('progress').textContent=`${tr('saving')} ${s} (${i+1}/${d.samples.length})`;
+  const d=state.dataset;
+  const entries=[];
+
+  for(let ri=0;ri<d.radii.length;ri++){
+    const r=d.radii[ri];
+    const block=d.dataByRadius[radiusKey(r)];
+    const p=block.processed;
+    el('progress').textContent=`${tr('saving')} ${radiusLabel(r)} mm (${ri+1}/${d.radii.length})`;
+
     let traces,layout,name;
     if(mode==='raw'){
-      traces=[
-        {x:pointLabels(),y:block.values[s],type:'scatter',mode:'lines+markers',name:s,line:{width:2.2,color:el('colorRaw').value},marker:{size:6}},
-        {x:pointLabels(),y:pointLabels().map(()=>block.center[s]),type:'scatter',mode:'lines',name:tr('centerLegend'),line:{width:2,color:el('colorCenter').value,dash:'dash'}}
-      ];
-      layout=baseLayout(tr('pointAxis'));name=`Individual/R_${radiusLabel(block.radius)}mm_${s}.png`;
+      traces=overlayTraces(block.values);
+      layout=baseLayout(tr('pointAxis'));
+      name=`All_Radii_Overlays/R_${radiusLabel(r)}mm_ALL_SAMPLES_RAW_OVERLAY.png`;
     }else if(mode==='h1'){
-      traces=rawVsFitTraces(s,false);
-      traces.push({x:pointLabels(),y:pointLabels().map(()=>block.center[s]),type:'scatter',mode:'lines',name:tr('centerLegend'),line:{width:2,color:el('colorCenter').value,dash:'dash'}});
-      layout=baseLayout(tr('pointAxis'));name=`Individual/R_${radiusLabel(block.radius)}mm_${s}_Raw_vs_1X.png`;
+      traces=overlayTraces(p.rawFit);
+      layout=baseLayout(tr('pointAxis'));
+      name=`All_Radii_Overlays/R_${radiusLabel(r)}mm_ALL_SAMPLES_1X_FIT_OVERLAY.png`;
     }else if(mode==='alignedRaw'){
-      traces=[{x:pointLabels(),y:p.aligned[s],type:'scatter',mode:'lines+markers',name:s,line:{width:2.2,color:el('colorAligned').value},marker:{size:6}}];
-      layout=baseLayout(tr('alignedPointAxis'));name=`Individual/R_${radiusLabel(block.radius)}mm_${s}_Aligned.png`;
+      traces=overlayTraces(p.aligned);
+      layout=baseLayout(tr('alignedPointAxis'));
+      name=`All_Radii_Overlays/R_${radiusLabel(r)}mm_ALL_SAMPLES_ALIGNED_RAW_OVERLAY.png`;
     }else if(mode==='alignedH1'){
-      traces=rawVsFitTraces(s,true);layout=baseLayout(tr('alignedPointAxis'));name=`Individual/R_${radiusLabel(block.radius)}mm_${s}_Aligned_Raw_vs_1X.png`;
+      traces=[];
+      d.samples.forEach((s,i)=>{
+        const c=sampleColor(i,d.samples.length);
+        traces.push({x:d.points,y:p.aligned[s],type:'scatter',mode:'lines',name:`${s} raw`,showlegend:false,line:{width:1,color:c},opacity:.25});
+        traces.push({x:d.points,y:p.alignedFit[s],type:'scatter',mode:'lines+markers',name:s,line:{width:1.8,color:c},opacity:.9});
+      });
+      layout=baseLayout(tr('alignedPointAxis'));
+      name=`All_Radii_Overlays/R_${radiusLabel(r)}mm_ALL_SAMPLES_ALIGNED_RAW_1X_OVERLAY.png`;
     }else{
-      traces=[
-        {x:pointLabels(),y:block.values[s],type:'scatter',mode:'lines+markers',name:tr('rawBefore'),line:{width:2,color:el('colorRaw').value},marker:{size:5}},
-        {x:pointLabels(),y:p.aligned[s],type:'scatter',mode:'lines+markers',name:tr('alignedRaw'),line:{width:2,color:el('colorAligned').value},marker:{size:5}},
-        {x:pointLabels(),y:p.corrected[s],type:'scatter',mode:'lines+markers',name:tr('corrected'),line:{width:2.2,color:el('colorCorrected').value},marker:{size:5}}
-      ];
-      layout=baseLayout(tr('alignedPointAxis'));name=`Individual/R_${radiusLabel(block.radius)}mm_${s}_Raw_Aligned_Corrected.png`;
+      traces=overlayTraces(p.corrected);
+      layout=baseLayout(tr('alignedPointAxis'));
+      name=`All_Radii_Overlays/R_${radiusLabel(r)}mm_CORRECTED_ALL_SAMPLES_OVERLAY.png`;
     }
+
     entries.push({path:name,blob:await imageFromSpec(traces,layout)});
   }
   return entries;
@@ -1155,7 +1238,7 @@ el('saveBtn').onclick=async()=>{
         await writeBlob(state.saveHandle,`${folder}/All_Radii_Processed_Data.xlsx`,processedWorkbookBlob(mode));
       }
       if(state.individual){
-        const entries=await buildIndividualEntries(mode);
+        const entries=await buildAllRadiusOverlayEntries(mode);
         for(let i=0;i<entries.length;i++){
           el('progress').textContent=`${tr('saving')} ${i+1}/${entries.length}`;
           await writeBlob(state.saveHandle,`${folder}/${entries[i].path}`,entries[i].blob);
