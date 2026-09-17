@@ -92,15 +92,36 @@
       letter-spacing:-.03em;
     }
 
-    .lang-btn{
+    .topbar-actions{display:flex;align-items:center;gap:10px}
+
+    .lang-btn,.global-reset-btn{
       width:46px;
       height:46px;
       border:1px solid var(--line);
       border-radius:50%;
       background:#fff;
-      font-size:21px;
       box-shadow:0 6px 18px rgba(17,24,39,.06);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
     }
+
+    .lang-btn{font-size:21px}
+
+    .global-reset-btn{
+      font-size:25px;
+      font-weight:700;
+      line-height:1;
+      transition:.18s ease;
+    }
+
+    .global-reset-btn:hover,.tab-reset-btn:hover{
+      background:#f8f9fb;
+      transform:translateY(-1px);
+      border-color:#bdc3cc;
+    }
+
+    .global-reset-btn:active,.tab-reset-btn:active{transform:translateY(0)}
 
     .dock{
       position:fixed;
@@ -325,6 +346,33 @@
     .result-header h2{margin:0;font-size:21px;font-weight:800;letter-spacing:-.03em}
     .result-header .sub{font-size:12px;color:var(--muted);font-weight:600;margin-top:5px}
 
+    .result-controls{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .tab-reset-btn{
+      width:38px;
+      height:38px;
+      border:1px solid var(--line);
+      border-radius:50%;
+      background:#fff;
+      color:#111827;
+      font-size:21px;
+      font-weight:700;
+      line-height:1;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 4px 12px rgba(17,24,39,.05);
+      transition:.18s ease;
+      display:none;
+    }
+
+    .tab-reset-btn.visible{display:inline-flex}
+
     .actions{display:none;align-items:center;gap:10px;flex-wrap:wrap}
     .actions.visible{display:flex}
 
@@ -466,6 +514,7 @@
       .workspace{padding:10px 12px 50px}
       .chart{height:420px}
       .result-header{align-items:flex-start;flex-direction:column}
+      .result-controls{justify-content:flex-start;width:100%}
       .metric-grid{grid-template-columns:1fr}
       .table-wrap{margin:12px 12px 0}
     }
@@ -495,7 +544,10 @@
     <div class="title-wrap">
       <h1 data-i18n="title">Normalization assessment</h1>
     </div>
-    <button id="langBtn" class="lang-btn" aria-label="Change language" title="Language">🌐</button>
+    <div class="topbar-actions">
+      <button id="globalResetBtn" class="global-reset-btn" type="button" title="Reset all" aria-label="Reset all">↻</button>
+      <button id="langBtn" class="lang-btn" type="button" aria-label="Change language" title="Language">🌐</button>
+    </div>
   </header>
 
   <main class="workspace">
@@ -577,10 +629,13 @@
           <div class="sub" data-i18n="chooseAnalysis">Validate the workbook, then choose an analysis.</div>
         </div>
 
-        <div id="actions" class="actions">
-          <button class="sheet-btn active" data-sheet="Notch" disabled>Notch</button>
-          <button class="sheet-btn" data-sheet="Center" disabled>Center</button>
-          <button id="exportBtn" class="save-btn" disabled data-i18n="exportBtn">Export assessment CSV</button>
+        <div class="result-controls">
+          <button id="tabResetBtn" class="tab-reset-btn" type="button" title="Reset current analysis" aria-label="Reset current analysis">↻</button>
+          <div id="actions" class="actions">
+            <button class="sheet-btn active" data-sheet="Notch" disabled>Notch</button>
+            <button class="sheet-btn" data-sheet="Center" disabled>Center</button>
+            <button id="exportBtn" class="save-btn" disabled data-i18n="exportBtn">Export assessment CSV</button>
+          </div>
         </div>
       </div>
 
@@ -806,7 +861,11 @@
         meanInside: "Inside",
         meanOutside: "Outside",
         notAvailable: "N/A",
-        exportDone: "Assessment CSV saved to the selected folder."
+        exportDone: "Assessment CSV saved to the selected folder.",
+        globalResetTitle: "Reset all",
+        tabResetTitle: "Reset current analysis",
+        fullResetDone: "All inputs and analysis states were reset.",
+        tabResetDone: "The current analysis tab was reset."
       },
       ko: {
         home: "홈페이지",
@@ -894,7 +953,11 @@
         meanInside: "범위 내부",
         meanOutside: "범위 외부",
         notAvailable: "계산 불가",
-        exportDone: "평가 결과 CSV를 선택한 폴더에 저장했습니다."
+        exportDone: "평가 결과 CSV를 선택한 폴더에 저장했습니다.",
+        globalResetTitle: "전체 초기화",
+        tabResetTitle: "현재 분석 초기화",
+        fullResetDone: "입력값과 모든 분석 상태를 초기화했습니다.",
+        tabResetDone: "현재 분석 탭을 초기화했습니다."
       }
     };
 
@@ -937,7 +1000,9 @@
       referenceList: document.getElementById("referenceList"),
       visibleList: document.getElementById("visibleList"),
       sigmaInput: document.getElementById("sigmaInput"),
-      assessmentTableBody: document.getElementById("assessmentTableBody")
+      assessmentTableBody: document.getElementById("assessmentTableBody"),
+      globalResetBtn: document.getElementById("globalResetBtn"),
+      tabResetBtn: document.getElementById("tabResetBtn")
     };
 
     function tr(key) {
@@ -959,6 +1024,11 @@
       } else {
         els.folderName.textContent = tr("notSelected");
       }
+      els.globalResetBtn.title = tr("globalResetTitle");
+      els.globalResetBtn.setAttribute("aria-label", tr("globalResetTitle"));
+      els.tabResetBtn.title = tr("tabResetTitle");
+      els.tabResetBtn.setAttribute("aria-label", tr("tabResetTitle"));
+
       if (validated) {
         setStatus("success", tr("statusSuccess"));
         renderAll();
@@ -975,6 +1045,100 @@
       els.statusBox.className = "status" + (type ? " " + type : "");
       els.statusBox.textContent = message;
     }
+
+    function purgeAssessmentPlots() {
+      for (const id of ["basicChart", "normalChart"]) {
+        const div = document.getElementById(id);
+        if (div) {
+          try { Plotly.purge(div); } catch (_) {}
+        }
+      }
+    }
+
+    function setActiveTab(tabName) {
+      activeTab = tabName === "normal" ? "normal" : "basic";
+      document.querySelectorAll(".content-tab").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.tab === activeTab);
+      });
+      document.getElementById("basicPage").classList.toggle("active", activeTab === "basic");
+      document.getElementById("normalPage").classList.toggle("active", activeTab === "normal");
+    }
+
+    function clearRenderedAssessmentContent() {
+      purgeAssessmentPlots();
+      els.colorGrid.innerHTML = "";
+      els.basicTableBody.innerHTML = "";
+      els.referenceList.innerHTML = "";
+      els.visibleList.innerHTML = "";
+      els.assessmentTableBody.innerHTML = "";
+
+      for (const id of ["metricReference", "metricReferenceSub", "metricBounds", "metricBoundsSub", "metricVisible", "metricVisibleSub", "metricClosest", "metricClosestSub"]) {
+        const node = document.getElementById(id);
+        if (node) node.textContent = "—";
+      }
+    }
+
+    function resetAll() {
+      purgeAssessmentPlots();
+
+      workbook = null;
+      rawFileName = "";
+      parsed = null;
+      validated = false;
+      activeSheet = "Notch";
+      activeTab = "basic";
+      referenceCondition = null;
+      visibleConditions = new Set();
+      conditionColors = {};
+      saveHandle = null;
+
+      els.excelInput.value = "";
+      els.fileName.textContent = tr("noFile");
+      els.folderName.textContent = tr("notSelected");
+      els.expectedSamples.value = "30";
+      els.expectedConditions.value = "3";
+      els.sigmaInput.value = "3";
+      els.validateBtn.disabled = true;
+
+      setActiveTab("basic");
+      clearRenderedAssessmentContent();
+      resetAnalysisUI();
+      setStatus("success", tr("fullResetDone"));
+    }
+
+    function resetCurrentAnalysis() {
+      if (!validated || !parsed) {
+        setStatus("error", workbook ? tr("chooseAnalysis") : tr("statusNoWorkbook"));
+        return;
+      }
+
+      const d = getCurrentData();
+      if (!d) return;
+
+      if (activeTab === "basic") {
+        const chart = document.getElementById("basicChart");
+        if (chart) {
+          try { Plotly.purge(chart); } catch (_) {}
+        }
+        renderBasicChart();
+        renderBasicTable();
+      } else {
+        els.sigmaInput.value = "3";
+        referenceCondition = d.conditions[0] || null;
+        visibleConditions = new Set(d.conditions);
+        const chart = document.getElementById("normalChart");
+        if (chart) {
+          try { Plotly.purge(chart); } catch (_) {}
+        }
+        renderNormalControls();
+        renderNormalAssessment();
+      }
+
+      setStatus("success", tr("tabResetDone"));
+    }
+
+    els.globalResetBtn.addEventListener("click", resetAll);
+    els.tabResetBtn.addEventListener("click", resetCurrentAnalysis);
 
     function isPositiveInteger(v) {
       return Number.isInteger(v) && v > 0;
@@ -1087,6 +1251,13 @@
       els.fileName.textContent = rawFileName;
       validated = false;
       parsed = null;
+      activeSheet = "Notch";
+      referenceCondition = null;
+      visibleConditions = new Set();
+      conditionColors = {};
+      els.sigmaInput.value = "3";
+      setActiveTab("basic");
+      clearRenderedAssessmentContent();
       resetAnalysisUI();
 
       try {
@@ -1259,6 +1430,7 @@
       els.emptyState.classList.remove("hidden");
       els.exportBtn.disabled = true;
       document.getElementById("actions").classList.remove("visible");
+      els.tabResetBtn.classList.remove("visible");
 
       document.querySelectorAll(".sheet-btn").forEach(btn => {
         btn.disabled = true;
@@ -1276,6 +1448,7 @@
       els.emptyState.classList.add("hidden");
       updateExportAvailability();
       document.getElementById("actions").classList.add("visible");
+      els.tabResetBtn.classList.add("visible");
       document.querySelectorAll(".sheet-btn").forEach(btn => btn.disabled = false);
       switchSheet("Notch");
     }
@@ -1315,10 +1488,7 @@
 
     document.querySelectorAll(".content-tab").forEach(btn => {
       btn.addEventListener("click", () => {
-        activeTab = btn.dataset.tab;
-        document.querySelectorAll(".content-tab").forEach(x => x.classList.toggle("active", x === btn));
-        document.getElementById("basicPage").classList.toggle("active", activeTab === "basic");
-        document.getElementById("normalPage").classList.toggle("active", activeTab === "normal");
+        setActiveTab(btn.dataset.tab);
         setTimeout(() => {
           if (activeTab === "basic") Plotly.Plots.resize(document.getElementById("basicChart"));
           else Plotly.Plots.resize(document.getElementById("normalChart"));
