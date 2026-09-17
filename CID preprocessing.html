@@ -83,15 +83,36 @@
     }
 
 
-    .lang-btn{
+    .topbar-actions{display:flex;align-items:center;gap:10px}
+
+    .lang-btn,.global-reset-btn{
       width:46px;
       height:46px;
       border:1px solid var(--line);
       border-radius:50%;
       background:#fff;
-      font-size:21px;
       box-shadow:0 6px 18px rgba(17,24,39,.06);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
     }
+
+    .lang-btn{font-size:21px}
+
+    .global-reset-btn{
+      font-size:25px;
+      font-weight:700;
+      line-height:1;
+      transition:.18s ease;
+    }
+
+    .global-reset-btn:hover,.tab-reset-btn:hover{
+      background:#f8f9fb;
+      transform:translateY(-1px);
+      border-color:#bdc3cc;
+    }
+
+    .global-reset-btn:active,.tab-reset-btn:active{transform:translateY(0)}
 
     .dock{
       position:fixed;
@@ -384,6 +405,33 @@
       margin-top:5px;
     }
 
+    .result-controls{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .tab-reset-btn{
+      width:38px;
+      height:38px;
+      border:1px solid var(--line);
+      border-radius:50%;
+      background:#fff;
+      color:#111827;
+      font-size:21px;
+      font-weight:700;
+      line-height:1;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 4px 12px rgba(17,24,39,.05);
+      transition:.18s ease;
+      display:none;
+    }
+
+    .tab-reset-btn.visible{display:inline-flex}
+
     .actions{
       display:none;
       align-items:center;
@@ -523,6 +571,11 @@
         align-items:flex-start;
         flex-direction:column;
       }
+
+      .result-controls{
+        justify-content:flex-start;
+        width:100%;
+      }
     }
   </style>
 </head>
@@ -612,14 +665,18 @@
       </h1>
     </div>
 
-    <button
-      id="langBtn"
-      class="lang-btn"
-      title="Language"
-      aria-label="Change language"
-    >
-      🌐
-    </button>
+    <div class="topbar-actions">
+      <button id="globalResetBtn" class="global-reset-btn" type="button" title="Reset all" aria-label="Reset all">↻</button>
+      <button
+        id="langBtn"
+        class="lang-btn"
+        type="button"
+        title="Language"
+        aria-label="Change language"
+      >
+        🌐
+      </button>
+    </div>
 
   </header>
 
@@ -814,30 +871,34 @@
 
         </div>
 
-        <div
-          id="actions"
-          class="actions"
-        >
+        <div class="result-controls">
+          <button id="tabResetBtn" class="tab-reset-btn" type="button" title="Reset current analysis" aria-label="Reset current analysis">↻</button>
 
-          <button
-            id="individualToggle"
-            class="toggle"
+          <div
+            id="actions"
+            class="actions"
           >
-            <span class="lamp"></span>
 
-            <span data-i18n="individual">
-              Individual sample waveforms
-            </span>
-          </button>
+            <button
+              id="individualToggle"
+              class="toggle"
+            >
+              <span class="lamp"></span>
 
-          <button
-            id="saveBtn"
-            class="save-btn"
-            data-i18n="save"
-          >
-            Save
-          </button>
+              <span data-i18n="individual">
+                Individual sample waveforms
+              </span>
+            </button>
 
+            <button
+              id="saveBtn"
+              class="save-btn"
+              data-i18n="save"
+            >
+              Save
+            </button>
+
+          </div>
         </div>
 
       </div>
@@ -946,7 +1007,11 @@ const I18N={
   modeEcc:'Eccentricity Diagnostic & Correction',
   analysisReady:'Plot generated. Use the toggle to include individual sample figures in Save.',
   actual:'actual',
-  expected:'expected'
+  expected:'expected',
+  globalResetTitle:'Reset all',
+  tabResetTitle:'Reset current analysis',
+  fullResetDone:'All inputs and analysis states were reset.',
+  tabResetDone:'The current analysis tab was reset.'
  },
 
  ko:{
@@ -1029,7 +1094,11 @@ const I18N={
   modeEcc:'Eccentricity Diagnostic & Correction',
   analysisReady:'플롯 생성 완료. 개별 샘플 파형 버튼을 켜면 Save 시 개별 그래프도 저장됩니다.',
   actual:'실제',
-  expected:'입력'
+  expected:'입력',
+  globalResetTitle:'전체 리셋',
+  tabResetTitle:'현재 분석 탭 리셋',
+  fullResetDone:'입력과 분석 상태를 모두 초기화했습니다.',
+  tabResetDone:'현재 분석 탭을 초기화했습니다.'
  }
 };
 
@@ -1073,6 +1142,11 @@ function applyLanguage(){
  }else{
   setStatus(tr('ready'));
  }
+
+ el('globalResetBtn').title=tr('globalResetTitle');
+ el('globalResetBtn').setAttribute('aria-label',tr('globalResetTitle'));
+ el('tabResetBtn').title=tr('tabResetTitle');
+ el('tabResetBtn').setAttribute('aria-label',tr('tabResetTitle'));
 
  if(state.currentMode){
   el('resultTitle').textContent=
@@ -1129,6 +1203,7 @@ function resetAnalysisView(resetIndividual=false){
   .forEach(b=>b.classList.remove('active'));
 
  el('actions').classList.remove('visible');
+ el('tabResetBtn').classList.remove('visible');
  el('resultTitle').textContent=tr('result');
  el('resultSub').textContent=tr('chooseAnalysis');
  el('plots').innerHTML=
@@ -1138,6 +1213,51 @@ function resetAnalysisView(resetIndividual=false){
   resetIndividualToggle();
  }
 }
+
+function resetAll(){
+ purgeCurrentPlots();
+ state.file=null;
+ state.saveHandle=null;
+ state.dataset=null;
+ state.currentMode=null;
+ state.individual=false;
+ state.currentPlots=[];
+
+ el('excelInput').value='';
+ el('filename').textContent=tr('noFile');
+ el('folderName').textContent=tr('notSelected');
+
+ el('expectedSamples').value='';
+ el('expectedPoints').value='';
+
+ el('colorRaw').value='#111827';
+ el('colorAligned').value='#2563eb';
+ el('colorH1').value='#7c3aed';
+ el('colorCorrected').value='#16a34a';
+
+ el('detected').innerHTML='';
+ el('progress').textContent='';
+ el('progress').classList.remove('visible');
+ el('saveBtn').disabled=false;
+ resetAnalysisView(true);
+ setStatus(tr('fullResetDone'),'good');
+}
+
+async function resetCurrentAnalysis(){
+ if(!state.dataset||!state.currentMode){
+  setStatus(!state.file?tr('needFile'):(!state.saveHandle?tr('needFolder'):tr('chooseAnalysis')),'bad');
+  return;
+ }
+
+ const mode=state.currentMode;
+ purgeCurrentPlots();
+ resetIndividualToggle();
+ await renderMainPlot(mode);
+ setStatus(tr('tabResetDone'),'good');
+}
+
+el('globalResetBtn').onclick=resetAll;
+el('tabResetBtn').onclick=resetCurrentAnalysis;
 
 function hexToRgba(hex,a){
  let h=hex.replace('#','');
@@ -2338,6 +2458,10 @@ async function runAnalysis(
    );
 
   el('actions')
+   .classList
+   .add('visible');
+
+  el('tabResetBtn')
    .classList
    .add('visible');
 
