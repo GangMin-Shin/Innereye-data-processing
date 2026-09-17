@@ -75,10 +75,15 @@
     }
 
     .title-wrap h1{font-size:24px;margin:0;font-weight:800;letter-spacing:-.03em}
-    .lang-btn{
+    .topbar-actions{display:flex;align-items:center;gap:10px}
+    .lang-btn,.global-reset-btn{
       width:46px;height:46px;border:1px solid var(--line);border-radius:50%;background:#fff;
-      font-size:21px;box-shadow:0 6px 18px rgba(17,24,39,.06)
+      box-shadow:0 6px 18px rgba(17,24,39,.06);display:inline-flex;align-items:center;justify-content:center
     }
+    .lang-btn{font-size:21px}
+    .global-reset-btn{font-size:25px;font-weight:700;line-height:1;transition:.18s ease}
+    .global-reset-btn:hover,.tab-reset-btn:hover{background:#f8f9fb;transform:translateY(-1px);border-color:#bdc3cc}
+    .global-reset-btn:active,.tab-reset-btn:active{transform:translateY(0)}
 
     .dock{
       position:fixed;
@@ -167,6 +172,8 @@
     .result-header h2{margin:0;font-size:21px;font-weight:800;letter-spacing:-.03em}
     .result-header .sub{font-size:12px;color:var(--muted);font-weight:600;margin-top:5px}
     .result-controls{display:flex;align-items:end;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .tab-reset-btn{width:38px;height:38px;border:1px solid var(--line);border-radius:50%;background:#fff;color:#111827;font-size:21px;font-weight:700;line-height:1;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(17,24,39,.05);transition:.18s ease;display:none}
+    .tab-reset-btn.visible{display:inline-flex}
     .mini-field label{display:block;font-size:11px;font-weight:800;color:#475467;margin-bottom:6px}
     .mini-field select{height:44px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:0 12px;min-width:150px;font-weight:700}
     .actions{display:none;align-items:center;gap:10px;flex-wrap:wrap}
@@ -242,7 +249,10 @@
 
   <header class="topbar">
     <div class="title-wrap"><h1 data-i18n="module">CID multi point analysis</h1></div>
-    <button id="langBtn" class="lang-btn" title="Language" aria-label="Change language">🌐</button>
+    <div class="topbar-actions">
+      <button id="globalResetBtn" class="global-reset-btn" type="button" title="Reset all" aria-label="Reset all">↻</button>
+      <button id="langBtn" class="lang-btn" type="button" title="Language" aria-label="Change language">🌐</button>
+    </div>
   </header>
 
   <main class="workspace">
@@ -322,6 +332,7 @@
         </div>
 
         <div class="result-controls">
+          <button id="tabResetBtn" class="tab-reset-btn" type="button" title="Reset current analysis" aria-label="Reset current analysis">↻</button>
           <div id="radiusControl" class="mini-field" style="display:none">
             <label data-i18n="viewRadius">View radius</label>
             <select id="radiusSelect"></select>
@@ -376,7 +387,8 @@ const I18N={
     rawLegend:'Raw', fitLegend:'1st harmonic', alignedLegend:'Aligned raw', correctedLegend:'Corrected', centerLegend:'Center', meanLegend:'mean', sdLegend:'± SD',
     saving:'Generating files…', saved:'Save completed.', saveFailed:'Save failed', individualOn:'All-radius sample overlay export ON', individualOff:'All-radius sample overlay export OFF',
     radius:'Radius', points:'Points', samples:'Samples', center:'Center', pointMean:'Point mean', meanMinusCenter:'MeanMinusCenter',
-    preview:'Preview', actual:'actual', expected:'expected'
+    preview:'Preview', actual:'actual', expected:'expected',
+    globalResetTitle:'Reset all', tabResetTitle:'Reset current analysis', fullResetDone:'All inputs and analysis states were reset.', tabResetDone:'The current analysis tab was reset.'
   },
   ko:{
     module:'CID 멀티 포인트 분석', dockHint:'분석 기능을 선택하세요.', back:'← 뒤로가기', home:'🏠 Home', analysis:'분석',
@@ -410,7 +422,8 @@ const I18N={
     rawLegend:'Raw', fitLegend:'1차 하모닉', alignedLegend:'정렬 Raw', correctedLegend:'보정 후', centerLegend:'Center', meanLegend:'평균', sdLegend:'± 표준편차',
     saving:'파일 생성 중…', saved:'저장이 완료되었습니다.', saveFailed:'저장 실패', individualOn:'반지름별 전체 샘플 파형 저장 ON', individualOff:'반지름별 전체 샘플 파형 저장 OFF',
     radius:'반지름', points:'포인트', samples:'샘플', center:'Center', pointMean:'포인트 평균', meanMinusCenter:'MeanMinusCenter',
-    preview:'미리보기', actual:'실제', expected:'입력'
+    preview:'미리보기', actual:'실제', expected:'입력',
+    globalResetTitle:'전체 리셋', tabResetTitle:'현재 분석 탭 리셋', fullResetDone:'입력과 분석 상태를 모두 초기화했습니다.', tabResetDone:'현재 분석 탭을 초기화했습니다.'
   }
 };
 
@@ -647,12 +660,69 @@ function resetAnalysisView(resetIndividual=false){
   state.currentMode=null;
   document.querySelectorAll('.analysis-btn').forEach(b=>b.classList.remove('active'));
   el('actions').classList.remove('visible');
+  el('tabResetBtn').classList.remove('visible');
   el('radiusControl').style.display='none';
   el('resultTitle').textContent=tr('result');
   el('resultSub').textContent=tr('chooseAnalysis');
   el('plots').innerHTML=`<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;
   if(resetIndividual)resetIndividualToggle();
 }
+
+function resetAll(){
+  purgeCurrentPlots();
+  state.file=null;
+  state.saveHandle=null;
+  state.dataset=null;
+  state.currentMode=null;
+  state.individual=false;
+  state.selectedRadiusKey=null;
+
+  el('excelInput').value='';
+  el('filename').textContent=tr('noFile');
+  el('folderName').textContent=tr('notSelected');
+
+  el('startRadius').value='0.1';
+  el('endRadius').value='7';
+  el('radiusStep').value='0.1';
+  el('expectedPoints').value='4';
+  el('expectedSamples').value='30';
+
+  el('colorRaw').value='#111827';
+  el('colorAligned').value='#2563eb';
+  el('colorH1').value='#7c3aed';
+  el('colorCorrected').value='#16a34a';
+  el('colorCenter').value='#dc2626';
+
+  el('detected').innerHTML='';
+  el('radiusSelect').innerHTML='';
+  el('progress').textContent='';
+  el('progress').classList.remove('visible');
+  el('saveBtn').disabled=false;
+  resetAnalysisView(true);
+  setStatus(tr('fullResetDone'),'good');
+}
+
+async function resetCurrentAnalysis(){
+  if(!state.dataset||!state.currentMode){
+    setStatus(!state.file?tr('needFile'):(!state.saveHandle?tr('needFolder'):tr('chooseAnalysis')),'bad');
+    return;
+  }
+
+  const mode=state.currentMode;
+  purgeCurrentPlots();
+  resetIndividualToggle();
+
+  if(modeUsesRadius(mode)){
+    state.selectedRadiusKey=radiusKey(state.dataset.radii[state.dataset.radii.length-1]);
+    el('radiusSelect').value=state.selectedRadiusKey;
+  }
+
+  await renderMainPlot(mode);
+  setStatus(tr('tabResetDone'),'good');
+}
+
+el('globalResetBtn').onclick=resetAll;
+el('tabResetBtn').onclick=resetCurrentAnalysis;
 
 function renderDetected(){
   const d=state.dataset;
@@ -688,6 +758,10 @@ function applyLanguage(){
   if(state.dataset){setStatus(tr('readSuccess'),'good');renderDetected()}
   else if(state.saveHandle)setStatus(tr('folderSelected'),'good');
   else setStatus(tr('ready'));
+  el('globalResetBtn').title=tr('globalResetTitle');
+  el('globalResetBtn').setAttribute('aria-label',tr('globalResetTitle'));
+  el('tabResetBtn').title=tr('tabResetTitle');
+  el('tabResetBtn').setAttribute('aria-label',tr('tabResetTitle'));
   if(state.currentMode){
     el('resultTitle').textContent=tr(modeInfo[state.currentMode].title);
     el('resultSub').textContent=tr('analysisReady');
@@ -970,6 +1044,7 @@ async function runAnalysis(mode,activate=true){
   if(activate){
     document.querySelectorAll('.analysis-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
     el('actions').classList.add('visible');
+    el('tabResetBtn').classList.add('visible');
     el('resultTitle').textContent=tr(modeInfo[mode].title);
     el('resultSub').textContent=mode==='organize'?tr('organizeSub'):tr('analysisReady');
   }
