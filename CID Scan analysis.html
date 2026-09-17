@@ -19,7 +19,12 @@
     button,input,select{font:inherit}button{cursor:pointer}
     .topbar{position:sticky;top:0;z-index:30;height:82px;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px 0 330px}
     .title-wrap h1{font-size:24px;margin:0;font-weight:800;letter-spacing:-.03em}
-    .lang-btn{width:46px;height:46px;border:1px solid var(--line);border-radius:50%;background:#fff;font-size:21px;box-shadow:0 6px 18px rgba(17,24,39,.06)}
+    .topbar-actions{display:flex;align-items:center;gap:10px}
+    .lang-btn,.global-reset-btn{width:46px;height:46px;border:1px solid var(--line);border-radius:50%;background:#fff;box-shadow:0 6px 18px rgba(17,24,39,.06);display:inline-flex;align-items:center;justify-content:center}
+    .lang-btn{font-size:21px}
+    .global-reset-btn{font-size:25px;font-weight:700;line-height:1;transition:.18s ease}
+    .global-reset-btn:hover,.tab-reset-btn:hover{background:#f8f9fb;transform:translateY(-1px);border-color:#bdc3cc}
+    .global-reset-btn:active,.tab-reset-btn:active{transform:translateY(0)}
     .dock{position:fixed;z-index:40;left:22px;bottom:22px;width:280px;max-height:calc(100vh - 44px);overflow:auto;background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:var(--shadow);backdrop-filter:blur(10px)}
     .dock-head{padding:8px 8px 12px}.dock-head strong{display:block;font-size:15px}.dock-head span{display:block;font-size:12px;color:var(--muted);margin-top:4px}
     .nav-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}.nav-btn,.analysis-btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;font-weight:800}.nav-btn{height:42px}
@@ -34,7 +39,10 @@
     .detected{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.badge{padding:7px 10px;border:1px solid var(--line);border-radius:999px;font-size:11px;font-weight:800;color:#344054;background:#fafafa}.badge.good{background:var(--green-soft);color:#16653f;border-color:#ccebd9}.badge.warn{background:var(--amber-soft);color:#9a6700;border-color:#f4dfad}
     .colors{margin-top:18px;padding-top:18px;border-top:1px solid var(--line);display:flex;gap:16px;flex-wrap:wrap;align-items:center}.color-opt{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;color:#475467}.color-opt input{width:30px;height:30px;padding:0;border:0;background:none}
     .result-header{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:28px 0 14px}.result-header h2{margin:0;font-size:21px;font-weight:800;letter-spacing:-.03em}.result-header .sub{font-size:12px;color:var(--muted);font-weight:600;margin-top:5px}.actions{display:none;align-items:center;gap:10px;flex-wrap:wrap}.actions.visible{display:flex}.toggle{height:44px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:0 13px;display:flex;gap:9px;align-items:center;font-size:12px;font-weight:800}.lamp{width:11px;height:11px;border-radius:50%;background:#c7cbd1;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}.toggle.on .lamp{background:#24b26b;box-shadow:0 0 0 4px rgba(36,178,107,.12)}.save-btn{height:44px;border:0;border-radius:12px;background:#111827;color:#fff;padding:0 17px;font-weight:800}.save-btn:disabled{opacity:.45;cursor:not-allowed}
-    .analysis-card{padding:18px;margin-bottom:16px;display:none}.analysis-card.visible{display:block}.control-grid{display:grid;grid-template-columns:minmax(150px,.7fr) minmax(180px,1fr) minmax(180px,1fr) minmax(220px,1.2fr);gap:12px;align-items:end}.line-row{display:flex;gap:8px;flex-wrap:wrap}.line-toggle{height:42px;min-width:56px;border:1px solid var(--line);border-radius:12px;background:#fff;font-weight:800}.line-toggle.active{background:#111827;color:#fff;border-color:#111827}.range-row{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.range-field{min-width:130px;flex:1}.range-field label{display:block;font-size:11px;font-weight:800;color:#475467;margin-bottom:6px}.range-field input{width:100%;height:42px;border:1px solid #d9dde4;border-radius:11px;padding:0 10px}.analysis-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.analysis-actions button{height:42px;border:1px solid var(--line);border-radius:11px;background:#fff;font-weight:800;padding:0 14px}.analysis-actions button.primary-mini{background:#111827;color:#fff;border-color:#111827}.hint{font-size:11px;line-height:1.55;color:var(--muted);font-weight:600;margin-top:10px}
+    .analysis-card{padding:18px;margin-bottom:16px;display:none}.analysis-card.visible{display:block}
+    .analysis-card-head{display:flex;align-items:center;justify-content:flex-end;margin-bottom:10px}
+    .tab-reset-btn{width:38px;height:38px;border:1px solid var(--line);border-radius:50%;background:#fff;color:#111827;font-size:21px;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(17,24,39,.05);transition:.18s ease}
+    .control-grid{display:grid;grid-template-columns:minmax(150px,.7fr) minmax(180px,1fr) minmax(180px,1fr) minmax(220px,1.2fr);gap:12px;align-items:end}.line-row{display:flex;gap:8px;flex-wrap:wrap}.line-toggle{height:42px;min-width:56px;border:1px solid var(--line);border-radius:12px;background:#fff;font-weight:800}.line-toggle.active{background:#111827;color:#fff;border-color:#111827}.range-row{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.range-field{min-width:130px;flex:1}.range-field label{display:block;font-size:11px;font-weight:800;color:#475467;margin-bottom:6px}.range-field input{width:100%;height:42px;border:1px solid #d9dde4;border-radius:11px;padding:0 10px}.analysis-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.analysis-actions button{height:42px;border:1px solid var(--line);border-radius:11px;background:#fff;font-weight:800;padding:0 14px}.analysis-actions button.primary-mini{background:#111827;color:#fff;border-color:#111827}.hint{font-size:11px;line-height:1.55;color:var(--muted);font-weight:600;margin-top:10px}
     .plots{display:grid;gap:18px}.plot-card{padding:16px;min-height:470px}.plot-title{display:flex;align-items:center;justify-content:space-between;padding:3px 4px 10px;font-size:13px;font-weight:800}.plot{width:100%;height:540px}.empty{min-height:500px;border:1px dashed #d5dae1;border-radius:20px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-weight:700;line-height:1.6;padding:30px}.progress{display:none;margin-top:10px;font-size:12px;font-weight:700;color:var(--muted)}.progress.visible{display:block}
     .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;margin-top:14px;background:#fff}.result-table{width:100%;border-collapse:collapse;min-width:980px;font-size:12px}.result-table th,.result-table td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}.result-table th:first-child,.result-table td:first-child,.result-table th:nth-child(2),.result-table td:nth-child(2){text-align:left}.result-table th{background:#f8f9fb;font-weight:800;color:#344054;position:sticky;top:0}.result-table tr:last-child td{border-bottom:0}
     @media(max-width:1200px){.setup-grid{grid-template-columns:1fr 1fr}.control-grid{grid-template-columns:1fr 1fr}}
@@ -52,7 +60,13 @@
     <button class="analysis-btn" data-mode="interval" data-i18n="intervalBtn">Interval analysis</button>
   </aside>
 
-  <header class="topbar"><div class="title-wrap"><h1 data-i18n="module">CID Scan analysis</h1></div><button id="langBtn" class="lang-btn" title="Language" aria-label="Change language">🌐</button></header>
+  <header class="topbar">
+    <div class="title-wrap"><h1 data-i18n="module">CID Scan analysis</h1></div>
+    <div class="topbar-actions">
+      <button id="globalResetBtn" class="global-reset-btn" type="button" title="Reset all" aria-label="Reset all">↻</button>
+      <button id="langBtn" class="lang-btn" type="button" title="Language" aria-label="Change language">🌐</button>
+    </div>
+  </header>
 
   <main class="workspace">
     <section class="setup-card">
@@ -79,6 +93,9 @@
       </div>
 
       <div id="analysisControls" class="analysis-card">
+        <div class="analysis-card-head">
+          <button id="tabResetBtn" class="tab-reset-btn" type="button" title="Reset current analysis" aria-label="Reset current analysis">↻</button>
+        </div>
         <div class="control-grid">
           <div class="field"><label data-i18n="sample">Sample</label><select id="sampleSelect"></select></div>
           <div class="field"><label data-i18n="lines">Displayed lines</label><div class="line-row"><button class="line-toggle active" data-line="L1">L1</button><button class="line-toggle active" data-line="L2">L2</button><button class="line-toggle active" data-line="L3">L3</button></div></div>
@@ -96,8 +113,8 @@
 
 <script>
 const I18N={
-  en:{module:'CID Scan analysis',dockHint:'Select an analysis function.',back:'← Back',home:'🏠 Home',analysis:'Analysis',rawBtn:'Raw data plot',sgBtn:'SG smoothing plot',intervalBtn:'Interval analysis',inputSetup:'Input & output setup',excelFile:'Excel workbook',savePath:'Save path',browse:'Browse',noFile:'No file selected',notSelected:'No folder selected',excitation:'Excitation frequency (kHz)',signalType:'Signal type',scanSpeed:'Scan speed (mm/s)',scanLength:'Scan length (mm)',notchPosition:'Estimated notch position from start (mm)',expectedSamples:'Measured samples',readAnalyze:'Read & analyze',ready:'Ready',plotColors:'Plot colors',result:'Processing result',chooseAnalysis:'Read an Excel file, then choose an analysis.',exportAll:'Export all sample plots',save:'Save',sample:'Sample',lines:'Displayed lines',rangeStart:'Range start (mm)',rangeEnd:'Range end (mm)',useVisible:'Use visible x-range',findExtrema:'Find local extrema',calcAuc:'Calculate peak-to-peak AUC',empty:'No plot yet.\nLoad a valid workbook and select a function from the lower-left panel.',needFile:'Please select an Excel workbook.',needFolder:'Please select a save folder.',folderSelected:'Save folder selected.',folderUnsupported:'This browser does not support folder selection. Use a browser with the File System Access API.',reading:'Reading workbook and preprocessing…',readSuccess:'Workbook read and preprocessing completed.',invalidParams:'Check the input parameters. Speed, length, frequency and sample count must be valid positive values.',sheetMismatch:'Sample sheets must be exactly S1 through the entered sample count.',headerMismatch:'Each sample sheet must have L1, L2 and L3 in A1:C1.',noValid:'No valid non-zero numeric data were found.',rawTitle:'Raw data',sgTitle:'SG smoothing',intervalTitle:'Interval analysis',rawSub:'Select a sample and one or more lines.',sgSub:'Third-order Savitzky–Golay smoothing with a 0.01 s window.',intervalSub:'Drag horizontally to zoom/select an x-range, or enter the range numerically.',samplingRate:'Estimated sampling rate',duration:'Scan duration',minLength:'Common valid length',sgWindow:'SG window',distanceStep:'Distance/sample',filenameMeta:'Filename metadata',match:'match',mismatch:'mismatch',notDetected:'not detected',notch:'Notch',distanceAxis:'Distance from scan start (mm)',sensorAxisPhase:'Phase',sensorAxisEMF:'EMF',rawLegend:'Raw',sgLegend:'SG smoothed',needRead:'Select the Excel workbook and save folder, then run Read & analyze.',exportOn:'All-sample plot export ON.',exportOff:'All-sample plot export OFF.',saving:'Generating files…',saved:'Save completed.',saveFailed:'Save failed',hintRaw:'Use the sample selector and L1/L2/L3 buttons to control the overlay.',hintSG:'SG polynomial order = 3. Window duration is fixed at 0.01 s and converted to the nearest valid odd sample count.',hintInterval:'For each sample, L1/L2/L3 use one common search range. For AUC, the two most prominent local maxima inside that range are selected, and the corrected AUC is calculated only between those two maxima.',extremaDone:'Dominant local extrema were detected from the SG-smoothed signal using sign-change candidates and topographic prominence.',aucDone:'Within the entered search range, the two most prominent local maxima were selected. AUC was calculated only between those maxima after subtracting the straight baseline connecting them, then applying trapezoidal integration.',noExtrema:'No valid local maximum/minimum pair was found in the selected interval.',noTwoMaxima:'Fewer than two valid local maxima were found in the selected search range.',rangeInvalid:'The analysis range is invalid.',lineRequired:'At least one line must remain selected.',modeRaw:'Raw data',modeSG:'SG smoothing',modeInterval:'Interval analysis'},
-  ko:{module:'CID 스캔 분석',dockHint:'분석 기능을 선택하세요.',back:'← 뒤로가기',home:'🏠 Home',analysis:'분석',rawBtn:'Rawdata 플롯',sgBtn:'SG 스무딩 플롯',intervalBtn:'구간 분석',inputSetup:'입력 및 저장 설정',excelFile:'입력 Excel 파일',savePath:'저장 경로',browse:'Browse',noFile:'선택된 파일 없음',notSelected:'선택된 폴더 없음',excitation:'여자주파수 (kHz)',signalType:'신호 종류',scanSpeed:'스캔 속도 (mm/s)',scanLength:'스캔 길이 (mm)',notchPosition:'시작점 기준 노치 추정 위치 (mm)',expectedSamples:'측정 샘플 수',readAnalyze:'데이터 분석 시작',ready:'준비 완료',plotColors:'그래프 색상',result:'처리 결과',chooseAnalysis:'Excel을 읽은 뒤 분석 기능을 선택하세요.',exportAll:'전체 샘플 그래프 저장',save:'세이브',sample:'샘플',lines:'표시 라인',rangeStart:'구간 시작 (mm)',rangeEnd:'구간 끝 (mm)',useVisible:'현재 보이는 x구간 사용',findExtrema:'극대·극소점 찾기',calcAuc:'극댓값 사이 보정 AUC 계산',empty:'아직 플롯이 없습니다.\n유효한 엑셀을 불러오고 왼쪽 아래에서 기능을 선택하세요.',needFile:'입력 Excel 파일을 선택해주세요.',needFolder:'저장 폴더를 선택해주세요.',folderSelected:'저장 폴더 선택 완료.',folderUnsupported:'이 브라우저는 저장 폴더 선택을 지원하지 않습니다. File System Access API 지원 브라우저를 사용해주세요.',reading:'Excel 구조 확인 및 전처리 중…',readSuccess:'Excel 리딩 및 전처리가 완료되었습니다.',invalidParams:'입력 파라미터를 확인해주세요. 속도, 길이, 주파수, 샘플 수는 유효한 양수여야 합니다.',sheetMismatch:'샘플 시트는 입력한 개수에 맞춰 S1부터 연속적으로 존재해야 합니다.',headerMismatch:'각 샘플 시트의 A1:C1은 L1, L2, L3이어야 합니다.',noValid:'0이 아닌 유효 숫자 데이터를 찾지 못했습니다.',rawTitle:'Rawdata',sgTitle:'SG 스무딩',intervalTitle:'구간 분석',rawSub:'샘플과 L1/L2/L3를 선택해 오버레이를 확인합니다.',sgSub:'0.01 s 윈도우를 사용하는 3차 Savitzky–Golay 스무딩입니다.',intervalSub:'그래프를 가로로 드래그해 구간을 잡거나 수치로 직접 입력할 수 있습니다.',samplingRate:'추정 샘플링 레이트',duration:'스캔 시간',minLength:'공통 유효 길이',sgWindow:'SG 윈도우',distanceStep:'샘플당 거리',filenameMeta:'파일명 메타데이터',match:'일치',mismatch:'불일치',notDetected:'검출 안 됨',notch:'Notch',distanceAxis:'스캔 시작점 기준 거리 (mm)',sensorAxisPhase:'Phase',sensorAxisEMF:'EMF',rawLegend:'Raw',sgLegend:'SG 스무딩',needRead:'Excel 파일과 저장 폴더를 지정한 뒤 데이터 분석 시작을 실행해주세요.',exportOn:'전체 샘플 그래프 저장 ON.',exportOff:'전체 샘플 그래프 저장 OFF.',saving:'파일 생성 중…',saved:'저장이 완료되었습니다.',saveFailed:'저장 실패',hintRaw:'샘플 선택과 L1/L2/L3 버튼으로 오버레이 라인을 선택할 수 있습니다.',hintSG:'SG 다항식 차수는 3차이며, 윈도우 시간은 0.01 s로 고정하고 샘플링 레이트에 따라 가장 가까운 유효 홀수 샘플 수로 변환합니다.',hintInterval:'샘플별로 L1/L2/L3는 하나의 동일한 검색 구간을 사용합니다. AUC 계산 시에는 입력한 검색 구간 안에서 prominence가 큰 대표 극댓값 2개를 선택하고, 두 극댓값 사이에서만 baseline 보정 AUC를 계산합니다.',extremaDone:'SG 스무딩 신호의 미분 부호 변화 후보와 topographic prominence를 이용해 대표 극대·극소점을 검출했습니다.',aucDone:'입력한 검색 구간 안에서 prominence가 큰 대표 극댓값 2개를 선택한 뒤, 두 극댓값을 잇는 직선 baseline을 제거하고 두 극댓값 사이만 사다리꼴 적분하여 AUC를 계산했습니다.',noExtrema:'선택 구간에서 유효한 극대점·극소점 쌍을 찾지 못했습니다.',noTwoMaxima:'선택한 검색 구간에서 유효한 극댓값을 2개 이상 찾지 못했습니다.',rangeInvalid:'분석 구간이 올바르지 않습니다.',lineRequired:'최소 한 개의 라인은 선택되어 있어야 합니다.',modeRaw:'Rawdata',modeSG:'SG 스무딩',modeInterval:'구간 분석'}
+  en:{module:'CID Scan analysis',dockHint:'Select an analysis function.',back:'← Back',home:'🏠 Home',analysis:'Analysis',rawBtn:'Raw data plot',sgBtn:'SG smoothing plot',intervalBtn:'Interval analysis',inputSetup:'Input & output setup',excelFile:'Excel workbook',savePath:'Save path',browse:'Browse',noFile:'No file selected',notSelected:'No folder selected',excitation:'Excitation frequency (kHz)',signalType:'Signal type',scanSpeed:'Scan speed (mm/s)',scanLength:'Scan length (mm)',notchPosition:'Estimated notch position from start (mm)',expectedSamples:'Measured samples',readAnalyze:'Read & analyze',ready:'Ready',plotColors:'Plot colors',result:'Processing result',chooseAnalysis:'Read an Excel file, then choose an analysis.',exportAll:'Export all sample plots',save:'Save',sample:'Sample',lines:'Displayed lines',rangeStart:'Range start (mm)',rangeEnd:'Range end (mm)',useVisible:'Use visible x-range',findExtrema:'Find local extrema',calcAuc:'Calculate peak-to-peak AUC',empty:'No plot yet.\nLoad a valid workbook and select a function from the lower-left panel.',needFile:'Please select an Excel workbook.',needFolder:'Please select a save folder.',folderSelected:'Save folder selected.',folderUnsupported:'This browser does not support folder selection. Use a browser with the File System Access API.',reading:'Reading workbook and preprocessing…',readSuccess:'Workbook read and preprocessing completed.',invalidParams:'Check the input parameters. Speed, length, frequency and sample count must be valid positive values.',sheetMismatch:'Sample sheets must be exactly S1 through the entered sample count.',headerMismatch:'Each sample sheet must have L1, L2 and L3 in A1:C1.',noValid:'No valid non-zero numeric data were found.',rawTitle:'Raw data',sgTitle:'SG smoothing',intervalTitle:'Interval analysis',rawSub:'Select a sample and one or more lines.',sgSub:'Third-order Savitzky–Golay smoothing with a 0.01 s window.',intervalSub:'Drag horizontally to zoom/select an x-range, or enter the range numerically.',samplingRate:'Estimated sampling rate',duration:'Scan duration',minLength:'Common valid length',sgWindow:'SG window',distanceStep:'Distance/sample',filenameMeta:'Filename metadata',match:'match',mismatch:'mismatch',notDetected:'not detected',notch:'Notch',distanceAxis:'Distance from scan start (mm)',sensorAxisPhase:'Phase',sensorAxisEMF:'EMF',rawLegend:'Raw',sgLegend:'SG smoothed',needRead:'Select the Excel workbook and save folder, then run Read & analyze.',exportOn:'All-sample plot export ON.',exportOff:'All-sample plot export OFF.',saving:'Generating files…',saved:'Save completed.',saveFailed:'Save failed',hintRaw:'Use the sample selector and L1/L2/L3 buttons to control the overlay.',hintSG:'SG polynomial order = 3. Window duration is fixed at 0.01 s and converted to the nearest valid odd sample count.',hintInterval:'For each sample, L1/L2/L3 use one common search range. For AUC, the two most prominent local maxima inside that range are selected, and the corrected AUC is calculated only between those two maxima.',extremaDone:'Dominant local extrema were detected from the SG-smoothed signal using sign-change candidates and topographic prominence.',aucDone:'Within the entered search range, the two most prominent local maxima were selected. AUC was calculated only between those maxima after subtracting the straight baseline connecting them, then applying trapezoidal integration.',noExtrema:'No valid local maximum/minimum pair was found in the selected interval.',noTwoMaxima:'Fewer than two valid local maxima were found in the selected search range.',rangeInvalid:'The analysis range is invalid.',lineRequired:'At least one line must remain selected.',modeRaw:'Raw data',modeSG:'SG smoothing',modeInterval:'Interval analysis',globalResetTitle:'Reset all',tabResetTitle:'Reset current analysis',fullResetDone:'All inputs and analysis states were reset.',tabResetDone:'The current analysis tab was reset.'},
+  ko:{module:'CID 스캔 분석',dockHint:'분석 기능을 선택하세요.',back:'← 뒤로가기',home:'🏠 Home',analysis:'분석',rawBtn:'Rawdata 플롯',sgBtn:'SG 스무딩 플롯',intervalBtn:'구간 분석',inputSetup:'입력 및 저장 설정',excelFile:'입력 Excel 파일',savePath:'저장 경로',browse:'Browse',noFile:'선택된 파일 없음',notSelected:'선택된 폴더 없음',excitation:'여자주파수 (kHz)',signalType:'신호 종류',scanSpeed:'스캔 속도 (mm/s)',scanLength:'스캔 길이 (mm)',notchPosition:'시작점 기준 노치 추정 위치 (mm)',expectedSamples:'측정 샘플 수',readAnalyze:'데이터 분석 시작',ready:'준비 완료',plotColors:'그래프 색상',result:'처리 결과',chooseAnalysis:'Excel을 읽은 뒤 분석 기능을 선택하세요.',exportAll:'전체 샘플 그래프 저장',save:'세이브',sample:'샘플',lines:'표시 라인',rangeStart:'구간 시작 (mm)',rangeEnd:'구간 끝 (mm)',useVisible:'현재 보이는 x구간 사용',findExtrema:'극대·극소점 찾기',calcAuc:'극댓값 사이 보정 AUC 계산',empty:'아직 플롯이 없습니다.\n유효한 엑셀을 불러오고 왼쪽 아래에서 기능을 선택하세요.',needFile:'입력 Excel 파일을 선택해주세요.',needFolder:'저장 폴더를 선택해주세요.',folderSelected:'저장 폴더 선택 완료.',folderUnsupported:'이 브라우저는 저장 폴더 선택을 지원하지 않습니다. File System Access API 지원 브라우저를 사용해주세요.',reading:'Excel 구조 확인 및 전처리 중…',readSuccess:'Excel 리딩 및 전처리가 완료되었습니다.',invalidParams:'입력 파라미터를 확인해주세요. 속도, 길이, 주파수, 샘플 수는 유효한 양수여야 합니다.',sheetMismatch:'샘플 시트는 입력한 개수에 맞춰 S1부터 연속적으로 존재해야 합니다.',headerMismatch:'각 샘플 시트의 A1:C1은 L1, L2, L3이어야 합니다.',noValid:'0이 아닌 유효 숫자 데이터를 찾지 못했습니다.',rawTitle:'Rawdata',sgTitle:'SG 스무딩',intervalTitle:'구간 분석',rawSub:'샘플과 L1/L2/L3를 선택해 오버레이를 확인합니다.',sgSub:'0.01 s 윈도우를 사용하는 3차 Savitzky–Golay 스무딩입니다.',intervalSub:'그래프를 가로로 드래그해 구간을 잡거나 수치로 직접 입력할 수 있습니다.',samplingRate:'추정 샘플링 레이트',duration:'스캔 시간',minLength:'공통 유효 길이',sgWindow:'SG 윈도우',distanceStep:'샘플당 거리',filenameMeta:'파일명 메타데이터',match:'일치',mismatch:'불일치',notDetected:'검출 안 됨',notch:'Notch',distanceAxis:'스캔 시작점 기준 거리 (mm)',sensorAxisPhase:'Phase',sensorAxisEMF:'EMF',rawLegend:'Raw',sgLegend:'SG 스무딩',needRead:'Excel 파일과 저장 폴더를 지정한 뒤 데이터 분석 시작을 실행해주세요.',exportOn:'전체 샘플 그래프 저장 ON.',exportOff:'전체 샘플 그래프 저장 OFF.',saving:'파일 생성 중…',saved:'저장이 완료되었습니다.',saveFailed:'저장 실패',hintRaw:'샘플 선택과 L1/L2/L3 버튼으로 오버레이 라인을 선택할 수 있습니다.',hintSG:'SG 다항식 차수는 3차이며, 윈도우 시간은 0.01 s로 고정하고 샘플링 레이트에 따라 가장 가까운 유효 홀수 샘플 수로 변환합니다.',hintInterval:'샘플별로 L1/L2/L3는 하나의 동일한 검색 구간을 사용합니다. AUC 계산 시에는 입력한 검색 구간 안에서 prominence가 큰 대표 극댓값 2개를 선택하고, 두 극댓값 사이에서만 baseline 보정 AUC를 계산합니다.',extremaDone:'SG 스무딩 신호의 미분 부호 변화 후보와 topographic prominence를 이용해 대표 극대·극소점을 검출했습니다.',aucDone:'입력한 검색 구간 안에서 prominence가 큰 대표 극댓값 2개를 선택한 뒤, 두 극댓값을 잇는 직선 baseline을 제거하고 두 극댓값 사이만 사다리꼴 적분하여 AUC를 계산했습니다.',noExtrema:'선택 구간에서 유효한 극대점·극소점 쌍을 찾지 못했습니다.',noTwoMaxima:'선택한 검색 구간에서 유효한 극댓값을 2개 이상 찾지 못했습니다.',rangeInvalid:'분석 구간이 올바르지 않습니다.',lineRequired:'최소 한 개의 라인은 선택되어 있어야 합니다.',modeRaw:'Rawdata',modeSG:'SG 스무딩',modeInterval:'구간 분석',globalResetTitle:'전체 리셋',tabResetTitle:'현재 분석 탭 리셋',fullResetDone:'입력과 분석 상태를 모두 초기화했습니다.',tabResetDone:'현재 분석 탭을 초기화했습니다.'}
 };
 
 let lang=localStorage.getItem('innereye_lang')||'en';
@@ -117,6 +134,10 @@ function applyLanguage(){
   if(state.file)el('filename').textContent=state.file.name;
   if(state.saveHandle)el('folderName').textContent=state.saveHandle.name;
   if(state.dataset){setStatus(tr('readSuccess'),'good');renderDetected();}
+  el('globalResetBtn').title=tr('globalResetTitle');
+  el('globalResetBtn').setAttribute('aria-label',tr('globalResetTitle'));
+  el('tabResetBtn').title=tr('tabResetTitle');
+  el('tabResetBtn').setAttribute('aria-label',tr('tabResetTitle'));
   if(state.currentMode)activateMode(state.currentMode,false);
 }
 el('langBtn').onclick=()=>{lang=lang==='en'?'ko':'en';localStorage.setItem('innereye_lang',lang);applyLanguage();};
@@ -126,10 +147,90 @@ el('excelBrowseBtn').onclick=()=>el('excelInput').click();
 el('excelInput').addEventListener('change',e=>{state.file=e.target.files[0]||null;el('filename').textContent=state.file?state.file.name:tr('noFile');resetDataset();});
 el('folderBtn').onclick=async()=>{if(!window.showDirectoryPicker){setStatus(tr('folderUnsupported'),'bad');return;}try{state.saveHandle=await window.showDirectoryPicker({mode:'readwrite',id:'innereye-cid-scan-output'});el('folderName').textContent=state.saveHandle.name;setStatus(tr('folderSelected'),'good');}catch(e){if(e.name!=='AbortError')setStatus(String(e.message||e),'bad');}};
 
-function resetDataset(){
-  state.dataset=null;state.currentMode=null;state.selectedSample=null;state.ranges={};state.visibleRanges={};state.results={extrema:{},auc:{}};state.currentPlot=null;
-  document.querySelectorAll('.analysis-btn').forEach(b=>b.classList.remove('active'));el('actions').classList.remove('visible');el('analysisControls').classList.remove('visible');el('detected').innerHTML='';el('resultTitle').textContent=tr('result');el('resultSub').textContent=tr('chooseAnalysis');el('plots').innerHTML=`<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;setStatus(tr('ready'));
+function purgeCurrentPlot(){
+  if(state.currentPlot){
+    try{Plotly.purge(state.currentPlot);}catch(_){}
+  }
+  state.currentPlot=null;
 }
+
+function resetSelectedLines(){
+  state.selectedLines=new Set(['L1','L2','L3']);
+  document.querySelectorAll('.line-toggle').forEach(btn=>btn.classList.add('active'));
+}
+
+function resetDataset(){
+  purgeCurrentPlot();
+  state.dataset=null;state.currentMode=null;state.selectedSample=null;state.ranges={};state.visibleRanges={};state.results={extrema:{},auc:{}};
+  resetSelectedLines();
+  state.exportAll=false;
+  document.querySelectorAll('.analysis-btn').forEach(b=>b.classList.remove('active'));
+  el('exportAllToggle').classList.remove('on');
+  el('actions').classList.remove('visible');
+  el('analysisControls').classList.remove('visible');
+  el('detected').innerHTML='';
+  el('sampleSelect').innerHTML='';
+  el('rangeStart').value='';
+  el('rangeEnd').value='';
+  el('resultTableWrap').innerHTML='';
+  el('resultTitle').textContent=tr('result');
+  el('resultSub').textContent=tr('chooseAnalysis');
+  el('plots').innerHTML=`<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;
+  el('progress').textContent='';
+  el('progress').classList.remove('visible');
+  el('saveBtn').disabled=false;
+  setStatus(tr('ready'));
+}
+
+function resetAll(){
+  state.file=null;
+  state.saveHandle=null;
+  el('excelInput').value='';
+  el('filename').textContent=tr('noFile');
+  el('folderName').textContent=tr('notSelected');
+
+  el('excitation').value='100';
+  el('signalType').value='Phase';
+  el('scanSpeed').value='1';
+  el('scanLength').value='6';
+  el('notchPosition').value='2';
+  el('expectedSamples').value='6';
+
+  el('colorL1').value='#111827';
+  el('colorL2').value='#2563eb';
+  el('colorL3').value='#d97706';
+
+  resetDataset();
+  setStatus(tr('fullResetDone'),'good');
+}
+
+async function resetCurrentAnalysis(){
+  if(!state.dataset||!state.currentMode){setStatus(tr('needRead'),'bad');return;}
+
+  const mode=state.currentMode;
+  purgeCurrentPlot();
+  state.selectedSample=state.dataset.samples[0];
+  resetSelectedLines();
+  state.exportAll=false;
+  el('exportAllToggle').classList.remove('on');
+  el('resultTableWrap').innerHTML='';
+
+  if(mode==='interval'){
+    state.visibleRanges={};
+    state.results.extrema={};
+    state.results.auc={};
+    state.ranges={};
+    state.dataset.samples.forEach(s=>{state.ranges[s]=[0,state.dataset.params.scanLength];});
+  }
+
+  populateSampleSelect();
+  syncRangeInputs();
+  await renderCurrentMode();
+  setStatus(tr('tabResetDone'),'good');
+}
+
+el('globalResetBtn').onclick=resetAll;
+el('tabResetBtn').onclick=resetCurrentAnalysis;
 
 function getParams(){
   const p={excitation:Number(el('excitation').value),signalType:el('signalType').value,scanSpeed:Number(el('scanSpeed').value),scanLength:Number(el('scanLength').value),notchPosition:Number(el('notchPosition').value),expectedSamples:Number(el('expectedSamples').value)};
