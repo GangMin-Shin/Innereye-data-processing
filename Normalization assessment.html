@@ -375,6 +375,7 @@
 
     .actions{display:none;align-items:center;gap:10px;flex-wrap:wrap}
     .actions.visible{display:flex}
+    #sheetButtons{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 
     .sheet-btn,.mini-btn{
       height:44px;
@@ -583,7 +584,7 @@
         </div>
 
         <div class="field">
-          <label for="expectedConditions" data-i18n="conditionCount">Pressure conditions</label>
+          <label for="expectedConditions" data-i18n="conditionCount">Groups / conditions</label>
           <input id="expectedConditions" type="number" min="1" step="1" value="3" />
         </div>
 
@@ -606,6 +607,7 @@
 
       <div class="read-row">
         <button id="validateBtn" class="primary" disabled data-i18n="validateBtn">Validate workbook</button>
+        <button id="templateDownloadBtn" class="secondary" type="button" data-i18n="downloadTemplate">Download template</button>
         <span id="statusBox" class="status" data-i18n="statusIdle">Load a workbook to begin validation.</span>
       </div>
 
@@ -632,8 +634,7 @@
         <div class="result-controls">
           <button id="tabResetBtn" class="tab-reset-btn" type="button" title="Reset current analysis" aria-label="Reset current analysis">↻</button>
           <div id="actions" class="actions">
-            <button class="sheet-btn active" data-sheet="Notch" disabled>Notch</button>
-            <button class="sheet-btn" data-sheet="Center" disabled>Center</button>
+            <div id="sheetButtons"></div>
             <button id="exportBtn" class="save-btn" disabled data-i18n="exportBtn">Export assessment CSV</button>
           </div>
         </div>
@@ -642,7 +643,7 @@
       <div id="emptyState" class="empty">
         <div>
           <strong data-i18n="emptyTitle">Workbook validation is required.</strong>
-          <span data-i18n="emptyDesc">Load the Excel file, enter the expected structure, and run validation. Analysis controls will appear after both sheets pass.</span>
+          <span data-i18n="emptyDesc">Load the Excel file, enter the expected structure, and run validation. Analysis controls will appear after all detected data sheets pass.</span>
         </div>
       </div>
 
@@ -651,7 +652,7 @@
           <div class="control-strip">
             <div class="control-left">
               <div>
-                <div class="section-title" data-i18n="basicTitle">Phase summary by burst pressure</div>
+                <div class="section-title" data-i18n="basicTitle">Value summary by group / condition</div>
                 <div class="section-desc" data-i18n="basicDesc">Bars show the group mean and error bars show ±1 SD.</div>
               </div>
             </div>
@@ -668,7 +669,7 @@
             <div class="card-head">
               <div>
                 <h3 data-i18n="descriptiveTitle">Descriptive statistics</h3>
-                <p data-i18n="descriptiveDesc">Summary of valid numeric phase values in the selected sheet.</p>
+                <p data-i18n="descriptiveDesc">Summary of valid numeric values in the selected sheet.</p>
               </div>
             </div>
             <div class="table-wrap">
@@ -694,7 +695,7 @@
           <div class="normal-grid">
             <aside class="selection-card">
               <h3 data-i18n="normalControls">Distribution controls</h3>
-              <p data-i18n="normalControlsDesc">Choose the reference pressure, the visible distributions, and the sigma envelope applied to the reference group.</p>
+              <p data-i18n="normalControlsDesc">Choose the reference group, the visible distributions, and the sigma envelope applied to the reference group.</p>
 
               <div class="inline-field">
                 <label for="sigmaInput" data-i18n="sigmaLabel">Reference range (±Nσ)</label>
@@ -797,17 +798,20 @@
         chooseAnalysis: "Validate the workbook, then choose an analysis.",
         eyebrow: "CID · Distribution analysis",
         title: "Normalization assessment",
-        desc: "Validate Notch and Center sheets, summarize phase values by burst-pressure condition, and assess whether the condition distributions can be separated using a selected ±Nσ reference range.",
+        desc: "Validate any number of data sheets, read each sheet’s group headers dynamically, and assess their distributions using a selected ±Nσ reference range.",
         loadTitle: "1. Load workbook",
-        loadDesc: "Required sheets: Notch and Center. Column A contains Sample IDs; columns B onward contain burst-pressure groups.",
+        loadDesc: "The summary sheet is ignored. Every other sheet is treated as a data sheet. Column A contains Sample IDs; columns B onward contain user-defined groups or conditions.",
         dropTitle: "Choose an Excel workbook",
         dropSub: ".xlsx or .xls · processed locally in your browser",
         noFile: "No file selected.",
         validateTitle: "2. Validate structure",
-        validateDesc: "Enter the expected number of samples and burst-pressure conditions, then compare them with both sheets.",
+        validateDesc: "Enter the expected number of samples and groups/conditions, then validate every detected data sheet.",
         sampleCount: "Samples",
-        conditionCount: "Pressure conditions",
+        conditionCount: "Groups / conditions",
         validateBtn: "Validate workbook",
+        downloadTemplate: "Download template",
+        statusNoDataSheets: "No analyzable data sheet was found. Add at least one sheet other than summary.",
+        statusSampleSequence: "Sample IDs must be S1, S2, …, Sn in exact order without gaps.",
         statusIdle: "Load a workbook to begin validation.",
         sheetTitle: "3. Active sheet",
         detectedSamples: "Detected samples",
@@ -818,15 +822,15 @@
         basicTab: "Basic plot",
         normalTab: "Normalization assessment",
         emptyTitle: "Workbook validation is required.",
-        emptyDesc: "Load the Excel file, enter the expected structure, and run validation. Analysis controls will appear after both sheets pass.",
-        basicTitle: "Phase summary by burst pressure",
+        emptyDesc: "Load the Excel file, enter the expected structure, and run validation. Analysis controls will appear after all detected data sheets pass.",
+        basicTitle: "Value summary by group / condition",
         basicDesc: "Bars show the group mean and error bars show ±1 SD.",
         resetColors: "Reset colors",
         descriptiveTitle: "Descriptive statistics",
-        descriptiveDesc: "Summary of valid numeric phase values in the selected sheet.",
-        thCondition: "Condition",
+        descriptiveDesc: "Summary of valid numeric values in the selected sheet.",
+        thCondition: "Group / condition",
         normalControls: "Distribution controls",
-        normalControlsDesc: "Choose the reference pressure, the visible distributions, and the sigma envelope applied to the reference group.",
+        normalControlsDesc: "Choose the reference group, the visible distributions, and the sigma envelope applied to the reference group.",
         sigmaLabel: "Reference range (±Nσ)",
         referenceGroup: "Reference group",
         visibleGroups: "Visible groups",
@@ -844,19 +848,19 @@
         thExpectedInside: "Gaussian expected inside",
         thJB: "JB p",
         thStatus: "Mean position",
-        statusLoaded: "Workbook loaded. Enter the expected counts and validate.",
-        statusSuccess: "Validation passed. Notch and Center have matching sample IDs and pressure-condition headers.",
+        statusLoaded: "Workbook loaded. Enter the expected sample and group counts, then validate.",
+        statusSuccess: "Validation passed for all detected data sheets.",
         statusNoWorkbook: "Load an Excel workbook first.",
-        statusMissingSheets: "Both 'Notch' and 'Center' sheets are required.",
+        statusMissingSheets: "No analyzable data sheet was found.",
         statusSampleMismatch: "Sample count does not match the expected value.",
-        statusConditionMismatch: "Pressure-condition count does not match the expected value.",
-        statusHeaderMismatch: "Notch and Center condition headers do not match.",
-        statusSampleIdMismatch: "Notch and Center sample IDs do not match.",
+        statusConditionMismatch: "Group / condition count does not match the expected value.",
+        statusHeaderMismatch: "Group / condition headers are invalid.",
+        statusSampleIdMismatch: "Sample IDs are invalid.",
         statusDuplicateSample: "Duplicate Sample IDs were detected.",
-        statusDuplicateCondition: "Duplicate pressure-condition headers were detected.",
-        statusSampleHeader: "Cell A1 must be exactly \"Sample\" in both sheets.",
-        statusInsufficientGroup: "Each pressure condition needs at least two numeric phase values in both sheets.",
-        statusInvalidExpected: "Expected sample and condition counts must be positive integers.",
+        statusDuplicateCondition: "Duplicate group / condition headers were detected.",
+        statusSampleHeader: "Cell A1 must be exactly \"Sample\" in every data sheet.",
+        statusInsufficientGroup: "Each group / condition needs at least two valid numeric values in its data sheet.",
+        statusInvalidExpected: "Expected sample and group counts must be positive integers.",
         statusParseError: "Could not parse the workbook structure.",
         meanInside: "Inside",
         meanOutside: "Outside",
@@ -889,17 +893,20 @@
         chooseAnalysis: "엑셀 구조를 검증한 뒤 분석 기능을 선택하세요.",
         eyebrow: "CID · 분포 분석",
         title: "정규분포 평가",
-        desc: "Notch 및 Center 시트 구조를 검증하고 파열압 조건별 페이즈 값을 요약한 뒤, 선택한 기준군의 ±Nσ 범위를 이용해 조건 간 분리 가능성을 평가합니다.",
+        desc: "summary를 제외한 모든 데이터 시트를 검증하고 각 시트의 그룹 헤더를 자동으로 읽어, 선택한 기준군의 ±Nσ 범위로 분포를 평가합니다.",
         loadTitle: "1. 엑셀 불러오기",
-        loadDesc: "필수 시트는 Notch와 Center입니다. A열은 Sample ID, B열 이후는 파열압 조건입니다.",
+        loadDesc: "summary 시트는 분석에서 제외됩니다. 나머지 모든 시트는 데이터 시트로 처리되며, A열은 Sample ID, B열 이후는 사용자가 지정한 그룹/조건입니다.",
         dropTitle: "엑셀 파일 선택",
         dropSub: ".xlsx 또는 .xls · 브라우저 내부에서만 처리",
         noFile: "선택된 파일이 없습니다.",
         validateTitle: "2. 구조 검증",
-        validateDesc: "예상 샘플 수와 파열압 조건 수를 입력하고 두 시트의 실제 구조와 비교합니다.",
+        validateDesc: "예상 샘플 수와 그룹/조건 수를 입력하고 검출된 모든 데이터 시트의 구조를 검증합니다.",
         sampleCount: "샘플 수",
-        conditionCount: "파열압 조건 수",
+        conditionCount: "그룹 / 조건 수",
         validateBtn: "엑셀 구조 검증",
+        downloadTemplate: "입력 양식 다운로드",
+        statusNoDataSheets: "분석할 데이터 시트가 없습니다. summary 이외의 시트를 1개 이상 추가해주세요.",
+        statusSampleSequence: "Sample ID는 S1, S2, …, Sn 순서로 누락 없이 입력해야 합니다.",
         statusIdle: "엑셀 파일을 불러오면 검증을 시작할 수 있습니다.",
         sheetTitle: "3. 분석 시트",
         detectedSamples: "검출 샘플 수",
@@ -910,15 +917,15 @@
         basicTab: "Basic plot",
         normalTab: "정규분포 평가",
         emptyTitle: "엑셀 구조 검증이 필요합니다.",
-        emptyDesc: "엑셀 파일을 불러오고 예상 구조를 입력한 뒤 검증을 실행하세요. 두 시트가 모두 통과하면 분석 기능이 활성화됩니다.",
-        basicTitle: "파열압별 페이즈 요약",
+        emptyDesc: "엑셀 파일을 불러오고 예상 구조를 입력한 뒤 검증을 실행하세요. 검출된 모든 데이터 시트가 통과하면 분석 기능이 활성화됩니다.",
+        basicTitle: "그룹 / 조건별 측정값 요약",
         basicDesc: "막대는 그룹 평균, 오차막대는 ±1 SD(표준편차)를 표시합니다.",
         resetColors: "색상 초기화",
         descriptiveTitle: "기술통계",
-        descriptiveDesc: "현재 시트의 유효한 숫자 페이즈 값에 대한 요약입니다.",
-        thCondition: "파열압 조건",
+        descriptiveDesc: "현재 시트의 유효한 숫자 측정값에 대한 요약입니다.",
+        thCondition: "그룹 / 조건",
         normalControls: "분포 설정",
-        normalControlsDesc: "기준 파열압, 표시할 분포, 기준군에 적용할 시그마 범위를 선택합니다.",
+        normalControlsDesc: "기준 그룹, 표시할 분포, 기준군에 적용할 시그마 범위를 선택합니다.",
         sigmaLabel: "기준 범위 (±Nσ)",
         referenceGroup: "기준 그룹",
         visibleGroups: "표시할 그룹",
@@ -936,19 +943,19 @@
         thExpectedInside: "정규분포 예상 포함률",
         thJB: "JB p",
         thStatus: "평균 위치",
-        statusLoaded: "엑셀을 불러왔습니다. 예상 샘플 수와 조건 수를 입력한 뒤 검증하세요.",
-        statusSuccess: "검증 완료. Notch와 Center의 Sample ID 및 파열압 조건 헤더가 서로 일치합니다.",
+        statusLoaded: "엑셀을 불러왔습니다. 예상 샘플 수와 그룹 수를 입력한 뒤 검증하세요.",
+        statusSuccess: "검증 완료. 검출된 모든 데이터 시트가 입력 규칙을 통과했습니다.",
         statusNoWorkbook: "먼저 엑셀 파일을 불러오세요.",
-        statusMissingSheets: "'Notch'와 'Center' 시트가 모두 필요합니다.",
+        statusMissingSheets: "분석할 데이터 시트가 없습니다.",
         statusSampleMismatch: "실제 샘플 수가 입력한 예상값과 일치하지 않습니다.",
-        statusConditionMismatch: "실제 파열압 조건 수가 입력한 예상값과 일치하지 않습니다.",
-        statusHeaderMismatch: "Notch와 Center의 파열압 조건 헤더가 서로 다릅니다.",
-        statusSampleIdMismatch: "Notch와 Center의 Sample ID 구성이 서로 다릅니다.",
+        statusConditionMismatch: "실제 그룹/조건 수가 입력한 예상값과 일치하지 않습니다.",
+        statusHeaderMismatch: "그룹/조건 헤더가 올바르지 않습니다.",
+        statusSampleIdMismatch: "Sample ID 구성이 올바르지 않습니다.",
         statusDuplicateSample: "중복된 Sample ID가 검출되었습니다.",
-        statusDuplicateCondition: "중복된 파열압 조건 헤더가 검출되었습니다.",
-        statusSampleHeader: "두 시트 모두 A1 셀의 열 라벨은 정확히 \"Sample\"이어야 합니다.",
-        statusInsufficientGroup: "각 파열압 조건에는 두 시트 모두 최소 2개의 유효한 숫자 페이즈 값이 필요합니다.",
-        statusInvalidExpected: "예상 샘플 수와 조건 수는 1 이상의 정수여야 합니다.",
+        statusDuplicateCondition: "중복된 그룹/조건 헤더가 검출되었습니다.",
+        statusSampleHeader: "모든 데이터 시트의 A1 셀 열 라벨은 정확히 \"Sample\"이어야 합니다.",
+        statusInsufficientGroup: "각 그룹/조건에는 해당 데이터 시트에서 최소 2개의 유효한 숫자값이 필요합니다.",
+        statusInvalidExpected: "예상 샘플 수와 그룹 수는 1 이상의 정수여야 합니다.",
         statusParseError: "엑셀 구조를 해석하지 못했습니다.",
         meanInside: "범위 내부",
         meanOutside: "범위 외부",
@@ -971,7 +978,9 @@
     let rawFileName = "";
     let parsed = null;
     let validated = false;
-    let activeSheet = "Notch";
+    let activeSheet = null;
+    let dataSheetNames = [];
+    let sheetStates = {};
     let activeTab = "basic";
     let referenceCondition = null;
     let visibleConditions = new Set();
@@ -985,6 +994,8 @@
       folderBtn: document.getElementById("folderBtn"),
       folderName: document.getElementById("folderName"),
       validateBtn: document.getElementById("validateBtn"),
+      templateDownloadBtn: document.getElementById("templateDownloadBtn"),
+      sheetButtons: document.getElementById("sheetButtons"),
       expectedSamples: document.getElementById("expectedSamples"),
       expectedConditions: document.getElementById("expectedConditions"),
       statusBox: document.getElementById("statusBox"),
@@ -1030,7 +1041,8 @@
       els.tabResetBtn.setAttribute("aria-label", tr("tabResetTitle"));
 
       if (validated) {
-        setStatus("success", tr("statusSuccess"));
+        setStatus("success", validationSuccessMessage());
+        renderSheetButtons();
         renderAll();
       }
     }
@@ -1085,7 +1097,9 @@
       rawFileName = "";
       parsed = null;
       validated = false;
-      activeSheet = "Notch";
+      activeSheet = null;
+      dataSheetNames = [];
+      sheetStates = {};
       activeTab = "basic";
       referenceCondition = null;
       visibleConditions = new Set();
@@ -1132,6 +1146,7 @@
         }
         renderNormalControls();
         renderNormalAssessment();
+        persistCurrentSheetState();
       }
 
       setStatus("success", tr("tabResetDone"));
@@ -1251,7 +1266,9 @@
       els.fileName.textContent = rawFileName;
       validated = false;
       parsed = null;
-      activeSheet = "Notch";
+      activeSheet = null;
+      dataSheetNames = [];
+      sheetStates = {};
       referenceCondition = null;
       visibleConditions = new Set();
       conditionColors = {};
@@ -1283,6 +1300,34 @@
       }
     });
 
+
+    const TEMPLATE_FILE_NAME = "CID data 정규화 분석용 양식.xlsx";
+    const TEMPLATE_BASE64 = "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";
+
+    function downloadEmbeddedTemplate() {
+      try {
+        const binary = atob(TEMPLATE_BASE64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        const blob = new Blob([bytes], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = TEMPLATE_FILE_NAME;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      } catch (err) {
+        console.error(err);
+        setStatus("error", String(err?.message || err));
+      }
+    }
+
+    els.templateDownloadBtn.addEventListener("click", downloadEmbeddedTemplate);
+
     function updateExportAvailability() {
       els.exportBtn.disabled = !(validated && saveHandle);
     }
@@ -1310,6 +1355,74 @@
       }
     });
 
+    function failValidation(message) {
+      validated = false;
+      parsed = null;
+      activeSheet = null;
+      dataSheetNames = [];
+      sheetStates = {};
+      referenceCondition = null;
+      visibleConditions = new Set();
+      conditionColors = {};
+      clearRenderedAssessmentContent();
+      resetAnalysisUI();
+      setStatus("error", message);
+    }
+
+    function validationSuccessMessage() {
+      const count = dataSheetNames.length;
+      return lang === "ko"
+        ? `검증 완료. ${count}개 데이터 시트를 확인했으며 각 시트의 그룹 헤더를 독립적으로 적용합니다.`
+        : `Validation passed for ${count} data sheet${count === 1 ? "" : "s"}. Group headers are applied independently for each sheet.`;
+    }
+
+    function expectedSampleIds(n) {
+      return Array.from({ length: n }, (_, i) => `S${i + 1}`);
+    }
+
+    function initializeSheetState(sheetName) {
+      const d = parsed?.[sheetName];
+      if (!d) return null;
+      const colors = {};
+      d.conditions.forEach((c, i) => {
+        colors[c] = palette[i % palette.length];
+      });
+      const state = {
+        referenceCondition: d.conditions[0] || null,
+        visibleConditions: new Set(d.conditions),
+        conditionColors: colors
+      };
+      sheetStates[sheetName] = state;
+      return state;
+    }
+
+    function loadSheetState(sheetName) {
+      const d = parsed?.[sheetName];
+      if (!d) return;
+      const state = sheetStates[sheetName] || initializeSheetState(sheetName);
+      referenceCondition = d.conditions.includes(state.referenceCondition)
+        ? state.referenceCondition
+        : (d.conditions[0] || null);
+      visibleConditions = new Set(
+        [...(state.visibleConditions || [])].filter(c => d.conditions.includes(c))
+      );
+      if (!visibleConditions.size && referenceCondition) visibleConditions.add(referenceCondition);
+      if (referenceCondition) visibleConditions.add(referenceCondition);
+      conditionColors = { ...(state.conditionColors || {}) };
+      d.conditions.forEach((c, i) => {
+        if (!conditionColors[c]) conditionColors[c] = palette[i % palette.length];
+      });
+    }
+
+    function persistCurrentSheetState() {
+      if (!activeSheet || !parsed?.[activeSheet]) return;
+      sheetStates[activeSheet] = {
+        referenceCondition,
+        visibleConditions: new Set(visibleConditions),
+        conditionColors: { ...conditionColors }
+      };
+    }
+
     function validateWorkbook() {
       if (!workbook) {
         setStatus("error", tr("statusNoWorkbook"));
@@ -1320,106 +1433,100 @@
       const expectedConditions = Number(els.expectedConditions.value);
 
       if (!isPositiveInteger(expectedSamples) || !isPositiveInteger(expectedConditions)) {
-        setStatus("error", tr("statusInvalidExpected"));
+        failValidation(tr("statusInvalidExpected"));
         return;
       }
 
-      if (!workbook.SheetNames.includes("Notch") || !workbook.SheetNames.includes("Center")) {
-        setStatus("error", tr("statusMissingSheets"));
+      const detectedSheets = workbook.SheetNames.filter(
+        name => normalizeHeader(name).toLowerCase() !== "summary"
+      );
+
+      if (!detectedSheets.length) {
+        failValidation(tr("statusNoDataSheets"));
         return;
       }
 
       try {
-        const notch = parseSheet("Notch");
-        const center = parseSheet("Center");
+        const parsedSheets = {};
+        const requiredIds = expectedSampleIds(expectedSamples);
 
-        if (notch.sampleHeader !== "Sample" || center.sampleHeader !== "Sample") {
-          setStatus(
-            "error",
-            `${tr("statusSampleHeader")} Notch A1="${notch.sampleHeader || "—"}" / Center A1="${center.sampleHeader || "—"}"`
-          );
-          return;
-        }
+        for (const sheetName of detectedSheets) {
+          const d = parseSheet(sheetName);
 
-        const duplicateSamplesNotch = duplicates(notch.sampleIds);
-        const duplicateSamplesCenter = duplicates(center.sampleIds);
-        if (duplicateSamplesNotch.length || duplicateSamplesCenter.length) {
-          setStatus("error", `${tr("statusDuplicateSample")} Notch: ${duplicateSamplesNotch.join(", ") || "—"} / Center: ${duplicateSamplesCenter.join(", ") || "—"}`);
-          return;
-        }
-
-        const duplicateConditionsNotch = duplicates(notch.conditions);
-        const duplicateConditionsCenter = duplicates(center.conditions);
-        if (duplicateConditionsNotch.length || duplicateConditionsCenter.length) {
-          setStatus("error", `${tr("statusDuplicateCondition")} Notch: ${duplicateConditionsNotch.join(", ") || "—"} / Center: ${duplicateConditionsCenter.join(", ") || "—"}`);
-          return;
-        }
-
-        if (notch.sampleIds.length !== expectedSamples || center.sampleIds.length !== expectedSamples) {
-          setStatus(
-            "error",
-            `${tr("statusSampleMismatch")} Expected ${expectedSamples}; Notch ${notch.sampleIds.length}; Center ${center.sampleIds.length}.`
-          );
-          return;
-        }
-
-        if (notch.conditions.length !== expectedConditions || center.conditions.length !== expectedConditions) {
-          setStatus(
-            "error",
-            `${tr("statusConditionMismatch")} Expected ${expectedConditions}; Notch ${notch.conditions.length}; Center ${center.conditions.length}.`
-          );
-          return;
-        }
-
-        if (!sameStringArray(notch.conditions, center.conditions)) {
-          setStatus(
-            "error",
-            `${tr("statusHeaderMismatch")} Notch: [${notch.conditions.join(", ")}] / Center: [${center.conditions.join(", ")}]`
-          );
-          return;
-        }
-
-        if (!sameStringSet(notch.sampleIds, center.sampleIds)) {
-          setStatus("error", tr("statusSampleIdMismatch"));
-          return;
-        }
-
-        const insufficient = [];
-        for (const condition of notch.conditions) {
-          const nNotch = notch.groups[condition].length;
-          const nCenter = center.groups[condition].length;
-          if (nNotch < 2 || nCenter < 2) {
-            insufficient.push(`${condition} (Notch n=${nNotch}, Center n=${nCenter})`);
+          if (d.sampleHeader !== "Sample") {
+            failValidation(
+              `${tr("statusSampleHeader")} ${sheetName} A1="${d.sampleHeader || "—"}"`
+            );
+            return;
           }
+
+          const duplicateSamples = duplicates(d.sampleIds);
+          if (duplicateSamples.length) {
+            failValidation(
+              `${tr("statusDuplicateSample")} ${sheetName}: ${duplicateSamples.join(", ")}`
+            );
+            return;
+          }
+
+          const duplicateConditions = duplicates(d.conditions);
+          if (duplicateConditions.length) {
+            failValidation(
+              `${tr("statusDuplicateCondition")} ${sheetName}: ${duplicateConditions.join(", ")}`
+            );
+            return;
+          }
+
+          if (d.sampleIds.length !== expectedSamples) {
+            failValidation(
+              `${tr("statusSampleMismatch")} ${sheetName}: Expected ${expectedSamples}, detected ${d.sampleIds.length}.`
+            );
+            return;
+          }
+
+          if (!sameStringArray(d.sampleIds, requiredIds)) {
+            failValidation(
+              `${tr("statusSampleSequence")} ${sheetName}: ${d.sampleIds.join(", ")}`
+            );
+            return;
+          }
+
+          if (d.conditions.length !== expectedConditions) {
+            failValidation(
+              `${tr("statusConditionMismatch")} ${sheetName}: Expected ${expectedConditions}, detected ${d.conditions.length}.`
+            );
+            return;
+          }
+
+          const insufficient = [];
+          for (const condition of d.conditions) {
+            const n = d.groups[condition].length;
+            if (n < 2) insufficient.push(`${condition} (n=${n})`);
+          }
+
+          if (insufficient.length) {
+            failValidation(
+              `${tr("statusInsufficientGroup")} ${sheetName}: ${insufficient.join("; ")}`
+            );
+            return;
+          }
+
+          parsedSheets[sheetName] = d;
         }
 
-        if (insufficient.length) {
-          setStatus(
-            "error",
-            `${tr("statusInsufficientGroup")} ${insufficient.join("; ")}`
-          );
-          return;
-        }
-
-        parsed = { Notch: notch, Center: center };
+        parsed = parsedSheets;
+        dataSheetNames = detectedSheets;
         validated = true;
-        activeSheet = "Notch";
+        activeSheet = dataSheetNames[0] || null;
+        sheetStates = {};
+        for (const name of dataSheetNames) initializeSheetState(name);
+        loadSheetState(activeSheet);
 
-        const conditions = notch.conditions;
-        conditionColors = {};
-        conditions.forEach((c, i) => {
-          conditionColors[c] = palette[i % palette.length];
-        });
-
-        referenceCondition = conditions[0] || null;
-        visibleConditions = new Set(conditions);
-
-        setStatus("success", tr("statusSuccess"));
+        setStatus("success", validationSuccessMessage());
         activateAnalysisUI();
         renderAll();
       } catch (err) {
         console.error(err);
-        setStatus("error", tr("statusParseError") + " " + err.message);
+        failValidation(tr("statusParseError") + " " + err.message);
       }
     }
 
@@ -1431,16 +1538,27 @@
       els.exportBtn.disabled = true;
       document.getElementById("actions").classList.remove("visible");
       els.tabResetBtn.classList.remove("visible");
-
-      document.querySelectorAll(".sheet-btn").forEach(btn => {
-        btn.disabled = true;
-        btn.classList.toggle("active", btn.dataset.sheet === "Notch");
-      });
+      els.sheetButtons.innerHTML = "";
 
       els.summarySamples.textContent = "—";
       els.summaryConditions.textContent = "—";
       els.summarySheet.textContent = "—";
       els.summaryValues.textContent = "—";
+    }
+
+    function renderSheetButtons() {
+      els.sheetButtons.innerHTML = "";
+      if (!validated || !parsed) return;
+
+      for (const sheetName of dataSheetNames) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "sheet-btn" + (sheetName === activeSheet ? " active" : "");
+        btn.dataset.sheet = sheetName;
+        btn.textContent = sheetName;
+        btn.addEventListener("click", () => switchSheet(sheetName));
+        els.sheetButtons.appendChild(btn);
+      }
     }
 
     function activateAnalysisUI() {
@@ -1449,8 +1567,8 @@
       updateExportAvailability();
       document.getElementById("actions").classList.add("visible");
       els.tabResetBtn.classList.add("visible");
-      document.querySelectorAll(".sheet-btn").forEach(btn => btn.disabled = false);
-      switchSheet("Notch");
+      renderSheetButtons();
+      if (activeSheet) switchSheet(activeSheet);
     }
 
     function getCurrentData() {
@@ -1472,19 +1590,13 @@
 
     function switchSheet(sheetName) {
       if (!validated || !parsed?.[sheetName]) return;
+      if (activeSheet && activeSheet !== sheetName) persistCurrentSheetState();
       activeSheet = sheetName;
-
-      document.querySelectorAll(".sheet-btn").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.sheet === sheetName);
-      });
-
+      loadSheetState(sheetName);
+      renderSheetButtons();
       updateSidebarSummary();
       renderAll();
     }
-
-    document.querySelectorAll(".sheet-btn").forEach(btn => {
-      btn.addEventListener("click", () => switchSheet(btn.dataset.sheet));
-    });
 
     document.querySelectorAll(".content-tab").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -1558,6 +1670,7 @@
         input.value = conditionColors[condition] || "#2563eb";
         input.addEventListener("input", () => {
           conditionColors[condition] = input.value;
+          persistCurrentSheetState();
           renderBasicChart();
           renderNormalControls();
           renderNormalAssessment();
@@ -1580,6 +1693,7 @@
         conditionColors[c] = palette[i % palette.length];
       });
 
+      persistCurrentSheetState();
       renderAll();
     });
 
@@ -1617,7 +1731,7 @@
         plot_bgcolor: "#fff",
         font: { family: "Inter, sans-serif", color: "#111827" },
         xaxis: {
-          title: { text: lang === "ko" ? "파열압 조건 (Kgf)" : "Burst-pressure condition (Kgf)", standoff: 18 },
+          title: { text: lang === "ko" ? "그룹 / 조건" : "Group / condition", standoff: 18 },
           tickfont: { size: 12 },
           showgrid: false,
           zeroline: false,
@@ -1625,7 +1739,7 @@
           linewidth: 1.3
         },
         yaxis: {
-          title: { text: lang === "ko" ? "페이즈 값" : "Phase value", standoff: 14 },
+          title: { text: lang === "ko" ? "측정값" : "Measured value", standoff: 14 },
           zeroline: false,
           showgrid: false,
           linecolor: "#9aa1ad",
@@ -1691,6 +1805,7 @@
         refBtn.addEventListener("click", () => {
           referenceCondition = condition;
           visibleConditions.add(condition);
+          persistCurrentSheetState();
           renderNormalControls();
           renderNormalAssessment();
         });
@@ -1706,6 +1821,7 @@
         check.addEventListener("change", () => {
           if (check.checked) visibleConditions.add(condition);
           else visibleConditions.delete(condition);
+          persistCurrentSheetState();
           renderNormalAssessment();
         });
 
@@ -1725,6 +1841,7 @@
       const d = getCurrentData();
       if (!d) return;
       visibleConditions = new Set(d.conditions);
+      persistCurrentSheetState();
       renderNormalControls();
       renderNormalAssessment();
     });
@@ -1732,6 +1849,7 @@
     document.getElementById("selectRefOnlyBtn").addEventListener("click", () => {
       if (!referenceCondition) return;
       visibleConditions = new Set([referenceCondition]);
+      persistCurrentSheetState();
       renderNormalControls();
       renderNormalAssessment();
     });
@@ -1982,7 +2100,7 @@
         plot_bgcolor: "#fff",
         font: { family: "Inter, sans-serif", color: "#111827" },
         xaxis: {
-          title: { text: lang === "ko" ? "페이즈 값" : "Phase value", standoff: 16 },
+          title: { text: lang === "ko" ? "측정값" : "Measured value", standoff: 16 },
           zeroline: false,
           showgrid: false,
           linecolor: "#9aa1ad",
@@ -2147,7 +2265,7 @@
       const lines = [];
       lines.push([
         "Sheet",
-        "ReferenceCondition",
+        "ReferenceGroup",
         "SigmaN",
         "ReferenceMean",
         "ReferenceSD",
@@ -2167,7 +2285,7 @@
 
       lines.push("");
       lines.push([
-        "Condition",
+        "GroupOrCondition",
         "n",
         "Mean",
         "SD",
