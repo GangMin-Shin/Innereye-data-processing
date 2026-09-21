@@ -37,7 +37,7 @@
     .file-line{display:flex;gap:8px;align-items:center}.file-line input[type=file]{display:none}.primary,.secondary,.dangerless{height:46px;border-radius:12px;padding:0 18px;font-size:14px;font-weight:800;border:1px solid var(--line);white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;line-height:1}.primary{background:#111827;color:#fff;border-color:#111827}.secondary,.dangerless{background:#fff;color:#111827}.secondary:hover,.dangerless:hover{background:#f8f9fb}
     .filename{flex:1;height:46px;display:flex;align-items:center;padding:0 12px;border:1px dashed #cfd4dc;border-radius:12px;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.read-row{display:flex;gap:10px;align-items:center;margin-top:15px;flex-wrap:wrap}.status{font-size:12px;font-weight:700;color:var(--muted)}.status.good{color:var(--green)}.status.bad{color:var(--danger)}.status.warn{color:var(--amber)}
     .detected{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.badge{padding:7px 10px;border:1px solid var(--line);border-radius:999px;font-size:11px;font-weight:800;color:#344054;background:#fafafa}.badge.good{background:var(--green-soft);color:#16653f;border-color:#ccebd9}.badge.warn{background:var(--amber-soft);color:#9a6700;border-color:#f4dfad}
-    .colors{margin-top:18px;padding-top:18px;border-top:1px solid var(--line);display:flex;gap:16px;flex-wrap:wrap;align-items:center}.color-opt{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;color:#475467}.color-opt input{width:30px;height:30px;padding:0;border:0;background:none}
+    .colors{margin-top:18px;padding-top:18px;border-top:1px solid var(--line);display:flex;gap:16px;flex-wrap:wrap;align-items:center}.colors[hidden]{display:none!important}.color-opt{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;color:#475467}.color-opt input{width:30px;height:30px;padding:0;border:0;background:none}
     .result-header{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:28px 0 14px}.result-header h2{margin:0;font-size:21px;font-weight:800;letter-spacing:-.03em}.result-header .sub{font-size:12px;color:var(--muted);font-weight:600;margin-top:5px}.actions{display:none;align-items:center;gap:10px;flex-wrap:wrap}.actions.visible{display:flex}.toggle{height:44px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:0 13px;display:flex;gap:9px;align-items:center;font-size:12px;font-weight:800}.lamp{width:11px;height:11px;border-radius:50%;background:#c7cbd1;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}.toggle.on .lamp{background:#24b26b;box-shadow:0 0 0 4px rgba(36,178,107,.12)}.save-btn{height:44px;border:0;border-radius:12px;background:#111827;color:#fff;padding:0 17px;font-weight:800}.save-btn:disabled{opacity:.45;cursor:not-allowed}
     .analysis-card{padding:18px;margin-bottom:16px;display:none}.analysis-card.visible{display:block}
     .analysis-card-head{display:flex;align-items:center;justify-content:flex-end;margin-bottom:10px}
@@ -45,6 +45,7 @@
     .control-grid{display:grid;grid-template-columns:minmax(150px,.7fr) minmax(180px,1fr) minmax(180px,1fr) minmax(220px,1.2fr);gap:12px;align-items:end}.line-row{display:flex;gap:8px;flex-wrap:wrap}.line-toggle{height:42px;min-width:56px;border:1px solid var(--line);border-radius:12px;background:#fff;font-weight:800}.line-toggle.active{background:#111827;color:#fff;border-color:#111827}.range-row{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.range-field{min-width:130px;flex:1}.range-field label{display:block;font-size:11px;font-weight:800;color:#475467;margin-bottom:6px}.range-field input{width:100%;height:42px;border:1px solid #d9dde4;border-radius:11px;padding:0 10px}.analysis-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.analysis-actions button{height:42px;border:1px solid var(--line);border-radius:11px;background:#fff;font-weight:800;padding:0 14px}.analysis-actions button.primary-mini{background:#111827;color:#fff;border-color:#111827}.hint{font-size:11px;line-height:1.55;color:var(--muted);font-weight:600;margin-top:10px}
     .plots{display:grid;gap:18px}.plot-card{padding:16px;min-height:470px}.plot-title{display:flex;align-items:center;justify-content:space-between;padding:3px 4px 10px;font-size:13px;font-weight:800}.plot{width:100%;height:540px}.empty{min-height:500px;border:1px dashed #d5dae1;border-radius:20px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-weight:700;line-height:1.6;padding:30px}.progress{display:none;margin-top:10px;font-size:12px;font-weight:700;color:var(--muted)}.progress.visible{display:block}
     .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;margin-top:14px;background:#fff}.result-table{width:100%;border-collapse:collapse;min-width:980px;font-size:12px}.result-table th,.result-table td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}.result-table th:first-child,.result-table td:first-child,.result-table th:nth-child(2),.result-table td:nth-child(2){text-align:left}.result-table th{background:#f8f9fb;font-weight:800;color:#344054;position:sticky;top:0}.result-table tr:last-child td{border-bottom:0}
+    .region-manager{display:none;margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#fbfcfd}.region-manager.visible{display:block}.region-manager-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.region-manager-title{font-size:12px;font-weight:800;color:#344054}.region-list{display:flex;gap:8px;flex-wrap:wrap}.region-chip{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #d9dde4;border-radius:999px;background:#fff;font-size:11px;font-weight:800;color:#344054}.region-remove{width:22px;height:22px;border:0;border-radius:50%;background:#f2f4f7;color:#475467;font-weight:800;line-height:1}.region-remove:hover{background:#e4e7ec}.region-empty{font-size:11px;color:var(--muted);font-weight:600}.step-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:11px;font-weight:800;color:#475467}.step-badge.ready{background:var(--green-soft);color:#16653f;border-color:#ccebd9}
     .app-shell[hidden]{display:none!important}
     .cid-selector-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px;position:relative}
     .cid-selector-card{width:min(760px,100%);padding:42px;border:1px solid var(--line);border-radius:28px;background:rgba(255,255,255,.94);box-shadow:0 20px 60px rgba(17,24,39,.12);backdrop-filter:blur(14px);text-align:center}
@@ -89,6 +90,7 @@
     <button class="analysis-btn" data-mode="raw" data-i18n="rawBtn">Raw data plot</button>
     <button class="analysis-btn" data-mode="sg" data-i18n="sgBtn">SG smoothing plot</button>
     <button class="analysis-btn" data-mode="interval" data-i18n="intervalBtn">Interval analysis</button>
+    <button class="analysis-btn" data-mode="intervalMean" data-i18n="intervalMeanBtn">Interval Mean Cal.</button>
   </aside>
 
   <header class="topbar">
@@ -112,9 +114,9 @@
         <div class="field"><label data-i18n="notchPosition">Estimated notch position from start (mm)</label><input id="notchPosition" type="number" min="0" step="0.01" value="2"></div>
         <div class="field"><label data-i18n="expectedSamples">Measured samples</label><input id="expectedSamples" type="number" min="1" step="1" value="6"></div>
       </div>
-      <div class="read-row"><button id="readBtn" class="primary" data-i18n="readAnalyze">Read & analyze</button><span id="status" class="status" data-i18n="ready">Ready</span></div>
+      <div class="read-row"><button id="readBtn" class="primary" data-i18n="readOnly">Read Excel</button><button id="analyzeBtn" class="secondary" data-i18n="analyze" hidden>Analyze</button><span id="status" class="status" data-i18n="ready">Ready</span></div>
       <div id="detected" class="detected"></div>
-      <div class="colors"><span style="font-size:11px;font-weight:800;color:#344054" data-i18n="plotColors">Plot colors</span><label class="color-opt"><input id="colorL1" type="color" value="#111827"><span>L1</span></label><label class="color-opt"><input id="colorL2" type="color" value="#2563eb"><span>L2</span></label><label class="color-opt"><input id="colorL3" type="color" value="#d97706"><span>L3</span></label></div>
+      <div id="colorsSection" class="colors" hidden><span style="font-size:11px;font-weight:800;color:#344054" data-i18n="plotColors">Plot colors</span><div id="colorOptions" style="display:flex;gap:16px;flex-wrap:wrap;align-items:center"></div></div>
     </section>
 
     <section>
@@ -129,11 +131,13 @@
         </div>
         <div class="control-grid">
           <div class="field"><label data-i18n="sample">Sample</label><select id="sampleSelect"></select></div>
-          <div class="field"><label data-i18n="lines">Displayed lines</label><div class="line-row"><button class="line-toggle active" data-line="L1">L1</button><button class="line-toggle active" data-line="L2">L2</button><button class="line-toggle active" data-line="L3">L3</button></div></div>
+          <div class="field"><label data-i18n="lines">Displayed lines</label><div id="lineRow" class="line-row"></div></div>
           <div id="rangeControls" class="range-row" style="display:none"><div class="range-field"><label data-i18n="rangeStart">Range start (mm)</label><input id="rangeStart" type="number" step="0.001"></div><div class="range-field"><label data-i18n="rangeEnd">Range end (mm)</label><input id="rangeEnd" type="number" step="0.001"></div></div>
           <div id="intervalActions" class="analysis-actions" style="display:none"><button id="useVisibleBtn" data-i18n="useVisible">Use visible x-range</button><button id="extremaBtn" class="primary-mini" data-i18n="findExtrema">Find local extrema</button><button id="aucBtn" class="primary-mini" data-i18n="calcAuc">Calculate corrected AUC</button></div>
+          <div id="meanActions" class="analysis-actions" style="display:none"><button id="useVisibleMeanBtn" data-i18n="useVisible">Use visible x-range</button><button id="addRegionBtn" class="primary-mini" data-i18n="addRegion">Add region</button><button id="calcMeanBtn" class="primary-mini" data-i18n="calcMean">Calculate mean ± SD</button><button id="clearRegionsBtn" data-i18n="clearRegions">Clear regions</button></div>
         </div>
         <div id="controlHint" class="hint"></div>
+        <div id="regionManager" class="region-manager"><div class="region-manager-head"><span class="region-manager-title" data-i18n="selectedRegions">Selected regions</span></div><div id="regionList" class="region-list"></div></div>
         <div id="resultTableWrap"></div>
       </div>
 
@@ -145,12 +149,16 @@
 
 <script>
 const I18N={
-  en:{module:'CID Scan analysis',selectCidTitle:'Select CID type',selectCidHint:'Choose the CID model to open the scan analysis workspace.',openAnalysis:'Open analysis',dockHint:'Select an analysis function.',back:'← Back',home:'🏠 Home',analysis:'Analysis',rawBtn:'Raw data plot',sgBtn:'SG smoothing plot',intervalBtn:'Interval analysis',inputSetup:'Input & output setup',excelFile:'Excel workbook',savePath:'Save path',browse:'Browse',noFile:'No file selected',notSelected:'No folder selected',excitation:'Excitation frequency (kHz)',signalType:'Signal type',scanSpeed:'Scan speed (mm/s)',scanLength:'Scan length (mm)',notchPosition:'Estimated notch position from start (mm)',expectedSamples:'Measured samples',readAnalyze:'Read & analyze',ready:'Ready',plotColors:'Plot colors',result:'Processing result',chooseAnalysis:'Read an Excel file, then choose an analysis.',exportAll:'Export all sample plots',save:'Save',sample:'Sample',lines:'Displayed lines',rangeStart:'Range start (mm)',rangeEnd:'Range end (mm)',useVisible:'Use visible x-range',findExtrema:'Find local extrema',calcAuc:'Calculate peak-to-peak AUC',empty:'No plot yet.\nLoad a valid workbook and select a function from the lower-left panel.',needFile:'Please select an Excel workbook.',needFolder:'Please select a save folder.',folderSelected:'Save folder selected.',folderUnsupported:'This browser does not support folder selection. Use a browser with the File System Access API.',reading:'Reading workbook and preprocessing…',readSuccess:'Workbook read and preprocessing completed.',invalidParams:'Check the input parameters. Speed, length, frequency and sample count must be valid positive values.',sheetMismatch:'Sample sheets must be exactly S1 through the entered sample count.',headerMismatch:'Each sample sheet must have L1, L2 and L3 in A1:C1.',noValid:'No valid non-zero numeric data were found.',rawTitle:'Raw data',sgTitle:'SG smoothing',intervalTitle:'Interval analysis',rawSub:'Select a sample and one or more lines.',sgSub:'Third-order Savitzky–Golay smoothing with a 0.01 s window.',intervalSub:'Drag horizontally to zoom/select an x-range, or enter the range numerically.',samplingRate:'Estimated sampling rate',duration:'Scan duration',minLength:'Common valid length',sgWindow:'SG window',distanceStep:'Distance/sample',filenameMeta:'Filename metadata',match:'match',mismatch:'mismatch',notDetected:'not detected',notch:'Notch',distanceAxis:'Distance from scan start (mm)',sensorAxisPhase:'Phase',sensorAxisEMF:'EMF',rawLegend:'Raw',sgLegend:'SG smoothed',needRead:'Select the Excel workbook and save folder, then run Read & analyze.',exportOn:'All-sample plot export ON.',exportOff:'All-sample plot export OFF.',saving:'Generating files…',saved:'Save completed.',saveFailed:'Save failed',hintRaw:'Use the sample selector and L1/L2/L3 buttons to control the overlay.',hintSG:'SG polynomial order = 3. Window duration is fixed at 0.01 s and converted to the nearest valid odd sample count.',hintInterval:'For each sample, L1/L2/L3 use one common search range. For AUC, the two most prominent local maxima inside that range are selected, and the corrected AUC is calculated only between those two maxima.',extremaDone:'Dominant local extrema were detected from the SG-smoothed signal using sign-change candidates and topographic prominence.',aucDone:'Within the entered search range, the two most prominent local maxima were selected. AUC was calculated only between those maxima after subtracting the straight baseline connecting them, then applying trapezoidal integration.',noExtrema:'No valid local maximum/minimum pair was found in the selected interval.',noTwoMaxima:'Fewer than two valid local maxima were found in the selected search range.',rangeInvalid:'The analysis range is invalid.',lineRequired:'At least one line must remain selected.',modeRaw:'Raw data',modeSG:'SG smoothing',modeInterval:'Interval analysis',globalResetTitle:'Reset all',tabResetTitle:'Reset current analysis',fullResetDone:'All inputs and analysis states were reset.',tabResetDone:'The current analysis tab was reset.'},
-  ko:{module:'CID 스캔 분석',selectCidTitle:'CID 종류 선택',selectCidHint:'분석할 CID 모델을 선택하면 해당 스캔 분석 화면이 열립니다.',openAnalysis:'분석 화면 열기',dockHint:'분석 기능을 선택하세요.',back:'← 뒤로가기',home:'🏠 Home',analysis:'분석',rawBtn:'Rawdata 플롯',sgBtn:'SG 스무딩 플롯',intervalBtn:'구간 분석',inputSetup:'입력 및 저장 설정',excelFile:'입력 Excel 파일',savePath:'저장 경로',browse:'Browse',noFile:'선택된 파일 없음',notSelected:'선택된 폴더 없음',excitation:'여자주파수 (kHz)',signalType:'신호 종류',scanSpeed:'스캔 속도 (mm/s)',scanLength:'스캔 길이 (mm)',notchPosition:'시작점 기준 노치 추정 위치 (mm)',expectedSamples:'측정 샘플 수',readAnalyze:'데이터 분석 시작',ready:'준비 완료',plotColors:'그래프 색상',result:'처리 결과',chooseAnalysis:'Excel을 읽은 뒤 분석 기능을 선택하세요.',exportAll:'전체 샘플 그래프 저장',save:'세이브',sample:'샘플',lines:'표시 라인',rangeStart:'구간 시작 (mm)',rangeEnd:'구간 끝 (mm)',useVisible:'현재 보이는 x구간 사용',findExtrema:'극대·극소점 찾기',calcAuc:'극댓값 사이 보정 AUC 계산',empty:'아직 플롯이 없습니다.\n유효한 엑셀을 불러오고 왼쪽 아래에서 기능을 선택하세요.',needFile:'입력 Excel 파일을 선택해주세요.',needFolder:'저장 폴더를 선택해주세요.',folderSelected:'저장 폴더 선택 완료.',folderUnsupported:'이 브라우저는 저장 폴더 선택을 지원하지 않습니다. File System Access API 지원 브라우저를 사용해주세요.',reading:'Excel 구조 확인 및 전처리 중…',readSuccess:'Excel 리딩 및 전처리가 완료되었습니다.',invalidParams:'입력 파라미터를 확인해주세요. 속도, 길이, 주파수, 샘플 수는 유효한 양수여야 합니다.',sheetMismatch:'샘플 시트는 입력한 개수에 맞춰 S1부터 연속적으로 존재해야 합니다.',headerMismatch:'각 샘플 시트의 A1:C1은 L1, L2, L3이어야 합니다.',noValid:'0이 아닌 유효 숫자 데이터를 찾지 못했습니다.',rawTitle:'Rawdata',sgTitle:'SG 스무딩',intervalTitle:'구간 분석',rawSub:'샘플과 L1/L2/L3를 선택해 오버레이를 확인합니다.',sgSub:'0.01 s 윈도우를 사용하는 3차 Savitzky–Golay 스무딩입니다.',intervalSub:'그래프를 가로로 드래그해 구간을 잡거나 수치로 직접 입력할 수 있습니다.',samplingRate:'추정 샘플링 레이트',duration:'스캔 시간',minLength:'공통 유효 길이',sgWindow:'SG 윈도우',distanceStep:'샘플당 거리',filenameMeta:'파일명 메타데이터',match:'일치',mismatch:'불일치',notDetected:'검출 안 됨',notch:'Notch',distanceAxis:'스캔 시작점 기준 거리 (mm)',sensorAxisPhase:'Phase',sensorAxisEMF:'EMF',rawLegend:'Raw',sgLegend:'SG 스무딩',needRead:'Excel 파일과 저장 폴더를 지정한 뒤 데이터 분석 시작을 실행해주세요.',exportOn:'전체 샘플 그래프 저장 ON.',exportOff:'전체 샘플 그래프 저장 OFF.',saving:'파일 생성 중…',saved:'저장이 완료되었습니다.',saveFailed:'저장 실패',hintRaw:'샘플 선택과 L1/L2/L3 버튼으로 오버레이 라인을 선택할 수 있습니다.',hintSG:'SG 다항식 차수는 3차이며, 윈도우 시간은 0.01 s로 고정하고 샘플링 레이트에 따라 가장 가까운 유효 홀수 샘플 수로 변환합니다.',hintInterval:'샘플별로 L1/L2/L3는 하나의 동일한 검색 구간을 사용합니다. AUC 계산 시에는 입력한 검색 구간 안에서 prominence가 큰 대표 극댓값 2개를 선택하고, 두 극댓값 사이에서만 baseline 보정 AUC를 계산합니다.',extremaDone:'SG 스무딩 신호의 미분 부호 변화 후보와 topographic prominence를 이용해 대표 극대·극소점을 검출했습니다.',aucDone:'입력한 검색 구간 안에서 prominence가 큰 대표 극댓값 2개를 선택한 뒤, 두 극댓값을 잇는 직선 baseline을 제거하고 두 극댓값 사이만 사다리꼴 적분하여 AUC를 계산했습니다.',noExtrema:'선택 구간에서 유효한 극대점·극소점 쌍을 찾지 못했습니다.',noTwoMaxima:'선택한 검색 구간에서 유효한 극댓값을 2개 이상 찾지 못했습니다.',rangeInvalid:'분석 구간이 올바르지 않습니다.',lineRequired:'최소 한 개의 라인은 선택되어 있어야 합니다.',modeRaw:'Rawdata',modeSG:'SG 스무딩',modeInterval:'구간 분석',globalResetTitle:'전체 리셋',tabResetTitle:'현재 분석 탭 리셋',fullResetDone:'입력과 분석 상태를 모두 초기화했습니다.',tabResetDone:'현재 분석 탭을 초기화했습니다.'}
+  en:{
+    module:'CID Scan analysis',selectCidTitle:'Select CID type',selectCidHint:'Choose the CID model to open the scan analysis workspace.',openAnalysis:'Open analysis',dockHint:'Select an analysis function.',back:'← Back',home:'🏠 Home',analysis:'Analysis',rawBtn:'Raw data plot',sgBtn:'SG smoothing plot',intervalBtn:'Interval analysis',intervalMeanBtn:'Interval Mean Cal.',inputSetup:'Input & output setup',excelFile:'Excel workbook',savePath:'Save path',browse:'Browse',noFile:'No file selected',notSelected:'No folder selected',excitation:'Excitation frequency (kHz)',signalType:'Signal type',scanSpeed:'Scan speed (mm/s)',scanLength:'Scan length (mm)',notchPosition:'Estimated notch position from start (mm)',expectedSamples:'Measured samples',readOnly:'Read Excel',analyze:'Analyze',ready:'Ready',plotColors:'Plot colors',result:'Processing result',chooseAnalysis:'Read the Excel workbook, set the detected line colors, then press Analyze.',exportAll:'Export all sample plots',save:'Save',sample:'Sample',lines:'Displayed lines',rangeStart:'Range start (mm)',rangeEnd:'Range end (mm)',useVisible:'Use visible x-range',findExtrema:'Find local extrema',calcAuc:'Calculate peak-to-peak AUC',addRegion:'Add region',calcMean:'Calculate mean ± SD',clearRegions:'Clear regions',selectedRegions:'Selected regions',empty:'No plot yet.\nRead a valid workbook and start analysis.',needFile:'Please select an Excel workbook.',needFolder:'Please select a save folder.',folderSelected:'Save folder selected.',folderUnsupported:'This browser does not support folder selection. Use a browser with the File System Access API.',reading:'Reading workbook, validating dynamic scan lines, and preprocessing…',readyToAnalyze:'Workbook validation completed. Set the plot colors for the detected lines, then press Analyze.',analysisStarted:'Analysis is ready.',invalidParams:'Check the input parameters. Speed, length, frequency and sample count must be valid positive values.',sheetMismatch:'Sample sheets must be exactly S1 through the entered sample count.',headerMismatch:'Each sample sheet must contain contiguous scan-line headers starting at A1 as L1, L2, ... with no gaps.',lineSetMismatch:'All sample sheets must use the same contiguous scan-line headers.',noLines:'No valid scan-line header was found. The first header must be L1.',noValid:'No valid non-zero numeric data were found.',rawTitle:'Raw data',sgTitle:'SG smoothing',intervalTitle:'Interval analysis',intervalMeanTitle:'Interval Mean Cal.',rawSub:'Select a sample and one or more detected lines.',sgSub:'Third-order Savitzky–Golay smoothing with a 0.01 s window.',intervalSub:'Drag horizontally to zoom/select an x-range, or enter the range numerically.',intervalMeanSub:'Use the SG-smoothed signal. Select any number of x-ranges by dragging or direct mm entry, then add regions and calculate mean ± SD.',samplingRate:'Estimated sampling rate',duration:'Scan duration',minLength:'Common valid length',sgWindow:'SG window',distanceStep:'Distance/sample',detectedLines:'Detected scan lines',filenameMeta:'Filename metadata',match:'match',mismatch:'mismatch',notDetected:'not detected',notch:'Notch',distanceAxis:'Distance from scan start (mm)',sensorAxisPhase:'Phase',sensorAxisEMF:'EMF',rawLegend:'Raw',sgLegend:'SG smoothed',needRead:'Read the Excel workbook and press Analyze first.',needReadFirst:'Press Read Excel first.',needAnalyze:'Workbook is ready. Set line colors and press Analyze.',exportOn:'All-sample plot export ON.',exportOff:'All-sample plot export OFF.',saving:'Generating files…',saved:'Save completed.',saveFailed:'Save failed',hintRaw:'Use the sample selector and dynamically detected line buttons to control the overlay.',hintSG:'SG polynomial order = 3. Window duration is fixed at 0.01 s and converted to the nearest valid odd sample count.',hintInterval:'For each sample, all selected scan lines use one common search range. For AUC, the two most prominent local maxima inside that range are selected, and the corrected AUC is calculated only between those two maxima.',hintIntervalMean:'The displayed signal is SG-smoothed. Drag the x-axis or enter start/end values, add the interval as a region, and repeat as many times as needed. Regions are automatically renamed from left to right as Region 1, Region 2, ... Mean and sample SD (n−1) are calculated for every selected line.',extremaDone:'Dominant local extrema were detected from the SG-smoothed signal using sign-change candidates and topographic prominence.',aucDone:'Within the entered search range, the two most prominent local maxima were selected. AUC was calculated only between those maxima after subtracting the straight baseline connecting them, then applying trapezoidal integration.',noExtrema:'No valid local maximum/minimum pair was found in the selected interval.',noTwoMaxima:'Fewer than two valid local maxima were found in the selected search range.',rangeInvalid:'The analysis range is invalid.',lineRequired:'At least one line must remain selected.',regionAdded:'Region added. Mean and SD were updated.',regionRemoved:'Region removed. Mean and SD were updated.',regionsCleared:'All regions for the current sample were cleared.',noRegions:'Add at least one region first.',duplicateRegion:'The same region is already registered.',meanDone:'Interval mean and sample SD were calculated.',modeRaw:'Raw data',modeSG:'SG smoothing',modeInterval:'Interval analysis',modeIntervalMean:'Interval Mean Cal.',globalResetTitle:'Reset all',tabResetTitle:'Reset current analysis',fullResetDone:'All inputs and analysis states were reset.',tabResetDone:'The current analysis tab was reset.',inputsChanged:'Input parameters changed. Read the workbook again before analysis.'
+  },
+  ko:{
+    module:'CID 스캔 분석',selectCidTitle:'CID 종류 선택',selectCidHint:'분석할 CID 모델을 선택하면 해당 스캔 분석 화면이 열립니다.',openAnalysis:'분석 화면 열기',dockHint:'분석 기능을 선택하세요.',back:'← 뒤로가기',home:'🏠 Home',analysis:'분석',rawBtn:'Rawdata 플롯',sgBtn:'SG 스무딩 플롯',intervalBtn:'구간 분석',intervalMeanBtn:'Interval Mean Cal.',inputSetup:'입력 및 저장 설정',excelFile:'입력 Excel 파일',savePath:'저장 경로',browse:'Browse',noFile:'선택된 파일 없음',notSelected:'선택된 폴더 없음',excitation:'여자주파수 (kHz)',signalType:'신호 종류',scanSpeed:'스캔 속도 (mm/s)',scanLength:'스캔 길이 (mm)',notchPosition:'시작점 기준 노치 추정 위치 (mm)',expectedSamples:'측정 샘플 수',readOnly:'Excel 읽기',analyze:'분석 시작',ready:'준비 완료',plotColors:'그래프 색상',result:'처리 결과',chooseAnalysis:'Excel을 읽고 검출된 라인별 색상을 설정한 뒤 분석 시작을 눌러주세요.',exportAll:'전체 샘플 그래프 저장',save:'세이브',sample:'샘플',lines:'표시 라인',rangeStart:'구간 시작 (mm)',rangeEnd:'구간 끝 (mm)',useVisible:'현재 보이는 x구간 사용',findExtrema:'극대·극소점 찾기',calcAuc:'극댓값 사이 보정 AUC 계산',addRegion:'구간 추가',calcMean:'평균 ± 표준편차 계산',clearRegions:'구간 전체 삭제',selectedRegions:'선택된 구간',empty:'아직 플롯이 없습니다.\n유효한 Excel을 읽고 분석을 시작하세요.',needFile:'입력 Excel 파일을 선택해주세요.',needFolder:'저장 폴더를 선택해주세요.',folderSelected:'저장 폴더 선택 완료.',folderUnsupported:'이 브라우저는 저장 폴더 선택을 지원하지 않습니다. File System Access API 지원 브라우저를 사용해주세요.',reading:'Excel 구조와 동적 스캔 라인을 확인하고 전처리 중…',readyToAnalyze:'Excel 검증이 완료되었습니다. 검출된 라인별 그래프 색상을 설정한 뒤 분석 시작을 눌러주세요.',analysisStarted:'분석 준비가 완료되었습니다.',invalidParams:'입력 파라미터를 확인해주세요. 속도, 길이, 주파수, 샘플 수는 유효한 양수여야 합니다.',sheetMismatch:'샘플 시트는 입력한 개수에 맞춰 S1부터 연속적으로 존재해야 합니다.',headerMismatch:'각 샘플 시트는 A1부터 L1, L2, ... 형식으로 빈 열 없이 연속된 스캔 라인 헤더를 가져야 합니다.',lineSetMismatch:'모든 샘플 시트의 스캔 라인 헤더 구성은 동일해야 합니다.',noLines:'유효한 스캔 라인 헤더가 없습니다. 첫 번째 헤더는 L1이어야 합니다.',noValid:'0이 아닌 유효 숫자 데이터를 찾지 못했습니다.',rawTitle:'Rawdata',sgTitle:'SG 스무딩',intervalTitle:'구간 분석',intervalMeanTitle:'Interval Mean Cal.',rawSub:'샘플과 검출된 스캔 라인을 선택해 오버레이를 확인합니다.',sgSub:'0.01 s 윈도우를 사용하는 3차 Savitzky–Golay 스무딩입니다.',intervalSub:'그래프를 가로로 드래그해 구간을 잡거나 수치로 직접 입력할 수 있습니다.',intervalMeanSub:'SG 스무딩 신호에서 드래그 또는 mm 직접 입력으로 원하는 수만큼 구간을 추가하고 각 구간의 평균과 표준편차를 계산합니다.',samplingRate:'추정 샘플링 레이트',duration:'스캔 시간',minLength:'공통 유효 길이',sgWindow:'SG 윈도우',distanceStep:'샘플당 거리',detectedLines:'검출된 스캔 라인',filenameMeta:'파일명 메타데이터',match:'일치',mismatch:'불일치',notDetected:'검출 안 됨',notch:'Notch',distanceAxis:'스캔 시작점 기준 거리 (mm)',sensorAxisPhase:'Phase',sensorAxisEMF:'EMF',rawLegend:'Raw',sgLegend:'SG 스무딩',needRead:'Excel을 읽고 분석 시작을 실행해주세요.',needReadFirst:'먼저 Excel 읽기를 실행해주세요.',needAnalyze:'Excel 검증이 완료되었습니다. 라인별 색상을 설정한 뒤 분석 시작을 눌러주세요.',exportOn:'전체 샘플 그래프 저장 ON.',exportOff:'전체 샘플 그래프 저장 OFF.',saving:'파일 생성 중…',saved:'저장이 완료되었습니다.',saveFailed:'저장 실패',hintRaw:'샘플 선택과 동적으로 검출된 라인 버튼으로 오버레이 라인을 선택할 수 있습니다.',hintSG:'SG 다항식 차수는 3차이며, 윈도우 시간은 0.01 s로 고정하고 샘플링 레이트에 따라 가장 가까운 유효 홀수 샘플 수로 변환합니다.',hintInterval:'샘플별로 선택된 모든 스캔 라인은 하나의 동일한 검색 구간을 사용합니다. AUC 계산 시에는 입력한 검색 구간 안에서 prominence가 큰 대표 극댓값 2개를 선택하고, 두 극댓값 사이에서만 baseline 보정 AUC를 계산합니다.',hintIntervalMean:'표시 신호는 SG 스무딩 신호입니다. x축을 드래그하거나 시작/끝 값을 직접 입력한 뒤 구간 추가를 누르고 원하는 수만큼 반복할 수 있습니다. 구간은 x축 앞쪽부터 Region 1, Region 2, ...로 자동 재정렬되며, 선택된 각 라인에 대해 평균과 표본 표준편차(n−1)를 계산합니다.',extremaDone:'SG 스무딩 신호의 미분 부호 변화 후보와 topographic prominence를 이용해 대표 극대·극소점을 검출했습니다.',aucDone:'입력한 검색 구간 안에서 prominence가 큰 대표 극댓값 2개를 선택한 뒤, 두 극댓값을 잇는 직선 baseline을 제거하고 두 극댓값 사이만 사다리꼴 적분하여 AUC를 계산했습니다.',noExtrema:'선택 구간에서 유효한 극대점·극소점 쌍을 찾지 못했습니다.',noTwoMaxima:'선택한 검색 구간에서 유효한 극댓값을 2개 이상 찾지 못했습니다.',rangeInvalid:'분석 구간이 올바르지 않습니다.',lineRequired:'최소 한 개의 라인은 선택되어 있어야 합니다.',regionAdded:'구간을 추가했고 평균과 표준편차를 갱신했습니다.',regionRemoved:'구간을 삭제했고 평균과 표준편차를 갱신했습니다.',regionsCleared:'현재 샘플의 모든 구간을 삭제했습니다.',noRegions:'먼저 한 개 이상의 구간을 추가해주세요.',duplicateRegion:'동일한 구간이 이미 등록되어 있습니다.',meanDone:'구간 평균과 표본 표준편차를 계산했습니다.',modeRaw:'Rawdata',modeSG:'SG 스무딩',modeInterval:'구간 분석',modeIntervalMean:'Interval Mean Cal.',globalResetTitle:'전체 리셋',tabResetTitle:'현재 분석 탭 리셋',fullResetDone:'입력과 분석 상태를 모두 초기화했습니다.',tabResetDone:'현재 분석 탭을 초기화했습니다.',inputsChanged:'입력 파라미터가 변경되었습니다. 분석 전에 Excel을 다시 읽어주세요.'
+  }
 };
 
 let lang=localStorage.getItem('innereye_lang')||'en';
-const state={cidType:null,file:null,saveHandle:null,dataset:null,currentMode:null,exportAll:false,selectedSample:null,selectedLines:new Set(['L1','L2','L3']),ranges:{},visibleRanges:{},results:{extrema:{},auc:{}},currentPlot:null};
+const state={cidType:null,file:null,saveHandle:null,readCache:null,dataset:null,currentMode:null,exportAll:false,selectedSample:null,selectedLines:new Set(),lineColors:{},ranges:{},visibleRanges:{},meanRegions:{},results:{extrema:{},auc:{},mean:{}},currentPlot:null};
 const el=id=>document.getElementById(id);const tr=k=>I18N[lang][k]||k;
 
 function setStatus(text,kind=''){el('status').textContent=text;el('status').className='status '+kind;}
@@ -158,25 +166,10 @@ function naturalNum(s){const m=String(s).match(/(\d+)/);return m?Number(m[1]):Nu
 function fmt(v,d=6){return Number.isFinite(v)?Number(v).toFixed(d):'';}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 function sensorAxis(){return el('signalType').value==='EMF'?tr('sensorAxisEMF'):tr('sensorAxisPhase');}
-function lineColor(line){return el('color'+line).value;}
-function currentModuleTitle(){
-  if(!state.cidType)return tr('module');
-  return lang==='ko'?`CID ${state.cidType} 스캔 분석`:`CID ${state.cidType} Scan analysis`;
-}
-function updateCidIdentity(){
-  const title=currentModuleTitle();
-  if(el('moduleTitle'))el('moduleTitle').textContent=title;
-  if(el('dockModuleTitle'))el('dockModuleTitle').textContent=title;
-  document.title=title;
-}
-function selectCidType(type){
-  if(type!=='2170'&&type!=='4680')return;
-  state.cidType=type;
-  el('cidSelector').style.display='none';
-  el('appShell').hidden=false;
-  updateCidIdentity();
-}
-
+function lineColor(line){return state.lineColors[line]||'#111827';}
+function currentModuleTitle(){if(!state.cidType)return tr('module');return lang==='ko'?`CID ${state.cidType} 스캔 분석`:`CID ${state.cidType} Scan analysis`;}
+function updateCidIdentity(){const title=currentModuleTitle();if(el('moduleTitle'))el('moduleTitle').textContent=title;if(el('dockModuleTitle'))el('dockModuleTitle').textContent=title;document.title=title;}
+function selectCidType(type){if(type!=='2170'&&type!=='4680')return;state.cidType=type;el('cidSelector').style.display='none';el('appShell').hidden=false;updateCidIdentity();}
 document.querySelectorAll('.cid-choice-btn').forEach(btn=>btn.addEventListener('click',()=>selectCidType(btn.dataset.cid)));
 
 function applyLanguage(){
@@ -185,345 +178,152 @@ function applyLanguage(){
   updateCidIdentity();
   if(state.file)el('filename').textContent=state.file.name;
   if(state.saveHandle)el('folderName').textContent=state.saveHandle.name;
-  if(state.dataset){setStatus(tr('readSuccess'),'good');renderDetected();}
-  el('globalResetBtn').title=tr('globalResetTitle');
-  el('globalResetBtn').setAttribute('aria-label',tr('globalResetTitle'));
-  el('tabResetBtn').title=tr('tabResetTitle');
-  el('tabResetBtn').setAttribute('aria-label',tr('tabResetTitle'));
-  if(state.currentMode)activateMode(state.currentMode,false);
+  if(state.readCache||state.dataset)renderDetected(state.dataset||state.readCache);
+  renderColorOptions();
+  if(state.dataset)renderLineToggles();
+  if(state.currentMode==='intervalMean')renderRegionManager();
+  el('globalResetBtn').title=tr('globalResetTitle');el('globalResetBtn').setAttribute('aria-label',tr('globalResetTitle'));
+  el('tabResetBtn').title=tr('tabResetTitle');el('tabResetBtn').setAttribute('aria-label',tr('tabResetTitle'));
+  if(state.currentMode&&state.dataset)activateMode(state.currentMode,false);
 }
 el('langBtn').onclick=()=>{lang=lang==='en'?'ko':'en';localStorage.setItem('innereye_lang',lang);applyLanguage();};
 applyLanguage();
 
+function purgeCurrentPlot(){if(state.currentPlot){try{Plotly.purge(state.currentPlot);}catch(_){}}state.currentPlot=null;}
+function clearAnalysisUi(){
+  purgeCurrentPlot();state.dataset=null;state.currentMode=null;state.selectedSample=null;state.ranges={};state.visibleRanges={};state.meanRegions={};state.results={extrema:{},auc:{},mean:{}};state.selectedLines=new Set();state.exportAll=false;
+  document.querySelectorAll('.analysis-btn').forEach(b=>b.classList.remove('active'));el('exportAllToggle').classList.remove('on');el('actions').classList.remove('visible');el('analysisControls').classList.remove('visible');el('sampleSelect').innerHTML='';el('lineRow').innerHTML='';el('rangeStart').value='';el('rangeEnd').value='';el('resultTableWrap').innerHTML='';el('regionList').innerHTML='';el('regionManager').classList.remove('visible');el('resultTitle').textContent=tr('result');el('resultSub').textContent=tr('chooseAnalysis');el('plots').innerHTML=`<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;el('progress').textContent='';el('progress').classList.remove('visible');el('saveBtn').disabled=false;
+}
+function resetDataset(){
+  clearAnalysisUi();state.readCache=null;state.lineColors={};el('detected').innerHTML='';el('colorOptions').innerHTML='';el('colorsSection').hidden=true;el('analyzeBtn').hidden=true;setStatus(tr('ready'));
+}
+function invalidatePreparedData(){if(!state.readCache&&!state.dataset)return;resetDataset();setStatus(tr('inputsChanged'),'warn');}
+
 el('excelBrowseBtn').onclick=()=>el('excelInput').click();
 el('excelInput').addEventListener('change',e=>{state.file=e.target.files[0]||null;el('filename').textContent=state.file?state.file.name:tr('noFile');resetDataset();});
 el('folderBtn').onclick=async()=>{if(!window.showDirectoryPicker){setStatus(tr('folderUnsupported'),'bad');return;}try{state.saveHandle=await window.showDirectoryPicker({mode:'readwrite',id:'innereye-cid-scan-output'});el('folderName').textContent=state.saveHandle.name;setStatus(tr('folderSelected'),'good');}catch(e){if(e.name!=='AbortError')setStatus(String(e.message||e),'bad');}};
-
-function purgeCurrentPlot(){
-  if(state.currentPlot){
-    try{Plotly.purge(state.currentPlot);}catch(_){}
-  }
-  state.currentPlot=null;
-}
-
-function resetSelectedLines(){
-  state.selectedLines=new Set(['L1','L2','L3']);
-  document.querySelectorAll('.line-toggle').forEach(btn=>btn.classList.add('active'));
-}
-
-function resetDataset(){
-  purgeCurrentPlot();
-  state.dataset=null;state.currentMode=null;state.selectedSample=null;state.ranges={};state.visibleRanges={};state.results={extrema:{},auc:{}};
-  resetSelectedLines();
-  state.exportAll=false;
-  document.querySelectorAll('.analysis-btn').forEach(b=>b.classList.remove('active'));
-  el('exportAllToggle').classList.remove('on');
-  el('actions').classList.remove('visible');
-  el('analysisControls').classList.remove('visible');
-  el('detected').innerHTML='';
-  el('sampleSelect').innerHTML='';
-  el('rangeStart').value='';
-  el('rangeEnd').value='';
-  el('resultTableWrap').innerHTML='';
-  el('resultTitle').textContent=tr('result');
-  el('resultSub').textContent=tr('chooseAnalysis');
-  el('plots').innerHTML=`<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;
-  el('progress').textContent='';
-  el('progress').classList.remove('visible');
-  el('saveBtn').disabled=false;
-  setStatus(tr('ready'));
-}
+['excitation','signalType','scanSpeed','scanLength','notchPosition','expectedSamples'].forEach(id=>el(id).addEventListener('change',invalidatePreparedData));
 
 function resetAll(){
-  state.file=null;
-  state.saveHandle=null;
-  el('excelInput').value='';
-  el('filename').textContent=tr('noFile');
-  el('folderName').textContent=tr('notSelected');
-
-  el('excitation').value='100';
-  el('signalType').value='Phase';
-  el('scanSpeed').value='1';
-  el('scanLength').value='6';
-  el('notchPosition').value='2';
-  el('expectedSamples').value='6';
-
-  el('colorL1').value='#111827';
-  el('colorL2').value='#2563eb';
-  el('colorL3').value='#d97706';
-
-  resetDataset();
-  setStatus(tr('fullResetDone'),'good');
+  state.file=null;state.saveHandle=null;el('excelInput').value='';el('filename').textContent=tr('noFile');el('folderName').textContent=tr('notSelected');el('excitation').value='100';el('signalType').value='Phase';el('scanSpeed').value='1';el('scanLength').value='6';el('notchPosition').value='2';el('expectedSamples').value='6';resetDataset();setStatus(tr('fullResetDone'),'good');
 }
-
 async function resetCurrentAnalysis(){
   if(!state.dataset||!state.currentMode){setStatus(tr('needRead'),'bad');return;}
+  const mode=state.currentMode;purgeCurrentPlot();state.selectedSample=state.dataset.samples[0];resetSelectedLines();state.exportAll=false;el('exportAllToggle').classList.remove('on');el('resultTableWrap').innerHTML='';
+  if(mode==='interval'){state.visibleRanges={};state.results.extrema={};state.results.auc={};state.ranges={};state.dataset.samples.forEach(s=>{state.ranges[s]=[0,state.dataset.params.scanLength];});}
+  if(mode==='intervalMean'){state.visibleRanges={};state.ranges={};state.meanRegions={};state.results.mean={};state.dataset.samples.forEach(s=>{state.ranges[s]=[0,state.dataset.params.scanLength];state.meanRegions[s]=[];});}
+  populateSampleSelect();renderLineToggles();syncRangeInputs();renderRegionManager();await renderCurrentMode();setStatus(tr('tabResetDone'),'good');
+}
+el('globalResetBtn').onclick=resetAll;el('tabResetBtn').onclick=resetCurrentAnalysis;
 
-  const mode=state.currentMode;
-  purgeCurrentPlot();
-  state.selectedSample=state.dataset.samples[0];
-  resetSelectedLines();
-  state.exportAll=false;
-  el('exportAllToggle').classList.remove('on');
-  el('resultTableWrap').innerHTML='';
-
-  if(mode==='interval'){
-    state.visibleRanges={};
-    state.results.extrema={};
-    state.results.auc={};
-    state.ranges={};
-    state.dataset.samples.forEach(s=>{state.ranges[s]=[0,state.dataset.params.scanLength];});
-  }
-
-  populateSampleSelect();
-  syncRangeInputs();
-  await renderCurrentMode();
-  setStatus(tr('tabResetDone'),'good');
+function getParams(){const p={excitation:Number(el('excitation').value),signalType:el('signalType').value,scanSpeed:Number(el('scanSpeed').value),scanLength:Number(el('scanLength').value),notchPosition:Number(el('notchPosition').value),expectedSamples:Number(el('expectedSamples').value)};if(!(p.excitation>0&&p.scanSpeed>0&&p.scanLength>0&&Number.isInteger(p.expectedSamples)&&p.expectedSamples>0&&Number.isFinite(p.notchPosition)))throw new Error(tr('invalidParams'));return p;}
+function parseFilenameMeta(name){const freq=String(name).match(/(\d+(?:\.\d+)?)\s*kHz/i);const sig=String(name).match(/\b(Phase|EMF)\b/i);return{frequency:freq?Number(freq[1]):NaN,signal:sig?(sig[1].toLowerCase()==='phase'?'Phase':'EMF'):null};}
+function cleanLineValues(aoa,col){const out=[];for(let r=1;r<aoa.length;r++){const raw=aoa[r]?.[col];if(raw===null||raw===undefined||String(raw).trim()==='')continue;const v=Number(raw);if(Number.isFinite(v)&&v!==0)out.push(v);}return out;}
+function detectLineHeaders(row){
+  const vals=(row||[]).map(v=>String(v??'').trim());let last=-1;for(let i=0;i<vals.length;i++)if(vals[i]!=='')last=i;if(last<0)throw new Error(tr('noLines'));
+  const headers=vals.slice(0,last+1).map(v=>v.toUpperCase());for(let i=0;i<headers.length;i++){if(headers[i]!==`L${i+1}`)throw new Error(tr('headerMismatch'));}return headers;
 }
 
-el('globalResetBtn').onclick=resetAll;
-el('tabResetBtn').onclick=resetCurrentAnalysis;
-
-function getParams(){
-  const p={excitation:Number(el('excitation').value),signalType:el('signalType').value,scanSpeed:Number(el('scanSpeed').value),scanLength:Number(el('scanLength').value),notchPosition:Number(el('notchPosition').value),expectedSamples:Number(el('expectedSamples').value)};
-  if(!(p.excitation>0&&p.scanSpeed>0&&p.scanLength>0&&Number.isInteger(p.expectedSamples)&&p.expectedSamples>0&&Number.isFinite(p.notchPosition)))throw new Error(tr('invalidParams'));
-  return p;
-}
-
-function parseFilenameMeta(name){
-  const freq=String(name).match(/(\d+(?:\.\d+)?)\s*kHz/i);const sig=String(name).match(/\b(Phase|EMF)\b/i);
-  return{frequency:freq?Number(freq[1]):NaN,signal:sig?(sig[1].toLowerCase()==='phase'?'Phase':'EMF'):null};
-}
-
-function cleanLineValues(aoa,col){
-  const out=[];
-  for(let r=1;r<aoa.length;r++){
-    const raw=aoa[r]?.[col];
-    if(raw===null||raw===undefined||String(raw).trim()==='')continue;
-    const v=Number(raw);
-    if(Number.isFinite(v)&&v!==0)out.push(v);
-  }
-  return out;
-}
-
-function invertMatrix(A){
-  const n=A.length;const M=A.map((row,i)=>row.slice().concat(Array.from({length:n},(_,j)=>i===j?1:0)));
-  for(let c=0;c<n;c++){
-    let pivot=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[pivot][c]))pivot=r;
-    if(Math.abs(M[pivot][c])<1e-14)throw new Error('Singular matrix in SG filter.');
-    [M[c],M[pivot]]=[M[pivot],M[c]];const div=M[c][c];for(let j=0;j<2*n;j++)M[c][j]/=div;
-    for(let r=0;r<n;r++){if(r===c)continue;const f=M[r][c];for(let j=0;j<2*n;j++)M[r][j]-=f*M[c][j];}
-  }
-  return M.map(row=>row.slice(n));
-}
-
-function sgCoefficients(window,order){
-  const m=(window-1)/2;const A=[];
-  for(let i=-m;i<=m;i++){const row=[];for(let p=0;p<=order;p++)row.push(i**p);A.push(row);}
-  const k=order+1;const ATA=Array.from({length:k},()=>Array(k).fill(0));
-  for(let r=0;r<k;r++)for(let c=0;c<k;c++)for(let i=0;i<window;i++)ATA[r][c]+=A[i][r]*A[i][c];
-  const inv=invertMatrix(ATA);const coeff=[];
-  for(let i=0;i<window;i++){let v=0;for(let p=0;p<k;p++)v+=inv[0][p]*A[i][p];coeff.push(v);}
-  return coeff;
-}
-
+function invertMatrix(A){const n=A.length;const M=A.map((row,i)=>row.slice().concat(Array.from({length:n},(_,j)=>i===j?1:0)));for(let c=0;c<n;c++){let pivot=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[pivot][c]))pivot=r;if(Math.abs(M[pivot][c])<1e-14)throw new Error('Singular matrix in SG filter.');[M[c],M[pivot]]=[M[pivot],M[c]];const div=M[c][c];for(let j=0;j<2*n;j++)M[c][j]/=div;for(let r=0;r<n;r++){if(r===c)continue;const f=M[r][c];for(let j=0;j<2*n;j++)M[r][j]-=f*M[c][j];}}return M.map(row=>row.slice(n));}
+function sgCoefficients(window,order){const m=(window-1)/2;const A=[];for(let i=-m;i<=m;i++){const row=[];for(let p=0;p<=order;p++)row.push(i**p);A.push(row);}const k=order+1;const ATA=Array.from({length:k},()=>Array(k).fill(0));for(let r=0;r<k;r++)for(let c=0;c<k;c++)for(let i=0;i<window;i++)ATA[r][c]+=A[i][r]*A[i][c];const inv=invertMatrix(ATA);const coeff=[];for(let i=0;i<window;i++){let v=0;for(let p=0;p<k;p++)v+=inv[0][p]*A[i][p];coeff.push(v);}return coeff;}
 function reflectIndex(i,n){while(i<0||i>=n){if(i<0)i=-i-1;if(i>=n)i=2*n-i-1;}return i;}
 function savgol(y,window,order=3){const c=sgCoefficients(window,order);const m=(window-1)/2;const out=new Array(y.length);for(let i=0;i<y.length;i++){let s=0;for(let j=-m;j<=m;j++)s+=c[j+m]*y[reflectIndex(i+j,y.length)];out[i]=s;}return out;}
-function validSgWindow(fs,n){let w=Math.round(fs*0.01);if(w%2===0)w+=1;w=Math.max(5,w);if(w>n){w=n%2===1?n:n-1;}if(w<5)throw new Error('The common data length is too short for a 3rd-order SG filter.');return w;}
+function validSgWindow(fs,n){let w=Math.round(fs*0.01);if(w%2===0)w+=1;w=Math.max(5,w);if(w>n)w=n%2===1?n:n-1;if(w<5)throw new Error('The common data length is too short for a 3rd-order SG filter.');return w;}
 
-el('readBtn').onclick=async()=>{
-  if(!state.file){setStatus(tr('needFile'),'bad');return;}if(!state.saveHandle){setStatus(tr('needFolder'),'bad');return;}
-  setStatus(tr('reading'));
-  try{
-    const p=getParams();const buf=await state.file.arrayBuffer();const wb=XLSX.read(buf,{type:'array'});
-    const expected=Array.from({length:p.expectedSamples},(_,i)=>`S${i+1}`);const sampleSheets=wb.SheetNames.filter(n=>/^S\d+$/i.test(n)).sort((a,b)=>naturalNum(a)-naturalNum(b));
-    if(sampleSheets.length!==expected.length||expected.some((s,i)=>sampleSheets[i]!==s))throw new Error(`${tr('sheetMismatch')} [${sampleSheets.join(', ')}]`);
-    const raw={};const lengths=[];
-    for(const s of expected){
-      const aoa=XLSX.utils.sheet_to_json(wb.Sheets[s],{header:1,defval:null,raw:true});const headers=(aoa[0]||[]).slice(0,3).map(v=>String(v??'').trim());
-      if(headers[0]!=='L1'||headers[1]!=='L2'||headers[2]!=='L3')throw new Error(`${tr('headerMismatch')} (${s}: ${headers.join(', ')})`);
-      raw[s]={};['L1','L2','L3'].forEach((line,c)=>{raw[s][line]=cleanLineValues(aoa,c);lengths.push({Sample:s,Line:line,Valid_Length:raw[s][line].length});});
-    }
-    const minLength=Math.min(...lengths.map(x=>x.Valid_Length));if(!Number.isFinite(minLength)||minLength<5)throw new Error(tr('noValid'));
-    const duration=p.scanLength/p.scanSpeed;const fs=minLength/duration;const dx=p.scanSpeed/fs;const distance=Array.from({length:minLength},(_,i)=>i*dx);const window=validSgWindow(fs,minLength);
-    const cleaned={};const smoothed={};
-    for(const s of expected){cleaned[s]={};smoothed[s]={};for(const line of ['L1','L2','L3']){cleaned[s][line]=raw[s][line].slice(0,minLength);smoothed[s][line]=savgol(cleaned[s][line],window,3);}}
-    const meta=parseFilenameMeta(state.file.name);
-    state.dataset={workbook:wb,params:p,samples:expected,lines:['L1','L2','L3'],raw:cleaned,smoothed,distance,minLength,duration,fs,dx,sgWindow:window,sgWindowSec:0.01,sgWindowMm:p.scanSpeed*0.01,lengths,filenameMeta:meta};
-    state.selectedSample=expected[0];state.ranges={};state.visibleRanges={};state.results={extrema:{},auc:{}};expected.forEach(s=>{state.ranges[s]=[0,p.scanLength];});
-    populateSampleSelect();renderDetected();setStatus(tr('readSuccess'),'good');activateMode('raw',true);
-  }catch(err){console.error(err);state.dataset=null;setStatus(err.message||String(err),'bad');el('detected').innerHTML='';}
-};
-
-function renderDetected(){
-  const d=state.dataset;if(!d)return;const m=d.filenameMeta;const p=d.params;const freqState=Number.isFinite(m.frequency)?(Math.abs(m.frequency-p.excitation)<1e-9?tr('match'):tr('mismatch')):tr('notDetected');const sigState=m.signal?(m.signal===p.signalType?tr('match'):tr('mismatch')):tr('notDetected');
-  const chips=[`<span class="badge good">${tr('minLength')}: ${d.minLength}</span>`,`<span class="badge good">${tr('duration')}: ${fmt(d.duration,4)} s</span>`,`<span class="badge good">${tr('samplingRate')}: ${fmt(d.fs,3)} Hz</span>`,`<span class="badge good">${tr('distanceStep')}: ${fmt(d.dx,6)} mm</span>`,`<span class="badge good">${tr('sgWindow')}: ${d.sgWindow} samples · ${(d.sgWindowSec*1000).toFixed(1)} ms · ${(d.sgWindowMm*1000).toFixed(1)} µm</span>`,`<span class="badge ${freqState===tr('match')?'good':'warn'}">${tr('filenameMeta')} F: ${Number.isFinite(m.frequency)?m.frequency+' kHz':tr('notDetected')} · ${freqState}</span>`,`<span class="badge ${sigState===tr('match')?'good':'warn'}">${tr('filenameMeta')} Signal: ${m.signal||tr('notDetected')} · ${sigState}</span>`];
-  el('detected').innerHTML=chips.join('');
+function hslToHex(h,s,l){s/=100;l/=100;const k=n=>(n+h/30)%12;const a=s*Math.min(l,1-l);const f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));return '#'+[f(0),f(8),f(4)].map(x=>Math.round(255*x).toString(16).padStart(2,'0')).join('');}
+function defaultColorForIndex(i){const base=['#111827','#2563eb','#d97706','#059669','#dc2626','#7c3aed','#0891b2','#be185d','#4d7c0f','#9333ea','#0f766e','#c2410c'];if(i<base.length)return base[i];return hslToHex((i*137.508)%360,62,43);}
+function initializeLineColors(lines){const next={};lines.forEach((line,i)=>{next[line]=state.lineColors[line]||defaultColorForIndex(i);});state.lineColors=next;}
+function renderColorOptions(){
+  const d=state.readCache||state.dataset;if(!d){el('colorOptions').innerHTML='';el('colorsSection').hidden=true;return;}initializeLineColors(d.lines);el('colorOptions').innerHTML=d.lines.map(line=>`<label class="color-opt"><input type="color" data-color-line="${line}" value="${lineColor(line)}"><span>${line}</span></label>`).join('');el('colorsSection').hidden=false;
+  el('colorOptions').querySelectorAll('input[data-color-line]').forEach(input=>input.addEventListener('change',()=>{state.lineColors[input.dataset.colorLine]=input.value;if(state.currentMode)renderCurrentMode();}));
+}
+function resetSelectedLines(){const d=state.dataset||state.readCache;state.selectedLines=new Set(d?d.lines:[]);renderLineToggles();}
+function renderLineToggles(){
+  const d=state.dataset;if(!d){el('lineRow').innerHTML='';return;}const available=d.sampleLines?.[state.selectedSample]||d.lines;if(!available.some(line=>state.selectedLines.has(line)))available.forEach(line=>state.selectedLines.add(line));el('lineRow').innerHTML=available.map(line=>`<button type="button" class="line-toggle ${state.selectedLines.has(line)?'active':''}" data-line="${line}">${line}</button>`).join('');
+  el('lineRow').querySelectorAll('.line-toggle').forEach(btn=>btn.addEventListener('click',async()=>{const line=btn.dataset.line;if(state.selectedLines.has(line)){if(selectedLineList(state.selectedSample).length===1){setStatus(tr('lineRequired'),'warn');return;}state.selectedLines.delete(line);}else state.selectedLines.add(line);renderLineToggles();if(state.currentMode==='intervalMean'&&(state.meanRegions[state.selectedSample]||[]).length)calculateMeanRegionsForSample(state.selectedSample);await renderCurrentMode();if(state.currentMode==='intervalMean')renderMeanResultTable(state.selectedSample);}));
 }
 
+el('readBtn').onclick=async()=>{
+  if(!state.file){setStatus(tr('needFile'),'bad');return;}setStatus(tr('reading'));
+  try{
+    clearAnalysisUi();state.readCache=null;state.lineColors={};el('detected').innerHTML='';el('colorsSection').hidden=true;el('analyzeBtn').hidden=true;
+    const p=getParams();const buf=await state.file.arrayBuffer();const wb=XLSX.read(buf,{type:'array'});const expected=Array.from({length:p.expectedSamples},(_,i)=>`S${i+1}`);const sampleSheets=wb.SheetNames.filter(n=>/^S\d+$/i.test(n)).sort((a,b)=>naturalNum(a)-naturalNum(b));
+    if(sampleSheets.length!==expected.length||expected.some((s,i)=>sampleSheets[i]!==s))throw new Error(`${tr('sheetMismatch')} [${sampleSheets.join(', ')}]`);
+    const raw={};const lengths=[];const sampleLines={};const allLineSet=new Set();
+    for(const s of expected){
+      const aoa=XLSX.utils.sheet_to_json(wb.Sheets[s],{header:1,defval:null,raw:true});let headers;try{headers=detectLineHeaders(aoa[0]);}catch(e){throw new Error(`${e.message} (${s})`);}sampleLines[s]=headers;headers.forEach(line=>allLineSet.add(line));
+      raw[s]={};headers.forEach((line,c)=>{raw[s][line]=cleanLineValues(aoa,c);lengths.push({Sample:s,Line:line,Valid_Length:raw[s][line].length});});
+    }
+    const lines=[...allLineSet].sort((a,b)=>naturalNum(a)-naturalNum(b));if(!lines.length)throw new Error(tr('noLines'));const minLength=Math.min(...lengths.map(x=>x.Valid_Length));if(!Number.isFinite(minLength)||minLength<5)throw new Error(tr('noValid'));
+    const duration=p.scanLength/p.scanSpeed;const fs=minLength/duration;const dx=p.scanSpeed/fs;const distance=Array.from({length:minLength},(_,i)=>i*dx);const window=validSgWindow(fs,minLength);const cleaned={};const smoothed={};
+    for(const s of expected){cleaned[s]={};smoothed[s]={};for(const line of sampleLines[s]){cleaned[s][line]=raw[s][line].slice(0,minLength);smoothed[s][line]=savgol(cleaned[s][line],window,3);}}
+    const meta=parseFilenameMeta(state.file.name);state.readCache={workbook:wb,params:p,samples:expected,lines,sampleLines,raw:cleaned,smoothed,distance,minLength,duration,fs,dx,sgWindow:window,sgWindowSec:0.01,sgWindowMm:p.scanSpeed*0.01,lengths,filenameMeta:meta};initializeLineColors(lines);state.selectedLines=new Set(lines);renderDetected(state.readCache);renderColorOptions();el('analyzeBtn').hidden=false;setStatus(tr('readyToAnalyze'),'good');
+  }catch(err){console.error(err);state.readCache=null;state.dataset=null;el('detected').innerHTML='';el('colorOptions').innerHTML='';el('colorsSection').hidden=true;el('analyzeBtn').hidden=true;setStatus(err.message||String(err),'bad');}
+};
+
+el('analyzeBtn').onclick=async()=>{
+  if(!state.readCache){setStatus(tr('needReadFirst'),'bad');return;}state.dataset=state.readCache;state.currentMode=null;state.selectedSample=state.dataset.samples[0];state.selectedLines=new Set(state.dataset.lines);state.ranges={};state.visibleRanges={};state.meanRegions={};state.results={extrema:{},auc:{},mean:{}};state.dataset.samples.forEach(s=>{state.ranges[s]=[0,state.dataset.params.scanLength];state.meanRegions[s]=[];});populateSampleSelect();renderLineToggles();renderRegionManager();setStatus(tr('analysisStarted'),'good');await activateMode('raw',true);
+};
+
+function renderDetected(d=state.dataset||state.readCache){if(!d)return;const m=d.filenameMeta;const p=d.params;const freqState=Number.isFinite(m.frequency)?(Math.abs(m.frequency-p.excitation)<1e-9?tr('match'):tr('mismatch')):tr('notDetected');const sigState=m.signal?(m.signal===p.signalType?tr('match'):tr('mismatch')):tr('notDetected');const lineCounts=d.samples.map(s=>`${s}:${(d.sampleLines?.[s]||d.lines).length}`).join(' · ');const chips=[`<span class="badge good">${tr('detectedLines')}: ${d.lines.length} · ${d.lines.join(', ')}</span>`,`<span class="badge good">Lines/sample: ${lineCounts}</span>`,`<span class="badge good">${tr('minLength')}: ${d.minLength}</span>`,`<span class="badge good">${tr('duration')}: ${fmt(d.duration,4)} s</span>`,`<span class="badge good">${tr('samplingRate')}: ${fmt(d.fs,3)} Hz</span>`,`<span class="badge good">${tr('distanceStep')}: ${fmt(d.dx,6)} mm</span>`,`<span class="badge good">${tr('sgWindow')}: ${d.sgWindow} samples · ${(d.sgWindowSec*1000).toFixed(1)} ms · ${(d.sgWindowMm*1000).toFixed(1)} µm</span>`,`<span class="badge ${freqState===tr('match')?'good':'warn'}">${tr('filenameMeta')} F: ${Number.isFinite(m.frequency)?m.frequency+' kHz':tr('notDetected')} · ${freqState}</span>`,`<span class="badge ${sigState===tr('match')?'good':'warn'}">${tr('filenameMeta')} Signal: ${m.signal||tr('notDetected')} · ${sigState}</span>`];el('detected').innerHTML=chips.join('');}
+
 function populateSampleSelect(){el('sampleSelect').innerHTML=state.dataset.samples.map(s=>`<option value="${s}">${s}</option>`).join('');el('sampleSelect').value=state.selectedSample;}
-el('sampleSelect').addEventListener('change',()=>{state.selectedSample=el('sampleSelect').value;syncRangeInputs();renderCurrentMode();});
-document.querySelectorAll('.line-toggle').forEach(btn=>btn.addEventListener('click',()=>{const line=btn.dataset.line;if(state.selectedLines.has(line)){if(state.selectedLines.size===1){setStatus(tr('lineRequired'),'warn');return;}state.selectedLines.delete(line);btn.classList.remove('active');}else{state.selectedLines.add(line);btn.classList.add('active');}renderCurrentMode();}));
-['colorL1','colorL2','colorL3'].forEach(id=>el(id).addEventListener('change',()=>{if(state.currentMode)renderCurrentMode();}));
+el('sampleSelect').addEventListener('change',async()=>{state.selectedSample=el('sampleSelect').value;renderLineToggles();syncRangeInputs();renderRegionManager();await renderCurrentMode();if(state.currentMode==='intervalMean')renderMeanResultTable(state.selectedSample);});
 
-const modeInfo={raw:{title:'modeRaw',sub:'rawSub',folder:'Raw data'},sg:{title:'modeSG',sub:'sgSub',folder:'SG smoothing'},interval:{title:'modeInterval',sub:'intervalSub',folder:'Interval analysis'}};
+const modeInfo={raw:{title:'modeRaw',sub:'rawSub',folder:'Raw data'},sg:{title:'modeSG',sub:'sgSub',folder:'SG smoothing'},interval:{title:'modeInterval',sub:'intervalSub',folder:'Interval analysis'},intervalMean:{title:'modeIntervalMean',sub:'intervalMeanSub',folder:'Interval Mean Cal'}};
 document.querySelectorAll('.analysis-btn').forEach(btn=>btn.addEventListener('click',()=>activateMode(btn.dataset.mode,true)));
-
-function activateMode(mode,updateButtons=true){
-  if(!state.dataset){setStatus(tr('needRead'),'bad');return;}state.currentMode=mode;
-  if(updateButtons)document.querySelectorAll('.analysis-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
-  el('actions').classList.add('visible');el('analysisControls').classList.add('visible');el('resultTitle').textContent=tr(modeInfo[mode].title);el('resultSub').textContent=tr(modeInfo[mode].sub);
-  const interval=mode==='interval';el('rangeControls').style.display=interval?'flex':'none';el('intervalActions').style.display=interval?'flex':'none';el('controlHint').textContent=tr(interval?'hintInterval':(mode==='sg'?'hintSG':'hintRaw'));el('resultTableWrap').innerHTML='';syncRangeInputs();renderCurrentMode();
+async function activateMode(mode,updateButtons=true){
+  if(!state.dataset){setStatus(state.readCache?tr('needAnalyze'):tr('needRead'),'bad');return;}state.currentMode=mode;if(updateButtons)document.querySelectorAll('.analysis-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));el('actions').classList.add('visible');el('analysisControls').classList.add('visible');el('resultTitle').textContent=tr(modeInfo[mode].title);el('resultSub').textContent=tr(modeInfo[mode].sub);
+  const interval=mode==='interval',mean=mode==='intervalMean';el('rangeControls').style.display=(interval||mean)?'flex':'none';el('intervalActions').style.display=interval?'flex':'none';el('meanActions').style.display=mean?'flex':'none';el('regionManager').classList.toggle('visible',mean);el('controlHint').textContent=tr(mean?'hintIntervalMean':(interval?'hintInterval':(mode==='sg'?'hintSG':'hintRaw')));el('resultTableWrap').innerHTML='';syncRangeInputs();renderRegionManager();await renderCurrentMode();if(mean)renderMeanResultTable(state.selectedSample);
 }
 
 function syncRangeInputs(){if(!state.dataset||!state.selectedSample)return;const r=state.ranges[state.selectedSample]||[0,state.dataset.params.scanLength];el('rangeStart').value=fmt(r[0],4);el('rangeEnd').value=fmt(r[1],4);}
 function readRangeInputs(){const d=state.dataset;let a=Number(el('rangeStart').value),b=Number(el('rangeEnd').value);a=clamp(a,0,d.params.scanLength);b=clamp(b,0,d.params.scanLength);if(!(b>a))throw new Error(tr('rangeInvalid'));state.ranges[state.selectedSample]=[a,b];return[a,b];}
-['rangeStart','rangeEnd'].forEach(id=>el(id).addEventListener('change',()=>{try{readRangeInputs();renderCurrentMode();}catch(e){setStatus(e.message,'bad');}}));
-el('useVisibleBtn').onclick=()=>{const vr=state.visibleRanges[state.selectedSample];if(vr){state.ranges[state.selectedSample]=vr.slice();syncRangeInputs();renderCurrentMode();}};
+['rangeStart','rangeEnd'].forEach(id=>el(id).addEventListener('change',()=>{try{readRangeInputs();if(state.currentMode==='interval')renderCurrentMode();}catch(e){setStatus(e.message,'bad');}}));
+el('useVisibleBtn').onclick=()=>useVisibleRange();el('useVisibleMeanBtn').onclick=()=>useVisibleRange();
+function useVisibleRange(){const vr=state.visibleRanges[state.selectedSample];if(vr){state.ranges[state.selectedSample]=vr.slice();syncRangeInputs();if(state.currentMode==='interval')renderCurrentMode();}}
 
+function regionFill(i){const fills=['rgba(37,99,235,.10)','rgba(5,150,105,.10)','rgba(217,119,6,.11)','rgba(124,58,237,.10)','rgba(220,38,38,.09)','rgba(8,145,178,.10)'];return fills[i%fills.length];}
 function baseLayout(title,mode,sample){
-  const d=state.dataset;const layout={margin:{l:76,r:28,t:30,b:78},paper_bgcolor:'#fff',plot_bgcolor:'#fff',font:{family:'Inter, sans-serif',color:'#111827'},xaxis:{title:{text:tr('distanceAxis'),font:{size:13}},showgrid:false,zeroline:false,linecolor:'#9aa1ad',linewidth:1.3,range:[0,d.params.scanLength]},yaxis:{title:{text:sensorAxis(),font:{size:13}},showgrid:false,zeroline:false,linecolor:'#9aa1ad',linewidth:1.3},legend:{orientation:'h',y:-.20,x:.5,xanchor:'center'},hovermode:'x unified',dragmode:mode==='interval'?'zoom':'zoom',title:{text:`${title} · ${sample}`,font:{size:14},x:.01,xanchor:'left'},shapes:[{type:'line',x0:d.params.notchPosition,x1:d.params.notchPosition,y0:0,y1:1,yref:'paper',line:{color:'#111827',width:1.5,dash:'dash'}}],annotations:[{x:d.params.notchPosition,y:1.02,yref:'paper',text:tr('notch'),showarrow:false,font:{size:11,color:'#111827'}}]};
+  const d=state.dataset;const layout={margin:{l:76,r:28,t:30,b:78},paper_bgcolor:'#fff',plot_bgcolor:'#fff',font:{family:'Inter, sans-serif',color:'#111827'},xaxis:{title:{text:tr('distanceAxis'),font:{size:13}},showgrid:false,zeroline:false,linecolor:'#9aa1ad',linewidth:1.3,range:[0,d.params.scanLength]},yaxis:{title:{text:sensorAxis(),font:{size:13}},showgrid:false,zeroline:false,linecolor:'#9aa1ad',linewidth:1.3},legend:{orientation:'h',y:-.20,x:.5,xanchor:'center'},hovermode:'x unified',dragmode:(mode==='interval'||mode==='intervalMean')?'zoom':'zoom',title:{text:`${title} · ${sample}`,font:{size:14},x:.01,xanchor:'left'},shapes:[{type:'line',x0:d.params.notchPosition,x1:d.params.notchPosition,y0:0,y1:1,yref:'paper',line:{color:'#111827',width:1.5,dash:'dash'}}],annotations:[{x:d.params.notchPosition,y:1.02,yref:'paper',text:tr('notch'),showarrow:false,font:{size:11,color:'#111827'}}]};
   if(mode==='interval'){const r=state.ranges[sample]||[0,d.params.scanLength];layout.shapes.push({type:'rect',x0:r[0],x1:r[1],y0:0,y1:1,yref:'paper',fillcolor:'rgba(37,99,235,.08)',line:{color:'rgba(37,99,235,.45)',width:1}});}
+  if(mode==='intervalMean'){const regs=getSortedRegions(sample);regs.forEach((r,i)=>{layout.shapes.push({type:'rect',x0:r.start,x1:r.end,y0:0,y1:1,yref:'paper',fillcolor:regionFill(i),line:{color:'rgba(17,24,39,.38)',width:1,dash:'dot'}});layout.annotations.push({x:(r.start+r.end)/2,y:.98,yref:'paper',text:`Region ${i+1}`,showarrow:false,bgcolor:'rgba(255,255,255,.82)',bordercolor:'rgba(17,24,39,.14)',borderpad:3,font:{size:10,color:'#111827'}});});}
   return layout;
 }
-
-function selectedLineList(){return state.dataset.lines.filter(l=>state.selectedLines.has(l));}
-function makeTraces(sample,mode){
-  const d=state.dataset;const source=mode==='raw'?d.raw:d.smoothed;const traces=[];
-  for(const line of selectedLineList()){traces.push({x:d.distance,y:source[sample][line],type:'scatter',mode:'lines',name:`${line} · ${mode==='raw'?tr('rawLegend'):tr('sgLegend')}`,line:{width:mode==='raw'?1.5:2.2,color:lineColor(line)},hovertemplate:'x=%{x:.4f} mm<br>y=%{y:.6f}<extra>'+line+'</extra>'});}
-  if(mode==='interval'){
-    for(const line of selectedLineList()){
-      const ex=state.results.extrema?.[sample]?.[line];if(ex){traces.push({x:[ex.xMax],y:[ex.yMax],type:'scatter',mode:'markers',name:`${line} local max`,marker:{size:11,symbol:'triangle-up',color:lineColor(line),line:{color:'#111827',width:1}}});traces.push({x:[ex.xMin],y:[ex.yMin],type:'scatter',mode:'markers',name:`${line} local min`,marker:{size:11,symbol:'triangle-down',color:lineColor(line),line:{color:'#111827',width:1}}});}
-      const au=state.results.auc?.[sample]?.[line];if(au){
-        traces.push({x:[au.peak1X,au.peak2X],y:[au.peak1Y,au.peak2Y],type:'scatter',mode:'markers',name:`${line} AUC maxima`,marker:{size:10,symbol:'circle-open',color:lineColor(line),line:{color:'#111827',width:1.2}}});
-        traces.push({x:[au.x0,au.x1],y:[au.y0,au.y1],type:'scatter',mode:'lines',name:`${line} AUC baseline`,line:{width:1.4,dash:'dot',color:lineColor(line)},opacity:.75});
-      }
-    }
-  }
-  return traces;
-}
+function selectedLineList(sample=state.selectedSample){const available=state.dataset.sampleLines?.[sample]||state.dataset.lines;return available.filter(l=>state.selectedLines.has(l));}
+function makeTraces(sample,mode){const d=state.dataset;const source=mode==='raw'?d.raw:d.smoothed;const traces=[];for(const line of selectedLineList(sample))traces.push({x:d.distance,y:source[sample][line],type:'scatter',mode:'lines',name:`${line} · ${mode==='raw'?tr('rawLegend'):tr('sgLegend')}`,line:{width:mode==='raw'?1.5:2.2,color:lineColor(line)},hovertemplate:'x=%{x:.4f} mm<br>y=%{y:.6f}<extra>'+line+'</extra>'});if(mode==='interval'){for(const line of selectedLineList(sample)){const ex=state.results.extrema?.[sample]?.[line];if(ex){traces.push({x:[ex.xMax],y:[ex.yMax],type:'scatter',mode:'markers',name:`${line} local max`,marker:{size:11,symbol:'triangle-up',color:lineColor(line),line:{color:'#111827',width:1}}});traces.push({x:[ex.xMin],y:[ex.yMin],type:'scatter',mode:'markers',name:`${line} local min`,marker:{size:11,symbol:'triangle-down',color:lineColor(line),line:{color:'#111827',width:1}}});}const au=state.results.auc?.[sample]?.[line];if(au){traces.push({x:[au.peak1X,au.peak2X],y:[au.peak1Y,au.peak2Y],type:'scatter',mode:'markers',name:`${line} AUC maxima`,marker:{size:10,symbol:'circle-open',color:lineColor(line),line:{color:'#111827',width:1.2}}});traces.push({x:[au.x0,au.x1],y:[au.y0,au.y1],type:'scatter',mode:'lines',name:`${line} AUC baseline`,line:{width:1.4,dash:'dot',color:lineColor(line)},opacity:.75});}}}return traces;}
 
 const plotConfig={responsive:true,displaylogo:false,modeBarButtonsToRemove:['select2d','lasso2d'],scrollZoom:false,toImageButtonOptions:{format:'png',filename:'plot',height:900,width:1600,scale:2}};
 async function renderCurrentMode(){
-  if(!state.dataset||!state.currentMode)return;const sample=state.selectedSample;const mode=state.currentMode;const plotMode=mode==='raw'?'raw':(mode==='sg'?'sg':'interval');const title=tr(modeInfo[mode].title);el('plots').innerHTML='<div class="plot-card"><div class="plot-title"><span>'+title+' · '+sample+'</span></div><div id="plot-main" class="plot"></div></div>';const div=el('plot-main');const traces=makeTraces(sample,plotMode);const layout=baseLayout(title,plotMode,sample);await Plotly.newPlot(div,traces,layout,plotConfig);state.currentPlot=div;
-  if(mode==='interval'){
-    div.on('plotly_relayout',ev=>{let a,b;if(ev['xaxis.range[0]']!==undefined&&ev['xaxis.range[1]']!==undefined){a=Number(ev['xaxis.range[0]']);b=Number(ev['xaxis.range[1]']);}else if(Array.isArray(ev['xaxis.range'])){[a,b]=ev['xaxis.range'].map(Number);}else if(ev['xaxis.autorange']){a=0;b=state.dataset.params.scanLength;}if(Number.isFinite(a)&&Number.isFinite(b)&&b>a){a=clamp(a,0,state.dataset.params.scanLength);b=clamp(b,0,state.dataset.params.scanLength);state.visibleRanges[sample]=[a,b];state.ranges[sample]=[a,b];el('rangeStart').value=fmt(a,4);el('rangeEnd').value=fmt(b,4);}});
-  }
+  if(!state.dataset||!state.currentMode)return;purgeCurrentPlot();const sample=state.selectedSample;const mode=state.currentMode;const plotMode=mode;const title=tr(modeInfo[mode].title);el('plots').innerHTML='<div class="plot-card"><div class="plot-title"><span>'+title+' · '+sample+'</span></div><div id="plot-main" class="plot"></div></div>';const div=el('plot-main');const traces=makeTraces(sample,plotMode);const layout=baseLayout(title,plotMode,sample);await Plotly.newPlot(div,traces,layout,plotConfig);state.currentPlot=div;
+  if(mode==='interval'||mode==='intervalMean'){div.on('plotly_relayout',ev=>{let a,b;if(ev['xaxis.range[0]']!==undefined&&ev['xaxis.range[1]']!==undefined){a=Number(ev['xaxis.range[0]']);b=Number(ev['xaxis.range[1]']);}else if(Array.isArray(ev['xaxis.range'])){[a,b]=ev['xaxis.range'].map(Number);}else if(ev['xaxis.autorange']){a=0;b=state.dataset.params.scanLength;}if(Number.isFinite(a)&&Number.isFinite(b)&&b>a){a=clamp(a,0,state.dataset.params.scanLength);b=clamp(b,0,state.dataset.params.scanLength);state.visibleRanges[sample]=[a,b];state.ranges[sample]=[a,b];el('rangeStart').value=fmt(a,4);el('rangeEnd').value=fmt(b,4);}});}
 }
 
 function rangeIndices(range){const d=state.dataset;let i0=Math.ceil(range[0]/d.dx),i1=Math.floor(range[1]/d.dx);i0=clamp(i0,0,d.minLength-1);i1=clamp(i1,0,d.minLength-1);if(i1-i0<2)throw new Error(tr('rangeInvalid'));return[i0,i1];}
 function transformed(y,isMax){return isMax?y:y.map(v=>-v);}
 function peakProminence(y,idx,isMax){const z=transformed(y,isMax),peak=z[idx];let leftMin=peak,rightMin=peak;for(let k=idx-1;k>=0;k--){const v=z[k];if(v>peak)break;if(v<leftMin)leftMin=v;}for(let k=idx+1;k<z.length;k++){const v=z[k];if(v>peak)break;if(v<rightMin)rightMin=v;}const contour=Math.max(leftMin,rightMin);return Math.max(0,peak-contour);}
-function dominantExtrema(x,y){
-  if(y.length<5)return null;const yr=Math.max(...y)-Math.min(...y);const threshold=Math.max(1e-12,yr*0.01);const maxima=[],minima=[];
-  for(let i=1;i<y.length-1;i++){const d1=y[i]-y[i-1],d2=y[i+1]-y[i];if(d1>0&&d2<=0){const prom=peakProminence(y,i,true);if(prom>=threshold)maxima.push({i,prom});}if(d1<0&&d2>=0){const prom=peakProminence(y,i,false);if(prom>=threshold)minima.push({i,prom});}}
-  if(!maxima.length||!minima.length)return null;maxima.sort((a,b)=>b.prom-a.prom);minima.sort((a,b)=>b.prom-a.prom);const ma=maxima[0],mi=minima[0];const xMax=x[ma.i],yMax=y[ma.i],xMin=x[mi.i],yMin=y[mi.i];const dxSigned=xMax-xMin,dySigned=yMax-yMin;return{xMax,yMax,xMin,yMin,deltaX:Math.abs(dxSigned),deltaY:Math.abs(dySigned),slope:Math.abs(dxSigned)>1e-15?dySigned/dxSigned:NaN,maxProminence:ma.prom,minProminence:mi.prom,maxCandidates:maxima.length,minCandidates:minima.length};
+function dominantExtrema(x,y){if(y.length<5)return null;const yr=Math.max(...y)-Math.min(...y);const threshold=Math.max(1e-12,yr*0.01);const maxima=[],minima=[];for(let i=1;i<y.length-1;i++){const d1=y[i]-y[i-1],d2=y[i+1]-y[i];if(d1>0&&d2<=0){const prom=peakProminence(y,i,true);if(prom>=threshold)maxima.push({i,prom});}if(d1<0&&d2>=0){const prom=peakProminence(y,i,false);if(prom>=threshold)minima.push({i,prom});}}if(!maxima.length||!minima.length)return null;maxima.sort((a,b)=>b.prom-a.prom);minima.sort((a,b)=>b.prom-a.prom);const ma=maxima[0],mi=minima[0];const xMax=x[ma.i],yMax=y[ma.i],xMin=x[mi.i],yMin=y[mi.i];const dxSigned=xMax-xMin,dySigned=yMax-yMin;return{xMax,yMax,xMin,yMin,deltaX:Math.abs(dxSigned),deltaY:Math.abs(dySigned),slope:Math.abs(dxSigned)>1e-15?dySigned/dxSigned:NaN,maxProminence:ma.prom,minProminence:mi.prom,maxCandidates:maxima.length,minCandidates:minima.length};}
+function dominantTwoMaxima(x,y){if(y.length<5)return null;const yr=Math.max(...y)-Math.min(...y);const threshold=Math.max(1e-12,yr*0.01);const maxima=[];for(let i=1;i<y.length-1;i++){const d1=y[i]-y[i-1],d2=y[i+1]-y[i];if(d1>0&&d2<=0){const prom=peakProminence(y,i,true);if(prom>=threshold)maxima.push({i,prom,x:x[i],y:y[i]});}}if(maxima.length<2)return null;maxima.sort((a,b)=>b.prom-a.prom);const selected=maxima.slice(0,2).sort((a,b)=>a.i-b.i);return{first:selected[0],second:selected[1],maxCandidates:maxima.length,prominenceThreshold:threshold};}
+function correctedAUC(x,y){const x0=x[0],x1=x[x.length-1],y0=y[0],y1=y[y.length-1];let signed=0,absolute=0,positive=0,negative=0;for(let i=0;i<x.length-1;i++){const b0=y0+(y1-y0)*(x[i]-x0)/(x1-x0),b1=y0+(y1-y0)*(x[i+1]-x0)/(x1-x0);const c0=y[i]-b0,c1=y[i+1]-b1,dx=x[i+1]-x[i];const area=(c0+c1)*0.5*dx;signed+=area;absolute+=(Math.abs(c0)+Math.abs(c1))*0.5*dx;if(area>=0)positive+=area;else negative+=area;}return{x0,x1,y0,y1,signedAUC:signed,absoluteAUC:absolute,positiveAUC:positive,negativeAUC:negative};}
+
+el('extremaBtn').onclick=()=>{try{const sample=state.selectedSample;const range=readRangeInputs();const [i0,i1]=rangeIndices(range);state.results.extrema[sample]=state.results.extrema[sample]||{};const rows=[];for(const line of selectedLineList()){const x=state.dataset.distance.slice(i0,i1+1),y=state.dataset.smoothed[sample][line].slice(i0,i1+1);const r=dominantExtrema(x,y);if(r){state.results.extrema[sample][line]={...r,rangeStart:range[0],rangeEnd:range[1]};rows.push({Sample:sample,Line:line,Range_Start_mm:range[0],Range_End_mm:range[1],Local_Max_X_mm:r.xMax,Local_Max_Y:r.yMax,Local_Min_X_mm:r.xMin,Local_Min_Y:r.yMin,Delta_X_mm:r.deltaX,Delta_Y:r.deltaY,Slope_Y_per_mm:r.slope,Max_Prominence:r.maxProminence,Min_Prominence:r.minProminence,Max_Candidates:r.maxCandidates,Min_Candidates:r.minCandidates});}else rows.push({Sample:sample,Line:line,Status:tr('noExtrema')});}renderResultTable('extrema',rows);setStatus(tr('extremaDone'),'good');renderCurrentMode();}catch(e){setStatus(e.message||String(e),'bad');}};
+el('aucBtn').onclick=()=>{try{const sample=state.selectedSample;const range=readRangeInputs();const [i0,i1]=rangeIndices(range);state.results.auc[sample]=state.results.auc[sample]||{};const rows=[];for(const line of selectedLineList()){const xSearch=state.dataset.distance.slice(i0,i1+1),ySearch=state.dataset.smoothed[sample][line].slice(i0,i1+1),peaks=dominantTwoMaxima(xSearch,ySearch);if(!peaks){delete state.results.auc[sample][line];rows.push({Sample:sample,Line:line,Search_Range_Start_mm:range[0],Search_Range_End_mm:range[1],Status:tr('noTwoMaxima')});continue;}const p1=peaks.first,p2=peaks.second,xAuc=xSearch.slice(p1.i,p2.i+1),yAuc=ySearch.slice(p1.i,p2.i+1),r=correctedAUC(xAuc,yAuc);state.results.auc[sample][line]={...r,searchRangeStart:range[0],searchRangeEnd:range[1],peak1X:p1.x,peak1Y:p1.y,peak2X:p2.x,peak2Y:p2.y,peak1Prominence:p1.prom,peak2Prominence:p2.prom,maxCandidates:peaks.maxCandidates,prominenceThreshold:peaks.prominenceThreshold};rows.push({Sample:sample,Line:line,Search_Range_Start_mm:range[0],Search_Range_End_mm:range[1],Peak1_X_mm:p1.x,Peak1_Y:p1.y,Peak2_X_mm:p2.x,Peak2_Y:p2.y,AUC_Start_mm:r.x0,AUC_End_mm:r.x1,Baseline_Start_Y:r.y0,Baseline_End_Y:r.y1,Peak1_Prominence:p1.prom,Peak2_Prominence:p2.prom,Max_Candidates:peaks.maxCandidates,Prominence_Threshold:peaks.prominenceThreshold,Signed_AUC:r.signedAUC,Absolute_AUC:r.absoluteAUC,Positive_AUC:r.positiveAUC,Negative_AUC:r.negativeAUC});}renderResultTable('auc',rows);const hasSuccess=rows.some(r=>Number.isFinite(r.Signed_AUC));setStatus(hasSuccess?tr('aucDone'):tr('noTwoMaxima'),hasSuccess?'good':'warn');renderCurrentMode();}catch(e){setStatus(e.message||String(e),'bad');}};
+
+function getSortedRegions(sample){const regs=(state.meanRegions[sample]||[]).map(r=>({start:r.start,end:r.end}));regs.sort((a,b)=>a.start-b.start||a.end-b.end);return regs;}
+function normalizeStoredRegions(sample){state.meanRegions[sample]=getSortedRegions(sample);}
+function meanAndSampleSD(values){const n=values.length;if(!n)return{n:0,mean:NaN,sd:NaN};const mean=values.reduce((a,b)=>a+b,0)/n;if(n===1)return{n,mean,sd:0};let ss=0;for(const v of values)ss+=(v-mean)**2;return{n,mean,sd:Math.sqrt(ss/(n-1))};}
+function calculateMeanRegionsForSample(sample){
+  const regs=getSortedRegions(sample),rows=[];for(let ri=0;ri<regs.length;ri++){const r=regs[ri];let idx;try{idx=rangeIndices([r.start,r.end]);}catch(_){continue;}const [i0,i1]=idx;for(const line of selectedLineList(sample)){const vals=state.dataset.smoothed[sample][line].slice(i0,i1+1);const st=meanAndSampleSD(vals);rows.push({Sample:sample,Region:`Region ${ri+1}`,Region_No:ri+1,Range_Start_mm:r.start,Range_End_mm:r.end,Line:line,N:st.n,Mean:st.mean,SD:st.sd});}}state.results.mean[sample]=rows;return rows;
 }
-
-function dominantTwoMaxima(x,y){
-  if(y.length<5)return null;
-  const yr=Math.max(...y)-Math.min(...y);
-  const threshold=Math.max(1e-12,yr*0.01);
-  const maxima=[];
-  for(let i=1;i<y.length-1;i++){
-    const d1=y[i]-y[i-1],d2=y[i+1]-y[i];
-    if(d1>0&&d2<=0){
-      const prom=peakProminence(y,i,true);
-      if(prom>=threshold)maxima.push({i,prom,x:x[i],y:y[i]});
-    }
-  }
-  if(maxima.length<2)return null;
-  maxima.sort((a,b)=>b.prom-a.prom);
-  const selected=maxima.slice(0,2).sort((a,b)=>a.i-b.i);
-  return{
-    first:selected[0],
-    second:selected[1],
-    maxCandidates:maxima.length,
-    prominenceThreshold:threshold
-  };
+function renderRegionManager(){
+  if(!state.dataset||state.currentMode!=='intervalMean'){el('regionManager').classList.remove('visible');return;}el('regionManager').classList.add('visible');const regs=getSortedRegions(state.selectedSample);if(!regs.length){el('regionList').innerHTML=`<span class="region-empty">${tr('noRegions')}</span>`;return;}el('regionList').innerHTML=regs.map((r,i)=>`<span class="region-chip"><span>Region ${i+1}: ${fmt(r.start,4)}–${fmt(r.end,4)} mm</span><button type="button" class="region-remove" data-region-index="${i}" aria-label="Remove Region ${i+1}">×</button></span>`).join('');el('regionList').querySelectorAll('.region-remove').forEach(btn=>btn.addEventListener('click',async()=>{const i=Number(btn.dataset.regionIndex);const regsNow=getSortedRegions(state.selectedSample);regsNow.splice(i,1);state.meanRegions[state.selectedSample]=regsNow;if(regsNow.length)calculateMeanRegionsForSample(state.selectedSample);else state.results.mean[state.selectedSample]=[];renderRegionManager();renderMeanResultTable(state.selectedSample);await renderCurrentMode();setStatus(tr('regionRemoved'),'good');}));
 }
+function renderMeanResultTable(sample){const rows=state.results.mean[sample]||[];renderResultTable('mean',rows);}
+el('addRegionBtn').onclick=async()=>{try{const sample=state.selectedSample;const [start,end]=readRangeInputs();const regs=getSortedRegions(sample);if(regs.some(r=>Math.abs(r.start-start)<1e-9&&Math.abs(r.end-end)<1e-9)){setStatus(tr('duplicateRegion'),'warn');return;}regs.push({start,end});state.meanRegions[sample]=regs;normalizeStoredRegions(sample);calculateMeanRegionsForSample(sample);renderRegionManager();renderMeanResultTable(sample);await renderCurrentMode();setStatus(tr('regionAdded'),'good');}catch(e){setStatus(e.message||String(e),'bad');}};
+el('calcMeanBtn').onclick=()=>{try{const regs=getSortedRegions(state.selectedSample);if(!regs.length){setStatus(tr('noRegions'),'warn');return;}calculateMeanRegionsForSample(state.selectedSample);renderMeanResultTable(state.selectedSample);setStatus(tr('meanDone'),'good');}catch(e){setStatus(e.message||String(e),'bad');}};
+el('clearRegionsBtn').onclick=async()=>{state.meanRegions[state.selectedSample]=[];state.results.mean[state.selectedSample]=[];renderRegionManager();renderMeanResultTable(state.selectedSample);await renderCurrentMode();setStatus(tr('regionsCleared'),'good');};
 
-function correctedAUC(x,y){
-  const x0=x[0],x1=x[x.length-1],y0=y[0],y1=y[y.length-1];let signed=0,absolute=0,positive=0,negative=0;for(let i=0;i<x.length-1;i++){const b0=y0+(y1-y0)*(x[i]-x0)/(x1-x0),b1=y0+(y1-y0)*(x[i+1]-x0)/(x1-x0);const c0=y[i]-b0,c1=y[i+1]-b1,dx=x[i+1]-x[i];const area=(c0+c1)*0.5*dx;signed+=area;absolute+=(Math.abs(c0)+Math.abs(c1))*0.5*dx;if(area>=0)positive+=area;else negative+=area;}return{x0,x1,y0,y1,signedAUC:signed,absoluteAUC:absolute,positiveAUC:positive,negativeAUC:negative};
-}
-
-el('extremaBtn').onclick=()=>{
-  try{const sample=state.selectedSample;const range=readRangeInputs();const [i0,i1]=rangeIndices(range);state.results.extrema[sample]=state.results.extrema[sample]||{};const rows=[];for(const line of selectedLineList()){const x=state.dataset.distance.slice(i0,i1+1),y=state.dataset.smoothed[sample][line].slice(i0,i1+1);const r=dominantExtrema(x,y);if(r){state.results.extrema[sample][line]={...r,rangeStart:range[0],rangeEnd:range[1]};rows.push({Sample:sample,Line:line,Range_Start_mm:range[0],Range_End_mm:range[1],Local_Max_X_mm:r.xMax,Local_Max_Y:r.yMax,Local_Min_X_mm:r.xMin,Local_Min_Y:r.yMin,Delta_X_mm:r.deltaX,Delta_Y:r.deltaY,Slope_Y_per_mm:r.slope,Max_Prominence:r.maxProminence,Min_Prominence:r.minProminence,Max_Candidates:r.maxCandidates,Min_Candidates:r.minCandidates});}else{rows.push({Sample:sample,Line:line,Status:tr('noExtrema')});}}
-    renderResultTable('extrema',rows);setStatus(tr('extremaDone'),'good');renderCurrentMode();
-  }catch(e){setStatus(e.message||String(e),'bad');}
-};
-
-el('aucBtn').onclick=()=>{
-  try{
-    const sample=state.selectedSample;
-    const range=readRangeInputs();
-    const [i0,i1]=rangeIndices(range);
-    state.results.auc[sample]=state.results.auc[sample]||{};
-    const rows=[];
-    for(const line of selectedLineList()){
-      const xSearch=state.dataset.distance.slice(i0,i1+1);
-      const ySearch=state.dataset.smoothed[sample][line].slice(i0,i1+1);
-      const peaks=dominantTwoMaxima(xSearch,ySearch);
-      if(!peaks){
-        delete state.results.auc[sample][line];
-        rows.push({Sample:sample,Line:line,Search_Range_Start_mm:range[0],Search_Range_End_mm:range[1],Status:tr('noTwoMaxima')});
-        continue;
-      }
-
-      const p1=peaks.first;
-      const p2=peaks.second;
-      const xAuc=xSearch.slice(p1.i,p2.i+1);
-      const yAuc=ySearch.slice(p1.i,p2.i+1);
-      const r=correctedAUC(xAuc,yAuc);
-
-      state.results.auc[sample][line]={
-        ...r,
-        searchRangeStart:range[0],
-        searchRangeEnd:range[1],
-        peak1X:p1.x,
-        peak1Y:p1.y,
-        peak2X:p2.x,
-        peak2Y:p2.y,
-        peak1Prominence:p1.prom,
-        peak2Prominence:p2.prom,
-        maxCandidates:peaks.maxCandidates,
-        prominenceThreshold:peaks.prominenceThreshold
-      };
-
-      rows.push({
-        Sample:sample,
-        Line:line,
-        Search_Range_Start_mm:range[0],
-        Search_Range_End_mm:range[1],
-        Peak1_X_mm:p1.x,
-        Peak1_Y:p1.y,
-        Peak2_X_mm:p2.x,
-        Peak2_Y:p2.y,
-        AUC_Start_mm:r.x0,
-        AUC_End_mm:r.x1,
-        Baseline_Start_Y:r.y0,
-        Baseline_End_Y:r.y1,
-        Peak1_Prominence:p1.prom,
-        Peak2_Prominence:p2.prom,
-        Max_Candidates:peaks.maxCandidates,
-        Prominence_Threshold:peaks.prominenceThreshold,
-        Signed_AUC:r.signedAUC,
-        Absolute_AUC:r.absoluteAUC,
-        Positive_AUC:r.positiveAUC,
-        Negative_AUC:r.negativeAUC
-      });
-    }
-    renderResultTable('auc',rows);
-    const hasSuccess=rows.some(r=>Number.isFinite(r.Signed_AUC));
-    setStatus(hasSuccess?tr('aucDone'):tr('noTwoMaxima'),hasSuccess?'good':'warn');
-    renderCurrentMode();
-  }catch(e){setStatus(e.message||String(e),'bad');}
-};
-
-function renderResultTable(kind,rows){
-  if(!rows.length){el('resultTableWrap').innerHTML='';return;}const cols=Object.keys(rows.reduce((a,r)=>Object.assign(a,r),{}));const head=cols.map(c=>`<th>${c}</th>`).join('');const body=rows.map(r=>'<tr>'+cols.map(c=>`<td>${typeof r[c]==='number'?fmt(r[c],6):(r[c]??'')}</td>`).join('')+'</tr>').join('');el('resultTableWrap').innerHTML=`<div class="table-wrap"><table class="result-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
-}
-
+function renderResultTable(kind,rows){if(!rows.length){el('resultTableWrap').innerHTML='';return;}const cols=Object.keys(rows.reduce((a,r)=>Object.assign(a,r),{}));const head=cols.map(c=>`<th>${c}</th>`).join('');const body=rows.map(r=>'<tr>'+cols.map(c=>`<td>${typeof r[c]==='number'?fmt(r[c],6):(r[c]??'')}</td>`).join('')+'</tr>').join('');el('resultTableWrap').innerHTML=`<div class="table-wrap"><table class="result-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;}
 el('exportAllToggle').onclick=()=>{state.exportAll=!state.exportAll;el('exportAllToggle').classList.toggle('on',state.exportAll);setStatus(state.exportAll?tr('exportOn'):tr('exportOff'),state.exportAll?'good':'');};
 
 function dataURLtoBlob(dataURL){const [meta,b64]=dataURL.split(',');const mime=meta.match(/:(.*?);/)[1];const bin=atob(b64);const arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);return new Blob([arr],{type:mime});}
@@ -531,34 +331,25 @@ async function plotDivToBlob(div){const url=await Plotly.toImage(div,{format:'pn
 async function imageFromSpec(traces,layout){const tmp=document.createElement('div');tmp.style.cssText='position:fixed;left:-10000px;top:0;width:1400px;height:800px;background:#fff';document.body.appendChild(tmp);try{await Plotly.newPlot(tmp,traces,layout,{displayModeBar:false,staticPlot:true});return await plotDivToBlob(tmp);}finally{try{Plotly.purge(tmp);}catch(_){}tmp.remove();}}
 async function ensureDirPath(root,path){let h=root;for(const part of path.split('/').filter(Boolean))h=await h.getDirectoryHandle(part,{create:true});return h;}
 async function writeBlob(root,path,blob){const parts=path.split('/').filter(Boolean);const name=parts.pop();const dir=await ensureDirPath(root,parts.join('/'));const fh=await dir.getFileHandle(name,{create:true});const w=await fh.createWritable();await w.write(blob);await w.close();}
-
 function appendAoASheet(wb,name,aoa){XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),name.slice(0,31));}
 function appendJsonSheet(wb,name,rows){if(rows.length)XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),name.slice(0,31));}
-function parameterRows(){const d=state.dataset;return[{Parameter:'Input file',Value:state.file?.name||''},{Parameter:'Excitation frequency',Value:d.params.excitation,Unit:'kHz'},{Parameter:'Signal type',Value:d.params.signalType},{Parameter:'Scan speed',Value:d.params.scanSpeed,Unit:'mm/s'},{Parameter:'Scan length',Value:d.params.scanLength,Unit:'mm'},{Parameter:'Estimated notch position',Value:d.params.notchPosition,Unit:'mm'},{Parameter:'Measured samples',Value:d.params.expectedSamples},{Parameter:'Scan duration',Value:d.duration,Unit:'s'},{Parameter:'Common valid length',Value:d.minLength,Unit:'samples'},{Parameter:'Estimated sampling rate',Value:d.fs,Unit:'Hz'},{Parameter:'Distance per sample',Value:d.dx,Unit:'mm/sample'},{Parameter:'SG polynomial order',Value:3},{Parameter:'SG window duration',Value:d.sgWindowSec,Unit:'s'},{Parameter:'SG window samples',Value:d.sgWindow},{Parameter:'SG physical window',Value:d.sgWindowMm,Unit:'mm'}];}
-function datasetSheet(sample,source){const d=state.dataset;const aoa=[['Distance_mm','L1','L2','L3']];for(let i=0;i<d.minLength;i++)aoa.push([d.distance[i],source[sample].L1[i],source[sample].L2[i],source[sample].L3[i]]);return aoa;}
-function allExtremaRows(){const rows=[];for(const s of state.dataset.samples)for(const line of state.dataset.lines){const r=state.results.extrema?.[s]?.[line];if(r)rows.push({Sample:s,Line:line,Range_Start_mm:r.rangeStart,Range_End_mm:r.rangeEnd,Local_Max_X_mm:r.xMax,Local_Max_Y:r.yMax,Local_Min_X_mm:r.xMin,Local_Min_Y:r.yMin,Delta_X_mm:r.deltaX,Delta_Y:r.deltaY,Slope_Y_per_mm:r.slope,Max_Prominence:r.maxProminence,Min_Prominence:r.minProminence,Max_Candidates:r.maxCandidates,Min_Candidates:r.minCandidates});}return rows;}
-function allAucRows(){const rows=[];for(const s of state.dataset.samples)for(const line of state.dataset.lines){const r=state.results.auc?.[s]?.[line];if(r)rows.push({Sample:s,Line:line,Search_Range_Start_mm:r.searchRangeStart,Search_Range_End_mm:r.searchRangeEnd,Peak1_X_mm:r.peak1X,Peak1_Y:r.peak1Y,Peak2_X_mm:r.peak2X,Peak2_Y:r.peak2Y,AUC_Start_mm:r.x0,AUC_End_mm:r.x1,Baseline_Start_Y:r.y0,Baseline_End_Y:r.y1,Peak1_Prominence:r.peak1Prominence,Peak2_Prominence:r.peak2Prominence,Max_Candidates:r.maxCandidates,Prominence_Threshold:r.prominenceThreshold,Signed_AUC:r.signedAUC,Absolute_AUC:r.absoluteAUC,Positive_AUC:r.positiveAUC,Negative_AUC:r.negativeAUC});}return rows;}
+function parameterRows(){const d=state.dataset;return[{Parameter:'Input file',Value:state.file?.name||''},{Parameter:'CID type',Value:state.cidType||''},{Parameter:'Excitation frequency',Value:d.params.excitation,Unit:'kHz'},{Parameter:'Signal type',Value:d.params.signalType},{Parameter:'Scan speed',Value:d.params.scanSpeed,Unit:'mm/s'},{Parameter:'Scan length',Value:d.params.scanLength,Unit:'mm'},{Parameter:'Estimated notch position',Value:d.params.notchPosition,Unit:'mm'},{Parameter:'Measured samples',Value:d.params.expectedSamples},{Parameter:'Detected scan lines',Value:d.lines.length},{Parameter:'Scan line labels',Value:d.lines.join(', ')},{Parameter:'Scan duration',Value:d.duration,Unit:'s'},{Parameter:'Common valid length',Value:d.minLength,Unit:'samples'},{Parameter:'Estimated sampling rate',Value:d.fs,Unit:'Hz'},{Parameter:'Distance per sample',Value:d.dx,Unit:'mm/sample'},{Parameter:'SG polynomial order',Value:3},{Parameter:'SG window duration',Value:d.sgWindowSec,Unit:'s'},{Parameter:'SG window samples',Value:d.sgWindow},{Parameter:'SG physical window',Value:d.sgWindowMm,Unit:'mm'}];}
+function lineColorRows(){return state.dataset.lines.map(line=>({Line:line,Color_HEX:lineColor(line)}));}
+function datasetSheet(sample,source){const d=state.dataset;const lines=d.sampleLines?.[sample]||d.lines;const aoa=[['Distance_mm',...lines]];for(let i=0;i<d.minLength;i++)aoa.push([d.distance[i],...lines.map(line=>source[sample][line][i])]);return aoa;}
+function allExtremaRows(){const rows=[];for(const s of state.dataset.samples)for(const line of (state.dataset.sampleLines?.[s]||state.dataset.lines)){const r=state.results.extrema?.[s]?.[line];if(r)rows.push({Sample:s,Line:line,Range_Start_mm:r.rangeStart,Range_End_mm:r.rangeEnd,Local_Max_X_mm:r.xMax,Local_Max_Y:r.yMax,Local_Min_X_mm:r.xMin,Local_Min_Y:r.yMin,Delta_X_mm:r.deltaX,Delta_Y:r.deltaY,Slope_Y_per_mm:r.slope,Max_Prominence:r.maxProminence,Min_Prominence:r.minProminence,Max_Candidates:r.maxCandidates,Min_Candidates:r.minCandidates});}return rows;}
+function allAucRows(){const rows=[];for(const s of state.dataset.samples)for(const line of (state.dataset.sampleLines?.[s]||state.dataset.lines)){const r=state.results.auc?.[s]?.[line];if(r)rows.push({Sample:s,Line:line,Search_Range_Start_mm:r.searchRangeStart,Search_Range_End_mm:r.searchRangeEnd,Peak1_X_mm:r.peak1X,Peak1_Y:r.peak1Y,Peak2_X_mm:r.peak2X,Peak2_Y:r.peak2Y,AUC_Start_mm:r.x0,AUC_End_mm:r.x1,Baseline_Start_Y:r.y0,Baseline_End_Y:r.y1,Peak1_Prominence:r.peak1Prominence,Peak2_Prominence:r.peak2Prominence,Max_Candidates:r.maxCandidates,Prominence_Threshold:r.prominenceThreshold,Signed_AUC:r.signedAUC,Absolute_AUC:r.absoluteAUC,Positive_AUC:r.positiveAUC,Negative_AUC:r.negativeAUC});}return rows;}
 function rangeRows(){return state.dataset.samples.map(s=>({Sample:s,Range_Start_mm:state.ranges[s]?.[0]??0,Range_End_mm:state.ranges[s]?.[1]??state.dataset.params.scanLength}));}
-function buildWorkbook(mode){
-  const d=state.dataset;const wb=XLSX.utils.book_new();appendJsonSheet(wb,'Parameters',parameterRows());appendJsonSheet(wb,'Length_Audit',d.lengths);
-  if(mode==='raw'){for(const s of d.samples)appendAoASheet(wb,`${s}_Raw`,datasetSheet(s,d.raw));}
-  if(mode==='sg'){for(const s of d.samples)appendAoASheet(wb,`${s}_SG`,datasetSheet(s,d.smoothed));}
-  if(mode==='interval'){appendJsonSheet(wb,'Analysis_Ranges',rangeRows());appendJsonSheet(wb,'Extrema_Results',allExtremaRows());appendJsonSheet(wb,'AUC_Results',allAucRows());for(const s of d.samples)appendAoASheet(wb,`${s}_SG`,datasetSheet(s,d.smoothed));}
-  const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});return new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-}
+function regionSelectionRows(){const rows=[];for(const s of state.dataset.samples){const regs=getSortedRegions(s);regs.forEach((r,i)=>rows.push({Sample:s,Region:`Region ${i+1}`,Region_No:i+1,Range_Start_mm:r.start,Range_End_mm:r.end}));}return rows;}
+function allMeanRows(){const rows=[];for(const s of state.dataset.samples)rows.push(...(state.results.mean[s]||[]));return rows;}
+function recomputeAllMeanResults(){for(const s of state.dataset.samples)if((state.meanRegions[s]||[]).length)calculateMeanRegionsForSample(s);}
+function buildWorkbook(mode){const d=state.dataset;const wb=XLSX.utils.book_new();appendJsonSheet(wb,'Parameters',parameterRows());appendJsonSheet(wb,'Line_Colors',lineColorRows());appendJsonSheet(wb,'Length_Audit',d.lengths);if(mode==='raw'){for(const s of d.samples)appendAoASheet(wb,`${s}_Raw`,datasetSheet(s,d.raw));}if(mode==='sg'){for(const s of d.samples)appendAoASheet(wb,`${s}_SG`,datasetSheet(s,d.smoothed));}if(mode==='interval'){appendJsonSheet(wb,'Analysis_Ranges',rangeRows());appendJsonSheet(wb,'Extrema_Results',allExtremaRows());appendJsonSheet(wb,'AUC_Results',allAucRows());for(const s of d.samples)appendAoASheet(wb,`${s}_SG`,datasetSheet(s,d.smoothed));}if(mode==='intervalMean'){recomputeAllMeanResults();appendJsonSheet(wb,'Region_Selections',regionSelectionRows());appendJsonSheet(wb,'Interval_Mean_Results',allMeanRows());for(const s of d.samples)appendAoASheet(wb,`${s}_SG`,datasetSheet(s,d.smoothed));}const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});return new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});}
 
-async function buildAllSamplePlotEntries(mode){
-  const d=state.dataset;const entries=[];for(let i=0;i<d.samples.length;i++){const s=d.samples[i];el('progress').textContent=`${tr('saving')} ${s} (${i+1}/${d.samples.length})`;const plotMode=mode==='raw'?'raw':(mode==='sg'?'sg':'interval');const traces=makeTracesForSampleExport(s,plotMode);const layout=baseLayout(tr(modeInfo[mode].title),plotMode,s);entries.push({path:`Individual/${s}_${mode}.png`,blob:await imageFromSpec(traces,layout)});}return entries;
-}
-function makeTracesForSampleExport(sample,mode){const d=state.dataset;const source=mode==='raw'?d.raw:d.smoothed;const traces=[];for(const line of selectedLineList())traces.push({x:d.distance,y:source[sample][line],type:'scatter',mode:'lines',name:line,line:{width:mode==='raw'?1.5:2.2,color:lineColor(line)}});if(mode==='interval'){for(const line of selectedLineList()){const ex=state.results.extrema?.[sample]?.[line];if(ex){traces.push({x:[ex.xMax],y:[ex.yMax],type:'scatter',mode:'markers',name:`${line} max`,marker:{size:11,symbol:'triangle-up',color:lineColor(line)}});traces.push({x:[ex.xMin],y:[ex.yMin],type:'scatter',mode:'markers',name:`${line} min`,marker:{size:11,symbol:'triangle-down',color:lineColor(line)}});}const au=state.results.auc?.[sample]?.[line];if(au){traces.push({x:[au.peak1X,au.peak2X],y:[au.peak1Y,au.peak2Y],type:'scatter',mode:'markers',name:`${line} AUC maxima`,marker:{size:10,symbol:'circle-open',color:lineColor(line)}});traces.push({x:[au.x0,au.x1],y:[au.y0,au.y1],type:'scatter',mode:'lines',name:`${line} AUC baseline`,line:{width:1.4,dash:'dot',color:lineColor(line)}});}}}return traces;}
+async function buildAllSamplePlotEntries(mode){const d=state.dataset;const entries=[];for(let i=0;i<d.samples.length;i++){const s=d.samples[i];el('progress').textContent=`${tr('saving')} ${s} (${i+1}/${d.samples.length})`;const traces=makeTracesForSampleExport(s,mode);const layout=baseLayout(tr(modeInfo[mode].title),mode,s);entries.push({path:`Individual/${s}_${mode}.png`,blob:await imageFromSpec(traces,layout)});}return entries;}
+function makeTracesForSampleExport(sample,mode){const d=state.dataset;const source=mode==='raw'?d.raw:d.smoothed;const traces=[];for(const line of selectedLineList(sample))traces.push({x:d.distance,y:source[sample][line],type:'scatter',mode:'lines',name:line,line:{width:mode==='raw'?1.5:2.2,color:lineColor(line)}});if(mode==='interval'){for(const line of selectedLineList(sample)){const ex=state.results.extrema?.[sample]?.[line];if(ex){traces.push({x:[ex.xMax],y:[ex.yMax],type:'scatter',mode:'markers',name:`${line} max`,marker:{size:11,symbol:'triangle-up',color:lineColor(line)}});traces.push({x:[ex.xMin],y:[ex.yMin],type:'scatter',mode:'markers',name:`${line} min`,marker:{size:11,symbol:'triangle-down',color:lineColor(line)}});}const au=state.results.auc?.[sample]?.[line];if(au){traces.push({x:[au.peak1X,au.peak2X],y:[au.peak1Y,au.peak2Y],type:'scatter',mode:'markers',name:`${line} AUC maxima`,marker:{size:10,symbol:'circle-open',color:lineColor(line)}});traces.push({x:[au.x0,au.x1],y:[au.y0,au.y1],type:'scatter',mode:'lines',name:`${line} AUC baseline`,line:{width:1.4,dash:'dot',color:lineColor(line)}});}}}return traces;}
 
 el('saveBtn').onclick=async()=>{
-  if(!state.dataset||!state.currentMode||!state.currentPlot){setStatus(tr('needRead'),'bad');return;}if(!state.saveHandle){setStatus(tr('needFolder'),'bad');return;}
-  el('saveBtn').disabled=true;el('progress').classList.add('visible');el('progress').textContent=tr('saving');
-  try{
-    const mode=state.currentMode;const folder=modeInfo[mode].folder;const entries=[{path:`${state.selectedSample}_${mode}_current.png`,blob:await plotDivToBlob(state.currentPlot)},{path:`CID_Scan_${mode}_Results.xlsx`,blob:buildWorkbook(mode)}];if(state.exportAll)entries.push(...await buildAllSamplePlotEntries(mode));
-    for(let i=0;i<entries.length;i++){el('progress').textContent=`${tr('saving')} ${i+1}/${entries.length}`;await writeBlob(state.saveHandle,`${folder}/${entries[i].path}`,entries[i].blob);}setStatus(tr('saved'),'good');
-  }catch(err){console.error(err);setStatus(`${tr('saveFailed')}: ${err.message||err}`,'bad');}finally{el('saveBtn').disabled=false;el('progress').classList.remove('visible');}
+  if(!state.dataset||!state.currentMode||!state.currentPlot){setStatus(tr('needRead'),'bad');return;}if(!state.saveHandle){setStatus(tr('needFolder'),'bad');return;}el('saveBtn').disabled=true;el('progress').classList.add('visible');el('progress').textContent=tr('saving');
+  try{const mode=state.currentMode;if(mode==='intervalMean')recomputeAllMeanResults();const folder=modeInfo[mode].folder;const entries=[{path:`${state.selectedSample}_${mode}_current.png`,blob:await plotDivToBlob(state.currentPlot)},{path:`CID_Scan_${mode}_Results.xlsx`,blob:buildWorkbook(mode)}];if(state.exportAll)entries.push(...await buildAllSamplePlotEntries(mode));for(let i=0;i<entries.length;i++){el('progress').textContent=`${tr('saving')} ${i+1}/${entries.length}`;await writeBlob(state.saveHandle,`${folder}/${entries[i].path}`,entries[i].blob);}setStatus(tr('saved'),'good');}catch(err){console.error(err);setStatus(`${tr('saveFailed')}: ${err.message||err}`,'bad');}finally{el('saveBtn').disabled=false;el('progress').classList.remove('visible');}
 };
 </script>
 </body>
