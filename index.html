@@ -400,11 +400,9 @@
 
     const visitorCountElement = document.getElementById("visitorCount");
 
-    const COUNTER_NAMESPACE = "gangmin-shin.github.io";
-    const COUNTER_KEY = "innereye-data-processing-homepage-visitors";
-    const COUNTER_BASE = "https://api.countapi.xyz";
-
-    const VISITOR_STORAGE_KEY = "innereye_homepage_visitor_counted";
+    const COUNTER_BASE = "https://countapi.mileshilliard.com/api/v1";
+    const COUNTER_KEY =
+      "gangmin-shin-github-io-innereye-data-processing-homepage-visitors";
 
     function displayVisitorCount(value) {
       const number = Number(value);
@@ -419,12 +417,10 @@
 
     async function loadVisitorCount() {
       try {
-        const alreadyCounted =
-          localStorage.getItem(VISITOR_STORAGE_KEY) === "true";
+        visitorCountElement.textContent = "...";
 
-        const endpoint = alreadyCounted
-          ? `${COUNTER_BASE}/get/${COUNTER_NAMESPACE}/${COUNTER_KEY}`
-          : `${COUNTER_BASE}/hit/${COUNTER_NAMESPACE}/${COUNTER_KEY}`;
+        const endpoint =
+          `${COUNTER_BASE}/hit/${COUNTER_KEY}?_=${Date.now()}`;
 
         const response = await fetch(endpoint, {
           method: "GET",
@@ -442,13 +438,6 @@
           typeof data.value !== "undefined"
         ) {
           displayVisitorCount(data.value);
-
-          if (!alreadyCounted) {
-            localStorage.setItem(
-              VISITOR_STORAGE_KEY,
-              "true"
-            );
-          }
         } else {
           throw new Error("Invalid visitor counter response");
         }
@@ -459,7 +448,9 @@
       }
     }
 
-    loadVisitorCount();
+    window.addEventListener("pageshow", () => {
+      loadVisitorCount();
+    });
   </script>
 </body>
 </html>
