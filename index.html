@@ -8,49 +8,458 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root{--ink:#111827;--muted:#667085;--line:#e5e7eb;--soft:#f7f8fa;--accent:#111827}
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0;min-height:100%}
-    body{margin:0;min-height:100vh;background:#fff;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;position:relative}
-    body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.62),rgba(255,255,255,.62)),url("./Homepage.jpg");background-size:cover;background-position:center;background-repeat:no-repeat;opacity:.20;filter:saturate(.72) brightness(1.08) contrast(.92);z-index:-2}
-    body::after{content:"";position:fixed;inset:0;background:rgba(255,255,255,.22);z-index:-1}
-    .shell{min-height:100vh;padding:44px 52px;position:relative;overflow:hidden}
-    .brand{font-size:15px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
-    .lang-btn{position:fixed;top:28px;right:32px;width:48px;height:48px;border:1px solid var(--line);border-radius:50%;background:#fff;cursor:pointer;font-size:22px;box-shadow:0 7px 24px rgba(17,24,39,.07);z-index:10}
-    .hero{max-width:920px;margin:15vh auto 0;text-align:center}
-    .eyebrow{color:var(--muted);font-size:14px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
-    h1{margin:16px 0 18px;font-size:clamp(44px,6vw,82px);line-height:.98;letter-spacing:-.055em;font-weight:800}
-    .hero p{max-width:680px;margin:0 auto;color:var(--muted);font-size:18px;line-height:1.7;font-weight:600}
-    .tabs{position:fixed;left:40px;bottom:36px;display:flex;flex-direction:column;align-items:flex-start;gap:10px;z-index:10;max-height:calc(100vh - 130px);overflow:auto;padding-right:8px}
-    .tab{display:inline-flex;align-items:center;gap:10px;min-height:54px;min-width:280px;padding:0 20px;border:1px solid var(--line);border-radius:16px;background:#fff;color:var(--ink);text-decoration:none;font-size:15px;font-weight:800;box-shadow:0 10px 32px rgba(17,24,39,.08);transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
-    .tab:hover{transform:translateY(-2px);border-color:#c9cdd5;box-shadow:0 14px 38px rgba(17,24,39,.12)}
-    .tab .dot{width:9px;height:9px;border-radius:50%;background:#1f7a4d;flex:0 0 auto}
-    .tab.normalization .dot{background:#2563eb}.tab.multi .dot{background:#7c3aed}.tab.scan .dot{background:#d97706}.tab.quality .dot{background:#0f766e}
-    @media(max-width:720px){.shell{padding:28px 22px}.hero{margin-top:16vh}.tabs{left:20px;bottom:22px;max-width:calc(100vw - 40px)}.tab{min-height:50px;min-width:min(300px,calc(100vw - 40px));padding:0 17px;font-size:13px}.lang-btn{right:20px;top:20px}}
+    :root{
+      --ink:#111827;
+      --muted:#667085;
+      --line:#e5e7eb;
+      --soft:#f7f8fa;
+      --accent:#111827
+    }
+
+    *{
+      box-sizing:border-box
+    }
+
+    html,body{
+      margin:0;
+      padding:0;
+      min-height:100%
+    }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      background:#fff;
+      color:var(--ink);
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+      position:relative
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.62),rgba(255,255,255,.62)),
+        url("./Homepage.jpg");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      opacity:.20;
+      filter:saturate(.72) brightness(1.08) contrast(.92);
+      z-index:-2
+    }
+
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:rgba(255,255,255,.22);
+      z-index:-1
+    }
+
+    .shell{
+      min-height:100vh;
+      padding:44px 52px;
+      position:relative;
+      overflow:hidden
+    }
+
+    .top-controls{
+      position:fixed;
+      top:28px;
+      right:32px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      z-index:10
+    }
+
+    .lang-btn{
+      width:48px;
+      height:48px;
+      border:1px solid var(--line);
+      border-radius:50%;
+      background:#fff;
+      cursor:pointer;
+      font-size:22px;
+      box-shadow:0 7px 24px rgba(17,24,39,.07);
+      flex:0 0 auto
+    }
+
+    .visitor-counter{
+      height:48px;
+      padding:0 17px;
+      border:1px solid var(--line);
+      border-radius:24px;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      white-space:nowrap;
+      box-shadow:0 7px 24px rgba(17,24,39,.07);
+      color:var(--ink)
+    }
+
+    .visitor-label{
+      color:var(--muted);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.09em;
+      text-transform:uppercase
+    }
+
+    .visitor-value{
+      min-width:20px;
+      text-align:right;
+      font-size:14px;
+      font-weight:800;
+      font-variant-numeric:tabular-nums
+    }
+
+    .hero{
+      max-width:920px;
+      margin:15vh auto 0;
+      text-align:center
+    }
+
+    h1{
+      margin:16px 0 18px;
+      font-size:clamp(44px,6vw,82px);
+      line-height:.98;
+      letter-spacing:-.055em;
+      font-weight:800
+    }
+
+    .tabs{
+      position:fixed;
+      left:40px;
+      bottom:36px;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:10px;
+      z-index:10;
+      max-height:calc(100vh - 130px);
+      overflow:auto;
+      padding-right:8px
+    }
+
+    .tab{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      min-height:54px;
+      min-width:280px;
+      padding:0 20px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#fff;
+      color:var(--ink);
+      text-decoration:none;
+      font-size:15px;
+      font-weight:800;
+      box-shadow:0 10px 32px rgba(17,24,39,.08);
+      transition:
+        transform .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease
+    }
+
+    .tab:hover{
+      transform:translateY(-2px);
+      border-color:#c9cdd5;
+      box-shadow:0 14px 38px rgba(17,24,39,.12)
+    }
+
+    .tab .dot{
+      width:9px;
+      height:9px;
+      border-radius:50%;
+      background:#1f7a4d;
+      flex:0 0 auto
+    }
+
+    .tab.normalization .dot{
+      background:#2563eb
+    }
+
+    .tab.multi .dot{
+      background:#7c3aed
+    }
+
+    .tab.scan .dot{
+      background:#d97706
+    }
+
+    .tab.quality .dot{
+      background:#0f766e
+    }
+
+    .homepage-credit{
+      position:fixed;
+      right:32px;
+      bottom:28px;
+      z-index:10;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:7px
+    }
+
+    .homepage-credit img{
+      display:block;
+      width:120px;
+      height:auto;
+      max-height:90px;
+      object-fit:contain
+    }
+
+    .homepage-credit span{
+      color:var(--muted);
+      font-size:11px;
+      font-weight:600;
+      letter-spacing:.01em;
+      white-space:nowrap
+    }
+
+    @media(max-width:720px){
+      .shell{
+        padding:28px 22px
+      }
+
+      .hero{
+        margin-top:16vh
+      }
+
+      .tabs{
+        left:20px;
+        bottom:22px;
+        max-width:calc(100vw - 40px)
+      }
+
+      .tab{
+        min-height:50px;
+        min-width:min(300px,calc(100vw - 40px));
+        padding:0 17px;
+        font-size:13px
+      }
+
+      .top-controls{
+        top:20px;
+        right:20px;
+        gap:8px
+      }
+
+      .lang-btn{
+        width:44px;
+        height:44px;
+        font-size:20px
+      }
+
+      .visitor-counter{
+        height:44px;
+        padding:0 13px;
+        gap:6px
+      }
+
+      .visitor-label{
+        font-size:9px
+      }
+
+      .visitor-value{
+        font-size:12px
+      }
+
+      .homepage-credit{
+        right:20px;
+        bottom:22px
+      }
+
+      .homepage-credit img{
+        width:90px;
+        max-height:70px
+      }
+
+      .homepage-credit span{
+        font-size:9px
+      }
+    }
   </style>
 </head>
+
 <body>
   <main class="shell">
-    <div class="brand">INNEREYE · DATA PROCESSING</div>
-    <button id="langBtn" class="lang-btn" aria-label="Change language" title="Language">🌐</button>
-    <section class="hero"><div class="eyebrow" data-i18n="eyebrow">Homepage.</div><h1 data-i18n="title">Homepage.</h1><p data-i18n="desc">Open a processing module, load a standardized measurement workbook, inspect the signal, and export processed results directly from your browser.</p></section>
+
+    <div class="top-controls">
+      <button
+        id="langBtn"
+        class="lang-btn"
+        aria-label="Change language"
+        title="Language"
+      >🌐</button>
+
+      <div
+        class="visitor-counter"
+        aria-label="Homepage visitor count"
+        title="Homepage visitors"
+      >
+        <span class="visitor-label" data-i18n="visitors">Visitors</span>
+        <span
+          id="visitorCount"
+          class="visitor-value"
+          aria-live="polite"
+        >...</span>
+      </div>
+    </div>
+
+    <section class="hero">
+      <h1 data-i18n="title">Homepage.</h1>
+    </section>
+
     <nav class="tabs" aria-label="Processing modules">
-      <a class="tab" href="./CID%20preprocessing.html"><span class="dot"></span><span data-i18n="cid">CID preprocessing</span></a>
-      <a class="tab normalization" href="./Normalization%20assessment.html"><span class="dot"></span><span data-i18n="normalization">Normalization assessment</span></a>
-      <a class="tab multi" href="./CID%20multi%20point%20analysis.html"><span class="dot"></span><span data-i18n="multi">CID multi point analysis</span></a>
-      <a class="tab scan" href="./CID%20Scan%20analysis.html"><span class="dot"></span><span data-i18n="scan">CID Scan analysis</span></a>
-      <a class="tab quality" href="./Quality%20Control.html"><span class="dot"></span><span data-i18n="quality">Quality Control</span></a>
+      <a class="tab" href="./CID%20preprocessing.html">
+        <span class="dot"></span>
+        <span data-i18n="cid">CID preprocessing</span>
+      </a>
+
+      <a class="tab normalization" href="./Normalization%20assessment.html">
+        <span class="dot"></span>
+        <span data-i18n="normalization">Normalization assessment</span>
+      </a>
+
+      <a class="tab multi" href="./CID%20multi%20point%20analysis.html">
+        <span class="dot"></span>
+        <span data-i18n="multi">CID multi point analysis</span>
+      </a>
+
+      <a class="tab scan" href="./CID%20Scan%20analysis.html">
+        <span class="dot"></span>
+        <span data-i18n="scan">CID Scan analysis</span>
+      </a>
+
+      <a class="tab quality" href="./Quality%20Control.html">
+        <span class="dot"></span>
+        <span data-i18n="quality">Quality Control</span>
+      </a>
     </nav>
+
+    <div class="homepage-credit">
+      <img
+        src="./Homepage%20Logo.jpg"
+        alt="Homepage Logo"
+      >
+      <span>made by GangMin Shin</span>
+    </div>
+
   </main>
+
   <script>
-    const T={
-      en:{eyebrow:"Homepage.",title:"Homepage.",desc:"Open a processing module, load a standardized measurement workbook, inspect the signal, and export processed results directly from your browser.",cid:"CID preprocessing",normalization:"Normalization assessment",multi:"CID multi point analysis",scan:"CID Scan analysis",quality:"Quality Control"},
-      ko:{eyebrow:"홈페이지.",title:"홈페이지.",desc:"처리 모듈을 열고 표준화된 측정 엑셀을 불러온 뒤 신호를 확인하고 전처리 결과를 브라우저에서 바로 저장합니다.",cid:"CID 전처리",normalization:"정규분포 평가",multi:"CID 멀티 포인트 분석",scan:"CID 스캔 분석",quality:"품질 관리"}
+    const T = {
+      en: {
+        title: "Homepage.",
+        visitors: "Visitors",
+        cid: "CID preprocessing",
+        normalization: "Normalization assessment",
+        multi: "CID multi point analysis",
+        scan: "CID Scan analysis",
+        quality: "Quality Control"
+      },
+      ko: {
+        title: "홈페이지.",
+        visitors: "방문자",
+        cid: "CID 전처리",
+        normalization: "정규분포 평가",
+        multi: "CID 멀티 포인트 분석",
+        scan: "CID 스캔 분석",
+        quality: "품질 관리"
+      }
     };
-    let lang=localStorage.getItem("innereye_lang")||"en";
-    function renderLanguage(){document.documentElement.lang=lang;document.querySelectorAll("[data-i18n]").forEach(el=>{const key=el.dataset.i18n;if(T[lang]&&T[lang][key])el.textContent=T[lang][key];});}
-    document.getElementById("langBtn").addEventListener("click",()=>{lang=lang==="en"?"ko":"en";localStorage.setItem("innereye_lang",lang);renderLanguage();});
+
+    let lang = localStorage.getItem("innereye_lang") || "en";
+
+    function renderLanguage() {
+      document.documentElement.lang = lang;
+
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.dataset.i18n;
+
+        if (T[lang] && T[lang][key]) {
+          el.textContent = T[lang][key];
+        }
+      });
+    }
+
+    document.getElementById("langBtn").addEventListener("click", () => {
+      lang = lang === "en" ? "ko" : "en";
+      localStorage.setItem("innereye_lang", lang);
+      renderLanguage();
+    });
+
     renderLanguage();
+
+    const visitorCountElement = document.getElementById("visitorCount");
+
+    const COUNTER_NAMESPACE = "gangmin-shin.github.io";
+    const COUNTER_KEY = "innereye-data-processing-homepage-visitors";
+    const COUNTER_BASE = "https://api.countapi.xyz";
+
+    const VISITOR_STORAGE_KEY = "innereye_homepage_visitor_counted";
+
+    function displayVisitorCount(value) {
+      const number = Number(value);
+
+      if (Number.isFinite(number)) {
+        visitorCountElement.textContent =
+          new Intl.NumberFormat().format(number);
+      } else {
+        visitorCountElement.textContent = "--";
+      }
+    }
+
+    async function loadVisitorCount() {
+      try {
+        const alreadyCounted =
+          localStorage.getItem(VISITOR_STORAGE_KEY) === "true";
+
+        const endpoint = alreadyCounted
+          ? `${COUNTER_BASE}/get/${COUNTER_NAMESPACE}/${COUNTER_KEY}`
+          : `${COUNTER_BASE}/hit/${COUNTER_NAMESPACE}/${COUNTER_KEY}`;
+
+        const response = await fetch(endpoint, {
+          method: "GET",
+          cache: "no-store"
+        });
+
+        if (!response.ok) {
+          throw new Error(`Visitor counter error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (
+          data &&
+          typeof data.value !== "undefined"
+        ) {
+          displayVisitorCount(data.value);
+
+          if (!alreadyCounted) {
+            localStorage.setItem(
+              VISITOR_STORAGE_KEY,
+              "true"
+            );
+          }
+        } else {
+          throw new Error("Invalid visitor counter response");
+        }
+
+      } catch (error) {
+        console.error("Visitor counter failed:", error);
+        visitorCountElement.textContent = "--";
+      }
+    }
+
+    loadVisitorCount();
   </script>
 </body>
 </html>
