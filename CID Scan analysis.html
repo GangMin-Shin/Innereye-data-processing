@@ -194,6 +194,7 @@ function applyLanguage(){
   el('tabResetBtn').title=tr('tabResetTitle');el('tabResetBtn').setAttribute('aria-label',tr('tabResetTitle'));
   if(state.currentMode&&state.dataset)activateMode(state.currentMode,false);
 }
+
 el('langBtn').onclick=()=>{lang=lang==='en'?'ko':'en';localStorage.setItem('innereye_lang',lang);applyLanguage();};
 applyLanguage();
 
@@ -202,16 +203,41 @@ function clearAnalysisUi(){
   purgeCurrentPlot();state.dataset=null;state.currentMode=null;state.selectedSample=null;state.ranges={};state.visibleRanges={};state.meanSettings={};state.results={extrema:{},auc:{},mean:{},notchSlope:{}};state.selectedLines=new Set();state.exportAll=false;
   document.querySelectorAll('.analysis-btn').forEach(b=>b.classList.remove('active'));el('exportAllToggle').classList.remove('on');el('actions').classList.remove('visible');el('analysisControls').classList.remove('visible');el('sampleSelect').innerHTML='';el('lineRow').innerHTML='';el('rangeStart').value='';el('rangeEnd').value='';el('resultTableWrap').innerHTML='';el('regionList').innerHTML='';el('regionManager').classList.remove('visible');el('resultTitle').textContent=tr('result');el('resultSub').textContent=tr('chooseAnalysis');el('plots').innerHTML=`<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;el('progress').textContent='';el('progress').classList.remove('visible');el('saveBtn').disabled=false;
 }
+
 function resetDataset(){
   clearAnalysisUi();state.readCache=null;state.lineColors={};el('detected').innerHTML='';el('colorOptions').innerHTML='';el('colorsSection').hidden=true;el('analyzeBtn').hidden=true;setStatus(tr('ready'));
 }
+
 function invalidatePreparedData(){if(!state.readCache&&!state.dataset)return;resetDataset();setStatus(tr('inputsChanged'),'warn');}
 
-const TEMPLATE_FILE_PATH='./CID Scan data 분석용 양식.xlsx';
 const TEMPLATE_DOWNLOAD_NAME='CID Scan data 분석용 양식.xlsx';
 
+function buildTemplateWorkbook(){
+  const sampleCount=Math.max(1,Math.trunc(Number(el('expectedSamples').value)||BASE_DEFAULTS.expectedSamples));
+  const wb=XLSX.utils.book_new();
+
+  for(let i=1;i<=sampleCount;i++){
+    const ws=XLSX.utils.aoa_to_sheet([['L1']]);
+    ws['!cols']=[{wch:18}];
+    XLSX.utils.book_append_sheet(wb,ws,`S${i}`);
+  }
+
+  return wb;
+}
+
 el('excelBrowseBtn').onclick=()=>el('excelInput').click();
-el('downloadTemplateBtn').onclick=()=>{const a=document.createElement('a');a.href=encodeURI(TEMPLATE_FILE_PATH);a.download=TEMPLATE_DOWNLOAD_NAME;document.body.appendChild(a);a.click();a.remove();setStatus(tr('templateDownloadStarted'),'good');};
+
+el('downloadTemplateBtn').onclick=()=>{
+  try{
+    const wb=buildTemplateWorkbook();
+    XLSX.writeFile(wb,TEMPLATE_DOWNLOAD_NAME,{bookType:'xlsx',compression:true});
+    setStatus(tr('templateDownloadStarted'),'good');
+  }catch(e){
+    console.error(e);
+    setStatus(e.message||String(e),'bad');
+  }
+};
+
 el('setDefaultBtn').onclick=()=>{try{const p=getParams();localStorage.setItem(defaultStorageKey(),JSON.stringify(p));setStatus(tr('defaultSaved'),'good');}catch(e){setStatus(e.message||String(e),'bad');}};
 el('excelInput').addEventListener('change',e=>{state.file=e.target.files[0]||null;el('filename').textContent=state.file?state.file.name:tr('noFile');resetDataset();});
 el('folderBtn').onclick=async()=>{if(!window.showDirectoryPicker){setStatus(tr('folderUnsupported'),'bad');return;}try{state.saveHandle=await window.showDirectoryPicker({mode:'readwrite',id:'innereye-cid-scan-output'});el('folderName').textContent=state.saveHandle.name;setStatus(tr('folderSelected'),'good');}catch(e){if(e.name!=='AbortError')setStatus(String(e.message||e),'bad');}};
@@ -220,6 +246,7 @@ el('folderBtn').onclick=async()=>{if(!window.showDirectoryPicker){setStatus(tr('
 function resetAll(){
   state.file=null;state.saveHandle=null;el('excelInput').value='';el('filename').textContent=tr('noFile');el('folderName').textContent=tr('notSelected');applyStoredDefaults();resetDataset();setStatus(tr('fullResetDone'),'good');
 }
+
 async function resetCurrentAnalysis(){
   if(!state.dataset||!state.currentMode){setStatus(tr('needRead'),'bad');return;}
   const mode=state.currentMode;purgeCurrentPlot();state.selectedSample=state.dataset.samples[0];resetSelectedLines();state.exportAll=false;el('exportAllToggle').classList.remove('on');el('resultTableWrap').innerHTML='';
@@ -227,6 +254,7 @@ async function resetCurrentAnalysis(){
   if(mode==='intervalMean'){state.visibleRanges={};state.ranges={};state.meanSettings={};state.results.mean={};state.results.notchSlope={};state.dataset.samples.forEach(s=>{state.ranges[s]=[0,state.dataset.params.scanLength];});ensureMeanSetting(state.selectedSample);}
   populateSampleSelect();renderLineToggles();syncRangeInputs();if(mode==='intervalMean')syncMeanControls();renderRegionManager();await renderCurrentMode();setStatus(tr('tabResetDone'),'good');
 }
+
 el('globalResetBtn').onclick=resetAll;el('tabResetBtn').onclick=resetCurrentAnalysis;
 
 function getParams(){const p={excitation:Number(el('excitation').value),sgWindowSec:Number(el('sgWindowSec').value),signalType:el('signalType').value,scanSpeed:Number(el('scanSpeed').value),scanLength:Number(el('scanLength').value),notchPosition:Number(el('notchPosition').value),expectedSamples:Number(el('expectedSamples').value)};if(!(p.excitation>0&&p.sgWindowSec>0&&p.scanSpeed>0&&p.scanLength>0&&Number.isInteger(p.expectedSamples)&&p.expectedSamples>0&&Number.isFinite(p.notchPosition)))throw new Error(tr('invalidParams'));return p;}
@@ -250,6 +278,7 @@ function renderColorOptions(){
   const d=state.readCache||state.dataset;if(!d){el('colorOptions').innerHTML='';el('colorsSection').hidden=true;return;}initializeLineColors(d.lines);el('colorOptions').innerHTML=d.lines.map(line=>`<label class="color-opt"><input type="color" data-color-line="${line}" value="${lineColor(line)}"><span>${line}</span></label>`).join('');el('colorsSection').hidden=false;
   el('colorOptions').querySelectorAll('input[data-color-line]').forEach(input=>input.addEventListener('change',()=>{state.lineColors[input.dataset.colorLine]=input.value;if(state.currentMode)renderCurrentMode();}));
 }
+
 function resetSelectedLines(){const d=state.dataset||state.readCache;state.selectedLines=new Set(d?d.lines:[]);renderLineToggles();}
 function renderLineToggles(){
   const d=state.dataset;if(!d){el('lineRow').innerHTML='';return;}const available=d.sampleLines?.[state.selectedSample]||d.lines;
@@ -304,6 +333,7 @@ function baseLayout(title,mode,sample){
   if(mode==='interval'||mode==='intervalMean'){const r=state.ranges[sample]||[0,d.params.scanLength];layout.shapes.push({type:'rect',x0:r[0],x1:r[1],y0:0,y1:1,yref:'paper',editable:false,fillcolor:'rgba(37,99,235,.08)',line:{color:'rgba(37,99,235,.45)',width:1}});}
   return layout;
 }
+
 function selectedLineList(sample=state.selectedSample){const available=state.dataset.sampleLines?.[sample]||state.dataset.lines;return available.filter(l=>state.selectedLines.has(l));}
 function displayLineList(sample=state.selectedSample){return selectedLineList(sample);}
 function makeTraces(sample,mode){const d=state.dataset;const source=mode==='raw'?d.raw:d.smoothed;const traces=[];for(const line of displayLineList(sample))traces.push({x:d.distance,y:source[sample][line],type:'scatter',mode:'lines',name:`${line} · ${mode==='raw'?tr('rawLegend'):tr('sgLegend')}`,line:{width:mode==='raw'?1.5:2.2,color:lineColor(line)},hovertemplate:'x=%{x:.4f} mm<br>y=%{y:.6f}<extra>'+line+'</extra>'});if(mode==='interval'){for(const line of selectedLineList(sample)){const ex=state.results.extrema?.[sample]?.[line];if(ex){traces.push({x:[ex.xMax],y:[ex.yMax],type:'scatter',mode:'markers',name:`${line} local max`,marker:{size:11,symbol:'triangle-up',color:lineColor(line),line:{color:'#111827',width:1}}});traces.push({x:[ex.xMin],y:[ex.yMin],type:'scatter',mode:'markers',name:`${line} local min`,marker:{size:11,symbol:'triangle-down',color:lineColor(line),line:{color:'#111827',width:1}}});}const au=state.results.auc?.[sample]?.[line];if(au){traces.push({x:[au.peak1X,au.peak2X],y:[au.peak1Y,au.peak2Y],type:'scatter',mode:'markers',name:`${line} AUC maxima`,marker:{size:10,symbol:'circle-open',color:lineColor(line),line:{color:'#111827',width:1.2}}});traces.push({x:[au.x0,au.x1],y:[au.y0,au.y1],type:'scatter',mode:'lines',name:`${line} AUC baseline`,line:{width:1.4,dash:'dot',color:lineColor(line)},opacity:.75});}}}if(mode==='intervalMean'){for(const line of selectedLineList(sample)){const rows=state.results.mean?.[sample]?.[line]||[];const meta=rows[0];if(meta&&Number.isFinite(meta.Min1_X_mm)&&Number.isFinite(meta.Min2_X_mm)){traces.push({x:[meta.Min1_X_mm,meta.Min2_X_mm],y:[meta.Min1_Y,meta.Min2_Y],type:'scatter',mode:'markers',name:`${line} minima`,marker:{size:10,symbol:'triangle-down',color:lineColor(line),line:{color:'#111827',width:1}}});}}}return traces;}
