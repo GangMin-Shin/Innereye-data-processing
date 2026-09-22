@@ -335,23 +335,64 @@ function baseLayout(title,mode,sample){
 
 function selectedLineList(sample=state.selectedSample){const available=state.dataset.sampleLines?.[sample]||state.dataset.lines;return available.filter(l=>state.selectedLines.has(l));}
 function displayLineList(sample=state.selectedSample){return selectedLineList(sample);}
-function appendAucVisualization(traces,sample,line,au){
-  if(!au||!Number.isFinite(au.x0)||!Number.isFinite(au.x1)||!Number.isFinite(au.y0)||!Number.isFinite(au.y1)||!(au.x1>au.x0))return;
+function aucSegmentData(sample,line,au){
+  if(!au||!Number.isFinite(au.x0)||!Number.isFinite(au.x1)||!Number.isFinite(au.y0)||!Number.isFinite(au.y1)||!(au.x1>au.x0))return null;
   const d=state.dataset;
   const yAll=d.smoothed?.[sample]?.[line];
-  if(!Array.isArray(yAll))return;
+  if(!Array.isArray(yAll))return null;
   const i0=clamp(Math.ceil(au.x0/d.dx),0,d.minLength-1);
   const i1=clamp(Math.floor(au.x1/d.dx),0,d.minLength-1);
-  if(i1-i0<1)return;
+  if(i1-i0<1)return null;
   const x=d.distance.slice(i0,i1+1);
   const y=yAll.slice(i0,i1+1);
   const baseline=x.map(xi=>au.y0+(au.y1-au.y0)*(xi-au.x0)/(au.x1-au.x0));
-  traces.push({x,y:baseline,type:'scatter',mode:'lines',name:`${line} AUC baseline`,line:{width:1.4,dash:'dot',color:lineColor(line)},opacity:.75,hovertemplate:'x=%{x:.4f} mm<br>baseline=%{y:.6f}<extra>'+line+'</extra>'});
-  traces.push({x,y,type:'scatter',mode:'lines',name:`${line} AUC area`,line:{width:0,color:'rgba(0,0,0,0)'},fill:'tonexty',fillcolor:lightLineFill(line,.20,.78),showlegend:false,hoverinfo:'skip'});
+  return{x,y,baseline};
+}
+function aucAreaTrace(sample,line,au){
+  const seg=aucSegmentData(sample,line,au);
+  if(!seg)return null;
+  return{x:seg.x.concat(seg.x.slice().reverse()),y:seg.y.concat(seg.baseline.slice().reverse()),type:'scatter',mode:'lines',name:`${line} AUC area`,line:{width:0,color:'rgba(0,0,0,0)'},fill:'toself',fillcolor:lightLineFill(line,.20,.78),showlegend:false,hoverinfo:'skip'};
+}
+function appendAucOverlayTraces(traces,sample,line,au){
+  if(!au)return;
+  const seg=aucSegmentData(sample,line,au);
+  if(!seg)return;
+  traces.push({x:seg.x,y:seg.baseline,type:'scatter',mode:'lines',name:`${line} AUC baseline`,line:{width:1.4,dash:'dot',color:lineColor(line)},opacity:.75,hovertemplate:'x=%{x:.4f} mm<br>baseline=%{y:.6f}<extra>'+line+'</extra>'});
   traces.push({x:[au.peak1X,au.peak2X],y:[au.peak1Y,au.peak2Y],type:'scatter',mode:'markers',name:`${line} AUC maxima`,marker:{size:10,symbol:'circle-open',color:lineColor(line),line:{color:'#111827',width:1.2}}});
 }
 
-function makeTraces(sample,mode){const d=state.dataset;const source=mode==='raw'?d.raw:d.smoothed;const traces=[];for(const line of displayLineList(sample))traces.push({x:d.distance,y:source[sample][line],type:'scatter',mode:'lines',name:`${line} · ${mode==='raw'?tr('rawLegend'):tr('sgLegend')}`,line:{width:mode==='raw'?1.5:2.2,color:lineColor(line)},hovertemplate:'x=%{x:.4f} mm<br>y=%{y:.6f}<extra>'+line+'</extra>'});if(mode==='interval'){for(const line of selectedLineList(sample)){const ex=state.results.extrema?.[sample]?.[line];if(ex){traces.push({x:[ex.xMax],y:[ex.yMax],type:'scatter',mode:'markers',name:`${line} local max`,marker:{size:11,symbol:'triangle-up',color:lineColor(line),line:{color:'#111827',width:1}}});traces.push({x:[ex.xMin],y:[ex.yMin],type:'scatter',mode:'markers',name:`${line} local min`,marker:{size:11,symbol:'triangle-down',color:lineColor(line),line:{color:'#111827',width:1}}});}appendAucVisualization(traces,sample,line,state.results.auc?.[sample]?.[line]);}}if(mode==='intervalMean'){for(const line of selectedLineList(sample)){const rows=state.results.mean?.[sample]?.[line]||[];const meta=rows[0];if(meta&&Number.isFinite(meta.Min1_X_mm)&&Number.isFinite(meta.Min2_X_mm)){traces.push({x:[meta.Min1_X_mm,meta.Min2_X_mm],y:[meta.Min1_Y,meta.Min2_Y],type:'scatter',mode:'markers',name:`${line} minima`,marker:{size:10,symbol:'triangle-down',color:lineColor(line),line:{color:'#111827',width:1}}});}}}return traces;}
+function makeTraces(sample,mode){
+  const d=state.dataset;
+  const source=mode==='raw'?d.raw:d.smoothed;
+  const traces=[];
+  if(mode==='interval'){
+    for(const line of selectedLineList(sample)){
+      const areaTrace=aucAreaTrace(sample,line,state.results.auc?.[sample]?.[line]);
+      if(areaTrace)traces.push(areaTrace);
+    }
+  }
+  for(const line of displayLineList(sample))traces.push({x:d.distance,y:source[sample][line],type:'scatter',mode:'lines',name:`${line} · ${mode==='raw'?tr('rawLegend'):tr('sgLegend')}`,line:{width:mode==='raw'?1.5:2.2,color:lineColor(line)},hovertemplate:'x=%{x:.4f} mm<br>y=%{y:.6f}<extra>'+line+'</extra>'});
+  if(mode==='interval'){
+    for(const line of selectedLineList(sample)){
+      const ex=state.results.extrema?.[sample]?.[line];
+      if(ex){
+        traces.push({x:[ex.xMax],y:[ex.yMax],type:'scatter',mode:'markers',name:`${line} local max`,marker:{size:11,symbol:'triangle-up',color:lineColor(line),line:{color:'#111827',width:1}}});
+        traces.push({x:[ex.xMin],y:[ex.yMin],type:'scatter',mode:'markers',name:`${line} local min`,marker:{size:11,symbol:'triangle-down',color:lineColor(line),line:{color:'#111827',width:1}}});
+      }
+      appendAucOverlayTraces(traces,sample,line,state.results.auc?.[sample]?.[line]);
+    }
+  }
+  if(mode==='intervalMean'){
+    for(const line of selectedLineList(sample)){
+      const rows=state.results.mean?.[sample]?.[line]||[];
+      const meta=rows[0];
+      if(meta&&Number.isFinite(meta.Min1_X_mm)&&Number.isFinite(meta.Min2_X_mm)){
+        traces.push({x:[meta.Min1_X_mm,meta.Min2_X_mm],y:[meta.Min1_Y,meta.Min2_Y],type:'scatter',mode:'markers',name:`${line} minima`,marker:{size:10,symbol:'triangle-down',color:lineColor(line),line:{color:'#111827',width:1}}});
+      }
+    }
+  }
+  return traces;
+}
 
 const plotConfig={responsive:true,displaylogo:false,modeBarButtonsToRemove:['select2d','lasso2d'],scrollZoom:false,edits:{shapePosition:true},toImageButtonOptions:{format:'png',filename:'plot',height:900,width:1600,scale:2}};
 async function renderCurrentMode(){
@@ -410,7 +451,43 @@ function recomputeAllMeanResults(){return allMeanRows();}
 function buildWorkbook(mode){const d=state.dataset;const wb=XLSX.utils.book_new();appendJsonSheet(wb,'Parameters',parameterRows());appendJsonSheet(wb,'Line_Colors',lineColorRows());appendJsonSheet(wb,'Length_Audit',d.lengths);if(mode==='raw'){for(const s of d.samples)appendAoASheet(wb,`${s}_Raw`,datasetSheet(s,d.raw));}if(mode==='sg'){for(const s of d.samples)appendAoASheet(wb,`${s}_SG`,datasetSheet(s,d.smoothed));}if(mode==='interval'){appendJsonSheet(wb,'Analysis_Ranges',rangeRows());appendJsonSheet(wb,'Extrema_Results',allExtremaRows());appendJsonSheet(wb,'AUC_Results',allAucRows());for(const s of d.samples)appendAoASheet(wb,`${s}_SG`,datasetSheet(s,d.smoothed));}if(mode==='intervalMean'){appendJsonSheet(wb,'Region_Selections',regionSelectionRows());appendJsonSheet(wb,'Interval_Mean_Results',allMeanRows());appendJsonSheet(wb,'Notch_Tangent_Slope',allNotchSlopeRows());for(const s of d.samples)appendAoASheet(wb,`${s}_SG`,datasetSheet(s,d.smoothed));}const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});return new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});}
 
 async function buildAllSamplePlotEntries(mode){const d=state.dataset;const entries=[];for(let i=0;i<d.samples.length;i++){const s=d.samples[i];el('progress').textContent=`${tr('saving')} ${s} (${i+1}/${d.samples.length})`;const traces=makeTracesForSampleExport(s,mode);const layout=baseLayout(tr(modeInfo[mode].title),mode,s);entries.push({path:`Individual/${s}_${mode}.png`,blob:await imageFromSpec(traces,layout)});}return entries;}
-function makeTracesForSampleExport(sample,mode){const d=state.dataset;const source=mode==='raw'?d.raw:d.smoothed;const traces=[];const exportLines=selectedLineList(sample);for(const line of exportLines)traces.push({x:d.distance,y:source[sample][line],type:'scatter',mode:'lines',name:line,line:{width:mode==='raw'?1.5:2.2,color:lineColor(line)}});if(mode==='interval'){for(const line of selectedLineList(sample)){const ex=state.results.extrema?.[sample]?.[line];if(ex){traces.push({x:[ex.xMax],y:[ex.yMax],type:'scatter',mode:'markers',name:`${line} max`,marker:{size:11,symbol:'triangle-up',color:lineColor(line)}});traces.push({x:[ex.xMin],y:[ex.yMin],type:'scatter',mode:'markers',name:`${line} min`,marker:{size:11,symbol:'triangle-down',color:lineColor(line)}});}appendAucVisualization(traces,sample,line,state.results.auc?.[sample]?.[line]);}}if(mode==='intervalMean'){for(const line of exportLines){const rows=state.results.mean?.[sample]?.[line]||[],meta=rows[0];if(meta&&Number.isFinite(meta.Min1_X_mm)&&Number.isFinite(meta.Min2_X_mm)){traces.push({x:[meta.Min1_X_mm,meta.Min2_X_mm],y:[meta.Min1_Y,meta.Min2_Y],type:'scatter',mode:'markers',name:`${line} minima`,marker:{size:10,symbol:'triangle-down',color:lineColor(line)}});}}}return traces;}
+function makeTracesForSampleExport(sample,mode){
+  const d=state.dataset;
+  const source=mode==='raw'?d.raw:d.smoothed;
+  const traces=[];
+  const exportLines=selectedLineList(sample);
+  if(mode==='interval'){
+    for(const line of exportLines){
+      const areaTrace=aucAreaTrace(sample,line,state.results.auc?.[sample]?.[line]);
+      if(areaTrace)traces.push(areaTrace);
+    }
+  }
+  for(const line of exportLines)traces.push({x:d.distance,y:source[sample][line],type:'scatter',mode:'lines',name:line,line:{width:mode==='raw'?1.5:2.2,color:lineColor(line)}});
+  if(mode==='interval'){
+    for(const line of exportLines){
+      const ex=state.results.extrema?.[sample]?.[line];
+      if(ex){
+        traces.push({x:[ex.xMax],y:[ex.yMax],type:'scatter',mode:'markers',name:`${line} max`,marker:{size:11,symbol:'triangle-up',color:lineColor(line)}});
+        traces.push({x:[ex.xMin],y:[ex.yMin],type:'scatter',mode:'markers',name:`${line} min`,marker:{size:11,symbol:'triangle-down',color:lineColor(line)}});
+      }
+      const au=state.results.auc?.[sample]?.[line];
+      const seg=aucSegmentData(sample,line,au);
+      if(seg){
+        traces.push({x:seg.x,y:seg.baseline,type:'scatter',mode:'lines',name:`${line} AUC baseline`,line:{width:1.4,dash:'dot',color:lineColor(line)}});
+        traces.push({x:[au.peak1X,au.peak2X],y:[au.peak1Y,au.peak2Y],type:'scatter',mode:'markers',name:`${line} AUC maxima`,marker:{size:10,symbol:'circle-open',color:lineColor(line)}});
+      }
+    }
+  }
+  if(mode==='intervalMean'){
+    for(const line of exportLines){
+      const rows=state.results.mean?.[sample]?.[line]||[],meta=rows[0];
+      if(meta&&Number.isFinite(meta.Min1_X_mm)&&Number.isFinite(meta.Min2_X_mm)){
+        traces.push({x:[meta.Min1_X_mm,meta.Min2_X_mm],y:[meta.Min1_Y,meta.Min2_Y],type:'scatter',mode:'markers',name:`${line} minima`,marker:{size:10,symbol:'triangle-down',color:lineColor(line)}});
+      }
+    }
+  }
+  return traces;
+}
 
 el('saveBtn').onclick=async()=>{
   if(!state.dataset||!state.currentMode||!state.currentPlot){setStatus(tr('needRead'),'bad');return;}if(!state.saveHandle){setStatus(tr('needFolder'),'bad');return;}el('saveBtn').disabled=true;el('progress').classList.add('visible');el('progress').textContent=tr('saving');
