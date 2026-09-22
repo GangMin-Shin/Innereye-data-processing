@@ -354,6 +354,8 @@
   </main>
 
 <script>
+'use strict';
+
 const I18N={
   en:{
     module:'CID multi point analysis', dockHint:'Select an analysis function.', back:'← Back', home:'🏠 Home', analysis:'Analysis',
@@ -441,6 +443,10 @@ const state={
   selectedRadiusKey:null
 };
 
+const ANALYSIS_BUTTONS=[...document.querySelectorAll('.analysis-btn')];
+const PARAM_INPUT_IDS=['startRadius','endRadius','radiusStep','expectedPoints','expectedSamples'];
+const COLOR_INPUT_IDS=['colorRaw','colorAligned','colorH1','colorCorrected','colorCenter'];
+
 function setStatus(text,kind=''){
   el('status').textContent=text;
   el('status').className='status '+kind;
@@ -478,8 +484,7 @@ function firstHarmonic(y){
   return{mean:c0,a,b,amp,peak,r2,fit};
 }
 
-function alignByH1(y){
-  const h=firstHarmonic(y);
+function alignByH1(y,h=firstHarmonic(y)){
   const n=y.length;
   const step=360/n;
   const threshold=1e-10*Math.max(1,...y.map(v=>Math.abs(v)));
@@ -494,7 +499,7 @@ function processRadiusBlock(block,points,samples){
   for(const s of samples){
     const y=block.values[s];
     const rawH=firstHarmonic(y);
-    const al=alignByH1(y);
+    const al=alignByH1(y,rawH);
     const alH=firstHarmonic(al.aligned);
     const corr=al.aligned.map((v,i)=>v-(alH.fit[i]-alH.mean));
     aligned[s]=al.aligned;
@@ -621,12 +626,13 @@ function buildDataset(wb,params){
   const summary=[];
   for(const r of params.radii){
     const block=dataByRadius[radiusKey(r)];
-    for(const s of samples){
+    for(let si=0;si<samples.length;si++){
+      const s=samples[si];
       const raw=block.values[s];
       const m=mean(raw);
       const c=block.center[s];
       const p=block.processed;
-      const h=firstHarmonic(raw);
+      const metric=p.metrics[si];
       summary.push({
         Radius_mm:r,
         Sample:s,
@@ -634,9 +640,9 @@ function buildDataset(wb,params){
         Center:c,
         MeanMinusCenter:m-c,
         Raw_Point_SD:sd(raw),
-        H1_Amplitude:h.amp,
-        H1_R2:h.r2,
-        Shift_Points:p.metrics.find(x=>x.Sample===s)?.Shift_Points ?? null,
+        H1_Amplitude:metric.H1_Amplitude,
+        H1_R2:metric.H1_R2,
+        Shift_Points:metric.Shift_Points,
         Aligned_Point_SD:sd(p.aligned[s]),
         Corrected_Point_SD:sd(p.corrected[s])
       });
@@ -658,7 +664,7 @@ function resetIndividualToggle(){state.individual=false;el('individualToggle').c
 function resetAnalysisView(resetIndividual=false){
   purgeCurrentPlots();
   state.currentMode=null;
-  document.querySelectorAll('.analysis-btn').forEach(b=>b.classList.remove('active'));
+  ANALYSIS_BUTTONS.forEach(b=>b.classList.remove('active'));
   el('actions').classList.remove('visible');
   el('tabResetBtn').classList.remove('visible');
   el('radiusControl').style.display='none';
@@ -666,6 +672,14 @@ function resetAnalysisView(resetIndividual=false){
   el('resultSub').textContent=tr('chooseAnalysis');
   el('plots').innerHTML=`<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;
   if(resetIndividual)resetIndividualToggle();
+}
+
+function invalidatePreparedDataset(){
+  state.dataset=null;
+  state.selectedRadiusKey=null;
+  el('detected').innerHTML='';
+  el('radiusSelect').innerHTML='';
+  resetAnalysisView(true);
 }
 
 function resetAll(){
@@ -764,8 +778,8 @@ function applyLanguage(){
   el('tabResetBtn').setAttribute('aria-label',tr('tabResetTitle'));
   if(state.currentMode){
     el('resultTitle').textContent=tr(modeInfo[state.currentMode].title);
-    el('resultSub').textContent=tr('analysisReady');
-    runAnalysis(state.currentMode,false);
+    el('resultSub').textContent=state.currentMode==='organize'?tr('organizeSub'):tr('analysisReady');
+    void runAnalysis(state.currentMode,false);
   }
 }
 
@@ -776,9 +790,7 @@ el('excelBrowseBtn').onclick=()=>el('excelInput').click();
 el('excelInput').addEventListener('change',e=>{
   state.file=e.target.files[0]||null;
   el('filename').textContent=state.file?state.file.name:tr('noFile');
-  state.dataset=null;
-  el('detected').innerHTML='';
-  resetAnalysisView(true);
+  invalidatePreparedDataset();
   setStatus(tr('ready'));
 });
 
@@ -805,19 +817,15 @@ el('readBtn').onclick=async()=>{
     setStatus(tr('readSuccess'),'good');
     resetAnalysisView(true);
   }catch(err){
-    state.dataset=null;
-    el('detected').innerHTML='';
-    resetAnalysisView(true);
+    invalidatePreparedDataset();
     setStatus(err.message||String(err),'bad');
   }
 };
 
-['startRadius','endRadius','radiusStep','expectedPoints','expectedSamples'].forEach(id=>{
+PARAM_INPUT_IDS.forEach(id=>{
   el(id).addEventListener('input',()=>{
     if(state.dataset){
-      state.dataset=null;
-      el('detected').innerHTML='';
-      resetAnalysisView(true);
+      invalidatePreparedDataset();
       setStatus(tr('ready'));
     }
   });
@@ -848,21 +856,13 @@ function pointLabels(){return state.dataset.points}
 
 function overlayTraces(matrix){
   const d=state.dataset;
-  return d.samples.map((s,i)=>({
-    x:pointLabels(),y:matrix[s],type:'scatter',mode:'lines+markers',name:s,
-    line:{width:1.45,color:sampleColor(i,d.samples.length)},marker:{size:5,color:sampleColor(i,d.samples.length)},opacity:.82
-  }));
-}
-
-function rawVsFitTraces(sample,aligned=false){
-  const block=selectedBlock();
-  const p=block.processed;
-  const raw=aligned?p.aligned[sample]:block.values[sample];
-  const fit=aligned?p.alignedFit[sample]:p.rawFit[sample];
-  return[
-    {x:pointLabels(),y:raw,type:'scatter',mode:'lines+markers',name:aligned?tr('alignedLegend'):tr('rawLegend'),line:{width:2,color:aligned?el('colorAligned').value:el('colorRaw').value},marker:{size:6}},
-    {x:pointLabels(),y:fit,type:'scatter',mode:'lines',name:tr('fitLegend'),line:{width:2.6,color:el('colorH1').value}}
-  ];
+  return d.samples.map((s,i)=>{
+    const color=sampleColor(i,d.samples.length);
+    return{
+      x:pointLabels(),y:matrix[s],type:'scatter',mode:'lines+markers',name:s,
+      line:{width:1.45,color},marker:{size:5,color},opacity:.82
+    };
+  });
 }
 
 function summaryByRadius(){
@@ -1032,7 +1032,7 @@ const modeInfo={
 
 function modeUsesRadius(mode){return !['organize','radiusProfile'].includes(mode)}
 
-document.querySelectorAll('.analysis-btn').forEach(btn=>btn.addEventListener('click',()=>runAnalysis(btn.dataset.mode,true)));
+ANALYSIS_BUTTONS.forEach(btn=>btn.addEventListener('click',()=>{void runAnalysis(btn.dataset.mode,true)}));
 
 async function runAnalysis(mode,activate=true){
   if(!state.file||!state.saveHandle||!state.dataset){
@@ -1042,7 +1042,7 @@ async function runAnalysis(mode,activate=true){
 
   state.currentMode=mode;
   if(activate){
-    document.querySelectorAll('.analysis-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
+    ANALYSIS_BUTTONS.forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
     el('actions').classList.add('visible');
     el('tabResetBtn').classList.add('visible');
     el('resultTitle').textContent=tr(modeInfo[mode].title);
@@ -1054,7 +1054,7 @@ async function runAnalysis(mode,activate=true){
 
 el('radiusSelect').addEventListener('change',()=>{
   state.selectedRadiusKey=el('radiusSelect').value;
-  if(state.currentMode&&modeUsesRadius(state.currentMode))runAnalysis(state.currentMode,false);
+  if(state.currentMode&&modeUsesRadius(state.currentMode))void runAnalysis(state.currentMode,false);
 });
 
 el('individualToggle').onclick=()=>{
@@ -1063,7 +1063,7 @@ el('individualToggle').onclick=()=>{
   setStatus(state.individual?tr('individualOn'):tr('individualOff'),state.individual?'good':'');
 };
 
-['colorRaw','colorAligned','colorH1','colorCorrected','colorCenter'].forEach(id=>el(id).addEventListener('change',()=>{if(state.currentMode)runAnalysis(state.currentMode,false)}));
+COLOR_INPUT_IDS.forEach(id=>el(id).addEventListener('change',()=>{if(state.currentMode)void runAnalysis(state.currentMode,false)}));
 
 function dataURLtoBlob(dataURL){
   const [meta,b64]=dataURL.split(',');
@@ -1113,31 +1113,22 @@ function exportLayout(layout){
   return out;
 }
 
-async function directPlotDivToBlob(div){
-  const url=await Plotly.toImage(div,{format:'png',width:1600,height:900,scale:2});
-  return dataURLtoBlob(url);
-}
-
-async function plotDivToBlob(div){
-  const tmp=document.createElement('div');
-  tmp.style.cssText='position:fixed;left:-10000px;top:0;width:1600px;height:900px;background:#fff';
-  document.body.appendChild(tmp);
-  try{
-    const traces=deepClonePlotObject(div.data||[]);
-    const layout=exportLayout(div.layout||{});
-    await Plotly.newPlot(tmp,traces,layout,{displayModeBar:false,staticPlot:true,responsive:false});
-    return await directPlotDivToBlob(tmp);
-  }finally{try{Plotly.purge(tmp)}catch(_){}tmp.remove()}
-}
-
 async function imageFromSpec(traces,layout){
   const tmp=document.createElement('div');
   tmp.style.cssText='position:fixed;left:-10000px;top:0;width:1600px;height:900px;background:#fff';
   document.body.appendChild(tmp);
   try{
     await Plotly.newPlot(tmp,deepClonePlotObject(traces),exportLayout(layout),{displayModeBar:false,staticPlot:true,responsive:false});
-    return await directPlotDivToBlob(tmp);
-  }finally{try{Plotly.purge(tmp)}catch(_){}tmp.remove()}
+    const url=await Plotly.toImage(tmp,{format:'png',width:1600,height:900,scale:2});
+    return dataURLtoBlob(url);
+  }finally{
+    try{Plotly.purge(tmp)}catch(_){}
+    tmp.remove();
+  }
+}
+
+async function plotDivToBlob(div){
+  return imageFromSpec(div.data||[],div.layout||{});
 }
 
 async function ensureDirPath(root,path){
@@ -1147,10 +1138,18 @@ async function ensureDirPath(root,path){
 }
 
 async function writeBlob(root,path,blob){
-  const parts=path.split('/').filter(Boolean);const name=parts.pop();
+  const parts=path.split('/').filter(Boolean);
+  const name=parts.pop();
   const dir=await ensureDirPath(root,parts.join('/'));
   const fh=await dir.getFileHandle(name,{create:true});
-  const w=await fh.createWritable();await w.write(blob);await w.close();
+  const w=await fh.createWritable();
+  try{
+    await w.write(blob);
+    await w.close();
+  }catch(err){
+    try{await w.abort()}catch(_){}
+    throw err;
+  }
 }
 
 function sanitizeExcelValue(v){
@@ -1238,10 +1237,9 @@ function radiusSummaryWorkbookBlob(){
   return jsonWorkbookBlob({Radius_Summary:summaryByRadius(),Sample_Level:state.dataset.summary,H1_Metrics:allMetricsRows()});
 }
 
-async function buildAllRadiusOverlayEntries(mode){
-  if(!modeUsesRadius(mode))return[];
+async function saveAllRadiusOverlays(mode,folder){
+  if(!modeUsesRadius(mode))return;
   const d=state.dataset;
-  const entries=[];
 
   for(let ri=0;ri<d.radii.length;ri++){
     const r=d.radii[ri];
@@ -1277,9 +1275,9 @@ async function buildAllRadiusOverlayEntries(mode){
       name=`All_Radii_Overlays/R_${radiusLabel(r)}mm_CORRECTED_ALL_SAMPLES_OVERLAY.png`;
     }
 
-    entries.push({path:name,blob:await imageFromSpec(traces,layout)});
+    const blob=await imageFromSpec(traces,layout);
+    await writeBlob(state.saveHandle,`${folder}/${name}`,blob);
   }
-  return entries;
 }
 
 async function saveOrganizedByRadius(){
@@ -1313,11 +1311,7 @@ el('saveBtn').onclick=async()=>{
         await writeBlob(state.saveHandle,`${folder}/All_Radii_Processed_Data.xlsx`,processedWorkbookBlob(mode));
       }
       if(state.individual){
-        const entries=await buildAllRadiusOverlayEntries(mode);
-        for(let i=0;i<entries.length;i++){
-          el('progress').textContent=`${tr('saving')} ${i+1}/${entries.length}`;
-          await writeBlob(state.saveHandle,`${folder}/${entries[i].path}`,entries[i].blob);
-        }
+        await saveAllRadiusOverlays(mode,folder);
       }
     }
     setStatus(tr('saved'),'good');
