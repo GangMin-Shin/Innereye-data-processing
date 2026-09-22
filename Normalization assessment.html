@@ -1091,8 +1091,6 @@
     }
 
     function resetAll() {
-      purgeAssessmentPlots();
-
       workbook = null;
       rawFileName = "";
       parsed = null;
@@ -1197,36 +1195,20 @@
       }
 
       const sampleIds = [];
-      const rowRecords = [];
+      const groups = {};
+      for (const col of conditionColumns) {
+        groups[col.label] = [];
+      }
+
       for (let r = 1; r < rows.length; r++) {
         const row = rows[r] || [];
         const sample = normalizeHeader(row[0]);
         if (!sample) continue;
 
         sampleIds.push(sample);
-
-        const values = {};
         for (const col of conditionColumns) {
           const n = numericValue(row[col.index]);
-          values[col.label] = n;
-        }
-
-        rowRecords.push({
-          sample,
-          excelRow: r + 1,
-          values
-        });
-      }
-
-      const groups = {};
-      for (const col of conditionColumns) {
-        groups[col.label] = [];
-      }
-
-      for (const row of rowRecords) {
-        for (const col of conditionColumns) {
-          const v = row.values[col.label];
-          if (v !== null) groups[col.label].push(v);
+          if (n !== null) groups[col.label].push(n);
         }
       }
 
@@ -1235,7 +1217,6 @@
         sampleHeader,
         conditions: conditionColumns.map(d => d.label),
         sampleIds,
-        rows: rowRecords,
         groups
       };
     }
@@ -1254,12 +1235,6 @@
       return a.length === b.length && a.every((x, i) => x === b[i]);
     }
 
-    function sameStringSet(a, b) {
-      if (a.length !== b.length) return false;
-      const sa = [...a].sort();
-      const sb = [...b].sort();
-      return sa.every((x, i) => x === sb[i]);
-    }
 
     async function loadWorkbook(file) {
       rawFileName = file.name;
@@ -1523,7 +1498,6 @@
 
         setStatus("success", validationSuccessMessage());
         activateAnalysisUI();
-        renderAll();
       } catch (err) {
         console.error(err);
         failValidation(tr("statusParseError") + " " + err.message);
@@ -1567,8 +1541,8 @@
       updateExportAvailability();
       document.getElementById("actions").classList.add("visible");
       els.tabResetBtn.classList.add("visible");
-      renderSheetButtons();
       if (activeSheet) switchSheet(activeSheet);
+      else renderSheetButtons();
     }
 
     function getCurrentData() {
@@ -1598,13 +1572,17 @@
       renderAll();
     }
 
+    function resizeActivePlot() {
+      if (!validated) return;
+      const chartId = activeTab === "basic" ? "basicChart" : "normalChart";
+      const chart = document.getElementById(chartId);
+      if (chart) Plotly.Plots.resize(chart);
+    }
+
     document.querySelectorAll(".content-tab").forEach(btn => {
       btn.addEventListener("click", () => {
         setActiveTab(btn.dataset.tab);
-        setTimeout(() => {
-          if (activeTab === "basic") Plotly.Plots.resize(document.getElementById("basicChart"));
-          else Plotly.Plots.resize(document.getElementById("normalChart"));
-        }, 0);
+        requestAnimationFrame(resizeActivePlot);
       });
     });
 
@@ -1908,16 +1886,16 @@
       return { jb, p, skew, excess };
     }
 
-    function normalAssessmentRows() {
+    function buildNormalAssessment(includeJarqueBera = false) {
       const d = getCurrentData();
-      if (!d || !referenceCondition) return [];
+      if (!d || !referenceCondition) return null;
 
       const sigmaN = Number(els.sigmaInput.value);
       const ref = descriptive(d.groups[referenceCondition]);
       const lower = ref.mean - sigmaN * ref.sd;
       const upper = ref.mean + sigmaN * ref.sd;
 
-      return d.conditions
+      const rows = d.conditions
         .filter(c => visibleConditions.has(c))
         .map(condition => {
           const values = d.groups[condition];
@@ -1938,7 +1916,6 @@
               ? normalCdf(upper, s.mean, s.sd) - normalCdf(lower, s.mean, s.sd)
               : NaN;
 
-          const jb = jarqueBera(values);
           const meanInside =
             Number.isFinite(s.mean) && Number.isFinite(lower) && Number.isFinite(upper)
               ? s.mean >= lower && s.mean <= upper
@@ -1951,21 +1928,18 @@
             deltaSigma,
             observedInside,
             expectedInside,
-            jb,
+            jb: includeJarqueBera ? jarqueBera(values) : null,
             meanInside
           };
         });
+
+      return { sigmaN, ref, lower, upper, rows };
     }
 
-    function renderNormalChart() {
-      const d = getCurrentData();
-      if (!d || !referenceCondition) return;
+    function renderNormalChart(model) {
+      if (!model || !referenceCondition) return;
 
-      const sigmaN = Number(els.sigmaInput.value);
-      const rows = normalAssessmentRows();
-      const ref = descriptive(d.groups[referenceCondition]);
-      const lower = ref.mean - sigmaN * ref.sd;
-      const upper = ref.mean + sigmaN * ref.sd;
+      const { sigmaN, ref, lower, upper, rows } = model;
 
       const selectedValues = rows.flatMap(r => r.values);
       let xMin = selectedValues.length ? Math.min(...selectedValues) : ref.mean - 1;
@@ -2134,14 +2108,10 @@
       });
     }
 
-    function renderNormalMetrics() {
-      const d = getCurrentData();
-      if (!d || !referenceCondition) return;
+    function renderNormalMetrics(model) {
+      if (!model || !referenceCondition) return;
 
-      const sigmaN = Number(els.sigmaInput.value);
-      const ref = descriptive(d.groups[referenceCondition]);
-      const lower = ref.mean - sigmaN * ref.sd;
-      const upper = ref.mean + sigmaN * ref.sd;
+      const { sigmaN, ref, lower, upper, rows } = model;
 
       document.getElementById("metricReference").textContent = referenceCondition;
       document.getElementById("metricReferenceSub").textContent =
@@ -2157,14 +2127,9 @@
       document.getElementById("metricVisibleSub").textContent =
         [...visibleConditions].join(" · ") || "—";
 
-      const candidates = d.conditions
-        .filter(c => visibleConditions.has(c) && c !== referenceCondition)
-        .map(c => {
-          const s = descriptive(d.groups[c]);
-          const ds = Number.isFinite(ref.sd) && ref.sd > 0 ? Math.abs(s.mean - ref.mean) / ref.sd : NaN;
-          return { c, ds };
-        })
-        .filter(x => Number.isFinite(x.ds))
+      const candidates = rows
+        .filter(row => row.condition !== referenceCondition && Number.isFinite(row.deltaSigma))
+        .map(row => ({ c: row.condition, ds: row.deltaSigma }))
         .sort((a, b) => a.ds - b.ds);
 
       if (candidates.length) {
@@ -2177,8 +2142,9 @@
       }
     }
 
-    function renderAssessmentTable() {
-      const rows = normalAssessmentRows();
+    function renderAssessmentTable(model) {
+      if (!model) return;
+      const { rows } = model;
       els.assessmentTableBody.innerHTML = "";
 
       for (const row of rows) {
@@ -2208,9 +2174,11 @@
 
     function renderNormalAssessment() {
       if (!validated) return;
-      renderNormalMetrics();
-      renderNormalChart();
-      renderAssessmentTable();
+      const model = buildNormalAssessment(false);
+      if (!model) return;
+      renderNormalMetrics(model);
+      renderNormalChart(model);
+      renderAssessmentTable(model);
     }
 
     function renderAll() {
@@ -2256,11 +2224,9 @@
         return;
       }
 
-      const sigmaN = Number(els.sigmaInput.value);
-      const ref = descriptive(d.groups[referenceCondition]);
-      const lower = ref.mean - sigmaN * ref.sd;
-      const upper = ref.mean + sigmaN * ref.sd;
-      const rows = normalAssessmentRows();
+      const model = buildNormalAssessment(true);
+      if (!model) return;
+      const { sigmaN, ref, lower, upper, rows } = model;
 
       const lines = [];
       lines.push([
@@ -2350,10 +2316,14 @@
 
     els.exportBtn.addEventListener("click", exportCsv);
 
+    let resizeFrame = 0;
     window.addEventListener("resize", () => {
       if (!validated) return;
-      if (activeTab === "basic") Plotly.Plots.resize(document.getElementById("basicChart"));
-      else Plotly.Plots.resize(document.getElementById("normalChart"));
+      if (resizeFrame) cancelAnimationFrame(resizeFrame);
+      resizeFrame = requestAnimationFrame(() => {
+        resizeFrame = 0;
+        resizeActivePlot();
+      });
     });
 
     renderLanguage();
