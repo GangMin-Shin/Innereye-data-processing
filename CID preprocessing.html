@@ -591,7 +591,7 @@
 
     <div class="nav-row">
 
-      <button
+      <button type="button"
         class="nav-btn"
         onclick="history.back()"
         data-i18n="back"
@@ -599,7 +599,7 @@
         ← Back
       </button>
 
-      <button
+      <button type="button"
         class="nav-btn"
         onclick="location.href='./'"
         data-i18n="home"
@@ -615,7 +615,7 @@
       Analysis
     </div>
 
-    <button
+    <button type="button"
       class="analysis-btn"
       data-mode="raw"
       data-i18n="rawBtn"
@@ -623,7 +623,7 @@
       Raw data plot
     </button>
 
-    <button
+    <button type="button"
       class="analysis-btn"
       data-mode="h1"
       data-i18n="h1Btn"
@@ -631,7 +631,7 @@
       1st harmonic plot
     </button>
 
-    <button
+    <button type="button"
       class="analysis-btn"
       data-mode="alignedRaw"
       data-i18n="alignRawBtn"
@@ -639,7 +639,7 @@
       Alignment: raw data plot
     </button>
 
-    <button
+    <button type="button"
       class="analysis-btn"
       data-mode="alignedH1"
       data-i18n="alignH1Btn"
@@ -647,7 +647,7 @@
       Alignment: 1st harmonic plot
     </button>
 
-    <button
+    <button type="button"
       class="analysis-btn"
       data-mode="ecc"
       data-i18n="eccBtn"
@@ -768,7 +768,7 @@
 
           <div class="file-line">
 
-            <button
+            <button type="button"
               id="folderBtn"
               class="secondary"
               data-i18n="browse"
@@ -792,7 +792,7 @@
 
       <div class="read-row">
 
-        <button
+        <button type="button"
           id="readBtn"
           class="primary"
           data-i18n="readExcel"
@@ -879,7 +879,7 @@
             class="actions"
           >
 
-            <button
+            <button type="button"
               id="individualToggle"
               class="toggle"
             >
@@ -890,7 +890,7 @@
               </span>
             </button>
 
-            <button
+            <button type="button"
               id="saveBtn"
               class="save-btn"
               data-i18n="save"
@@ -1113,6 +1113,8 @@ const state={
  currentPlots:[]
 };
 
+let renderVersion=0;
+
 const el=id=>document.getElementById(id);
 const tr=k=>I18N[lang][k]||k;
 
@@ -1195,6 +1197,7 @@ function resetIndividualToggle(){
 }
 
 function resetAnalysisView(resetIndividual=false){
+ renderVersion++;
  purgeCurrentPlots();
  state.currentMode=null;
 
@@ -1215,13 +1218,11 @@ function resetAnalysisView(resetIndividual=false){
 }
 
 function resetAll(){
- purgeCurrentPlots();
  state.file=null;
  state.saveHandle=null;
  state.dataset=null;
  state.currentMode=null;
  state.individual=false;
- state.currentPlots=[];
 
  el('excelInput').value='';
  el('filename').textContent=tr('noFile');
@@ -1372,9 +1373,7 @@ function firstHarmonic(y){
  };
 }
 
-function alignByH1(y){
-
- const h=firstHarmonic(y);
+function alignByH1(y,h=firstHarmonic(y)){
 
  const n=y.length;
  const step=360/n;
@@ -1420,7 +1419,7 @@ function processDataset(ds){
   const y=ds.values[s];
 
   const rawH=firstHarmonic(y);
-  const al=alignByH1(y);
+  const al=alignByH1(y,rawH);
   const alH=firstHarmonic(al.aligned);
 
   const corr=
@@ -1898,28 +1897,29 @@ function overlayTraces(
  const d=state.dataset;
 
  return d.samples.map(
-  (s,i)=>({
-   x:pointLabels(),
-   y:matrix[s],
-   type:'scatter',
-   mode:'lines+markers',
-   name:namePrefix+s,
-   line:{
-    width:1.45,
-    color:sampleColor(
-     i,
-     d.samples.length
-    )
-   },
-   marker:{
-    size:4,
-    color:sampleColor(
-     i,
-     d.samples.length
-    )
-   },
-   opacity:.82
-  })
+  (s,i)=>{
+   const color=sampleColor(
+    i,
+    d.samples.length
+   );
+
+   return{
+    x:pointLabels(),
+    y:matrix[s],
+    type:'scatter',
+    mode:'lines+markers',
+    name:namePrefix+s,
+    line:{
+     width:1.45,
+     color
+    },
+    marker:{
+     size:4,
+     color
+    },
+    opacity:.82
+   };
+  }
  );
 }
 
@@ -1996,8 +1996,13 @@ function addPlotCard(
  return el(id);
 }
 
+function isCurrentRender(version){
+ return version===renderVersion;
+}
+
 async function renderMainPlot(mode){
 
+ const version=++renderVersion;
  const d=state.dataset;
  const p=d.processed;
 
@@ -2023,6 +2028,8 @@ async function renderMainPlot(mode){
    layout,
    config
   );
+
+  if(!isCurrentRender(version))return;
 
   state.currentPlots=[
    {
@@ -2052,6 +2059,8 @@ async function renderMainPlot(mode){
    config
   );
 
+  if(!isCurrentRender(version))return;
+
   state.currentPlots=[
    {
     div,
@@ -2080,6 +2089,8 @@ async function renderMainPlot(mode){
    config
   );
 
+  if(!isCurrentRender(version))return;
+
   state.currentPlots=[
    {
     div,
@@ -2095,10 +2106,6 @@ async function renderMainPlot(mode){
     'plot-main',
     tr('alignH1Title')
    );
-
-  if(!div){
-   throw new Error('Failed to create the Alignment: 1st harmonic plot container.');
-  }
 
   const traces=[];
 
@@ -2153,6 +2160,8 @@ async function renderMainPlot(mode){
    config
   );
 
+  if(!isCurrentRender(version))return;
+
   state.currentPlots=[
    {
     div,
@@ -2162,11 +2171,11 @@ async function renderMainPlot(mode){
  }
 
  if(mode==='ecc'){
-  await renderEccPlots();
+  await renderEccPlots(version);
  }
 }
 
-async function renderEccPlots(){
+async function renderEccPlots(version){
 
  const d=state.dataset;
  const p=d.processed;
@@ -2188,6 +2197,8 @@ async function renderEccPlots(){
   layout,
   config
  );
+
+ if(!isCurrentRender(version))return;
 
  const div2=
   addPlotCard(
@@ -2314,6 +2325,8 @@ async function renderEccPlots(){
   config
  );
 
+ if(!isCurrentRender(version))return;
+
  const div3=
   addPlotCard(
    'plot-ecc-sd',
@@ -2371,6 +2384,8 @@ async function renderEccPlots(){
   layout,
   config
  );
+
+ if(!isCurrentRender(version))return;
 
  state.currentPlots=[
   {
@@ -2823,6 +2838,7 @@ async function buildIndividualEntries(mode){
  const d=state.dataset;
  const p=d.processed;
  const entries=[];
+ const x=pointLabels();
 
  for(
   let i=0;
@@ -2843,7 +2859,7 @@ async function buildIndividualEntries(mode){
 
    traces=[
     {
-     x:pointLabels(),
+     x,
      y:d.values[s],
      type:'scatter',
      mode:'lines+markers',
@@ -2884,7 +2900,7 @@ async function buildIndividualEntries(mode){
 
    traces=[
     {
-     x:pointLabels(),
+     x,
      y:p.aligned[s],
      type:'scatter',
      mode:'lines+markers',
@@ -2925,7 +2941,7 @@ async function buildIndividualEntries(mode){
 
    traces=[
     {
-     x:pointLabels(),
+     x,
      y:d.values[s],
      type:'scatter',
      mode:'lines+markers',
@@ -2937,7 +2953,7 @@ async function buildIndividualEntries(mode){
      marker:{size:4}
     },
     {
-     x:pointLabels(),
+     x,
      y:p.aligned[s],
      type:'scatter',
      mode:'lines+markers',
@@ -2949,7 +2965,7 @@ async function buildIndividualEntries(mode){
      marker:{size:4}
     },
     {
-     x:pointLabels(),
+     x,
      y:p.corrected[s],
      type:'scatter',
      mode:'lines+markers',
