@@ -466,7 +466,7 @@ const I18N={
     sgSub:'Third-order Savitzky–Golay smoothing using the SG window size entered above.',
     intervalSub:'Enter Range start/end to set the analysis interval. Plot zooming is independent of the analysis range.',
     intervalMeanSub:'Overlay any combination of scan lines. Set one search range, then automatically calculate Min, Before, and Notch mean ± SD plus the notch-position tangent slope for every scan line in the current sample.',
-    intervalAucV1Sub:'Enter Range start/end to detect the dominant local minimum and maximum. AUC 1 keeps the previous symmetric Lower-AUC method, AUC 2 integrates only the vertical span between the detected minimum and maximum, and AUC 3 finds the opposite-side minimum beyond the entered range when necessary and applies the same DC-independent bounded integration on both sides of the maximum.',
+    intervalAucV1Sub:'Enter Range start/end to detect the dominant local minimum and maximum. AUC 1 keeps the previous symmetric Lower-AUC method, AUC 2 integrates only the vertical span between the detected minimum and maximum, and AUC 3 searches from the maximum to the end of the available data on the opposite side, regardless of the entered range, selects the first downward-convex local minimum, and applies the same DC-independent bounded integration on both sides of the maximum.',
     samplingRate:'Estimated sampling rate',
     duration:'Scan duration',
     minLength:'Common valid length',
@@ -494,7 +494,7 @@ const I18N={
     hintRaw:'Use the sample selector and dynamically detected line buttons to control the overlay.',
     hintSG:'SG polynomial order = 3. The entered window size is interpreted in seconds and converted to the nearest valid odd sample count based on the estimated sampling rate.',
     hintInterval:'For each sample, all selected scan lines use one common search range. For AUC, the two most prominent local maxima inside that range are selected. Upper AUC uses the straight line connecting the two maxima as the baseline, while Lower AUC uses the minimum value between the two maxima as a horizontal baseline.',
-    hintIntervalAucV1:'AUC 1: use the previous symmetric interval and calculate only the previous Lower AUC. AUC 2: integrate between the detected minimum and maximum after subtracting the minimum Y level and limiting the vertical contribution to the minimum-to-maximum Y span, so a DC offset does not change the area. AUC 3: find the nearest local minimum on the opposite side of the maximum, even outside the entered search range, then apply the same bounded DC-independent integration from each minimum to the maximum and sum both sides.',
+    hintIntervalAucV1:'AUC 1: use the previous symmetric interval and calculate only the previous Lower AUC. AUC 2: integrate between the detected minimum and maximum after subtracting the minimum Y level and limiting the vertical contribution to the minimum-to-maximum Y span, so a DC offset does not change the area. AUC 3: starting from the maximum, search all the way to the last available data point on the opposite side of the detected minimum, even outside the entered search range, and use the first downward-convex local minimum found. Then apply the same bounded DC-independent integration from each minimum to the maximum and sum both sides.',
     extremaDone:'Dominant local extrema were detected from the SG-smoothed signal using sign-change candidates and topographic prominence.',
     aucDone:'Within the entered search range, the two most prominent local maxima were selected. Upper AUC was calculated from the signal relative to the straight baseline connecting the maxima, and Lower AUC was calculated from the signal relative to the horizontal baseline at the minimum between the maxima. Both AUC values are reported as absolute integrated magnitudes.',
     aucV1Done:'AUC 1, AUC 2, and AUC 3 were calculated. AUC 1 uses the previous symmetric Lower-AUC method; AUC 2 uses the bounded minimum-to-maximum area; AUC 3 uses the bounded two-sided area between the minima surrounding the maximum.',
@@ -600,7 +600,7 @@ const I18N={
     sgSub:'상단에서 입력한 SG 윈도우 크기를 사용하는 3차 Savitzky–Golay 스무딩입니다.',
     intervalSub:'Range start/end로 분석 구간을 설정합니다. 그래프 확대·축소는 분석 구간과 독립적으로 사용할 수 있습니다.',
     intervalMeanSub:'여러 스캔 라인을 자유롭게 겹쳐 표시하고, 하나의 검색 구간을 설정한 뒤 현재 샘플의 모든 라인에 대해 Min, Before, Notch 평균과 표준편차 및 노치 위치의 접선 기울기를 자동 계산합니다.',
-    intervalAucV1Sub:'Range start/end에서 대표 극솟점과 극댓점을 검출합니다. AUC 1은 기존 대칭 구간의 Lower AUC 방식만 유지하고, AUC 2는 검출된 극솟점과 극댓점 사이에서 Y축 높이 차이만 적분하며, AUC 3은 필요하면 지정 범위를 넘어 극댓점 반대편의 극솟점을 추가로 찾아 양쪽에 같은 DC 독립 적분을 적용합니다.',
+    intervalAucV1Sub:'Range start/end에서 대표 극솟점과 극댓점을 검출합니다. AUC 1은 기존 대칭 구간의 Lower AUC 방식만 유지하고, AUC 2는 검출된 극솟점과 극댓점 사이에서 Y축 높이 차이만 적분하며, AUC 3은 지정 범위와 무관하게 극댓점에서 반대 방향의 전체 데이터 끝까지 탐색하여 처음 나타나는 아래볼록 극솟점을 추가로 찾고, 양쪽에 같은 DC 독립 적분을 적용합니다.',
     samplingRate:'추정 샘플링 레이트',
     duration:'스캔 시간',
     minLength:'공통 유효 길이',
@@ -628,7 +628,7 @@ const I18N={
     hintRaw:'샘플 선택과 동적으로 검출된 라인 버튼으로 오버레이 라인을 선택할 수 있습니다.',
     hintSG:'SG 다항식 차수는 3차로 고정하며, 상단에 입력한 윈도우 크기(s)를 추정 샘플링 레이트에 따라 가장 가까운 유효 홀수 샘플 수로 변환합니다.',
     hintInterval:'샘플별로 선택된 모든 스캔 라인은 하나의 동일한 검색 구간을 사용합니다. AUC 계산 시에는 입력한 검색 구간 안에서 prominence가 큰 대표 극댓값 2개를 선택합니다. Upper AUC는 두 극댓값을 잇는 직선을 baseline으로 사용하고, Lower AUC는 두 극댓값 사이의 극솟값을 수평 baseline으로 사용합니다.',
-    hintIntervalAucV1:'AUC 1: 기존처럼 극솟점-극댓점 X축 거리만큼 극댓점 반대편에 대칭 구간을 만들고 기존 Lower AUC만 계산합니다. AUC 2: 검출된 극솟점과 극댓점 사이에서 극솟점 Y를 기준선으로 빼고, 극솟점 Y부터 극댓점 Y 사이의 높이만 적분하여 DC 영향을 제거합니다. AUC 3: 극댓점 반대편에서 가장 가까운 새로운 극솟점을 찾되 입력 범위를 넘어가도 허용하고, 양쪽 극솟점에서 극댓점까지 각각 AUC 2 방식으로 적분한 뒤 합산합니다.',
+    hintIntervalAucV1:'AUC 1: 기존처럼 극솟점-극댓점 X축 거리만큼 극댓점 반대편에 대칭 구간을 만들고 기존 Lower AUC만 계산합니다. AUC 2: 검출된 극솟점과 극댓점 사이에서 극솟점 Y를 기준선으로 빼고, 극솟점 Y부터 극댓점 Y 사이의 높이만 적분하여 DC 영향을 제거합니다. AUC 3: 극댓점에서 시작해 기존 극솟점의 반대 방향으로 입력 범위와 무관하게 전체 데이터의 마지막 구간까지 탐색하고, 처음 나타나는 아래볼록 극솟점을 새로운 극솟점으로 선택합니다. 이후 양쪽 극솟점에서 극댓점까지 각각 AUC 2 방식으로 적분한 뒤 합산합니다.',
     extremaDone:'SG 스무딩 신호의 미분 부호 변화 후보와 topographic prominence를 이용해 대표 극대·극소점을 검출했습니다.',
     aucDone:'입력한 검색 구간 안에서 prominence가 큰 대표 극댓값 2개를 선택했습니다. Upper AUC는 두 극댓값을 잇는 직선 baseline 기준으로, Lower AUC는 두 극댓값 사이의 극솟값을 지나는 수평 baseline 기준으로 사다리꼴 적분했으며 두 값 모두 적분 결과의 절대값으로 표시합니다.',
     aucV1Done:'AUC 1, AUC 2, AUC 3 계산을 완료했습니다. AUC 1은 기존 대칭 Lower AUC 방식, AUC 2는 극솟점-극댓점 사이의 Y축 제한 면적, AUC 3은 극댓점 양쪽 극솟점을 이용한 두 구간의 Y축 제한 면적 합입니다.',
@@ -3392,22 +3392,56 @@ function boundedAUCByIndices(xAll,yAll,startIndex,endIndex,baselineY,capY){
   };
 }
 
-function findOppositeLocalMinimum(yAll,maxIndex,knownMinIndex,maxY){
+function findOppositeLocalMinimum(yAll,maxIndex,knownMinIndex){
+  const n=Array.isArray(yAll)?yAll.length:0;
+
+  if(
+    n<3||
+    !Number.isInteger(maxIndex)||
+    !Number.isInteger(knownMinIndex)||
+    maxIndex<=0||
+    maxIndex>=n-1
+  ){
+    return null;
+  }
+
   const direction=
     knownMinIndex<maxIndex
       ?1
       :-1;
 
-  if(direction>0){
-    for(let i=maxIndex+1;i<yAll.length-1;i++){
-      const d1=yAll[i]-yAll[i-1];
-      const d2=yAll[i+1]-yAll[i];
+  const isDownwardConvexMinimum=i=>{
+    if(i<=0||i>=n-1){
+      return false;
+    }
 
-      if(
-        d1<0&&
-        d2>=0&&
-        yAll[i]<maxY
-      ){
+    const dLeft=
+      yAll[i]-yAll[i-1];
+
+    const dRight=
+      yAll[i+1]-yAll[i];
+
+    const curvature=
+      yAll[i-1]-
+      2*yAll[i]+
+      yAll[i+1];
+
+    return(
+      (
+        dLeft<0&&
+        dRight>=0
+      )||
+      (
+        dLeft<=0&&
+        dRight>0
+      )
+    )&&
+    curvature>0;
+  };
+
+  if(direction>0){
+    for(let i=maxIndex+1;i<n-1;i++){
+      if(isDownwardConvexMinimum(i)){
         return{
           index:i,
           y:yAll[i],
@@ -3415,20 +3449,16 @@ function findOppositeLocalMinimum(yAll,maxIndex,knownMinIndex,maxY){
             yAll,
             i,
             false
-          )
+          ),
+          searchStartIndex:maxIndex+1,
+          searchEndIndex:n-2,
+          searchDirection:'right'
         };
       }
     }
   }else{
     for(let i=maxIndex-1;i>=1;i--){
-      const d1=yAll[i]-yAll[i-1];
-      const d2=yAll[i+1]-yAll[i];
-
-      if(
-        d1<0&&
-        d2>=0&&
-        yAll[i]<maxY
-      ){
+      if(isDownwardConvexMinimum(i)){
         return{
           index:i,
           y:yAll[i],
@@ -3436,7 +3466,10 @@ function findOppositeLocalMinimum(yAll,maxIndex,knownMinIndex,maxY){
             yAll,
             i,
             false
-          )
+          ),
+          searchStartIndex:maxIndex-1,
+          searchEndIndex:1,
+          searchDirection:'left'
         };
       }
     }
@@ -3670,8 +3703,7 @@ el('aucBtn').onclick=async()=>{
           findOppositeLocalMinimum(
             yAll,
             maxGlobalIndex,
-            minGlobalIndex,
-            ex.yMax
+            minGlobalIndex
           );
 
         let auc3=null;
