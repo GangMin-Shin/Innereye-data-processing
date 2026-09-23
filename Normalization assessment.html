@@ -1972,10 +1972,46 @@
 
       const traces = [];
 
+      const maxPdf = Math.max(
+        ...rows.map(row =>
+          Number.isFinite(row.stats.sd) && row.stats.sd > 0
+            ? gaussianPdf(row.stats.mean, row.stats.mean, row.stats.sd)
+            : 0
+        ),
+        1e-9
+      );
+
+      const rawBarWidth = Math.max(
+        (xMax - xMin) * 0.0045,
+        maxSd * 0.018,
+        1e-9
+      );
+
       for (const row of rows) {
         const { condition, stats, values } = row;
         const color = conditionColors[condition] || "#2563eb";
         const isRef = condition === referenceCondition;
+        const rawBarHeight = maxPdf * (isRef ? 0.13 : 0.10);
+
+        traces.push({
+          type: "bar",
+          x: values,
+          y: values.map(() => rawBarHeight),
+          width: values.map(() => rawBarWidth),
+          base: 0,
+          name: `${condition} raw`,
+          legendgroup: condition,
+          showlegend: false,
+          marker: {
+            color: hexToRgba(color, isRef ? 0.52 : 0.38),
+            line: {
+              color,
+              width: isRef ? 1.2 : 0.8
+            }
+          },
+          hovertemplate:
+            `<b>${escapeHtml(condition)}</b><br>Measured value=%{x:.4f}<extra></extra>`
+        });
 
         if (Number.isFinite(stats.sd) && stats.sd > 0) {
           traces.push({
@@ -1984,6 +2020,7 @@
             x,
             y: x.map(v => gaussianPdf(v, stats.mean, stats.sd)),
             name: condition,
+            legendgroup: condition,
             line: {
               color,
               width: isRef ? 4 : 2.5
@@ -2000,27 +2037,10 @@
             x: [stats.mean],
             y: [0],
             name: condition,
+            legendgroup: condition,
             marker: { color, size: isRef ? 12 : 9, symbol: "diamond" }
           });
         }
-
-        traces.push({
-          type: "scatter",
-          mode: "markers",
-          x: values,
-          y: values.map(() => 0),
-          name: `${condition} raw`,
-          legendgroup: condition,
-          showlegend: false,
-          marker: {
-            color,
-            size: isRef ? 8 : 6,
-            opacity: .65,
-            symbol: "line-ns-open"
-          },
-          hovertemplate:
-            `<b>${escapeHtml(condition)}</b><br>Phase=%{x:.4f}<extra></extra>`
-        });
       }
 
       const shapes = [];
@@ -2097,6 +2117,8 @@
         },
         shapes,
         annotations,
+        barmode: "overlay",
+        bargap: 0,
         hovermode: "closest",
         hoverlabel: { bgcolor: "#111827", font: { color: "#fff" } }
       };
