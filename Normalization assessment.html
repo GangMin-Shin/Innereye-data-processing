@@ -481,6 +481,42 @@
     .reference-btn.active{border-color:#93c5fd;background:var(--accent-soft);color:#1d4ed8}
     .reference-btn.active .reference-dot{background:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.13)}
 
+    .display-toggle-btn{
+      width:100%;
+      min-height:42px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:8px 11px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      color:var(--ink);
+      text-align:left;
+      font-size:12px;
+      font-weight:800;
+      transition:.18s ease;
+    }
+    .display-toggle-btn:hover{background:#f8f9fb;border-color:#bdc3cc}
+    .display-toggle-dot{
+      width:11px;
+      height:11px;
+      border-radius:50%;
+      background:#d0d5dd;
+      flex:0 0 auto;
+      box-shadow:0 0 0 3px rgba(208,213,221,.18);
+      transition:.18s ease;
+    }
+    .display-toggle-btn.active{
+      border-color:#a6e3c1;
+      background:var(--green-soft);
+      color:#16653f;
+    }
+    .display-toggle-btn.active .display-toggle-dot{
+      background:var(--green);
+      box-shadow:0 0 0 4px rgba(31,138,87,.14);
+    }
+
     .check-row{
       display:flex;align-items:center;gap:9px;min-height:36px;padding:6px 8px;border:1px solid var(--line);border-radius:11px;background:#fff;font-size:12px;font-weight:800
     }
@@ -712,6 +748,12 @@
               </div>
               <div id="visibleList" class="condition-list"></div>
 
+              <div class="control-group-title" data-i18n="displayOptions">Display options</div>
+              <button id="showMeasuredBarsBtn" class="display-toggle-btn active" type="button" aria-pressed="true">
+                <span class="display-toggle-dot"></span>
+                <span data-i18n="measuredBars">Measured value bars</span>
+              </button>
+
               <div class="note" data-i18n="normalityNote">Gaussian curves are fitted from each group mean and sample SD. The fitted curves are descriptive and should be interpreted together with the observed raw values.</div>
             </aside>
 
@@ -836,6 +878,8 @@
         visibleGroups: "Visible groups",
         selectAll: "All",
         refOnly: "Reference only",
+        displayOptions: "Display options",
+        measuredBars: "Measured value bars",
         normalityNote: "Gaussian curves are fitted from each group mean and sample SD. The fitted curves are descriptive and should be interpreted together with the observed raw values.",
         metricReference: "Reference",
         metricBounds: "Sigma bounds",
@@ -931,6 +975,8 @@
         visibleGroups: "표시할 그룹",
         selectAll: "전체",
         refOnly: "기준만",
+        displayOptions: "표시 옵션",
+        measuredBars: "측정값 바 표시",
         normalityNote: "각 곡선은 그룹 평균과 표본 SD로 적합한 정규분포 PDF입니다. 적합 곡선은 기술적 비교용이며 실제 관측값과 함께 해석해야 합니다.",
         metricReference: "기준 그룹",
         metricBounds: "시그마 경계",
@@ -985,6 +1031,7 @@
     let referenceCondition = null;
     let visibleConditions = new Set();
     let conditionColors = {};
+    let showMeasuredBars = true;
     let saveHandle = null;
 
     const els = {
@@ -1011,6 +1058,7 @@
       referenceList: document.getElementById("referenceList"),
       visibleList: document.getElementById("visibleList"),
       sigmaInput: document.getElementById("sigmaInput"),
+      showMeasuredBarsBtn: document.getElementById("showMeasuredBarsBtn"),
       assessmentTableBody: document.getElementById("assessmentTableBody"),
       globalResetBtn: document.getElementById("globalResetBtn"),
       tabResetBtn: document.getElementById("tabResetBtn")
@@ -1102,6 +1150,7 @@
       referenceCondition = null;
       visibleConditions = new Set();
       conditionColors = {};
+      showMeasuredBars = true;
       saveHandle = null;
 
       els.excelInput.value = "";
@@ -1138,6 +1187,7 @@
         els.sigmaInput.value = "3";
         referenceCondition = d.conditions[0] || null;
         visibleConditions = new Set(d.conditions);
+        showMeasuredBars = true;
         const chart = document.getElementById("normalChart");
         if (chart) {
           try { Plotly.purge(chart); } catch (_) {}
@@ -1247,6 +1297,7 @@
       referenceCondition = null;
       visibleConditions = new Set();
       conditionColors = {};
+      showMeasuredBars = true;
       els.sigmaInput.value = "3";
       setActiveTab("basic");
       clearRenderedAssessmentContent();
@@ -1339,6 +1390,7 @@
       referenceCondition = null;
       visibleConditions = new Set();
       conditionColors = {};
+      showMeasuredBars = true;
       clearRenderedAssessmentContent();
       resetAnalysisUI();
       setStatus("error", message);
@@ -1365,7 +1417,8 @@
       const state = {
         referenceCondition: d.conditions[0] || null,
         visibleConditions: new Set(d.conditions),
-        conditionColors: colors
+        conditionColors: colors,
+        showMeasuredBars: true
       };
       sheetStates[sheetName] = state;
       return state;
@@ -1384,6 +1437,7 @@
       if (!visibleConditions.size && referenceCondition) visibleConditions.add(referenceCondition);
       if (referenceCondition) visibleConditions.add(referenceCondition);
       conditionColors = { ...(state.conditionColors || {}) };
+      showMeasuredBars = state.showMeasuredBars !== false;
       d.conditions.forEach((c, i) => {
         if (!conditionColors[c]) conditionColors[c] = palette[i % palette.length];
       });
@@ -1394,7 +1448,8 @@
       sheetStates[activeSheet] = {
         referenceCondition,
         visibleConditions: new Set(visibleConditions),
-        conditionColors: { ...conditionColors }
+        conditionColors: { ...conditionColors },
+        showMeasuredBars
       };
     }
 
@@ -1756,6 +1811,19 @@
       }
     }
 
+    function updateMeasuredBarsToggle() {
+      if (!els.showMeasuredBarsBtn) return;
+      els.showMeasuredBarsBtn.classList.toggle("active", showMeasuredBars);
+      els.showMeasuredBarsBtn.setAttribute("aria-pressed", showMeasuredBars ? "true" : "false");
+    }
+
+    els.showMeasuredBarsBtn.addEventListener("click", () => {
+      showMeasuredBars = !showMeasuredBars;
+      updateMeasuredBarsToggle();
+      persistCurrentSheetState();
+      renderNormalAssessment();
+    });
+
     function renderNormalControls() {
       const d = getCurrentData();
       if (!d) return;
@@ -1771,6 +1839,7 @@
 
       els.referenceList.innerHTML = "";
       els.visibleList.innerHTML = "";
+      updateMeasuredBarsToggle();
 
       for (const condition of d.conditions) {
         const refBtn = document.createElement("button");
@@ -1988,25 +2057,27 @@
             ? values.map(v => gaussianPdf(v, stats.mean, stats.sd))
             : values.map(() => 0);
 
-        traces.push({
-          type: "bar",
-          x: values,
-          y: rawPdfHeights,
-          width: values.map(() => rawBarWidth),
-          base: 0,
-          name: `${condition} raw`,
-          legendgroup: condition,
-          showlegend: false,
-          marker: {
-            color: hexToRgba(color, isRef ? 0.52 : 0.38),
-            line: {
-              color,
-              width: isRef ? 1.2 : 0.8
-            }
-          },
-          hovertemplate:
-            `<b>${escapeHtml(condition)}</b><br>Measured value=%{x:.4f}<br>PDF=%{y:.4f}<extra></extra>`
-        });
+        if (showMeasuredBars) {
+          traces.push({
+            type: "bar",
+            x: values,
+            y: rawPdfHeights,
+            width: values.map(() => rawBarWidth),
+            base: 0,
+            name: `${condition} raw`,
+            legendgroup: condition,
+            showlegend: false,
+            marker: {
+              color: hexToRgba(color, isRef ? 0.52 : 0.38),
+              line: {
+                color,
+                width: isRef ? 1.2 : 0.8
+              }
+            },
+            hovertemplate:
+              `<b>${escapeHtml(condition)}</b><br>Measured value=%{x:.4f}<br>PDF=%{y:.4f}<extra></extra>`
+          });
+        }
 
         if (Number.isFinite(stats.sd) && stats.sd > 0) {
           traces.push({
