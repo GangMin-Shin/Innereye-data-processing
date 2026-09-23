@@ -466,7 +466,7 @@ const I18N={
     sgSub:'Third-order Savitzky–Golay smoothing using the SG window size entered above.',
     intervalSub:'Enter Range start/end to set the analysis interval. Plot zooming is independent of the analysis range.',
     intervalMeanSub:'Overlay any combination of scan lines. Set one search range, then automatically calculate Min, Before, and Notch mean ± SD plus the notch-position tangent slope for every scan line in the current sample.',
-    intervalAucV1Sub:'Enter Range start/end to set the analysis interval. The dominant local minimum and maximum are detected in that range, then a symmetric endpoint is placed on the opposite side of the maximum at the same X-distance as the minimum.',
+    intervalAucV1Sub:'Enter Range start/end to detect the dominant local minimum and maximum. AUC 1 keeps the previous symmetric Lower-AUC method, AUC 2 integrates only the vertical span between the detected minimum and maximum, and AUC 3 finds the opposite-side minimum beyond the entered range when necessary and applies the same DC-independent bounded integration on both sides of the maximum.',
     samplingRate:'Estimated sampling rate',
     duration:'Scan duration',
     minLength:'Common valid length',
@@ -494,13 +494,15 @@ const I18N={
     hintRaw:'Use the sample selector and dynamically detected line buttons to control the overlay.',
     hintSG:'SG polynomial order = 3. The entered window size is interpreted in seconds and converted to the nearest valid odd sample count based on the estimated sampling rate.',
     hintInterval:'For each sample, all selected scan lines use one common search range. For AUC, the two most prominent local maxima inside that range are selected. Upper AUC uses the straight line connecting the two maxima as the baseline, while Lower AUC uses the minimum value between the two maxima as a horizontal baseline.',
-    hintIntervalAucV1:'The dominant local minimum and maximum are detected with the same extrema algorithm. A symmetric endpoint is then selected on the opposite side of the maximum at the same X-distance as the minimum. Upper and Lower AUC are calculated over that symmetric interval using the same baseline rules as Interval analysis.',
+    hintIntervalAucV1:'AUC 1: use the previous symmetric interval and calculate only the previous Lower AUC. AUC 2: integrate between the detected minimum and maximum after subtracting the minimum Y level and limiting the vertical contribution to the minimum-to-maximum Y span, so a DC offset does not change the area. AUC 3: find the nearest local minimum on the opposite side of the maximum, even outside the entered search range, then apply the same bounded DC-independent integration from each minimum to the maximum and sum both sides.',
     extremaDone:'Dominant local extrema were detected from the SG-smoothed signal using sign-change candidates and topographic prominence.',
     aucDone:'Within the entered search range, the two most prominent local maxima were selected. Upper AUC was calculated from the signal relative to the straight baseline connecting the maxima, and Lower AUC was calculated from the signal relative to the horizontal baseline at the minimum between the maxima. Both AUC values are reported as absolute integrated magnitudes.',
-    aucV1Done:'The dominant minimum and maximum were detected, the symmetric endpoint was selected at the same X-distance on the opposite side of the maximum, and Upper/Lower AUC were calculated over that symmetric interval using the same baseline rules as Interval analysis.',
-    symmetricPointOut:'The symmetric AUC endpoint falls outside the available scan range.',
+    aucV1Done:'AUC 1, AUC 2, and AUC 3 were calculated. AUC 1 uses the previous symmetric Lower-AUC method; AUC 2 uses the bounded minimum-to-maximum area; AUC 3 uses the bounded two-sided area between the minima surrounding the maximum.',
+    symmetricPointOut:'The symmetric AUC 1 endpoint falls outside the available scan range.',
     noExtrema:'No valid local maximum/minimum pair was found in the selected interval.',
     noTwoMaxima:'Fewer than two valid local maxima were found in the selected search range.',
+    oppositeMinNotFound:'AUC 1 and AUC 2 were calculated, but no opposite-side local minimum was found for AUC 3.',
+    aucV1Partial:'At least one AUC result could not be calculated for one or more selected lines. Check the result table.',
     rangeInvalid:'The analysis range is invalid.',
     lineRequired:'At least one line must remain selected.',
     regionsReset:'Calculated regions were reset.',
@@ -598,7 +600,7 @@ const I18N={
     sgSub:'상단에서 입력한 SG 윈도우 크기를 사용하는 3차 Savitzky–Golay 스무딩입니다.',
     intervalSub:'Range start/end로 분석 구간을 설정합니다. 그래프 확대·축소는 분석 구간과 독립적으로 사용할 수 있습니다.',
     intervalMeanSub:'여러 스캔 라인을 자유롭게 겹쳐 표시하고, 하나의 검색 구간을 설정한 뒤 현재 샘플의 모든 라인에 대해 Min, Before, Notch 평균과 표준편차 및 노치 위치의 접선 기울기를 자동 계산합니다.',
-    intervalAucV1Sub:'Range start/end로 분석 구간을 설정합니다. 해당 구간에서 대표 극솟값과 극댓값을 검출한 뒤 극댓값을 기준으로 극솟값과 동일한 X축 거리에 있는 반대편 대칭 지점을 선택합니다.',
+    intervalAucV1Sub:'Range start/end에서 대표 극솟점과 극댓점을 검출합니다. AUC 1은 기존 대칭 구간의 Lower AUC 방식만 유지하고, AUC 2는 검출된 극솟점과 극댓점 사이에서 Y축 높이 차이만 적분하며, AUC 3은 필요하면 지정 범위를 넘어 극댓점 반대편의 극솟점을 추가로 찾아 양쪽에 같은 DC 독립 적분을 적용합니다.',
     samplingRate:'추정 샘플링 레이트',
     duration:'스캔 시간',
     minLength:'공통 유효 길이',
@@ -626,13 +628,15 @@ const I18N={
     hintRaw:'샘플 선택과 동적으로 검출된 라인 버튼으로 오버레이 라인을 선택할 수 있습니다.',
     hintSG:'SG 다항식 차수는 3차로 고정하며, 상단에 입력한 윈도우 크기(s)를 추정 샘플링 레이트에 따라 가장 가까운 유효 홀수 샘플 수로 변환합니다.',
     hintInterval:'샘플별로 선택된 모든 스캔 라인은 하나의 동일한 검색 구간을 사용합니다. AUC 계산 시에는 입력한 검색 구간 안에서 prominence가 큰 대표 극댓값 2개를 선택합니다. Upper AUC는 두 극댓값을 잇는 직선을 baseline으로 사용하고, Lower AUC는 두 극댓값 사이의 극솟값을 수평 baseline으로 사용합니다.',
-    hintIntervalAucV1:'Extrema와 동일한 알고리즘으로 대표 극솟값과 극댓값을 찾습니다. 이후 극댓값을 기준으로 극솟값과 동일한 X축 거리만큼 반대편에 대칭 지점을 선택하고, 그 대칭 구간에서 기존 Interval analysis와 동일한 baseline 규칙으로 Upper/Lower AUC를 계산합니다.',
+    hintIntervalAucV1:'AUC 1: 기존처럼 극솟점-극댓점 X축 거리만큼 극댓점 반대편에 대칭 구간을 만들고 기존 Lower AUC만 계산합니다. AUC 2: 검출된 극솟점과 극댓점 사이에서 극솟점 Y를 기준선으로 빼고, 극솟점 Y부터 극댓점 Y 사이의 높이만 적분하여 DC 영향을 제거합니다. AUC 3: 극댓점 반대편에서 가장 가까운 새로운 극솟점을 찾되 입력 범위를 넘어가도 허용하고, 양쪽 극솟점에서 극댓점까지 각각 AUC 2 방식으로 적분한 뒤 합산합니다.',
     extremaDone:'SG 스무딩 신호의 미분 부호 변화 후보와 topographic prominence를 이용해 대표 극대·극소점을 검출했습니다.',
     aucDone:'입력한 검색 구간 안에서 prominence가 큰 대표 극댓값 2개를 선택했습니다. Upper AUC는 두 극댓값을 잇는 직선 baseline 기준으로, Lower AUC는 두 극댓값 사이의 극솟값을 지나는 수평 baseline 기준으로 사다리꼴 적분했으며 두 값 모두 적분 결과의 절대값으로 표시합니다.',
-    aucV1Done:'대표 극솟값과 극댓값을 검출한 뒤 극댓값 반대편에 동일한 X축 거리의 대칭 지점을 선택하고, 해당 대칭 구간에서 기존 Interval analysis와 동일한 baseline 규칙으로 Upper/Lower AUC를 계산했습니다.',
-    symmetricPointOut:'대칭 AUC 끝점이 전체 스캔 가능 범위를 벗어납니다.',
+    aucV1Done:'AUC 1, AUC 2, AUC 3 계산을 완료했습니다. AUC 1은 기존 대칭 Lower AUC 방식, AUC 2는 극솟점-극댓점 사이의 Y축 제한 면적, AUC 3은 극댓점 양쪽 극솟점을 이용한 두 구간의 Y축 제한 면적 합입니다.',
+    symmetricPointOut:'AUC 1의 대칭 끝점이 전체 스캔 가능 범위를 벗어납니다.',
     noExtrema:'선택 구간에서 유효한 극대점·극소점 쌍을 찾지 못했습니다.',
     noTwoMaxima:'선택한 검색 구간에서 유효한 극댓값을 2개 이상 찾지 못했습니다.',
+    oppositeMinNotFound:'AUC 1과 AUC 2는 계산했지만 AUC 3에 필요한 극댓점 반대편의 새로운 극솟점을 찾지 못했습니다.',
+    aucV1Partial:'선택된 라인 중 하나 이상에서 일부 AUC를 계산하지 못했습니다. 결과 테이블을 확인해주세요.',
     rangeInvalid:'분석 구간이 올바르지 않습니다.',
     lineRequired:'최소 한 개의 라인은 선택되어 있어야 합니다.',
     regionsReset:'계산된 구간을 초기화했습니다.',
@@ -2372,56 +2376,257 @@ function appendAucOverlayTraces(traces,sample,line,au){
   );
 }
 
+function aucV1AreaTrace(sample,line,segment,name,alpha=.24,clipToCap=true){
+  if(
+    !segment||
+    !Number.isInteger(segment.startIndex)||
+    !Number.isInteger(segment.endIndex)||
+    !Number.isFinite(segment.baselineY)||
+    segment.endIndex<=segment.startIndex
+  ){
+    return null;
+  }
+
+  const d=state.dataset;
+  const yAll=d.smoothed?.[sample]?.[line];
+
+  if(!Array.isArray(yAll)){
+    return null;
+  }
+
+  const startIndex=clamp(
+    segment.startIndex,
+    0,
+    d.minLength-1
+  );
+
+  const endIndex=clamp(
+    segment.endIndex,
+    0,
+    d.minLength-1
+  );
+
+  if(endIndex-startIndex<1){
+    return null;
+  }
+
+  const x=d.distance.slice(
+    startIndex,
+    endIndex+1
+  );
+
+  const yRaw=yAll.slice(
+    startIndex,
+    endIndex+1
+  );
+
+  const lo=segment.baselineY;
+  const hi=
+    Number.isFinite(segment.capY)
+      ?Math.max(lo,segment.capY)
+      :Infinity;
+
+  const yArea=yRaw.map(v=>{
+    if(!clipToCap){
+      return v;
+    }
+
+    return Math.min(
+      hi,
+      Math.max(lo,v)
+    );
+  });
+
+  const baseline=x.map(()=>lo);
+
+  return{
+    x:x.concat(x.slice().reverse()),
+    y:yArea.concat(baseline.slice().reverse()),
+    type:'scatter',
+    mode:'lines',
+    name,
+    line:{
+      width:0,
+      color:'rgba(0,0,0,0)'
+    },
+    fill:'toself',
+    fillcolor:lightLineFill(line,alpha,.78),
+    showlegend:false,
+    hoverinfo:'skip'
+  };
+}
+
+function appendAucV1AreaTraces(traces,sample,line,au){
+  if(!au){
+    return;
+  }
+
+  const auc1Area=aucV1AreaTrace(
+    sample,
+    line,
+    au.auc1,
+    `${line} AUC 1 area`,
+    .18,
+    false
+  );
+
+  if(auc1Area){
+    traces.push(auc1Area);
+  }
+
+  const auc2Area=aucV1AreaTrace(
+    sample,
+    line,
+    au.auc2,
+    `${line} AUC 2 area`,
+    .30,
+    true
+  );
+
+  if(auc2Area){
+    traces.push(auc2Area);
+  }
+
+  if(au.auc3){
+    const leftArea=aucV1AreaTrace(
+      sample,
+      line,
+      au.auc3.leftSegment,
+      `${line} AUC 3 left area`,
+      .12,
+      true
+    );
+
+    const rightArea=aucV1AreaTrace(
+      sample,
+      line,
+      au.auc3.rightSegment,
+      `${line} AUC 3 right area`,
+      .12,
+      true
+    );
+
+    if(leftArea){
+      traces.push(leftArea);
+    }
+
+    if(rightArea){
+      traces.push(rightArea);
+    }
+  }
+}
+
 function appendAucV1OverlayTraces(traces,sample,line,au){
   if(!au){
     return;
   }
 
-  const seg=aucSegmentData(sample,line,au);
-
-  if(!seg){
-    return;
+  if(au.auc1){
+    traces.push(
+      {
+        x:[
+          state.dataset.distance[au.auc1.startIndex],
+          state.dataset.distance[au.auc1.endIndex]
+        ],
+        y:[
+          au.auc1.baselineY,
+          au.auc1.baselineY
+        ],
+        type:'scatter',
+        mode:'lines',
+        name:`${line} AUC 1 baseline`,
+        line:{
+          width:1.4,
+          dash:'dash',
+          color:lineColor(line)
+        },
+        opacity:.75,
+        hovertemplate:
+          'x=%{x:.4f} mm<br>AUC 1 baseline=%{y:.6f}<extra>'+
+          line+
+          '</extra>'
+      }
+    );
   }
 
-  traces.push(
-    {
-      x:seg.x,
-      y:seg.upperBaseline,
-      type:'scatter',
-      mode:'lines',
-      name:`${line} Upper AUC baseline`,
-      line:{
-        width:1.4,
-        dash:'dot',
-        color:lineColor(line)
-      },
-      opacity:.75,
-      hovertemplate:
-        'x=%{x:.4f} mm<br>upper baseline=%{y:.6f}<extra>'+
-        line+
-        '</extra>'
-    }
-  );
+  if(au.auc2){
+    traces.push(
+      {
+        x:[
+          state.dataset.distance[au.auc2.startIndex],
+          state.dataset.distance[au.auc2.endIndex]
+        ],
+        y:[
+          au.auc2.baselineY,
+          au.auc2.baselineY
+        ],
+        type:'scatter',
+        mode:'lines',
+        name:`${line} AUC 2 baseline`,
+        line:{
+          width:1.4,
+          dash:'dot',
+          color:lineColor(line)
+        },
+        opacity:.78,
+        hovertemplate:
+          'x=%{x:.4f} mm<br>AUC 2 baseline=%{y:.6f}<extra>'+
+          line+
+          '</extra>'
+      }
+    );
+  }
 
-  traces.push(
-    {
-      x:seg.x,
-      y:seg.lowerBaseline,
-      type:'scatter',
-      mode:'lines',
-      name:`${line} Lower AUC baseline`,
-      line:{
-        width:1.4,
-        dash:'dash',
-        color:lineColor(line)
-      },
-      opacity:.75,
-      hovertemplate:
-        'x=%{x:.4f} mm<br>lower baseline=%{y:.6f}<extra>'+
-        line+
-        '</extra>'
-    }
-  );
+  if(au.auc3){
+    const left=au.auc3.leftSegment;
+    const right=au.auc3.rightSegment;
+
+    traces.push(
+      {
+        x:[
+          state.dataset.distance[left.startIndex],
+          state.dataset.distance[left.endIndex]
+        ],
+        y:[
+          left.baselineY,
+          left.baselineY
+        ],
+        type:'scatter',
+        mode:'lines',
+        name:`${line} AUC 3 left baseline`,
+        line:{
+          width:1.2,
+          dash:'dashdot',
+          color:lineColor(line)
+        },
+        opacity:.60,
+        hoverinfo:'skip'
+      }
+    );
+
+    traces.push(
+      {
+        x:[
+          state.dataset.distance[right.startIndex],
+          state.dataset.distance[right.endIndex]
+        ],
+        y:[
+          right.baselineY,
+          right.baselineY
+        ],
+        type:'scatter',
+        mode:'lines',
+        name:`${line} AUC 3 right baseline`,
+        line:{
+          width:1.2,
+          dash:'dashdot',
+          color:lineColor(line)
+        },
+        opacity:.60,
+        hoverinfo:'skip'
+      }
+    );
+  }
 
   traces.push(
     {
@@ -2461,40 +2666,66 @@ function appendAucV1OverlayTraces(traces,sample,line,au){
     }
   );
 
-  traces.push(
-    {
-      x:[au.symmetricX],
-      y:[au.symmetricY],
-      type:'scatter',
-      mode:'markers',
-      name:`${line} symmetric endpoint`,
-      marker:{
-        size:10,
-        symbol:'diamond-open',
-        color:lineColor(line),
-        line:{
-          color:'#111827',
-          width:1.2
+  if(
+    Number.isFinite(au.symmetricX)&&
+    Number.isFinite(au.symmetricY)
+  ){
+    traces.push(
+      {
+        x:[au.symmetricX],
+        y:[au.symmetricY],
+        type:'scatter',
+        mode:'markers',
+        name:`${line} AUC 1 symmetric endpoint`,
+        marker:{
+          size:10,
+          symbol:'diamond-open',
+          color:lineColor(line),
+          line:{
+            color:'#111827',
+            width:1.2
+          }
         }
       }
-    }
-  );
+    );
+  }
+
+  if(
+    au.auc3&&
+    Number.isFinite(au.auc3.oppositeMinX)&&
+    Number.isFinite(au.auc3.oppositeMinY)
+  ){
+    traces.push(
+      {
+        x:[au.auc3.oppositeMinX],
+        y:[au.auc3.oppositeMinY],
+        type:'scatter',
+        mode:'markers',
+        name:`${line} AUC 3 opposite minimum`,
+        marker:{
+          size:10,
+          symbol:'triangle-down-open',
+          color:lineColor(line),
+          line:{
+            color:'#111827',
+            width:1.2
+          }
+        }
+      }
+    );
+  }
 }
+
 
 function makeTraces(sample,mode){
   const d=state.dataset;
   const source=mode==='raw'?d.raw:d.smoothed;
   const traces=[];
 
-  if(
-    mode==='interval'||
-    mode==='intervalAucV1'
-  ){
+  if(mode==='interval'){
     for(const line of selectedLineList(sample)){
       const au=
-        mode==='interval'
-          ?state.results.auc?.[sample]?.[line]
-          :state.results.aucV1?.[sample]?.[line];
+        state.results.auc?.[sample]?.[line];
 
       const lowerArea=
         lowerAucAreaTrace(sample,line,au);
@@ -2509,6 +2740,17 @@ function makeTraces(sample,mode){
       if(upperArea){
         traces.push(upperArea);
       }
+    }
+  }
+
+  if(mode==='intervalAucV1'){
+    for(const line of selectedLineList(sample)){
+      appendAucV1AreaTraces(
+        traces,
+        sample,
+        line,
+        state.results.aucV1?.[sample]?.[line]
+      );
     }
   }
 
@@ -3101,6 +3343,108 @@ function lowerAUCFromMinimum(x,y){
   };
 }
 
+
+function boundedAUCByIndices(xAll,yAll,startIndex,endIndex,baselineY,capY){
+  const a=Math.min(startIndex,endIndex);
+  const b=Math.max(startIndex,endIndex);
+
+  if(
+    b-a<1||
+    a<0||
+    b>=Math.min(xAll.length,yAll.length)||
+    !Number.isFinite(baselineY)||
+    !Number.isFinite(capY)||
+    !(capY>baselineY)
+  ){
+    return null;
+  }
+
+  let area=0;
+
+  const boundedY=i=>
+    Math.min(
+      capY,
+      Math.max(
+        baselineY,
+        yAll[i]
+      )
+    );
+
+  for(let i=a;i<b;i++){
+    const y0=boundedY(i)-baselineY;
+    const y1=boundedY(i+1)-baselineY;
+    const dx=xAll[i+1]-xAll[i];
+
+    area+=
+      (y0+y1)*
+      0.5*
+      dx;
+  }
+
+  return{
+    startIndex:a,
+    endIndex:b,
+    x0:xAll[a],
+    x1:xAll[b],
+    baselineY,
+    capY,
+    auc:Math.abs(area)
+  };
+}
+
+function findOppositeLocalMinimum(yAll,maxIndex,knownMinIndex,maxY){
+  const direction=
+    knownMinIndex<maxIndex
+      ?1
+      :-1;
+
+  if(direction>0){
+    for(let i=maxIndex+1;i<yAll.length-1;i++){
+      const d1=yAll[i]-yAll[i-1];
+      const d2=yAll[i+1]-yAll[i];
+
+      if(
+        d1<0&&
+        d2>=0&&
+        yAll[i]<maxY
+      ){
+        return{
+          index:i,
+          y:yAll[i],
+          prominence:peakProminence(
+            yAll,
+            i,
+            false
+          )
+        };
+      }
+    }
+  }else{
+    for(let i=maxIndex-1;i>=1;i--){
+      const d1=yAll[i]-yAll[i-1];
+      const d2=yAll[i+1]-yAll[i];
+
+      if(
+        d1<0&&
+        d2>=0&&
+        yAll[i]<maxY
+      ){
+        return{
+          index:i,
+          y:yAll[i],
+          prominence:peakProminence(
+            yAll,
+            i,
+            false
+          )
+        };
+      }
+    }
+  }
+
+  return null;
+}
+
 el('extremaBtn').onclick=async()=>{
   try{
     const sample=state.selectedSample;
@@ -3241,6 +3585,9 @@ el('aucBtn').onclick=async()=>{
           rangeEnd:range[1]
         };
 
+        const xAll=state.dataset.distance;
+        const yAll=state.dataset.smoothed[sample][line];
+
         const minGlobalIndex=
           i0+ex.minIndex;
 
@@ -3251,109 +3598,164 @@ el('aucBtn').onclick=async()=>{
           2*maxGlobalIndex-
           minGlobalIndex;
 
+        let symmetricX=NaN;
+        let symmetricY=NaN;
+        let auc1=null;
+
         if(
-          symmetricGlobalIndex<0||
-          symmetricGlobalIndex>=state.dataset.minLength
+          symmetricGlobalIndex>=0&&
+          symmetricGlobalIndex<state.dataset.minLength
         ){
-          delete state.results.aucV1[sample][line];
+          symmetricX=
+            xAll[symmetricGlobalIndex];
 
-          rows.push({
-            Sample:sample,
-            Line:line,
-            Search_Range_Start_mm:range[0],
-            Search_Range_End_mm:range[1],
-            Local_Min_X_mm:ex.xMin,
-            Local_Max_X_mm:ex.xMax,
-            Status:tr('symmetricPointOut')
-          });
+          symmetricY=
+            yAll[symmetricGlobalIndex];
 
-          continue;
-        }
-
-        const startIndex=Math.min(
-          minGlobalIndex,
-          symmetricGlobalIndex
-        );
-
-        const endIndex=Math.max(
-          minGlobalIndex,
-          symmetricGlobalIndex
-        );
-
-        if(endIndex-startIndex<2){
-          delete state.results.aucV1[sample][line];
-
-          rows.push({
-            Sample:sample,
-            Line:line,
-            Search_Range_Start_mm:range[0],
-            Search_Range_End_mm:range[1],
-            Status:tr('rangeInvalid')
-          });
-
-          continue;
-        }
-
-        const xAuc=
-          state.dataset.distance.slice(
-            startIndex,
-            endIndex+1
+          const auc1StartIndex=Math.min(
+            minGlobalIndex,
+            symmetricGlobalIndex
           );
 
-        const yAuc=
-          state.dataset.smoothed[sample][line]
-            .slice(
-              startIndex,
-              endIndex+1
-            );
+          const auc1EndIndex=Math.max(
+            minGlobalIndex,
+            symmetricGlobalIndex
+          );
 
-        const upper=correctedAUC(
-          xAuc,
-          yAuc
-        );
+          if(auc1EndIndex-auc1StartIndex>=2){
+            const xAuc1=
+              xAll.slice(
+                auc1StartIndex,
+                auc1EndIndex+1
+              );
 
-        const lower=lowerAUCFromMinimum(
-          xAuc,
-          yAuc
-        );
+            const yAuc1=
+              yAll.slice(
+                auc1StartIndex,
+                auc1EndIndex+1
+              );
 
-        if(!lower){
-          delete state.results.aucV1[sample][line];
+            const lower=
+              lowerAUCFromMinimum(
+                xAuc1,
+                yAuc1
+              );
 
-          rows.push({
-            Sample:sample,
-            Line:line,
-            Search_Range_Start_mm:range[0],
-            Search_Range_End_mm:range[1],
-            Status:tr('noExtrema')
-          });
-
-          continue;
+            if(lower){
+              auc1={
+                startIndex:auc1StartIndex,
+                endIndex:auc1EndIndex,
+                x0:xAuc1[0],
+                x1:xAuc1[xAuc1.length-1],
+                baselineY:lower.valleyY,
+                valleyX:lower.valleyX,
+                valleyY:lower.valleyY,
+                auc:lower.lowerAUC
+              };
+            }
+          }
         }
 
-        const symmetricX=
-          state.dataset.distance[
-            symmetricGlobalIndex
-          ];
+        const auc2=
+          boundedAUCByIndices(
+            xAll,
+            yAll,
+            minGlobalIndex,
+            maxGlobalIndex,
+            ex.yMin,
+            ex.yMax
+          );
 
-        const symmetricY=
-          state.dataset.smoothed[sample][line][
-            symmetricGlobalIndex
-          ];
+        const oppositeMin=
+          findOppositeLocalMinimum(
+            yAll,
+            maxGlobalIndex,
+            minGlobalIndex,
+            ex.yMax
+          );
+
+        let auc3=null;
+
+        if(oppositeMin){
+          const leftMinIndex=
+            minGlobalIndex<maxGlobalIndex
+              ?minGlobalIndex
+              :oppositeMin.index;
+
+          const rightMinIndex=
+            minGlobalIndex>maxGlobalIndex
+              ?minGlobalIndex
+              :oppositeMin.index;
+
+          const leftMinY=
+            yAll[leftMinIndex];
+
+          const rightMinY=
+            yAll[rightMinIndex];
+
+          const leftSegment=
+            boundedAUCByIndices(
+              xAll,
+              yAll,
+              leftMinIndex,
+              maxGlobalIndex,
+              leftMinY,
+              ex.yMax
+            );
+
+          const rightSegment=
+            boundedAUCByIndices(
+              xAll,
+              yAll,
+              maxGlobalIndex,
+              rightMinIndex,
+              rightMinY,
+              ex.yMax
+            );
+
+          if(leftSegment&&rightSegment){
+            auc3={
+              leftSegment,
+              rightSegment,
+              auc:leftSegment.auc+rightSegment.auc,
+              leftMinIndex,
+              leftMinX:xAll[leftMinIndex],
+              leftMinY,
+              maxIndex:maxGlobalIndex,
+              maxX:ex.xMax,
+              maxY:ex.yMax,
+              rightMinIndex,
+              rightMinX:xAll[rightMinIndex],
+              rightMinY,
+              oppositeMinIndex:oppositeMin.index,
+              oppositeMinX:xAll[oppositeMin.index],
+              oppositeMinY:yAll[oppositeMin.index],
+              oppositeMinProminence:
+                oppositeMin.prominence
+            };
+          }
+        }
 
         state.results.aucV1[sample][line]={
-          ...upper,
-          ...lower,
           searchRangeStart:range[0],
           searchRangeEnd:range[1],
+          localMinIndex:minGlobalIndex,
           localMinX:ex.xMin,
           localMinY:ex.yMin,
+          localMaxIndex:maxGlobalIndex,
           localMaxX:ex.xMax,
           localMaxY:ex.yMax,
+          symmetricIndex:
+            Number.isFinite(symmetricX)
+              ?symmetricGlobalIndex
+              :null,
           symmetricX,
           symmetricY,
           symmetricDistance:
             Math.abs(ex.xMax-ex.xMin),
+          auc1,
+          auc2,
+          auc3,
           maxProminence:ex.maxProminence,
           minProminence:ex.minProminence,
           maxCandidates:ex.maxCandidates,
@@ -3369,16 +3771,53 @@ el('aucBtn').onclick=async()=>{
           Local_Min_Y:ex.yMin,
           Local_Max_X_mm:ex.xMax,
           Local_Max_Y:ex.yMax,
-          Symmetric_Point_X_mm:symmetricX,
-          Symmetric_Point_Y:symmetricY,
-          Symmetric_Distance_mm:
-            Math.abs(ex.xMax-ex.xMin),
-          AUC_Start_mm:upper.x0,
-          AUC_End_mm:upper.x1,
-          Minimum_in_AUC_X_mm:lower.valleyX,
-          Minimum_in_AUC_Y:lower.valleyY,
-          Upper_AUC:upper.upperAUC,
-          Lower_AUC:lower.lowerAUC
+          AUC1_Symmetric_Point_X_mm:symmetricX,
+          AUC1_Symmetric_Point_Y:symmetricY,
+          AUC1_Baseline_Y:
+            auc1?.baselineY??NaN,
+          AUC_1:
+            auc1?.auc??NaN,
+          AUC2_Start_mm:
+            auc2?.x0??NaN,
+          AUC2_End_mm:
+            auc2?.x1??NaN,
+          AUC2_Min_Y:
+            auc2?.baselineY??NaN,
+          AUC2_Max_Y:
+            auc2?.capY??NaN,
+          AUC_2:
+            auc2?.auc??NaN,
+          AUC3_Left_Min_X_mm:
+            auc3?.leftMinX??NaN,
+          AUC3_Left_Min_Y:
+            auc3?.leftMinY??NaN,
+          AUC3_Max_X_mm:
+            auc3?.maxX??NaN,
+          AUC3_Max_Y:
+            auc3?.maxY??NaN,
+          AUC3_Right_Min_X_mm:
+            auc3?.rightMinX??NaN,
+          AUC3_Right_Min_Y:
+            auc3?.rightMinY??NaN,
+          AUC3_Opposite_Min_X_mm:
+            auc3?.oppositeMinX??NaN,
+          AUC3_Opposite_Min_Y:
+            auc3?.oppositeMinY??NaN,
+          AUC_3:
+            auc3?.auc??NaN,
+          AUC1_Status:
+            auc1
+              ?'Calculated'
+              :(
+                  symmetricGlobalIndex<0||
+                  symmetricGlobalIndex>=state.dataset.minLength
+                    ?tr('symmetricPointOut')
+                    :tr('rangeInvalid')
+                ),
+          AUC3_Status:
+            auc3
+              ?'Calculated'
+              :tr('oppositeMinNotFound')
         });
       }
 
@@ -3387,19 +3826,35 @@ el('aucBtn').onclick=async()=>{
         rows
       );
 
-      const hasSuccess=rows.some(
+      const complete=rows.some(
         r=>
-          Number.isFinite(r.Upper_AUC)&&
-          Number.isFinite(r.Lower_AUC)
+          Number.isFinite(r.AUC_1)&&
+          Number.isFinite(r.AUC_2)&&
+          Number.isFinite(r.AUC_3)
+      );
+
+      const partial=rows.some(
+        r=>
+          Number.isFinite(r.AUC_1)||
+          Number.isFinite(r.AUC_2)||
+          Number.isFinite(r.AUC_3)
       );
 
       setStatus(
-        hasSuccess
+        complete
           ?tr('aucV1Done')
-          :tr('noExtrema'),
-        hasSuccess
+          :(
+              partial
+                ?tr('aucV1Partial')
+                :tr('noExtrema')
+            ),
+        complete
           ?'good'
-          :'warn'
+          :(
+              partial
+                ?'warn'
+                :'bad'
+            )
       );
 
       await renderCurrentMode();
@@ -4726,15 +5181,32 @@ function allAucV1Rows(){
           Local_Min_Y:r.localMinY,
           Local_Max_X_mm:r.localMaxX,
           Local_Max_Y:r.localMaxY,
-          Symmetric_Point_X_mm:r.symmetricX,
-          Symmetric_Point_Y:r.symmetricY,
-          Symmetric_Distance_mm:r.symmetricDistance,
-          AUC_Start_mm:r.x0,
-          AUC_End_mm:r.x1,
-          Minimum_in_AUC_X_mm:r.valleyX,
-          Minimum_in_AUC_Y:r.valleyY,
-          Upper_AUC:r.upperAUC,
-          Lower_AUC:r.lowerAUC
+          AUC1_Symmetric_Point_X_mm:r.symmetricX,
+          AUC1_Symmetric_Point_Y:r.symmetricY,
+          AUC1_Symmetric_Distance_mm:r.symmetricDistance,
+          AUC1_Start_mm:r.auc1?.x0??'',
+          AUC1_End_mm:r.auc1?.x1??'',
+          AUC1_Baseline_Min_X_mm:r.auc1?.valleyX??'',
+          AUC1_Baseline_Min_Y:r.auc1?.baselineY??'',
+          AUC_1:r.auc1?.auc??'',
+          AUC2_Start_mm:r.auc2?.x0??'',
+          AUC2_End_mm:r.auc2?.x1??'',
+          AUC2_Min_Y:r.auc2?.baselineY??'',
+          AUC2_Max_Y:r.auc2?.capY??'',
+          AUC_2:r.auc2?.auc??'',
+          AUC3_Left_Min_X_mm:r.auc3?.leftMinX??'',
+          AUC3_Left_Min_Y:r.auc3?.leftMinY??'',
+          AUC3_Max_X_mm:r.auc3?.maxX??'',
+          AUC3_Max_Y:r.auc3?.maxY??'',
+          AUC3_Right_Min_X_mm:r.auc3?.rightMinX??'',
+          AUC3_Right_Min_Y:r.auc3?.rightMinY??'',
+          AUC3_Opposite_Min_X_mm:r.auc3?.oppositeMinX??'',
+          AUC3_Opposite_Min_Y:r.auc3?.oppositeMinY??'',
+          AUC3_Opposite_Min_Prominence:
+            r.auc3?.oppositeMinProminence??'',
+          AUC3_Left_AUC:r.auc3?.leftSegment?.auc??'',
+          AUC3_Right_AUC:r.auc3?.rightSegment?.auc??'',
+          AUC_3:r.auc3?.auc??''
         });
       }
     }
@@ -4742,6 +5214,7 @@ function allAucV1Rows(){
 
   return rows;
 }
+
 
 function rangeRows(){
   return state.dataset.samples.map(
@@ -5015,15 +5488,10 @@ function makeTracesForSampleExport(sample,mode){
   const traces=[];
   const exportLines=selectedLineList(sample);
 
-  if(
-    mode==='interval'||
-    mode==='intervalAucV1'
-  ){
+  if(mode==='interval'){
     for(const line of exportLines){
       const au=
-        mode==='interval'
-          ?state.results.auc?.[sample]?.[line]
-          :state.results.aucV1?.[sample]?.[line];
+        state.results.auc?.[sample]?.[line];
 
       const lowerArea=
         lowerAucAreaTrace(
@@ -5046,6 +5514,17 @@ function makeTracesForSampleExport(sample,mode){
       if(upperArea){
         traces.push(upperArea);
       }
+    }
+  }
+
+  if(mode==='intervalAucV1'){
+    for(const line of exportLines){
+      appendAucV1AreaTraces(
+        traces,
+        sample,
+        line,
+        state.results.aucV1?.[sample]?.[line]
+      );
     }
   }
 
