@@ -141,12 +141,14 @@ button{cursor:pointer}
 .setup-grid{grid-template-columns:1fr 1fr}
 .control-grid{grid-template-columns:1fr 1fr}
 }
+
 @media(max-width:1050px){
 .dock{position:static;width:auto;max-height:none;margin:18px}
 .topbar{padding-left:24px}
 .workspace{margin-left:0;padding:12px 18px 60px}
 .analysis-btn{font-size:12px}
 }
+
 @media(max-width:650px){
 .setup-grid,.control-grid{grid-template-columns:1fr}
 .topbar{height:auto;padding:16px 18px}
@@ -197,7 +199,7 @@ button{cursor:pointer}
 <button class="analysis-btn" data-mode="sg" data-i18n="sgBtn">SG smoothing plot</button>
 <button class="analysis-btn" data-mode="interval" data-i18n="intervalBtn">Interval analysis</button>
 <button class="analysis-btn" data-mode="intervalMean" data-i18n="intervalMeanBtn">Min / Before / Notch regions Interval analysis</button>
-<button class="analysis-btn" data-mode="intervalAucV1" data-i18n="intervalAucV1Btn">Interval analysis (AUC Cal. ver.1 )</button>
+<button class="analysis-btn" data-mode="intervalAucV1" data-i18n="intervalAucV1Btn">Interval analysis (Min & Max)</button>
 </aside>
 
 <header class="topbar">
@@ -389,7 +391,7 @@ rawBtn:'Raw data plot',
 sgBtn:'SG smoothing plot',
 intervalBtn:'Interval analysis',
 intervalMeanBtn:'Min / Before / Notch regions Interval analysis',
-intervalAucV1Btn:'Interval analysis (AUC Cal. ver.1 )',
+intervalAucV1Btn:'Interval analysis (Min & Max)',
 inputSetup:'Input & output setup',
 excelFile:'Excel workbook',
 savePath:'Save path',
@@ -447,7 +449,7 @@ rawTitle:'Raw data',
 sgTitle:'SG smoothing',
 intervalTitle:'Interval analysis',
 intervalMeanTitle:'Min / Before / Notch regions Interval analysis',
-intervalAucV1Title:'Interval analysis (AUC Cal. ver.1 )',
+intervalAucV1Title:'Interval analysis (Min & Max)',
 rawSub:'Select a sample and one or more detected lines.',
 sgSub:'Third-order Savitzky–Golay smoothing using the SG window size entered above.',
 intervalSub:'Enter Range start/end to set the analysis interval. Plot zooming is independent of the analysis range.',
@@ -505,7 +507,7 @@ modeRaw:'Raw data',
 modeSG:'SG smoothing',
 modeInterval:'Interval analysis',
 modeIntervalMean:'Min / Before / Notch regions Interval analysis',
-modeIntervalAucV1:'Interval analysis (AUC Cal. ver.1 )',
+modeIntervalAucV1:'Interval analysis (Min & Max)',
 globalResetTitle:'Reset all',
 tabResetTitle:'Reset current analysis',
 fullResetDone:'All inputs and analysis states were reset.',
@@ -525,7 +527,7 @@ rawBtn:'Rawdata 플롯',
 sgBtn:'SG 스무딩 플롯',
 intervalBtn:'구간 분석',
 intervalMeanBtn:'Min / Before / Notch regions Interval analysis',
-intervalAucV1Btn:'Interval analysis (AUC Cal. ver.1 )',
+intervalAucV1Btn:'Interval analysis (Min & Max)',
 inputSetup:'입력 및 저장 설정',
 excelFile:'입력 Excel 파일',
 savePath:'저장 경로',
@@ -583,7 +585,7 @@ rawTitle:'Rawdata',
 sgTitle:'SG 스무딩',
 intervalTitle:'구간 분석',
 intervalMeanTitle:'Min / Before / Notch regions Interval analysis',
-intervalAucV1Title:'Interval analysis (AUC Cal. ver.1 )',
+intervalAucV1Title:'Interval analysis (Min & Max)',
 rawSub:'샘플과 검출된 스캔 라인을 선택해 오버레이를 확인합니다.',
 sgSub:'상단에서 입력한 SG 윈도우 크기를 사용하는 3차 Savitzky–Golay 스무딩입니다.',
 intervalSub:'Range start/end로 분석 구간을 설정합니다. 그래프 확대·축소는 분석 구간과 독립적으로 사용할 수 있습니다.',
@@ -641,7 +643,7 @@ modeRaw:'Rawdata',
 modeSG:'SG 스무딩',
 modeInterval:'구간 분석',
 modeIntervalMean:'Min / Before / Notch regions Interval analysis',
-modeIntervalAucV1:'Interval analysis (AUC Cal. ver.1 )',
+modeIntervalAucV1:'Interval analysis (Min & Max)',
 globalResetTitle:'전체 리셋',
 tabResetTitle:'현재 분석 탭 리셋',
 fullResetDone:'입력과 분석 상태를 모두 초기화했습니다.',
@@ -1828,7 +1830,7 @@ folder:'Interval Mean Cal'
 intervalAucV1:{
 title:'modeIntervalAucV1',
 sub:'intervalAucV1Sub',
-folder:'Interval analysis (AUC Cal. ver.1 )'
+folder:'Interval analysis (Min & Max)'
 }
 };
 
@@ -5286,19 +5288,6 @@ d.raw
 }
 }
 
-if(mode==='sg'){
-for(const s of d.samples){
-appendAoASheet(
-wb,
-`${s}_SG`,
-datasetSheet(
-s,
-d.smoothed
-)
-);
-}
-}
-
 if(mode==='interval'){
 appendJsonSheet(
 wb,
@@ -5619,14 +5608,17 @@ blob:
 await plotDivToBlob(
 state.currentPlot
 )
-},
-{
+}
+];
+
+if(mode!=='sg'){
+entries.push({
 path:
 `CID_Scan_${mode}_Results.xlsx`,
 blob:
 buildWorkbook(mode)
+});
 }
-];
 
 if(state.exportAll){
 entries.push(
