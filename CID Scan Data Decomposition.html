@@ -123,10 +123,8 @@ button{cursor:pointer}
 <div class="analysis-card-head"><span id="analysisCardTitle" class="analysis-card-title"></span><button id="tabResetBtn" class="tab-reset-btn" type="button" title="Reset current analysis" aria-label="Reset current analysis">↻</button></div>
 
 <div id="tpControls" hidden>
-<div class="hint" data-i18n="tpLabelHint">Enter the residual thickness for each TP sheet in millimeters. The analysis uses the 2 mm region centered on the entered TP notch position (−1 mm to +1 mm).</div>
 <div id="tpLabelGrid" class="label-grid" style="margin-top:12px"></div>
 <div class="analysis-actions"><button id="runTpBtn" class="primary-mini" data-i18n="runTp">Apply labels & run TP analysis</button></div>
-<div class="method-note" data-i18n="tpMethodNote">TP analysis combines point-wise thickness correlation, discretized functional PCA, pairwise waveform distance, monotonic feature analysis, and grouped PLSR cross-validation. Cross-validation holds out an entire TP sheet so multiple scan lines from the same specimen cannot leak into both train and test folds.</div>
 </div>
 
 <div id="sampleControls" hidden>
@@ -137,7 +135,6 @@ button{cursor:pointer}
 <div class="field"><label data-i18n="ridgeLambda">Decomposition ridge λ</label><input id="ridgeLambda" type="number" min="0" step="0.001" value="0.02"></div>
 </div>
 <div class="analysis-actions"><button id="runSampleBtn" class="primary-mini" data-i18n="runCurrentSample">Run current SPL sample</button><button id="runAllSamplesBtn" data-i18n="runAllSamples">Run all SPL samples</button></div>
-<div class="method-note" data-i18n="sampleMethodNote">Because no notch-free CID exists, the background basis B is learned from off-notch windows of the actual SPL scans. The known notch position defines the 2 mm ROI; cross-correlation is used only for fine spatial alignment. The local decomposition is y = Bc + Ka + error, with ridge regularization on the kernel coefficients. Thickness is reported from PLSR, linear-kernel ridge regression, RBF-GPR, and nearest-reference matching.</div>
 </div>
 </div>
 
@@ -149,8 +146,8 @@ button{cursor:pointer}
 
 <script>
 const I18N={
-en:{module:'CID Scan Data Decomposition',selectCidTitle:'Select CID type',selectCidHint:'Choose the CID model to open the data decomposition workspace.',openAnalysis:'Open analysis',dockHint:'Select an analysis function.',back:'← Back',home:'🏠 Home',analysis:'Analysis',tpBtn:'TP analysis',sampleKernelBtn:'Sample kernel analysis',inputSetup:'Input & output setup',commonInfo:'Common info.',tpExcel:'TP Excel workbook',splExcel:'SPL Excel workbook',savePath:'Save path',browse:'Browse',noFile:'No file selected',notSelected:'No folder selected',excitation:'Excitation frequency (kHz)',sgWindowInput:'SG window size (s)',signalType:'Signal type',scanSpeed:'Scan speed (mm/s)',scanLength:'Scan length (mm)',notchPosition:'Estimated notch position from start (mm)',expectedSamples:'Measured samples',readOnly:'Read Excel',downloadTpTemplate:'Download TP template',downloadSplTemplate:'Download SPL template',setDefault:'Default',analyze:'Analyze',ready:'Ready',result:'Processing result',chooseAnalysis:'Read TP and SPL workbooks, then choose an analysis.',exportPlots:'Export current tab plots',save:'Save',tpLabelHint:'Enter the residual thickness for each TP sheet in millimeters. The analysis uses the 2 mm region centered on the entered TP notch position (−1 mm to +1 mm).',runTp:'Apply labels & run TP analysis',tpMethodNote:'TP analysis combines point-wise thickness correlation, discretized functional PCA, pairwise waveform distance, monotonic feature analysis, and grouped PLSR cross-validation. Cross-validation holds out an entire TP sheet so multiple scan lines from the same specimen cannot leak into both train and test folds.',sample:'SPL sample',lines:'Displayed lines',alignLag:'Fine-alignment max lag (mm)',ridgeLambda:'Decomposition ridge λ',runCurrentSample:'Run current SPL sample',runAllSamples:'Run all SPL samples',sampleMethodNote:'Because no notch-free CID exists, the background basis B is learned from off-notch windows of the actual SPL scans. The known notch position defines the 2 mm ROI; cross-correlation is used only for fine spatial alignment. The local decomposition is y = Bc + Ka + error, with ridge regularization on the kernel coefficients. Thickness is reported from PLSR, linear-kernel ridge regression, RBF-GPR, and nearest-reference matching.',empty:'No plot yet.\nLoad valid workbooks and select an analysis.',needTpFile:'Please select a TP Excel workbook.',needSplFile:'Please select a SPL Excel workbook.',needFolder:'Please select a save folder.',folderSelected:'Save folder selected.',folderUnsupported:'This browser does not support folder selection. Saving will fall back to a normal file download.',reading:'Reading TP/SPL workbooks, validating scan lines, and preprocessing…',readyToAnalyze:'Both workbooks were validated. Press Analyze, then select an analysis tab.',analysisStarted:'Analysis workspace is ready.',invalidParams:'Check the input parameters. Common settings, scan speed, scan length, notch position, and sample counts must be valid.',sheetMismatch:'Sample sheets must be exactly S1 through the entered sample count.',headerMismatch:'Each sample sheet must contain contiguous scan-line headers starting at A1 as L1, L2, ... with no gaps.',noLines:'No valid scan-line header was found. The first header must be L1.',noValid:'No valid non-zero numeric data were found.',roiOut:'The requested ±1 mm notch ROI falls outside the scan range.',labelsInvalid:'Enter a valid positive residual thickness in mm for every TP sample.',tpDone:'TP identifiability/separability analysis completed.',needTpAnalysis:'Run TP analysis first so the reference dictionary and calibration models exist.',sampleDone:'Sample kernel analysis completed.',sampleAllDone:'All SPL samples were processed.',lineRequired:'At least one SPL line must remain selected.',defaultSaved:'Current input parameters were saved as the default for CID 4680.',templateDownloadStarted:'Template download started.',globalResetTitle:'Reset all',tabResetTitle:'Reset current analysis',fullResetDone:'All inputs and analysis states were reset.',tabResetDone:'The current analysis tab was reset.',inputsChanged:'Input parameters changed. Read the workbooks again before analysis.',saving:'Generating files…',saved:'Save completed.',saveFailed:'Save failed',exportOn:'Current-tab plot export ON.',exportOff:'Current-tab plot export OFF.',tpTitle:'TP analysis',tpSub:'Identifiability / separability analysis using the full 2 mm TP waveform around the known groove/notch position.',sampleTitle:'Sample kernel analysis',sampleSub:'Reference-kernel decomposition and residual-thickness estimation for the known SPL notch ROI.'},
-ko:{module:'CID 스캔 데이터 분해',selectCidTitle:'CID 종류 선택',selectCidHint:'분석할 CID 모델을 선택하면 데이터 분해 화면이 열립니다.',openAnalysis:'분석 화면 열기',dockHint:'분석 기능을 선택하세요.',back:'← 뒤로가기',home:'🏠 Home',analysis:'분석',tpBtn:'TP analysis',sampleKernelBtn:'Sample kernel analysis',inputSetup:'입력 및 저장 설정',commonInfo:'공통 정보',tpExcel:'TP 입력 Excel 파일',splExcel:'SPL 입력 Excel 파일',savePath:'저장 경로',browse:'Browse',noFile:'선택된 파일 없음',notSelected:'선택된 폴더 없음',excitation:'여자주파수 (kHz)',sgWindowInput:'SG 윈도우 크기 (s)',signalType:'신호 종류',scanSpeed:'스캔 속도 (mm/s)',scanLength:'스캔 길이 (mm)',notchPosition:'시작점 기준 노치 추정 위치 (mm)',expectedSamples:'측정 샘플 수',readOnly:'Excel 읽기',downloadTpTemplate:'TP 양식 다운로드',downloadSplTemplate:'SPL 양식 다운로드',setDefault:'Default',analyze:'분석 시작',ready:'준비 완료',result:'처리 결과',chooseAnalysis:'TP와 SPL Excel을 읽은 뒤 분석 탭을 선택하세요.',exportPlots:'현재 탭 그래프 저장',save:'세이브',tpLabelHint:'각 TP 시트의 잔존 두께를 mm 단위로 입력하세요. 입력한 TP 노치 위치를 중심으로 앞 1 mm, 뒤 1 mm의 총 2 mm 구간을 사용합니다.',runTp:'라벨 적용 및 TP 분석 실행',tpMethodNote:'TP 분석은 point-wise 두께 상관, 이산화된 functional PCA, 파형 간 거리, 특징값 단조성, grouped PLSR 교차검증을 함께 수행합니다. 교차검증은 TP 시트 하나 전체를 테스트로 제외하여 동일 시편의 여러 스캔 라인이 학습/테스트에 동시에 들어가는 누수를 막습니다.',sample:'SPL 샘플',lines:'표시 라인',alignLag:'미세 정렬 최대 이동량 (mm)',ridgeLambda:'분해 Ridge λ',runCurrentSample:'현재 SPL 샘플 실행',runAllSamples:'전체 SPL 샘플 실행',sampleMethodNote:'노치가 없는 정상 CID가 없으므로 배경기저 B는 실제 SPL 스캔의 노치 외 구간에서 학습합니다. 알고 있는 노치 위치로 2 mm ROI를 먼저 정하고 cross-correlation은 미세 위치 정렬에만 사용합니다. 국소 분해는 y = Bc + Ka + error로 수행하며 커널 계수에는 ridge 정규화를 적용합니다. 두께는 PLSR, 선형 kernel ridge regression, RBF-GPR, 최근접 reference matching 결과를 함께 제공합니다.',empty:'아직 플롯이 없습니다.\n유효한 Excel을 읽고 분석을 선택하세요.',needTpFile:'TP Excel 파일을 선택해주세요.',needSplFile:'SPL Excel 파일을 선택해주세요.',needFolder:'저장 폴더를 선택해주세요.',folderSelected:'저장 폴더 선택 완료.',folderUnsupported:'이 브라우저는 폴더 선택을 지원하지 않습니다. 저장 시 일반 파일 다운로드로 대체합니다.',reading:'TP/SPL Excel 구조와 스캔 라인을 확인하고 전처리 중…',readyToAnalyze:'두 Excel 검증이 완료되었습니다. 분석 시작을 누른 뒤 분석 탭을 선택하세요.',analysisStarted:'분석 준비가 완료되었습니다.',invalidParams:'입력 파라미터를 확인해주세요. 공통 설정, 스캔 속도/길이, 노치 위치, 샘플 수는 유효해야 합니다.',sheetMismatch:'샘플 시트는 입력한 개수에 맞춰 S1부터 연속적으로 존재해야 합니다.',headerMismatch:'각 샘플 시트는 A1부터 L1, L2, ... 형식으로 빈 열 없이 연속된 스캔 라인 헤더를 가져야 합니다.',noLines:'유효한 스캔 라인 헤더가 없습니다. 첫 번째 헤더는 L1이어야 합니다.',noValid:'0이 아닌 유효 숫자 데이터를 찾지 못했습니다.',roiOut:'노치 기준 ±1 mm ROI가 스캔 범위를 벗어납니다.',labelsInvalid:'모든 TP 샘플의 잔존 두께를 유효한 양수 mm 값으로 입력해주세요.',tpDone:'TP 식별가능성·분리도 분석이 완료되었습니다.',needTpAnalysis:'Reference dictionary와 calibration model을 만들기 위해 먼저 TP analysis를 실행해주세요.',sampleDone:'Sample kernel analysis가 완료되었습니다.',sampleAllDone:'모든 SPL 샘플 분석이 완료되었습니다.',lineRequired:'최소 한 개의 SPL 라인은 선택되어 있어야 합니다.',defaultSaved:'현재 입력 파라미터를 CID 4680 디폴트값으로 저장했습니다.',templateDownloadStarted:'Excel 양식 다운로드를 시작했습니다.',globalResetTitle:'전체 리셋',tabResetTitle:'현재 분석 탭 리셋',fullResetDone:'입력과 분석 상태를 모두 초기화했습니다.',tabResetDone:'현재 분석 탭을 초기화했습니다.',inputsChanged:'입력 파라미터가 변경되었습니다. 분석 전에 Excel을 다시 읽어주세요.',saving:'파일 생성 중…',saved:'저장이 완료되었습니다.',saveFailed:'저장 실패',exportOn:'현재 탭 그래프 저장 ON.',exportOff:'현재 탭 그래프 저장 OFF.',tpTitle:'TP analysis',tpSub:'알고 있는 그루브/노치 위치 주변 2 mm 전체 파형을 이용한 식별가능성·분리도 분석입니다.',sampleTitle:'Sample kernel analysis',sampleSub:'알고 있는 SPL 노치 ROI에 reference kernel 분해를 적용하고 잔존 두께를 추정합니다.'}}
+en:{module:'CID Scan Data Decomposition',selectCidTitle:'Select CID type',selectCidHint:'Choose the CID model to open the data decomposition workspace.',openAnalysis:'Open analysis',dockHint:'Select an analysis function.',back:'← Back',home:'🏠 Home',analysis:'Analysis',tpBtn:'TP analysis',sampleKernelBtn:'Sample kernel analysis',inputSetup:'Input & output setup',commonInfo:'Common info.',tpExcel:'TP Excel workbook',splExcel:'SPL Excel workbook',savePath:'Save path',browse:'Browse',noFile:'No file selected',notSelected:'No folder selected',excitation:'Excitation frequency (kHz)',sgWindowInput:'SG window size (s)',signalType:'Signal type',scanSpeed:'Scan speed (mm/s)',scanLength:'Scan length (mm)',notchPosition:'Estimated notch position from start (mm)',expectedSamples:'Measured samples',readOnly:'Read Excel',downloadTpTemplate:'Download TP template',downloadSplTemplate:'Download SPL template',setDefault:'Default',analyze:'Analyze',ready:'Ready',result:'Processing result',chooseAnalysis:'Read TP and SPL workbooks, then choose an analysis.',exportPlots:'Export current tab plots',save:'Save',runTp:'Apply labels & run TP analysis',sample:'SPL sample',lines:'Displayed lines',alignLag:'Fine-alignment max lag (mm)',ridgeLambda:'Decomposition ridge λ',runCurrentSample:'Run current SPL sample',runAllSamples:'Run all SPL samples',empty:'No plot yet.\nLoad valid workbooks and select an analysis.',needTpFile:'Please select a TP Excel workbook.',needSplFile:'Please select a SPL Excel workbook.',needFolder:'Please select a save folder.',folderSelected:'Save folder selected.',folderUnsupported:'This browser does not support folder selection. Saving will fall back to a normal file download.',reading:'Reading TP/SPL workbooks, validating scan lines, and preprocessing…',readyToAnalyze:'Both workbooks were validated. Press Analyze, then select an analysis tab.',analysisStarted:'Analysis workspace is ready.',invalidParams:'Check the input parameters. Common settings, scan speed, scan length, notch position, and sample counts must be valid.',sheetMismatch:'Sample sheets must be exactly S1 through the entered sample count.',headerMismatch:'Each sample sheet must contain contiguous scan-line headers starting at A1 as L1, L2, ... with no gaps.',noLines:'No valid scan-line header was found. The first header must be L1.',noValid:'No valid non-zero numeric data were found.',roiOut:'The requested ±1 mm notch ROI falls outside the scan range.',labelsInvalid:'Enter a valid positive residual thickness in mm for every TP sample.',tpDone:'TP identifiability/separability analysis completed.',needTpAnalysis:'Run TP analysis first so the reference dictionary and calibration models exist.',sampleDone:'Sample kernel analysis completed.',sampleAllDone:'All SPL samples were processed.',lineRequired:'At least one SPL line must remain selected.',defaultSaved:'Current input parameters were saved as the default for CID 4680.',templateDownloadStarted:'Template download started.',globalResetTitle:'Reset all',tabResetTitle:'Reset current analysis',fullResetDone:'All inputs and analysis states were reset.',tabResetDone:'The current analysis tab was reset.',inputsChanged:'Input parameters changed. Read the workbooks again before analysis.',saving:'Generating files…',saved:'Save completed.',saveFailed:'Save failed',exportOn:'Current-tab plot export ON.',exportOff:'Current-tab plot export OFF.',tpTitle:'TP analysis',tpSub:'Identifiability / separability analysis using the full 2 mm TP waveform around the known groove/notch position.',sampleTitle:'Sample kernel analysis',sampleSub:'Reference-kernel decomposition and residual-thickness estimation for the known SPL notch ROI.'},
+ko:{module:'CID 스캔 데이터 분해',selectCidTitle:'CID 종류 선택',selectCidHint:'분석할 CID 모델을 선택하면 데이터 분해 화면이 열립니다.',openAnalysis:'분석 화면 열기',dockHint:'분석 기능을 선택하세요.',back:'← 뒤로가기',home:'🏠 Home',analysis:'분석',tpBtn:'TP analysis',sampleKernelBtn:'Sample kernel analysis',inputSetup:'입력 및 저장 설정',commonInfo:'공통 정보',tpExcel:'TP 입력 Excel 파일',splExcel:'SPL 입력 Excel 파일',savePath:'저장 경로',browse:'Browse',noFile:'선택된 파일 없음',notSelected:'선택된 폴더 없음',excitation:'여자주파수 (kHz)',sgWindowInput:'SG 윈도우 크기 (s)',signalType:'신호 종류',scanSpeed:'스캔 속도 (mm/s)',scanLength:'스캔 길이 (mm)',notchPosition:'시작점 기준 노치 추정 위치 (mm)',expectedSamples:'측정 샘플 수',readOnly:'Excel 읽기',downloadTpTemplate:'TP 양식 다운로드',downloadSplTemplate:'SPL 양식 다운로드',setDefault:'Default',analyze:'분석 시작',ready:'준비 완료',result:'처리 결과',chooseAnalysis:'TP와 SPL Excel을 읽은 뒤 분석 탭을 선택하세요.',exportPlots:'현재 탭 그래프 저장',save:'세이브',runTp:'라벨 적용 및 TP 분석 실행',sample:'SPL 샘플',lines:'표시 라인',alignLag:'미세 정렬 최대 이동량 (mm)',ridgeLambda:'분해 Ridge λ',runCurrentSample:'현재 SPL 샘플 실행',runAllSamples:'전체 SPL 샘플 실행',empty:'아직 플롯이 없습니다.\n유효한 Excel을 읽고 분석을 선택하세요.',needTpFile:'TP Excel 파일을 선택해주세요.',needSplFile:'SPL Excel 파일을 선택해주세요.',needFolder:'저장 폴더를 선택해주세요.',folderSelected:'저장 폴더 선택 완료.',folderUnsupported:'이 브라우저는 폴더 선택을 지원하지 않습니다. 저장 시 일반 파일 다운로드로 대체합니다.',reading:'TP/SPL Excel 구조와 스캔 라인을 확인하고 전처리 중…',readyToAnalyze:'두 Excel 검증이 완료되었습니다. 분석 시작을 누른 뒤 분석 탭을 선택하세요.',analysisStarted:'분석 준비가 완료되었습니다.',invalidParams:'입력 파라미터를 확인해주세요. 공통 설정, 스캔 속도/길이, 노치 위치, 샘플 수는 유효해야 합니다.',sheetMismatch:'샘플 시트는 입력한 개수에 맞춰 S1부터 연속적으로 존재해야 합니다.',headerMismatch:'각 샘플 시트는 A1부터 L1, L2, ... 형식으로 빈 열 없이 연속된 스캔 라인 헤더를 가져야 합니다.',noLines:'유효한 스캔 라인 헤더가 없습니다. 첫 번째 헤더는 L1이어야 합니다.',noValid:'0이 아닌 유효 숫자 데이터를 찾지 못했습니다.',roiOut:'노치 기준 ±1 mm ROI가 스캔 범위를 벗어납니다.',labelsInvalid:'모든 TP 샘플의 잔존 두께를 유효한 양수 mm 값으로 입력해주세요.',tpDone:'TP 식별가능성·분리도 분석이 완료되었습니다.',needTpAnalysis:'Reference dictionary와 calibration model을 만들기 위해 먼저 TP analysis를 실행해주세요.',sampleDone:'Sample kernel analysis가 완료되었습니다.',sampleAllDone:'모든 SPL 샘플 분석이 완료되었습니다.',lineRequired:'최소 한 개의 SPL 라인은 선택되어 있어야 합니다.',defaultSaved:'현재 입력 파라미터를 CID 4680 디폴트값으로 저장했습니다.',templateDownloadStarted:'Excel 양식 다운로드를 시작했습니다.',globalResetTitle:'전체 리셋',tabResetTitle:'현재 분석 탭 리셋',fullResetDone:'입력과 분석 상태를 모두 초기화했습니다.',tabResetDone:'현재 분석 탭을 초기화했습니다.',inputsChanged:'입력 파라미터가 변경되었습니다. 분석 전에 Excel을 다시 읽어주세요.',saving:'파일 생성 중…',saved:'저장이 완료되었습니다.',saveFailed:'저장 실패',exportOn:'현재 탭 그래프 저장 ON.',exportOff:'현재 탭 그래프 저장 OFF.',tpTitle:'TP analysis',tpSub:'알고 있는 그루브/노치 위치 주변 2 mm 전체 파형을 이용한 식별가능성·분리도 분석입니다.',sampleTitle:'Sample kernel analysis',sampleSub:'알고 있는 SPL 노치 ROI에 reference kernel 분해를 적용하고 잔존 두께를 추정합니다.'}}
 
 let lang=localStorage.getItem('innereye_lang')||'en';
 const el=id=>document.getElementById(id);const tr=k=>Object.prototype.hasOwnProperty.call(I18N[lang],k)?I18N[lang][k]:k;
@@ -210,7 +207,7 @@ el('globalResetBtn').onclick=resetAll;el('tabResetBtn').onclick=resetCurrentAnal
 el('tpBrowseBtn').onclick=()=>el('tpInput').click();el('splBrowseBtn').onclick=()=>el('splInput').click();
 el('tpInput').addEventListener('change',e=>{state.tpFile=e.target.files[0]||null;el('tpFilename').textContent=state.tpFile?state.tpFile.name:tr('noFile');resetPrepared()});
 el('splInput').addEventListener('change',e=>{state.splFile=e.target.files[0]||null;el('splFilename').textContent=state.splFile?state.splFile.name:tr('noFile');resetPrepared()});
-el('folderBtn').onclick=async()=>{if(!window.showDirectoryPicker){setStatus(tr('folderUnsupported'),'warn');return}try{state.saveHandle=await window.showDirectoryPicker({mode:'readwrite',id:'innereye-cid-decomposition-output'});el('folderName').textContent=state.saveHandle.name;setStatus(tr('folderSelected'),'good')}catch(e){if(e.name!=='AbortError')setStatus(e.message||String(e),'bad')}};
+el('folderBtn').onclick=async()=>{if(!window.showDirectoryPicker){setStatus(tr('folderUnsupported'),'warn');return}try{state.saveHandle=await window.showDirectoryPicker({mode:'readwrite',id:'innereye-cid-decomp-output'});el('folderName').textContent=state.saveHandle.name;setStatus(tr('folderSelected'),'good')}catch(e){if(e.name!=='AbortError')setStatus(e.message||String(e),'bad')}};
 ['excitation','sgWindowSec','signalType','tpScanSpeed','tpScanLength','tpNotchPosition','tpExpectedSamples','splScanSpeed','splScanLength','splNotchPosition','splExpectedSamples'].forEach(id=>el(id).addEventListener('change',invalidatePreparedData));
 el('setDefaultBtn').onclick=()=>{try{const p=getParams();localStorage.setItem(defaultStorageKey(),JSON.stringify(p));setStatus(tr('defaultSaved'),'good')}catch(e){setStatus(e.message||String(e),'bad')}};
 
@@ -270,7 +267,143 @@ function renderTable(rows){if(!rows.length)return'';const cols=Object.keys(rows.
 
 async function runTpAnalysis(){try{readTpLabels();const obs=buildTpObservations(),groups=groupMeanWaveforms(obs);if(obs.length<3||groups.length<3)throw new Error('TP analysis requires at least three labeled TP samples.');const point=pointwiseCorrelation(obs),pca=pcaFit(obs.map(o=>o.y),3),dist=pairwiseGroupDistance(groups),features=featureAnalysis(obs),cv=groupedPlsCv(obs),plsModel=plsFit(obs.map(o=>o.y),obs.map(o=>o.thicknessMm),Math.min(2,groups.length-2)),ridgeModel=ridgeDualFit(obs.map(o=>o.y),obs.map(o=>o.thicknessMm),.02),gprModel=gprFit(obs.map(o=>o.y),obs.map(o=>o.thicknessMm)),pc1rho=pca&&pca.scores[0]?.length?spearman(obs.map(o=>o.thicknessMm),pca.scores.map(r=>r[0])):NaN,maxAbsR=Math.max(...point.r.map(Math.abs)),bestMono=features.mono.slice().sort((a,b)=>Math.abs(b.Spearman_Rho)-Math.abs(a.Spearman_Rho))[0],reference={groups,K:groups.map(g=>g.y),labels:groups.map(g=>g.thicknessMm)};state.tpResults={obs,groups,point,pca,dist,features,cv,plsModel,ridgeModel,gprModel,reference,pc1rho,maxAbsR,bestMono};state.sampleResults={};await renderTpResults();setStatus(tr('tpDone'),'good')}catch(e){console.error(e);setStatus(e.message||String(e),'bad')}}
 el('runTpBtn').onclick=runTpAnalysis;
-async function renderTpResults(){const r=state.tpResults;if(!r)return;clearPlots();el('metrics').style.display='grid';el('metrics').innerHTML=[metricCard('Max |point-wise r|',fmt(r.maxAbsR,3),'Pearson correlation across all TP scan-line observations'),metricCard('PC1 Spearman ρ',fmt(r.pc1rho,3),`PC1 explained ${(100*(r.pca?.explained?.[0]||0)).toFixed(1)}%`),metricCard('Best feature |ρ|',fmt(Math.abs(r.bestMono?.Spearman_Rho),3),r.bestMono?.Feature||''),metricCard('PLSR R²CV',fmt(r.cv.r2,3),'Grouped leave-one-TP-sheet-out'),metricCard('PLSR RMSECV',`${fmt(r.cv.rmse*1000,2)} µm`,`MAE ${fmt(r.cv.mae*1000,2)} µm`)].join('');el('plots').innerHTML=plotCard('tp-wave','TP 2 mm waveforms',true)+plotCard('tp-corr','Point-wise correlation map')+plotCard('tp-pca','PCA / FPCA scores')+plotCard('tp-dist','Pairwise waveform distance')+plotCard('tp-feat','Feature monotonicity')+plotCard('tp-pls','PLSR grouped cross-validation')+renderTable(r.features.mono.map(x=>({Feature:x.Feature,Spearman_Rho:x.Spearman_Rho})));const x=roiGrid(),groupTraces=r.groups.map(g=>({x,y:g.y,type:'scatter',mode:'lines',name:`${(g.thicknessMm*1000).toFixed(0)} µm (${g.sample})`,line:{width:2.3}}));await newPlot('tp-wave',groupTraces,{xaxis:{title:'Distance from TP notch center (mm)',showgrid:false,zeroline:false,linecolor:'#9aa1ad'},yaxis:{title:'Baseline-corrected signal',showgrid:false,zeroline:false,linecolor:'#9aa1ad'},hovermode:'x unified'});await newPlot('tp-corr',[{x:r.point.x,y:r.point.r,type:'scatter',mode:'lines',name:'Pearson r',line:{width:2.5}},{x:[-1,1],y:[0,0],type:'scatter',mode:'lines',showlegend:false,line:{dash:'dot',width:1}}],{xaxis:{title:'Distance from TP notch center (mm)',showgrid:false},yaxis:{title:'Pearson r (signal vs thickness)',range:[-1.05,1.05],showgrid:false},hovermode:'x unified'});const pc1=r.pca.scores.map(v=>v[0]||0),pc2=r.pca.scores.map(v=>v[1]||0);await newPlot('tp-pca',[{x:pc1,y:pc2,text:r.obs.map(o=>`${o.sample}-${o.line}<br>${o.thicknessUm.toFixed(0)} µm`),customdata:r.obs.map(o=>o.thicknessUm),type:'scatter',mode:'markers+text',textposition:'top center',marker:{size:11,color:r.obs.map(o=>o.thicknessUm),colorscale:'Viridis',showscale:true,colorbar:{title:'µm'}},hovertemplate:'%{text}<br>PC1=%{x:.4f}<br>PC2=%{y:.4f}<extra></extra>'}],{xaxis:{title:`PC1 (${(100*(r.pca.explained[0]||0)).toFixed(1)}%)`,showgrid:false},yaxis:{title:`PC2 (${(100*(r.pca.explained[1]||0)).toFixed(1)}%)`,showgrid:false}});await newPlot('tp-dist',[{z:r.dist,x:r.groups.map(g=>`${(g.thicknessMm*1000).toFixed(0)} µm`),y:r.groups.map(g=>`${(g.thicknessMm*1000).toFixed(0)} µm`),type:'heatmap',colorscale:'Viridis',colorbar:{title:'RMSE'}}],{xaxis:{title:'Residual thickness',showgrid:false},yaxis:{title:'Residual thickness',showgrid:false}});const fNames=r.features.mono.map(m=>m.Feature),byThickness=r.groups.map(g=>g.thicknessMm),featTr=[];for(const f of fNames){const vals=byThickness.map(t=>{const v=r.features.rows.filter(row=>Math.abs(row.Thickness_mm-t)<1e-12).map(row=>row[f]);return mean(v)}),m=mean(vals),s=Math.max(sd(vals),1e-12);featTr.push({x:byThickness.map(v=>v*1000),y:vals.map(v=>(v-m)/s),type:'scatter',mode:'lines+markers',name:`${f} (ρ=${fmt(r.features.mono.find(z=>z.Feature===f)?.Spearman_Rho,2)})`})}await newPlot('tp-feat',featTr,{xaxis:{title:'Residual thickness (µm)',showgrid:false},yaxis:{title:'Feature value (z-score across thickness means)',showgrid:false}});const mn=Math.min(...r.cv.actual,...r.cv.pred),mx=Math.max(...r.cv.actual,...r.cv.pred);await newPlot('tp-pls',[{x:r.cv.actual.map(v=>v*1000),y:r.cv.pred.map(v=>v*1000),text:r.cv.rows.map(z=>`${z.Sample}-${z.Line}`),type:'scatter',mode:'markers',name:'Grouped CV',marker:{size:10}},{x:[mn*1000,mx*1000],y:[mn*1000,mx*1000],type:'scatter',mode:'lines',name:'Identity',line:{dash:'dash'}}],{xaxis:{title:'Actual residual thickness (µm)',showgrid:false},yaxis:{title:'PLSR predicted thickness (µm)',showgrid:false}})}
+
+async function renderTpResults(){
+const r=state.tpResults;
+if(!r)return;
+clearPlots();
+el('metrics').style.display='grid';
+el('metrics').innerHTML=[
+metricCard('Max |point-wise r|',fmt(r.maxAbsR,3),'Pearson correlation across all TP scan-line observations'),
+metricCard('PC1 Spearman ρ',fmt(r.pc1rho,3),`PC1 explained ${(100*(r.pca?.explained?.[0]||0)).toFixed(1)}%`),
+metricCard('Best feature |ρ|',fmt(Math.abs(r.bestMono?.Spearman_Rho),3),r.bestMono?.Feature||''),
+metricCard('PLSR R²CV',fmt(r.cv.r2,3),'Grouped leave-one-TP-sheet-out'),
+metricCard('PLSR RMSECV',`${fmt(r.cv.rmse*1000,2)} µm`,`MAE ${fmt(r.cv.mae*1000,2)} µm`)
+].join('');
+
+el('plots').innerHTML=
+plotCard('tp-wave','TP 2 mm waveforms',true)+
+plotCard('tp-corr','Point-wise correlation map')+
+plotCard('tp-pca','PCA / FPCA scores')+
+plotCard('tp-dist','Pairwise waveform distance')+
+plotCard('tp-feat','Feature monotonicity')+
+plotCard('tp-pls','PLSR grouped cross-validation')+
+renderTable(r.features.mono.map(x=>({Feature:x.Feature,Spearman_Rho:x.Spearman_Rho})));
+
+const x=roiGrid();
+const groupTraces=r.groups.map(g=>({
+x,
+y:g.y,
+type:'scatter',
+mode:'lines',
+name:`${(g.thicknessMm*1000).toFixed(0)} µm (${g.sample})`,
+line:{width:2.3}
+}));
+
+await newPlot('tp-wave',groupTraces,{
+xaxis:{title:'Distance from TP notch center (mm)',showgrid:false,zeroline:false,linecolor:'#9aa1ad'},
+yaxis:{title:'Baseline-corrected signal',showgrid:false,zeroline:false,linecolor:'#9aa1ad'},
+hovermode:'x unified'
+});
+
+await newPlot('tp-corr',[
+{x:r.point.x,y:r.point.r,type:'scatter',mode:'lines',name:'Pearson r',line:{width:2.5}},
+{x:[-1,1],y:[0,0],type:'scatter',mode:'lines',showlegend:false,line:{dash:'dot',width:1}}
+],{
+xaxis:{title:'Distance from TP notch center (mm)',showgrid:false},
+yaxis:{title:'Pearson r (signal vs thickness)',range:[-1.05,1.05],showgrid:false},
+hovermode:'x unified'
+});
+
+const pc1=r.pca.scores.map(v=>v[0]||0);
+const pc2=r.pca.scores.map(v=>v[1]||0);
+
+await newPlot('tp-pca',[{
+x:pc1,
+y:pc2,
+text:r.obs.map(o=>`${o.sample}-${o.line}<br>${o.thicknessUm.toFixed(0)} µm`),
+customdata:r.obs.map(o=>o.thicknessUm),
+type:'scatter',
+mode:'markers+text',
+textposition:'top center',
+marker:{
+size:11,
+color:r.obs.map(o=>o.thicknessUm),
+colorscale:'Viridis',
+showscale:true,
+colorbar:{title:'µm'}
+},
+hovertemplate:'%{text}<br>PC1=%{x:.4f}<br>PC2=%{y:.4f}<extra></extra>'
+}],{
+xaxis:{title:`PC1 (${(100*(r.pca.explained[0]||0)).toFixed(1)}%)`,showgrid:false},
+yaxis:{title:`PC2 (${(100*(r.pca.explained[1]||0)).toFixed(1)}%)`,showgrid:false}
+});
+
+await newPlot('tp-dist',[{
+z:r.dist,
+x:r.groups.map(g=>`${(g.thicknessMm*1000).toFixed(0)} µm`),
+y:r.groups.map(g=>`${(g.thicknessMm*1000).toFixed(0)} µm`),
+type:'heatmap',
+colorscale:'Viridis',
+colorbar:{title:'RMSE'}
+}],{
+xaxis:{title:'Residual thickness',showgrid:false},
+yaxis:{title:'Residual thickness',showgrid:false}
+});
+
+const fNames=r.features.mono.map(m=>m.Feature);
+const byThickness=r.groups.map(g=>g.thicknessMm);
+const featTr=[];
+
+for(const f of fNames){
+const vals=byThickness.map(t=>{
+const v=r.features.rows
+.filter(row=>Math.abs(row.Thickness_mm-t)<1e-12)
+.map(row=>row[f]);
+return mean(v)
+});
+const m=mean(vals);
+const s=Math.max(sd(vals),1e-12);
+featTr.push({
+x:byThickness.map(v=>v*1000),
+y:vals.map(v=>(v-m)/s),
+type:'scatter',
+mode:'lines+markers',
+name:`${f} (ρ=${fmt(r.features.mono.find(z=>z.Feature===f)?.Spearman_Rho,2)})`
+})
+}
+
+await newPlot('tp-feat',featTr,{
+xaxis:{title:'Residual thickness (µm)',showgrid:false},
+yaxis:{title:'Feature value (z-score across thickness means)',showgrid:false}
+});
+
+const mn=Math.min(...r.cv.actual,...r.cv.pred);
+const mx=Math.max(...r.cv.actual,...r.cv.pred);
+
+await newPlot('tp-pls',[
+{
+x:r.cv.actual.map(v=>v*1000),
+y:r.cv.pred.map(v=>v*1000),
+text:r.cv.rows.map(z=>`${z.Sample}-${z.Line}`),
+type:'scatter',
+mode:'markers',
+name:'Grouped CV',
+marker:{size:10}
+},
+{
+x:[mn*1000,mx*1000],
+y:[mn*1000,mx*1000],
+type:'scatter',
+mode:'lines',
+name:'Identity',
+line:{dash:'dash'}
+}
+],{
+xaxis:{title:'Actual residual thickness (µm)',showgrid:false},
+yaxis:{title:'PLSR predicted thickness (µm)',showgrid:false}
+})
+}
 
 function polyFitOutside(x,y,center,half=ROI_HALF_MM,degree=2){const xmin=x[0],xmax=x[x.length-1],mid=(xmin+xmax)/2,scale=Math.max(1e-12,(xmax-xmin)/2),rows=[],vals=[];for(let i=0;i<x.length;i++){if(Math.abs(x[i]-center)<=half)continue;const u=(x[i]-mid)/scale;rows.push(Array.from({length:degree+1},(_,p)=>u**p));vals.push(y[i])}if(rows.length<degree+2){for(let i=0;i<x.length;i++){const u=(x[i]-mid)/scale;rows.push(Array.from({length:degree+1},(_,p)=>u**p));vals.push(y[i])}}const AT=transpose(rows),ATA=matMul(AT,rows),ATy=AT.map(r=>dot(r,vals));for(let i=0;i<ATA.length;i++)ATA[i][i]+=1e-10;const coef=solveLinear(ATA,ATy),fit=x.map(xx=>{const u=(xx-mid)/scale;let s=0;for(let p=0;p<coef.length;p++)s+=coef[p]*u**p;return s});return{coef,fit,corrected:y.map((v,i)=>v-fit[i])}}
 function backgroundWindowsForLine(d,sample,line,step=.5){const x=d.distance,y=d.smoothed[sample][line],base=polyFitOutside(x,y,d.params.notchPosition,ROI_HALF_MM,2),windows=[];for(let c=ROI_HALF_MM;c<=d.params.scanLength-ROI_HALF_MM+1e-9;c+=step){const a=c-ROI_HALF_MM,b=c+ROI_HALF_MM,na=d.params.notchPosition-ROI_HALF_MM,nb=d.params.notchPosition+ROI_HALF_MM;if(!(b<na||a>nb))continue;try{windows.push(linearEdgeDetrend(resampleSegment(x,base.corrected,a,b,ROI_POINTS)))}catch(_){}}return{base,windows}}
@@ -287,7 +420,236 @@ async function runSample(sample){if(!state.tpResults)throw new Error(tr('needTpA
 el('runSampleBtn').onclick=async()=>{try{await runSample(state.selectedSplSample);await renderSampleResults();setStatus(tr('sampleDone'),'good')}catch(e){console.error(e);setStatus(e.message||String(e),'bad')}};
 el('runAllSamplesBtn').onclick=async()=>{try{if(!state.tpResults)throw new Error(tr('needTpAnalysis'));for(const s of state.dataset.spl.samples)await runSample(s);await renderSampleResults();setStatus(tr('sampleAllDone'),'good')}catch(e){console.error(e);setStatus(e.message||String(e),'bad')}};
 function sampleRowsAll(){const rows=[];for(const s of Object.keys(state.sampleResults))for(const l of Object.keys(state.sampleResults[s].lines)){const r=state.sampleResults[s].lines[l];rows.push({Sample:s,Line:l,Best_Kernel_um:r.Best_Kernel_um,Alignment_Correlation:r.Alignment_Correlation,Alignment_Lag_mm:r.Alignment_Lag_mm,PLSR_um:r.PLSR_mm*1000,Ridge_um:r.Ridge_mm*1000,GPR_um:r.GPR_mm*1000,GPR_SD_um:r.GPR_SD_mm*1000,Nearest_um:r.Nearest_mm*1000,Estimated_um:r.Estimated_um,Empirical_Uncertainty_um:r.Empirical_Uncertainty_um,Within_Reference_Range:r.Within_Reference_Range,PC1:r.PC1,PC2:r.PC2,Peak_to_Peak:r.Peak_to_Peak,Max_Abs:r.Max_Abs,Abs_AUC:r.Abs_AUC,RMS:r.RMS,FWHM_Abs_mm:r.FWHM_Abs_mm})}return rows}
-async function renderSampleResults(){const sample=state.selectedSplSample,res=state.sampleResults[sample];if(!res){resetResultsUi();return}clearPlots();const available=state.dataset.spl.sampleLines[sample],selected=available.filter(l=>state.selectedSplLines.has(l)),line=selected[0]||available[0],r=res.lines[line],rows=sampleRowsAll(),meanEst=mean(selected.map(l=>res.lines[l].Estimated_um)),meanUnc=mean(selected.map(l=>res.lines[l].Empirical_Uncertainty_um)),minCorr=Math.min(...selected.map(l=>res.lines[l].Alignment_Correlation));el('metrics').style.display='grid';el('metrics').innerHTML=[metricCard('Selected SPL',sample,`${selected.length} displayed line(s)`),metricCard('Mean estimate',`${fmt(meanEst,2)} µm`,`Mean across selected lines`),metricCard('Mean empirical uncertainty',`± ${fmt(meanUnc,2)} µm`,'CV error combined with model spread'),metricCard('Min alignment corr',fmt(minCorr,3),'Fine alignment against TP dictionary'),metricCard('Background basis',res.backgroundModel.method,`${res.backgroundModel.windows} off-notch windows`)].join('');el('plots').innerHTML=plotCard('spl-full',`${sample}-${line} full scan`,true)+plotCard('spl-roi','Aligned ROI and matched TP kernel')+plotCard('spl-dec','y = Bc + Ka + error decomposition')+plotCard('spl-pred','Thickness estimates')+plotCard('spl-pca','TP PCA space with extracted SPL notch')+renderTable(rows);const d=state.dataset.spl,x=d.distance,y=r.rawFull,shapes=[{type:'rect',xref:'x',yref:'paper',x0:d.params.notchPosition-ROI_HALF_MM,x1:d.params.notchPosition+ROI_HALF_MM,y0:0,y1:1,fillcolor:'rgba(37,99,235,.08)',line:{width:0}},{type:'line',xref:'x',yref:'paper',x0:d.params.notchPosition,x1:d.params.notchPosition,y0:0,y1:1,line:{dash:'dash',width:2,color:'#111827'}}];await newPlot('spl-full',[{x,y,type:'scatter',mode:'lines',name:'SG smoothed',line:{width:1.8}},{x,y:r.baselineFull,type:'scatter',mode:'lines',name:'Off-notch polynomial drift',line:{dash:'dot',width:1.6}}],{xaxis:{title:'Distance from scan start (mm)',showgrid:false},yaxis:{title:state.dataset.spl.params.signalType,showgrid:false},shapes,hovermode:'x unified'});const xr=roiGrid();await newPlot('spl-roi',[{x:xr,y:r.aligned,type:'scatter',mode:'lines',name:'Aligned SPL ROI',line:{width:2.3}},{x:xr,y:r.matchedKernel,type:'scatter',mode:'lines',name:`Matched TP ${(r.matchedThicknessMm*1000).toFixed(0)} µm`,line:{width:2,dash:'dash'}},{x:xr,y:r.notchComponent,type:'scatter',mode:'lines',name:'Extracted notch component Ka',line:{width:2}}],{xaxis:{title:'Distance from notch center (mm)',showgrid:false},yaxis:{title:'Baseline-corrected signal',showgrid:false},hovermode:'x unified'});await newPlot('spl-dec',[{x:xr,y:r.aligned,type:'scatter',mode:'lines',name:'y',line:{width:2.2}},{x:xr,y:r.background,type:'scatter',mode:'lines',name:'Background Bc',line:{width:2,dash:'dot'}},{x:xr,y:r.notchComponent,type:'scatter',mode:'lines',name:'Notch Ka',line:{width:2}},{x:xr,y:r.residual,type:'scatter',mode:'lines',name:'Error',line:{width:1.4,dash:'dash'}}],{xaxis:{title:'Distance from notch center (mm)',showgrid:false},yaxis:{title:'Component amplitude',showgrid:false},hovermode:'x unified'});const names=['PLSR','Ridge','GPR','Nearest','Ensemble'],vals=[r.PLSR_mm,r.Ridge_mm,r.GPR_mm,r.Nearest_mm,r.Estimated_mm].map(v=>v*1000);await newPlot('spl-pred',[{x:names,y:vals,type:'bar',name:'Estimated thickness'},{x:['Ensemble'],y:[r.Estimated_um],error_y:{type:'data',array:[r.Empirical_Uncertainty_um],visible:true},type:'scatter',mode:'markers',name:'Empirical ± uncertainty',marker:{size:10}}],{xaxis:{title:'Model',showgrid:false},yaxis:{title:'Estimated residual thickness (µm)',showgrid:false}});const tpPca=state.tpResults.pca,tpObs=state.tpResults.obs;await newPlot('spl-pca',[{x:tpPca.scores.map(v=>v[0]||0),y:tpPca.scores.map(v=>v[1]||0),text:tpObs.map(o=>`${o.sample}-${o.line}<br>${o.thicknessUm.toFixed(0)} µm`),customdata:tpObs.map(o=>o.thicknessUm),type:'scatter',mode:'markers',name:'TP observations',marker:{size:9,color:tpObs.map(o=>o.thicknessUm),colorscale:'Viridis',showscale:true,colorbar:{title:'µm'}}},{x:[Number.isFinite(r.PC1)?r.PC1:0],y:[Number.isFinite(r.PC2)?r.PC2:0],text:[`${sample}-${line}`],type:'scatter',mode:'markers+text',textposition:'top center',name:'Extracted SPL notch',marker:{size:15,symbol:'diamond',color:'#111827'}}],{xaxis:{title:`PC1 (${(100*(tpPca.explained[0]||0)).toFixed(1)}%)`,showgrid:false},yaxis:{title:`PC2 (${(100*(tpPca.explained[1]||0)).toFixed(1)}%)`,showgrid:false}})}
+
+async function renderSampleResults(){
+const sample=state.selectedSplSample;
+const res=state.sampleResults[sample];
+if(!res){
+resetResultsUi();
+return
+}
+
+clearPlots();
+
+const available=state.dataset.spl.sampleLines[sample];
+const selected=available.filter(l=>state.selectedSplLines.has(l));
+const line=selected[0]||available[0];
+const r=res.lines[line];
+const rows=sampleRowsAll();
+const meanEst=mean(selected.map(l=>res.lines[l].Estimated_um));
+const meanUnc=mean(selected.map(l=>res.lines[l].Empirical_Uncertainty_um));
+const minCorr=Math.min(...selected.map(l=>res.lines[l].Alignment_Correlation));
+
+el('metrics').style.display='grid';
+el('metrics').innerHTML=[
+metricCard('Selected SPL',sample,`${selected.length} displayed line(s)`),
+metricCard('Mean estimate',`${fmt(meanEst,2)} µm`,`Mean across selected lines`),
+metricCard('Mean empirical uncertainty',`± ${fmt(meanUnc,2)} µm`,'CV error combined with model spread'),
+metricCard('Min alignment corr',fmt(minCorr,3),'Fine alignment against TP dictionary'),
+metricCard('Background basis',res.backgroundModel.method,`${res.backgroundModel.windows} off-notch windows`)
+].join('');
+
+el('plots').innerHTML=
+plotCard('spl-full',`${sample}-${line} full scan`,true)+
+plotCard('spl-roi','Aligned ROI and matched TP kernel')+
+plotCard('spl-dec','y = Bc + Ka + error decomposition')+
+plotCard('spl-pred','Thickness estimates')+
+plotCard('spl-pca','TP PCA space with extracted SPL notch')+
+renderTable(rows);
+
+const d=state.dataset.spl;
+const x=d.distance;
+const y=r.rawFull;
+
+const shapes=[
+{
+type:'rect',
+xref:'x',
+yref:'paper',
+x0:d.params.notchPosition-ROI_HALF_MM,
+x1:d.params.notchPosition+ROI_HALF_MM,
+y0:0,
+y1:1,
+fillcolor:'rgba(37,99,235,.08)',
+line:{width:0}
+},
+{
+type:'line',
+xref:'x',
+yref:'paper',
+x0:d.params.notchPosition,
+x1:d.params.notchPosition,
+y0:0,
+y1:1,
+line:{dash:'dash',width:2,color:'#111827'}
+}
+];
+
+await newPlot('spl-full',[
+{
+x,
+y,
+type:'scatter',
+mode:'lines',
+name:'SG smoothed',
+line:{width:1.8}
+},
+{
+x,
+y:r.baselineFull,
+type:'scatter',
+mode:'lines',
+name:'Off-notch polynomial drift',
+line:{dash:'dot',width:1.6}
+}
+],{
+xaxis:{title:'Distance from scan start (mm)',showgrid:false},
+yaxis:{title:state.dataset.spl.params.signalType,showgrid:false},
+shapes,
+hovermode:'x unified'
+});
+
+const xr=roiGrid();
+
+await newPlot('spl-roi',[
+{
+x:xr,
+y:r.aligned,
+type:'scatter',
+mode:'lines',
+name:'Aligned SPL ROI',
+line:{width:2.3}
+},
+{
+x:xr,
+y:r.matchedKernel,
+type:'scatter',
+mode:'lines',
+name:`Matched TP ${(r.matchedThicknessMm*1000).toFixed(0)} µm`,
+line:{width:2,dash:'dash'}
+},
+{
+x:xr,
+y:r.notchComponent,
+type:'scatter',
+mode:'lines',
+name:'Extracted notch component Ka',
+line:{width:2}
+}
+],{
+xaxis:{title:'Distance from notch center (mm)',showgrid:false},
+yaxis:{title:'Baseline-corrected signal',showgrid:false},
+hovermode:'x unified'
+});
+
+await newPlot('spl-dec',[
+{
+x:xr,
+y:r.aligned,
+type:'scatter',
+mode:'lines',
+name:'y',
+line:{width:2.2}
+},
+{
+x:xr,
+y:r.background,
+type:'scatter',
+mode:'lines',
+name:'Background Bc',
+line:{width:2,dash:'dot'}
+},
+{
+x:xr,
+y:r.notchComponent,
+type:'scatter',
+mode:'lines',
+name:'Notch Ka',
+line:{width:2}
+},
+{
+x:xr,
+y:r.residual,
+type:'scatter',
+mode:'lines',
+name:'Error',
+line:{width:1.4,dash:'dash'}
+}
+],{
+xaxis:{title:'Distance from notch center (mm)',showgrid:false},
+yaxis:{title:'Component amplitude',showgrid:false},
+hovermode:'x unified'
+});
+
+const names=['PLSR','Ridge','GPR','Nearest','Ensemble'];
+const vals=[
+r.PLSR_mm,
+r.Ridge_mm,
+r.GPR_mm,
+r.Nearest_mm,
+r.Estimated_mm
+].map(v=>v*1000);
+
+await newPlot('spl-pred',[
+{
+x:names,
+y:vals,
+type:'bar',
+name:'Estimated thickness'
+},
+{
+x:['Ensemble'],
+y:[r.Estimated_um],
+error_y:{
+type:'data',
+array:[r.Empirical_Uncertainty_um],
+visible:true
+},
+type:'scatter',
+mode:'markers',
+name:'Empirical ± uncertainty',
+marker:{size:10}
+}
+],{
+xaxis:{title:'Model',showgrid:false},
+yaxis:{title:'Estimated residual thickness (µm)',showgrid:false}
+});
+
+const tpPca=state.tpResults.pca;
+const tpObs=state.tpResults.obs;
+
+await newPlot('spl-pca',[
+{
+x:tpPca.scores.map(v=>v[0]||0),
+y:tpPca.scores.map(v=>v[1]||0),
+text:tpObs.map(o=>`${o.sample}-${o.line}<br>${o.thicknessUm.toFixed(0)} µm`),
+customdata:tpObs.map(o=>o.thicknessUm),
+type:'scatter',
+mode:'markers',
+name:'TP observations',
+marker:{
+size:9,
+color:tpObs.map(o=>o.thicknessUm),
+colorscale:'Viridis',
+showscale:true,
+colorbar:{title:'µm'}
+}
+},
+{
+x:[Number.isFinite(r.PC1)?r.PC1:0],
+y:[Number.isFinite(r.PC2)?r.PC2:0],
+text:[`${sample}-${line}`],
+type:'scatter',
+mode:'markers+text',
+textposition:'top center',
+name:'Extracted SPL notch',
+marker:{size:15,symbol:'diamond',color:'#111827'}
+}
+],{
+xaxis:{title:`PC1 (${(100*(tpPca.explained[0]||0)).toFixed(1)}%)`,showgrid:false},
+yaxis:{title:`PC2 (${(100*(tpPca.explained[1]||0)).toFixed(1)}%)`,showgrid:false}
+})
+}
 
 const modeInfo={tp:{title:'tpTitle',sub:'tpSub'},sample:{title:'sampleTitle',sub:'sampleSub'}};
 document.querySelectorAll('.analysis-btn').forEach(btn=>btn.onclick=()=>activateMode(btn.dataset.mode,true));
@@ -298,12 +660,203 @@ el('exportPlotsToggle').onclick=()=>{state.exportPlots=!state.exportPlots;el('ex
 function appendJsonSheet(wb,name,rows){if(rows.length)XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),name.slice(0,31))}
 function appendAoASheet(wb,name,aoa){XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),name.slice(0,31))}
 function parameterRows(){const p=state.dataset.params;return[{Parameter:'CID type',Value:'4680'},{Parameter:'TP input file',Value:state.tpFile?.name||''},{Parameter:'SPL input file',Value:state.splFile?.name||''},{Parameter:'Excitation frequency',Value:p.excitation,Unit:'kHz'},{Parameter:'Signal type',Value:p.signalType},{Parameter:'SG window size input',Value:p.sgWindowSec,Unit:'s'},{Parameter:'TP scan speed',Value:p.tpScanSpeed,Unit:'mm/s'},{Parameter:'TP scan length',Value:p.tpScanLength,Unit:'mm'},{Parameter:'TP notch position',Value:p.tpNotchPosition,Unit:'mm'},{Parameter:'TP measured samples',Value:p.tpExpectedSamples},{Parameter:'SPL scan speed',Value:p.splScanSpeed,Unit:'mm/s'},{Parameter:'SPL scan length',Value:p.splScanLength,Unit:'mm'},{Parameter:'SPL notch position',Value:p.splNotchPosition,Unit:'mm'},{Parameter:'SPL measured samples',Value:p.splExpectedSamples},{Parameter:'ROI half width',Value:ROI_HALF_MM,Unit:'mm'},{Parameter:'ROI points',Value:ROI_POINTS}]}
-function buildOutputWorkbook(){const wb=XLSX.utils.book_new();appendJsonSheet(wb,'Parameters',parameterRows());if(state.tpResults){appendJsonSheet(wb,'TP_Labels',state.tpResults.groups.map(g=>({Sample:g.sample,Residual_Thickness_mm:g.thicknessMm,Residual_Thickness_um:g.thicknessMm*1000,Lines:g.n})));appendJsonSheet(wb,'TP_Pointwise_Corr',state.tpResults.point.x.map((x,i)=>({Relative_Position_mm:x,Pearson_r:state.tpResults.point.r[i]})));appendJsonSheet(wb,'TP_PCA_Scores',state.tpResults.obs.map((o,i)=>({Sample:o.sample,Line:o.line,Thickness_mm:o.thicknessMm,PC1:state.tpResults.pca.scores[i]?.[0]??'',PC2:state.tpResults.pca.scores[i]?.[1]??'',PC3:state.tpResults.pca.scores[i]?.[2]??''})));const distRows=[];for(let i=0;i<state.tpResults.groups.length;i++)for(let j=0;j<state.tpResults.groups.length;j++)distRows.push({Row_Thickness_um:state.tpResults.groups[i].thicknessMm*1000,Column_Thickness_um:state.tpResults.groups[j].thicknessMm*1000,RMSE_Distance:state.tpResults.dist[i][j]});appendJsonSheet(wb,'TP_Pairwise_Distance',distRows);appendJsonSheet(wb,'TP_Features',state.tpResults.features.rows);appendJsonSheet(wb,'TP_Monotonicity',state.tpResults.features.mono);appendJsonSheet(wb,'TP_PLSR_CV',state.tpResults.cv.rows);appendJsonSheet(wb,'TP_CV_Metrics',[{R2CV:state.tpResults.cv.r2,RMSECV_mm:state.tpResults.cv.rmse,RMSECV_um:state.tpResults.cv.rmse*1000,MAE_mm:state.tpResults.cv.mae,MAE_um:state.tpResults.cv.mae*1000}]);const x=roiGrid(),aoa=[['Relative_Position_mm',...state.tpResults.groups.map(g=>`${(g.thicknessMm*1000).toFixed(0)}um_${g.sample}`)]];for(let i=0;i<x.length;i++)aoa.push([x[i],...state.tpResults.groups.map(g=>g.y[i])]);appendAoASheet(wb,'TP_Reference_Dictionary',aoa)}const sampleRows=sampleRowsAll();if(sampleRows.length)appendJsonSheet(wb,'Sample_Predictions',sampleRows);return wb}
+
+function buildOutputWorkbook(){
+const wb=XLSX.utils.book_new();
+
+appendJsonSheet(wb,'Parameters',parameterRows());
+
+if(state.tpResults){
+appendJsonSheet(
+wb,
+'TP_Labels',
+state.tpResults.groups.map(g=>({
+Sample:g.sample,
+Residual_Thickness_mm:g.thicknessMm,
+Residual_Thickness_um:g.thicknessMm*1000,
+Lines:g.n
+}))
+);
+
+appendJsonSheet(
+wb,
+'TP_Pointwise_Corr',
+state.tpResults.point.x.map((x,i)=>({
+Relative_Position_mm:x,
+Pearson_r:state.tpResults.point.r[i]
+}))
+);
+
+appendJsonSheet(
+wb,
+'TP_PCA_Scores',
+state.tpResults.obs.map((o,i)=>({
+Sample:o.sample,
+Line:o.line,
+Thickness_mm:o.thicknessMm,
+PC1:state.tpResults.pca.scores[i]?.[0]??'',
+PC2:state.tpResults.pca.scores[i]?.[1]??'',
+PC3:state.tpResults.pca.scores[i]?.[2]??''
+}))
+);
+
+const distRows=[];
+
+for(let i=0;i<state.tpResults.groups.length;i++){
+for(let j=0;j<state.tpResults.groups.length;j++){
+distRows.push({
+Row_Thickness_um:state.tpResults.groups[i].thicknessMm*1000,
+Column_Thickness_um:state.tpResults.groups[j].thicknessMm*1000,
+RMSE_Distance:state.tpResults.dist[i][j]
+})
+}
+}
+
+appendJsonSheet(wb,'TP_Pairwise_Distance',distRows);
+appendJsonSheet(wb,'TP_Features',state.tpResults.features.rows);
+appendJsonSheet(wb,'TP_Monotonicity',state.tpResults.features.mono);
+appendJsonSheet(wb,'TP_PLSR_CV',state.tpResults.cv.rows);
+
+appendJsonSheet(wb,'TP_CV_Metrics',[{
+R2CV:state.tpResults.cv.r2,
+RMSECV_mm:state.tpResults.cv.rmse,
+RMSECV_um:state.tpResults.cv.rmse*1000,
+MAE_mm:state.tpResults.cv.mae,
+MAE_um:state.tpResults.cv.mae*1000
+}]);
+
+const x=roiGrid();
+
+const aoa=[[
+'Relative_Position_mm',
+...state.tpResults.groups.map(g=>`${(g.thicknessMm*1000).toFixed(0)}um_${g.sample}`)
+]];
+
+for(let i=0;i<x.length;i++){
+aoa.push([
+x[i],
+...state.tpResults.groups.map(g=>g.y[i])
+])
+}
+
+appendAoASheet(wb,'TP_Reference_Dictionary',aoa)
+}
+
+const sampleRows=sampleRowsAll();
+
+if(sampleRows.length){
+appendJsonSheet(wb,'Sample_Predictions',sampleRows)
+}
+
+return wb
+}
+
 function dataURLtoBlob(dataURL){const[meta,b64]=dataURL.split(','),mime=meta.match(/:(.*?);/)[1],bin=atob(b64),arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);return new Blob([arr],{type:mime})}
 async function ensureDirPath(root,path){let h=root;for(const part of path.split('/').filter(Boolean))h=await h.getDirectoryHandle(part,{create:true});return h}
 async function writeBlob(root,path,blob){const parts=path.split('/').filter(Boolean),name=parts.pop(),dir=await ensureDirPath(root,parts.join('/')),fh=await dir.getFileHandle(name,{create:true}),w=await fh.createWritable();await w.write(blob);await w.close()}
 async function plotBlob(div){const url=await Plotly.toImage(div,{format:'png',width:1600,height:900,scale:2});return dataURLtoBlob(url)}
-el('saveBtn').onclick=async()=>{if(!state.dataset){setStatus(tr('analysisStarted'),'bad');return}try{setStatus(tr('saving'));const wb=buildOutputWorkbook(),arr=XLSX.write(wb,{bookType:'xlsx',type:'array'}),blob=new Blob([arr],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),base=state.currentMode==='sample'?'CID_Scan_Data_Decomposition_Sample':'CID_Scan_Data_Decomposition_TP',name=`${base}.xlsx`;if(state.saveHandle){await writeBlob(state.saveHandle,name,blob);if(state.exportPlots){for(let i=0;i<state.currentPlots.length;i++)await writeBlob(state.saveHandle,`Plots/${base}_${String(i+1).padStart(2,'0')}.png`,await plotBlob(state.currentPlots[i]))}}else{XLSX.writeFile(wb,name,{bookType:'xlsx',compression:true});if(state.exportPlots)for(let i=0;i<state.currentPlots.length;i++){const url=await Plotly.toImage(state.currentPlots[i],{format:'png',width:1600,height:900,scale:2}),a=document.createElement('a');a.href=url;a.download=`${base}_${String(i+1).padStart(2,'0')}.png`;a.click()}}setStatus(tr('saved'),'good')}catch(e){console.error(e);setStatus(`${tr('saveFailed')}: ${e.message||e}`,'bad')}};
+
+el('saveBtn').onclick=async()=>{
+if(!state.dataset){
+setStatus(tr('analysisStarted'),'bad');
+return
+}
+
+try{
+setStatus(tr('saving'));
+
+const wb=buildOutputWorkbook();
+const arr=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+const blob=new Blob(
+[arr],
+{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}
+);
+
+const base=
+state.currentMode==='sample'
+?'CID_Scan_Data_Decomposition_Sample'
+:'CID_Scan_Data_Decomposition_TP';
+
+const name=`${base}.xlsx`;
+
+if(state.saveHandle){
+
+await writeBlob(
+state.saveHandle,
+name,
+blob
+);
+
+if(state.exportPlots){
+
+for(let i=0;i<state.currentPlots.length;i++){
+
+await writeBlob(
+state.saveHandle,
+`Plots/${base}_${String(i+1).padStart(2,'0')}.png`,
+await plotBlob(state.currentPlots[i])
+)
+
+}
+
+}
+
+}else{
+
+XLSX.writeFile(
+wb,
+name,
+{
+bookType:'xlsx',
+compression:true
+}
+);
+
+if(state.exportPlots){
+
+for(let i=0;i<state.currentPlots.length;i++){
+
+const url=await Plotly.toImage(
+state.currentPlots[i],
+{
+format:'png',
+width:1600,
+height:900,
+scale:2
+}
+);
+
+const a=document.createElement('a');
+
+a.href=url;
+
+a.download=
+`${base}_${String(i+1).padStart(2,'0')}.png`;
+
+a.click()
+
+}
+
+}
+
+}
+
+setStatus(
+tr('saved'),
+'good'
+)
+
+}catch(e){
+
+console.error(e);
+
+setStatus(
+`${tr('saveFailed')}: ${e.message||e}`,
+'bad'
+)
+
+}
+};
 
 applyLanguage();
 </script>
