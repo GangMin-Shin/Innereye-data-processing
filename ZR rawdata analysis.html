@@ -307,6 +307,8 @@ const I18N={
     goodCount:'Good',
     badCount:'Bad',
     defaultColors:'Default',
+    defaultColorsSaved:'Current plot colors were saved as the default.',
+    defaultColorsSaveFailed:'Failed to save the plot color defaults.',
     sigmaSummary:'Sigma summary',
     lowerLimit:'Lower limit',
     upperLimit:'Upper limit'
@@ -376,6 +378,8 @@ const I18N={
     goodCount:'양품',
     badCount:'불량',
     defaultColors:'디폴트',
+    defaultColorsSaved:'현재 그래프 색상을 디폴트로 저장했습니다.',
+    defaultColorsSaveFailed:'그래프 색상 디폴트 저장에 실패했습니다.',
     sigmaSummary:'시그마 요약',
     lowerLimit:'하한',
     upperLimit:'상한'
@@ -755,10 +759,72 @@ el('folderBtn').onclick=async()=>{
   }
 };
 
+const PLOT_COLOR_DEFAULTS_KEY='innereye_zr_rawdata_plot_colors';
+
+const FACTORY_PLOT_COLORS={
+  p0:'#2563eb',
+  p1:'#d97706',
+  diff:'#059669'
+};
+
+function isValidHexColor(value){
+  return /^#[0-9a-fA-F]{6}$/.test(String(value||'').trim());
+}
+
+function loadPlotColorDefaults(){
+  try{
+    const saved=JSON.parse(
+      localStorage.getItem(PLOT_COLOR_DEFAULTS_KEY)||'null'
+    );
+
+    if(
+      saved&&
+      isValidHexColor(saved.p0)&&
+      isValidHexColor(saved.p1)&&
+      isValidHexColor(saved.diff)
+    ){
+      return{
+        p0:saved.p0,
+        p1:saved.p1,
+        diff:saved.diff
+      };
+    }
+  }catch(e){
+    console.warn('Failed to load plot color defaults.',e);
+  }
+
+  return{
+    ...FACTORY_PLOT_COLORS
+  };
+}
+
 function resetPlotColors(){
-  el('p0Color').value='#2563eb';
-  el('p1Color').value='#d97706';
-  el('diffColor').value='#059669';
+  const defaults=
+    loadPlotColorDefaults();
+
+  el('p0Color').value=defaults.p0;
+  el('p1Color').value=defaults.p1;
+  el('diffColor').value=defaults.diff;
+}
+
+function savePlotColorDefaults(){
+  const defaults={
+    p0:el('p0Color').value,
+    p1:el('p1Color').value,
+    diff:el('diffColor').value
+  };
+
+  try{
+    localStorage.setItem(
+      PLOT_COLOR_DEFAULTS_KEY,
+      JSON.stringify(defaults)
+    );
+
+    return true;
+  }catch(e){
+    console.error('Failed to save plot color defaults.',e);
+    return false;
+  }
 }
 
 function resetPlotView(){
@@ -843,7 +909,15 @@ el('tabResetBtn').onclick=
   resetCurrentAnalysis;
 
 el('defaultColorsBtn').onclick=()=>{
-  resetPlotColors();
+  const saved=
+    savePlotColorDefaults();
+
+  setStatus(
+    saved
+    ?tr('defaultColorsSaved')
+    :tr('defaultColorsSaveFailed'),
+    saved?'good':'bad'
+  );
 
   if(state.dataset){
     renderPlots();
@@ -2207,6 +2281,7 @@ el('saveBtn').onclick=async()=>{
   }
 };
 
+resetPlotColors();
 applyLanguage();
 </script>
 </body>
