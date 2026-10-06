@@ -10,125 +10,756 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
 <style>
-:root{--ink:#111827;--muted:#667085;--line:#e5e7eb;--green:#1f8a57;--green-soft:#eaf8f0;--danger:#b42318;--amber:#b54708;--amber-soft:#fff7e8;--shadow:0 12px 38px rgba(17,24,39,.08)}
+:root{
+  --ink:#111827;
+  --muted:#667085;
+  --line:#e5e7eb;
+  --green:#1f8a57;
+  --green-soft:#eaf8f0;
+  --danger:#b42318;
+  --amber:#b54708;
+  --amber-soft:#fff7e8;
+  --shadow:0 12px 38px rgba(17,24,39,.08)
+}
+
 *{box-sizing:border-box}
+
 html{scroll-behavior:smooth}
-body{margin:0;background:#fff;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;position:relative}
-body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.60),rgba(255,255,255,.60)),url("./ZR%20rawdata%20analysis.png");background-size:cover;background-position:center;background-repeat:no-repeat;opacity:.20;filter:saturate(.72) brightness(1.08) contrast(.92);z-index:-2}
-body::after{content:"";position:fixed;inset:0;background:rgba(255,255,255,.24);z-index:-1}
+
+body{
+  margin:0;
+  background:#fff;
+  color:var(--ink);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  position:relative
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.60),rgba(255,255,255,.60)),
+    url("./ZR%20rawdata%20analysis.png");
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  opacity:.20;
+  filter:saturate(.72) brightness(1.08) contrast(.92);
+  z-index:-2
+}
+
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(255,255,255,.24);
+  z-index:-1
+}
+
 button,input,select{font:inherit}
 button{cursor:pointer}
-.topbar{position:sticky;top:0;z-index:30;height:82px;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px 0 330px}
-.title-wrap h1{font-size:24px;margin:0;font-weight:800;letter-spacing:-.03em}
-.topbar-actions{display:flex;align-items:center;gap:10px}
-.lang-btn,.global-reset-btn{width:46px;height:46px;border:1px solid var(--line);border-radius:50%;background:#fff;box-shadow:0 6px 18px rgba(17,24,39,.06);display:inline-flex;align-items:center;justify-content:center}
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:30;
+  height:82px;
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 34px 0 330px
+}
+
+.title-wrap h1{
+  font-size:24px;
+  margin:0;
+  font-weight:800;
+  letter-spacing:-.03em
+}
+
+.topbar-actions{
+  display:flex;
+  align-items:center;
+  gap:10px
+}
+
+.lang-btn,
+.global-reset-btn{
+  width:46px;
+  height:46px;
+  border:1px solid var(--line);
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 6px 18px rgba(17,24,39,.06);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center
+}
+
 .lang-btn{font-size:21px}
-.global-reset-btn{font-size:25px;font-weight:700;line-height:1;transition:.18s ease}
-.global-reset-btn:hover,.tab-reset-btn:hover{background:#f8f9fb;transform:translateY(-1px);border-color:#bdc3cc}
-.global-reset-btn:active,.tab-reset-btn:active{transform:translateY(0)}
-.dock{position:fixed;z-index:40;left:22px;bottom:22px;width:280px;max-height:calc(100vh - 44px);overflow:auto;background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:var(--shadow);backdrop-filter:blur(10px)}
-.dock-head{padding:8px 8px 12px}
-.dock-head strong{display:block;font-size:15px}
-.dock-head span{display:block;font-size:12px;color:var(--muted);margin-top:4px}
-.nav-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.nav-btn,.analysis-btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;font-weight:800}
-.nav-btn{height:42px}
-.analysis-btn{width:100%;text-align:left;padding:13px 14px;margin-top:8px;line-height:1.35;font-size:13px;transition:.18s ease}
-.analysis-btn:hover{transform:translateY(-1px);border-color:#bdc3cc}
-.analysis-btn.active{background:#111827;color:#fff;border-color:#111827}
-.dock hr{border:0;border-top:1px solid var(--line);margin:10px 0}
-.dock-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:800;padding:4px 8px}
-.workspace{margin-left:316px;padding:30px 36px 80px;max-width:1800px}
-.setup-card,.plot-card,.analysis-card{border:1px solid var(--line);border-radius:20px;background:rgba(255,255,255,.90);box-shadow:0 8px 28px rgba(17,24,39,.05);backdrop-filter:blur(8px)}
-.setup-card{padding:24px;margin-bottom:22px}
-.section-title{font-size:18px;font-weight:800;margin:0 0 18px;letter-spacing:-.02em}
-.setup-grid{display:grid;grid-template-columns:repeat(2,minmax(280px,1fr));gap:14px;align-items:end}
-.field label{display:block;font-size:12px;font-weight:800;color:#344054;margin-bottom:7px}
-.file-line{display:flex;gap:8px;align-items:center}
-.file-line input[type=file]{display:none}
-.primary,.secondary{height:46px;border-radius:12px;padding:0 18px;font-size:14px;font-weight:800;border:1px solid var(--line);white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;line-height:1}
-.primary{background:#111827;color:#fff;border-color:#111827}
-.secondary{background:#fff;color:#111827}
-.secondary:hover{background:#f8f9fb}
-.filename{flex:1;height:46px;display:flex;align-items:center;padding:0 12px;border:1px dashed #cfd4dc;border-radius:12px;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.read-row{display:flex;gap:10px;align-items:center;margin-top:15px;flex-wrap:wrap}
-.status{font-size:12px;font-weight:700;color:var(--muted)}
+
+.global-reset-btn{
+  font-size:25px;
+  font-weight:700;
+  line-height:1;
+  transition:.18s ease
+}
+
+.global-reset-btn:hover,
+.tab-reset-btn:hover{
+  background:#f8f9fb;
+  transform:translateY(-1px);
+  border-color:#bdc3cc
+}
+
+.global-reset-btn:active,
+.tab-reset-btn:active{
+  transform:translateY(0)
+}
+
+.dock{
+  position:fixed;
+  z-index:40;
+  left:22px;
+  bottom:22px;
+  width:280px;
+  max-height:calc(100vh - 44px);
+  overflow:auto;
+  background:rgba(255,255,255,.88);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:14px;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(10px)
+}
+
+.dock-head{
+  padding:8px 8px 12px
+}
+
+.dock-head strong{
+  display:block;
+  font-size:15px
+}
+
+.dock-head span{
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px
+}
+
+.nav-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:10px
+}
+
+.nav-btn,
+.analysis-btn{
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--ink);
+  border-radius:12px;
+  font-weight:800
+}
+
+.nav-btn{
+  height:42px
+}
+
+.analysis-btn{
+  width:100%;
+  text-align:left;
+  padding:13px 14px;
+  margin-top:8px;
+  line-height:1.35;
+  font-size:13px;
+  transition:.18s ease
+}
+
+.analysis-btn:hover{
+  transform:translateY(-1px);
+  border-color:#bdc3cc
+}
+
+.analysis-btn.active{
+  background:#111827;
+  color:#fff;
+  border-color:#111827
+}
+
+.dock hr{
+  border:0;
+  border-top:1px solid var(--line);
+  margin:10px 0
+}
+
+.dock-label{
+  font-size:11px;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  font-weight:800;
+  padding:4px 8px
+}
+
+.workspace{
+  margin-left:316px;
+  padding:30px 36px 80px;
+  max-width:1800px
+}
+
+.setup-card,
+.plot-card,
+.analysis-card{
+  border:1px solid var(--line);
+  border-radius:20px;
+  background:rgba(255,255,255,.90);
+  box-shadow:0 8px 28px rgba(17,24,39,.05);
+  backdrop-filter:blur(8px)
+}
+
+.setup-card{
+  padding:24px;
+  margin-bottom:22px
+}
+
+.section-title{
+  font-size:18px;
+  font-weight:800;
+  margin:0 0 18px;
+  letter-spacing:-.02em
+}
+
+.setup-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(280px,1fr));
+  gap:14px;
+  align-items:end
+}
+
+.field label{
+  display:block;
+  font-size:12px;
+  font-weight:800;
+  color:#344054;
+  margin-bottom:7px
+}
+
+.file-line{
+  display:flex;
+  gap:8px;
+  align-items:center
+}
+
+.file-line input[type=file]{
+  display:none
+}
+
+.primary,
+.secondary{
+  height:46px;
+  border-radius:12px;
+  padding:0 18px;
+  font-size:14px;
+  font-weight:800;
+  border:1px solid var(--line);
+  white-space:nowrap;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1
+}
+
+.primary{
+  background:#111827;
+  color:#fff;
+  border-color:#111827
+}
+
+.secondary{
+  background:#fff;
+  color:#111827
+}
+
+.secondary:hover{
+  background:#f8f9fb
+}
+
+.filename{
+  flex:1;
+  height:46px;
+  display:flex;
+  align-items:center;
+  padding:0 12px;
+  border:1px dashed #cfd4dc;
+  border-radius:12px;
+  color:var(--muted);
+  font-size:12px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.read-row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-top:15px;
+  flex-wrap:wrap
+}
+
+.status{
+  font-size:12px;
+  font-weight:700;
+  color:var(--muted)
+}
+
 .status.good{color:var(--green)}
 .status.bad{color:var(--danger)}
 .status.warn{color:var(--amber)}
-.detected{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
-.badge{padding:7px 10px;border:1px solid var(--line);border-radius:999px;font-size:11px;font-weight:800;color:#344054;background:#fafafa}
-.badge.good{background:var(--green-soft);color:#16653f;border-color:#ccebd9}
-.badge.warn{background:var(--amber-soft);color:#9a6700;border-color:#f4dfad}
-.colors{margin-top:18px;padding-top:18px;border-top:1px solid var(--line);display:flex;gap:16px;flex-wrap:wrap;align-items:center}
-.colors[hidden]{display:none!important}
-.color-opt{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;color:#475467}
-.color-opt input{width:30px;height:30px;padding:0;border:0;background:none}
-.color-default-btn{height:36px;padding:0 14px;font-size:12px}
-.sigma-control input{width:92px}
-.result-header{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:28px 0 14px}
-.result-header h2{margin:0;font-size:21px;font-weight:800;letter-spacing:-.03em}
-.result-header .sub{font-size:12px;color:var(--muted);font-weight:600;margin-top:5px}
-.actions{display:none;align-items:center;gap:10px;flex-wrap:wrap}
-.actions.visible{display:flex}
-.save-btn{height:44px;border:0;border-radius:12px;background:#111827;color:#fff;padding:0 17px;font-weight:800}
-.save-btn:disabled{opacity:.45;cursor:not-allowed}
-.analysis-card{padding:18px;margin-bottom:18px;display:none}
-.analysis-card.visible{display:block}
-.analysis-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
-.analysis-card-title{font-size:13px;font-weight:800;color:#344054}
-.tab-reset-btn{width:38px;height:38px;border:1px solid var(--line);border-radius:50%;background:#fff;color:#111827;font-size:21px;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(17,24,39,.05);transition:.18s ease}
-.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}
-.result-table{width:100%;border-collapse:collapse;min-width:1180px;font-size:12px}
-.result-table th,.result-table td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
-.result-table th{background:#f8f9fb;font-weight:800;color:#344054;position:sticky;top:0}
-.result-table th:nth-child(3),.result-table td:nth-child(3),.result-table th:nth-child(5),.result-table td:nth-child(5),.result-table th:nth-child(7),.result-table td:nth-child(7){border-left:2px solid #cbd5e1}
-.result-table th:nth-child(4),.result-table td:nth-child(4),.result-table th:nth-child(6),.result-table td:nth-child(6),.result-table th:nth-child(8),.result-table td:nth-child(8){border-right:2px solid #cbd5e1}
-.result-table tr:last-child td{border-bottom:0}
-.result-header .sub:empty{display:none}
-.plot-controls{display:flex;justify-content:flex-end;align-items:end;gap:12px;flex-wrap:wrap;margin:0 0 14px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.90);box-shadow:0 6px 20px rgba(17,24,39,.04);backdrop-filter:blur(8px)}
-.plot-controls[hidden]{display:none!important}
-.plot-control-group{display:flex;flex-direction:column;gap:6px;min-width:150px}
-.plot-control-group label,.y-control label{font-size:11px;font-weight:800;color:#475467}
-.plot-control-group select,.y-control input{height:38px;border:1px solid #cfd4dc;border-radius:10px;background:#fff;color:#111827;padding:0 10px;font-size:12px;font-weight:700;outline:none}
-.plot-control-group select:focus,.y-control input:focus{border-color:#98a2b3;box-shadow:0 0 0 3px rgba(17,24,39,.05)}
-.plots{display:grid;gap:18px}
-.plot-card{padding:16px;min-height:500px}
-.plot-title{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:3px 4px 10px;font-size:14px;font-weight:800}
-.plot-title-name{font-size:15px;font-weight:800;color:#111827}
-.y-controls{display:flex;align-items:end;justify-content:flex-end;gap:8px;flex-wrap:wrap}
-.y-control{display:flex;flex-direction:column;gap:5px}
-.y-control input{width:128px}
-.auto-scale-btn{height:38px;border:1px solid var(--line);border-radius:10px;background:#fff;color:#111827;padding:0 12px;font-size:12px;font-weight:800}
-.auto-scale-btn:hover{background:#f8f9fb;border-color:#bdc3cc}
-.plot{width:100%;height:460px}
-.empty{min-height:500px;border:1px dashed #d5dae1;border-radius:20px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-weight:700;line-height:1.6;padding:30px}
-.progress{display:none;margin-top:10px;font-size:12px;font-weight:700;color:var(--muted)}
-.progress.visible{display:block}
+
+.detected{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:13px
+}
+
+.badge{
+  padding:7px 10px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  font-size:11px;
+  font-weight:800;
+  color:#344054;
+  background:#fafafa
+}
+
+.badge.good{
+  background:var(--green-soft);
+  color:#16653f;
+  border-color:#ccebd9
+}
+
+.badge.warn{
+  background:var(--amber-soft);
+  color:#9a6700;
+  border-color:#f4dfad
+}
+
+.colors{
+  margin-top:18px;
+  padding-top:18px;
+  border-top:1px solid var(--line);
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+  align-items:center
+}
+
+.colors[hidden]{
+  display:none!important
+}
+
+.color-opt{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:11px;
+  font-weight:800;
+  color:#475467
+}
+
+.color-opt input{
+  width:30px;
+  height:30px;
+  padding:0;
+  border:0;
+  background:none
+}
+
+.color-default-btn{
+  height:36px;
+  padding:0 14px;
+  font-size:12px
+}
+
+.sigma-control input{
+  width:92px
+}
+
+.result-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  margin:28px 0 14px
+}
+
+.result-header h2{
+  margin:0;
+  font-size:21px;
+  font-weight:800;
+  letter-spacing:-.03em
+}
+
+.result-header .sub{
+  font-size:12px;
+  color:var(--muted);
+  font-weight:600;
+  margin-top:5px
+}
+
+.actions{
+  display:none;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap
+}
+
+.actions.visible{
+  display:flex
+}
+
+.save-btn{
+  height:44px;
+  border:0;
+  border-radius:12px;
+  background:#111827;
+  color:#fff;
+  padding:0 17px;
+  font-weight:800
+}
+
+.save-btn:disabled{
+  opacity:.45;
+  cursor:not-allowed
+}
+
+.analysis-card{
+  padding:18px;
+  margin-bottom:18px;
+  display:none
+}
+
+.analysis-card.visible{
+  display:block
+}
+
+.analysis-card-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px
+}
+
+.analysis-card-title{
+  font-size:13px;
+  font-weight:800;
+  color:#344054
+}
+
+.tab-reset-btn{
+  width:38px;
+  height:38px;
+  border:1px solid var(--line);
+  border-radius:50%;
+  background:#fff;
+  color:#111827;
+  font-size:21px;
+  font-weight:700;
+  line-height:1;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 4px 12px rgba(17,24,39,.05);
+  transition:.18s ease
+}
+
+.table-wrap{
+  overflow:auto;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#fff
+}
+
+.result-table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:1180px;
+  font-size:12px
+}
+
+.result-table th,
+.result-table td{
+  padding:11px 12px;
+  border-bottom:1px solid var(--line);
+  text-align:center;
+  white-space:nowrap
+}
+
+.result-table th{
+  background:#f8f9fb;
+  font-weight:800;
+  color:#344054;
+  position:sticky;
+  top:0
+}
+
+.result-table th:nth-child(3),
+.result-table td:nth-child(3),
+.result-table th:nth-child(5),
+.result-table td:nth-child(5),
+.result-table th:nth-child(7),
+.result-table td:nth-child(7){
+  border-left:2px solid #cbd5e1
+}
+
+.result-table th:nth-child(4),
+.result-table td:nth-child(4),
+.result-table th:nth-child(6),
+.result-table td:nth-child(6),
+.result-table th:nth-child(8),
+.result-table td:nth-child(8){
+  border-right:2px solid #cbd5e1
+}
+
+.result-table tr:last-child td{
+  border-bottom:0
+}
+
+.result-header .sub:empty{
+  display:none
+}
+
+.plot-controls{
+  display:flex;
+  justify-content:flex-end;
+  align-items:end;
+  gap:12px;
+  flex-wrap:wrap;
+  margin:0 0 14px;
+  padding:14px 16px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:rgba(255,255,255,.90);
+  box-shadow:0 6px 20px rgba(17,24,39,.04);
+  backdrop-filter:blur(8px)
+}
+
+.plot-controls[hidden]{
+  display:none!important
+}
+
+.plot-control-group{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-width:150px
+}
+
+.plot-control-group label,
+.y-control label{
+  font-size:11px;
+  font-weight:800;
+  color:#475467
+}
+
+.plot-control-group select,
+.y-control input{
+  height:38px;
+  border:1px solid #cfd4dc;
+  border-radius:10px;
+  background:#fff;
+  color:#111827;
+  padding:0 10px;
+  font-size:12px;
+  font-weight:700;
+  outline:none
+}
+
+.plot-control-group select:focus,
+.y-control input:focus{
+  border-color:#98a2b3;
+  box-shadow:0 0 0 3px rgba(17,24,39,.05)
+}
+
+.plots{
+  display:grid;
+  gap:18px
+}
+
+.plot-card{
+  padding:16px;
+  min-height:500px
+}
+
+.plot-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:3px 4px 10px;
+  font-size:14px;
+  font-weight:800
+}
+
+.plot-title-name{
+  font-size:15px;
+  font-weight:800;
+  color:#111827
+}
+
+.y-controls{
+  display:flex;
+  align-items:end;
+  justify-content:flex-end;
+  gap:8px;
+  flex-wrap:wrap
+}
+
+.y-control{
+  display:flex;
+  flex-direction:column;
+  gap:5px
+}
+
+.y-control input{
+  width:128px
+}
+
+.auto-scale-btn{
+  height:38px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#fff;
+  color:#111827;
+  padding:0 12px;
+  font-size:12px;
+  font-weight:800
+}
+
+.auto-scale-btn:hover{
+  background:#f8f9fb;
+  border-color:#bdc3cc
+}
+
+.plot{
+  width:100%;
+  height:460px
+}
+
+.empty{
+  min-height:500px;
+  border:1px dashed #d5dae1;
+  border-radius:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:var(--muted);
+  font-weight:700;
+  line-height:1.6;
+  padding:30px
+}
+
+.progress{
+  display:none;
+  margin-top:10px;
+  font-size:12px;
+  font-weight:700;
+  color:var(--muted)
+}
+
+.progress.visible{
+  display:block
+}
 
 @media(max-width:1050px){
-  .dock{position:static;width:auto;max-height:none;margin:18px}
-  .topbar{padding-left:24px}
-  .workspace{margin-left:0;padding:12px 18px 60px}
+  .dock{
+    position:static;
+    width:auto;
+    max-height:none;
+    margin:18px
+  }
+
+  .topbar{
+    padding-left:24px
+  }
+
+  .workspace{
+    margin-left:0;
+    padding:12px 18px 60px
+  }
 }
 
 @media(max-width:650px){
-  .setup-grid{grid-template-columns:1fr}
-  .topbar{height:auto;padding:16px 18px}
-  .title-wrap h1{font-size:19px}
-  .workspace{padding:10px 12px 50px}
-  .plot{height:430px}
-  .result-header{align-items:flex-start;flex-direction:column}
-  .plot-controls{justify-content:stretch}
-  .plot-control-group{min-width:0;flex:1 1 140px}
-  .plot-title{align-items:flex-start;flex-direction:column}
-  .y-controls{width:100%;justify-content:flex-start}
-  .y-control{flex:1 1 120px}
-  .y-control input{width:100%}
+  .setup-grid{
+    grid-template-columns:1fr
+  }
+
+  .topbar{
+    height:auto;
+    padding:16px 18px
+  }
+
+  .title-wrap h1{
+    font-size:19px
+  }
+
+  .workspace{
+    padding:10px 12px 50px
+  }
+
+  .plot{
+    height:430px
+  }
+
+  .result-header{
+    align-items:flex-start;
+    flex-direction:column
+  }
+
+  .plot-controls{
+    justify-content:stretch
+  }
+
+  .plot-control-group{
+    min-width:0;
+    flex:1 1 140px
+  }
+
+  .plot-title{
+    align-items:flex-start;
+    flex-direction:column
+  }
+
+  .y-controls{
+    width:100%;
+    justify-content:flex-start
+  }
+
+  .y-control{
+    flex:1 1 120px
+  }
+
+  .y-control input{
+    width:100%
+  }
 }
 </style>
 </head>
+
 <body>
 
 <aside class="dock">
@@ -143,101 +774,318 @@ button{cursor:pointer}
   </div>
 
   <hr>
+
   <div class="dock-label" data-i18n="analysis">Analysis</div>
-  <button id="descriptionBtn" class="analysis-btn" data-mode="description" data-i18n="descriptionBtn">Description</button>
+
+  <button
+    id="descriptionBtn"
+    class="analysis-btn"
+    data-mode="description"
+    data-i18n="descriptionBtn"
+  >
+    Description
+  </button>
 </aside>
 
 <header class="topbar">
   <div class="title-wrap">
     <h1 data-i18n="module">ZR rawdata analysis</h1>
   </div>
+
   <div class="topbar-actions">
-    <button id="globalResetBtn" class="global-reset-btn" type="button" title="Reset all" aria-label="Reset all">↻</button>
-    <button id="langBtn" class="lang-btn" type="button" title="Language" aria-label="Change language">🌐</button>
+    <button
+      id="globalResetBtn"
+      class="global-reset-btn"
+      type="button"
+      title="Reset all"
+      aria-label="Reset all"
+    >
+      ↻
+    </button>
+
+    <button
+      id="langBtn"
+      class="lang-btn"
+      type="button"
+      title="Language"
+      aria-label="Change language"
+    >
+      🌐
+    </button>
   </div>
 </header>
 
 <main class="workspace">
+
   <section class="setup-card">
-    <h2 class="section-title" data-i18n="inputSetup">Input & output setup</h2>
+    <h2 class="section-title" data-i18n="inputSetup">
+      Input & output setup
+    </h2>
 
     <div class="setup-grid">
+
       <div class="field">
-        <label data-i18n="excelFile">Excel workbook</label>
+        <label data-i18n="excelFile">
+          Excel workbook
+        </label>
+
         <div class="file-line">
-          <button id="excelBrowseBtn" type="button" class="secondary" data-i18n="browse">Browse</button>
-          <input id="excelInput" type="file" accept=".xlsx,.xlsm,.xls">
-          <div id="filename" class="filename" data-i18n="noFile">No file selected</div>
+          <button
+            id="excelBrowseBtn"
+            type="button"
+            class="secondary"
+            data-i18n="browse"
+          >
+            Browse
+          </button>
+
+          <input
+            id="excelInput"
+            type="file"
+            accept=".xlsx,.xlsm,.xls"
+          >
+
+          <div
+            id="filename"
+            class="filename"
+            data-i18n="noFile"
+          >
+            No file selected
+          </div>
         </div>
       </div>
 
       <div class="field">
-        <label data-i18n="savePath">Save path</label>
+        <label data-i18n="savePath">
+          Save path
+        </label>
+
         <div class="file-line">
-          <button id="folderBtn" type="button" class="secondary" data-i18n="browse">Browse</button>
-          <div id="folderName" class="filename" data-i18n="notSelected">No folder selected</div>
+          <button
+            id="folderBtn"
+            type="button"
+            class="secondary"
+            data-i18n="browse"
+          >
+            Browse
+          </button>
+
+          <div
+            id="folderName"
+            class="filename"
+            data-i18n="notSelected"
+          >
+            No folder selected
+          </div>
         </div>
       </div>
+
     </div>
 
     <div class="read-row">
-      <button id="readBtn" class="primary" data-i18n="readExcel">Read Excel</button>
-      <button id="downloadTemplateBtn" class="secondary" data-i18n="downloadTemplate">Download template</button>
-      <span id="status" class="status" data-i18n="ready">Ready</span>
+      <button
+        id="readBtn"
+        class="primary"
+        data-i18n="readExcel"
+      >
+        Read Excel
+      </button>
+
+      <button
+        id="downloadTemplateBtn"
+        class="secondary"
+        data-i18n="downloadTemplate"
+      >
+        Download template
+      </button>
+
+      <span
+        id="status"
+        class="status"
+        data-i18n="ready"
+      >
+        Ready
+      </span>
     </div>
 
-    <div id="detected" class="detected"></div>
+    <div
+      id="detected"
+      class="detected"
+    ></div>
 
-    <div id="colorsSection" class="colors" hidden>
-      <span style="font-size:11px;font-weight:800;color:#344054" data-i18n="plotColors">Plot colors</span>
-      <label class="color-opt"><input id="p0Color" type="color" value="#2563eb"><span>P0</span></label>
-      <label class="color-opt"><input id="p1Color" type="color" value="#d97706"><span>P1</span></label>
-      <label class="color-opt"><input id="diffColor" type="color" value="#059669"><span>P0 - P1</span></label>
-      <button id="defaultColorsBtn" type="button" class="secondary color-default-btn" data-i18n="defaultColors">Default</button>
+    <div
+      id="colorsSection"
+      class="colors"
+      hidden
+    >
+      <span
+        style="font-size:11px;font-weight:800;color:#344054"
+        data-i18n="plotColors"
+      >
+        Plot colors
+      </span>
+
+      <label class="color-opt">
+        <input
+          id="p0Color"
+          type="color"
+          value="#2563eb"
+        >
+        <span>P0</span>
+      </label>
+
+      <label class="color-opt">
+        <input
+          id="p1Color"
+          type="color"
+          value="#d97706"
+        >
+        <span>P1</span>
+      </label>
+
+      <label class="color-opt">
+        <input
+          id="diffColor"
+          type="color"
+          value="#059669"
+        >
+        <span>P0 - P1</span>
+      </label>
+
+      <button
+        id="defaultColorsBtn"
+        type="button"
+        class="secondary color-default-btn"
+        data-i18n="defaultColors"
+      >
+        Default
+      </button>
     </div>
   </section>
 
   <section>
+
     <div class="result-header">
       <div>
-        <h2 id="resultTitle" data-i18n="result">Processing result</h2>
-        <div id="resultSub" class="sub" data-i18n="chooseAnalysis">Read a valid workbook to generate the Description results.</div>
+        <h2
+          id="resultTitle"
+          data-i18n="result"
+        >
+          Processing result
+        </h2>
+
+        <div
+          id="resultSub"
+          class="sub"
+          data-i18n="chooseAnalysis"
+        >
+          Read a valid workbook to generate the Description results.
+        </div>
       </div>
-      <div id="actions" class="actions">
-        <button id="saveBtn" class="save-btn" data-i18n="save">Save</button>
+
+      <div
+        id="actions"
+        class="actions"
+      >
+        <button
+          id="saveBtn"
+          class="save-btn"
+          data-i18n="save"
+        >
+          Save
+        </button>
       </div>
     </div>
 
-    <div id="analysisControls" class="analysis-card">
+    <div
+      id="analysisControls"
+      class="analysis-card"
+    >
       <div class="analysis-card-head">
-        <span class="analysis-card-title" data-i18n="descriptionSummary">Description summary</span>
-        <button id="tabResetBtn" class="tab-reset-btn" type="button" title="Reset current analysis" aria-label="Reset current analysis">↻</button>
+        <span
+          class="analysis-card-title"
+          data-i18n="descriptionSummary"
+        >
+          Description summary
+        </span>
+
+        <button
+          id="tabResetBtn"
+          class="tab-reset-btn"
+          type="button"
+          title="Reset current analysis"
+          aria-label="Reset current analysis"
+        >
+          ↻
+        </button>
       </div>
+
       <div id="resultTableWrap"></div>
     </div>
 
-    <div id="plotControls" class="plot-controls" hidden>
+    <div
+      id="plotControls"
+      class="plot-controls"
+      hidden
+    >
       <div class="plot-control-group">
-        <label for="channelSelect" data-i18n="channelSelect">Channel</label>
+        <label
+          for="channelSelect"
+          data-i18n="channelSelect"
+        >
+          Channel
+        </label>
+
         <select id="channelSelect">
           <option value="Ch1">Ch1</option>
           <option value="Ch2">Ch2</option>
         </select>
       </div>
+
       <div class="plot-control-group">
-        <label for="plotTypeSelect" data-i18n="plotType">Plot type</label>
+        <label
+          for="plotTypeSelect"
+          data-i18n="plotType"
+        >
+          Plot type
+        </label>
+
         <select id="plotTypeSelect">
-          <option value="bar" data-i18n="barPlot">Bar plot</option>
-          <option value="line" data-i18n="linePlot">Line plot</option>
+          <option
+            value="bar"
+            data-i18n="barPlot"
+          >
+            Bar plot
+          </option>
+
+          <option
+            value="line"
+            data-i18n="linePlot"
+          >
+            Line plot
+          </option>
         </select>
       </div>
     </div>
 
-    <div id="plots" class="plots">
-      <div class="empty" data-i18n="empty">No plot yet.<br>Read a valid workbook to start analysis.</div>
+    <div
+      id="plots"
+      class="plots"
+    >
+      <div
+        class="empty"
+        data-i18n="empty"
+      >
+        No plot yet.<br>
+        Read a valid workbook to start analysis.
+      </div>
     </div>
 
-    <div id="progress" class="progress"></div>
+    <div
+      id="progress"
+      class="progress"
+    ></div>
+
   </section>
 </main>
 
@@ -274,7 +1122,7 @@ const I18N={
     templateDownloadStarted:'Template download started.',
     sheetMissing:'The workbook must contain both Ch1 and Ch2 sheets.',
     headerMismatch:'Each channel sheet must have A1=N, B1=P1, C1=P0 - P1.',
-    saving:'Saving workbook…',
+    saving:'Saving workbook and plot images…',
     saved:'Save completed.',
     saveFailed:'Save failed',
     globalResetTitle:'Reset all',
@@ -345,7 +1193,7 @@ const I18N={
     templateDownloadStarted:'Excel 양식 다운로드를 시작했습니다.',
     sheetMissing:'Excel에는 Ch1과 Ch2 시트가 모두 있어야 합니다.',
     headerMismatch:'각 채널 시트의 A1=N, B1=P1, C1=P0 - P1이어야 합니다.',
-    saving:'Excel 파일 저장 중…',
+    saving:'Excel 파일과 그래프 이미지를 저장 중…',
     saved:'저장이 완료되었습니다.',
     saveFailed:'저장 실패',
     globalResetTitle:'전체 리셋',
@@ -386,8 +1234,15 @@ const I18N={
   }
 };
 
-let lang=localStorage.getItem('innereye_lang')||'en';
-if(!I18N[lang])lang='en';
+let lang=
+  localStorage.getItem(
+    'innereye_lang'
+  )||
+  'en';
+
+if(!I18N[lang]){
+  lang='en';
+}
 
 const state={
   file:null,
@@ -429,27 +1284,64 @@ const state={
   }
 };
 
-const el=id=>document.getElementById(id);
-const tr=k=>Object.prototype.hasOwnProperty.call(I18N[lang],k)?I18N[lang][k]:k;
+const el=
+  id=>
+    document.getElementById(
+      id
+    );
 
-function setStatus(text,kind=''){
-  el('status').textContent=text;
-  el('status').className='status '+kind;
+const tr=
+  k=>
+    Object.prototype.hasOwnProperty.call(
+      I18N[lang],
+      k
+    )
+    ?I18N[lang][k]
+    :k;
+
+function setStatus(
+  text,
+  kind=''
+){
+  el('status').textContent=
+    text;
+
+  el('status').className=
+    'status '+kind;
 }
 
-function fmt(v,d=6){
-  return Number.isFinite(v)?Number(v).toFixed(d):'';
+function fmt(
+  v,
+  d=6
+){
+  return Number.isFinite(v)
+    ?Number(v).toFixed(d)
+    :'';
 }
 
 function isBlank(v){
-  return v===null||v===undefined||String(v).trim()==='';
+  return(
+    v===null||
+    v===undefined||
+    String(v).trim()===''
+  );
 }
 
 function toFiniteNumber(v){
-  if(isBlank(v))return NaN;
-  if(typeof v==='number')return Number.isFinite(v)?v:NaN;
+  if(isBlank(v)){
+    return NaN;
+  }
 
-  const s=String(v).trim().replace(/,/g,'');
+  if(typeof v==='number'){
+    return Number.isFinite(v)
+      ?v
+      :NaN;
+  }
+
+  const s=
+    String(v)
+    .trim()
+    .replace(/,/g,'');
 
   if(
     !s||
@@ -459,13 +1351,17 @@ function toFiniteNumber(v){
     return NaN;
   }
 
-  const n=Number(s);
+  const n=
+    Number(s);
 
-  return Number.isFinite(n)?n:NaN;
+  return Number.isFinite(n)
+    ?n
+    :NaN;
 }
 
 function meanAndSampleSD(values){
-  const n=values.length;
+  const n=
+    values.length;
 
   if(!n){
     return{
@@ -490,14 +1386,16 @@ function meanAndSampleSD(values){
   let ss=0;
 
   for(const v of values){
-    ss+=(v-mean)**2;
+    ss+=
+      (v-mean)**2;
   }
 
   return{
     mean,
-    sd:Math.sqrt(
-      ss/(n-1)
-    )
+    sd:
+      Math.sqrt(
+        ss/(n-1)
+      )
   };
 }
 
@@ -511,7 +1409,9 @@ function normalizeSigma(value){
 
   return Math.max(
     0,
-    Math.round(n*10)/10
+    Math.round(
+      n*10
+    )/10
   );
 }
 
@@ -525,20 +1425,42 @@ function lightenHexToRgba(
     .trim()
     .replace('#','');
 
-  if(!/^[0-9a-fA-F]{6}$/.test(raw)){
+  if(
+    !/^[0-9a-fA-F]{6}$/.test(
+      raw
+    )
+  ){
     return `rgba(148,163,184,${alpha})`;
   }
 
-  const r=parseInt(raw.slice(0,2),16);
-  const g=parseInt(raw.slice(2,4),16);
-  const b=parseInt(raw.slice(4,6),16);
-
-  const mix=v=>
-    Math.round(
-      v+(255-v)*lighten
+  const r=
+    parseInt(
+      raw.slice(0,2),
+      16
     );
 
-  return `rgba(${mix(r)},${mix(g)},${mix(b)},${alpha})`;
+  const g=
+    parseInt(
+      raw.slice(2,4),
+      16
+    );
+
+  const b=
+    parseInt(
+      raw.slice(4,6),
+      16
+    );
+
+  const mix=
+    v=>
+      Math.round(
+        v+
+        (255-v)*lighten
+      );
+
+  return(
+    `rgba(${mix(r)},${mix(g)},${mix(b)},${alpha})`
+  );
 }
 
 function sigmaAssessment(
@@ -558,10 +1480,12 @@ function sigmaAssessment(
     stats.sd;
 
   const lower=
-    mean-s*sd;
+    mean-
+    s*sd;
 
   const upper=
-    mean+s*sd;
+    mean+
+    s*sd;
 
   let good=0;
 
@@ -581,61 +1505,107 @@ function sigmaAssessment(
     lower,
     upper,
     good,
-    bad:values.length-good,
-    total:values.length
+    bad:
+      values.length-good,
+    total:
+      values.length
   };
 }
 
 function purgePlots(){
-  for(const div of state.plotDivs){
+  for(
+    const div of
+    state.plotDivs
+  ){
     try{
-      Plotly.purge(div);
+      Plotly.purge(
+        div
+      );
     }catch(_){}
   }
 
   state.plotDivs=[];
 }
 
-function clearDescription({keepStatus=false}={}){
+function clearDescription(
+  {
+    keepStatus=false
+  }={}
+){
   purgePlots();
 
   state.dataset=null;
 
-  el('descriptionBtn').classList.remove('active');
-  el('analysisControls').classList.remove('visible');
-  el('actions').classList.remove('visible');
+  el('descriptionBtn')
+    .classList.remove(
+      'active'
+    );
+
+  el('analysisControls')
+    .classList.remove(
+      'visible'
+    );
+
+  el('actions')
+    .classList.remove(
+      'visible'
+    );
 
   el('resultTableWrap').innerHTML='';
   el('detected').innerHTML='';
-  el('colorsSection').hidden=true;
-  el('plotControls').hidden=true;
 
-  el('resultTitle').textContent=tr('result');
-  el('resultSub').textContent=tr('chooseAnalysis');
+  el('colorsSection').hidden=
+    true;
+
+  el('plotControls').hidden=
+    true;
+
+  el('resultTitle').textContent=
+    tr('result');
+
+  el('resultSub').textContent=
+    tr('chooseAnalysis');
 
   el('plots').innerHTML=
     `<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;
 
   el('progress').textContent='';
-  el('progress').classList.remove('visible');
+
+  el('progress')
+    .classList.remove(
+      'visible'
+    );
 
   if(!keepStatus){
-    setStatus(tr('ready'));
+    setStatus(
+      tr('ready')
+    );
   }
 }
 
 function applyLanguage(){
-  document.documentElement.lang=lang;
+  document.documentElement.lang=
+    lang;
 
-  document.querySelectorAll('[data-i18n]').forEach(node=>{
-    const k=node.dataset.i18n;
+  document
+  .querySelectorAll(
+    '[data-i18n]'
+  )
+  .forEach(
+    node=>{
+      const k=
+        node.dataset.i18n;
 
-    if(I18N[lang][k]){
-      node.innerHTML=
-        I18N[lang][k]
-        .replace(/\n/g,'<br>');
+      if(I18N[lang][k]){
+        node.innerHTML=
+          I18N[lang][k]
+          .replace(
+            /\n/g,
+            '<br>'
+          );
+      }
     }
-  });
+  );
 
   if(state.file){
     el('filename').textContent=
@@ -648,32 +1618,46 @@ function applyLanguage(){
   }
 
   el('globalResetBtn').title=
-    tr('globalResetTitle');
+    tr(
+      'globalResetTitle'
+    );
 
   el('globalResetBtn')
     .setAttribute(
       'aria-label',
-      tr('globalResetTitle')
+      tr(
+        'globalResetTitle'
+      )
     );
 
   el('tabResetBtn').title=
-    tr('tabResetTitle');
+    tr(
+      'tabResetTitle'
+    );
 
   el('tabResetBtn')
     .setAttribute(
       'aria-label',
-      tr('tabResetTitle')
+      tr(
+        'tabResetTitle'
+      )
     );
 
   if(state.dataset){
     el('descriptionBtn')
-      .classList.add('active');
+      .classList.add(
+        'active'
+      );
 
     el('analysisControls')
-      .classList.add('visible');
+      .classList.add(
+        'visible'
+      );
 
     el('actions')
-      .classList.add('visible');
+      .classList.add(
+        'visible'
+      );
 
     el('resultTitle').textContent=
       'Description';
@@ -686,22 +1670,26 @@ function applyLanguage(){
   }
 }
 
-el('langBtn').onclick=()=>{
-  lang=
-    lang==='en'
-    ?'ko'
-    :'en';
+el('langBtn').onclick=
+  ()=>{
+    lang=
+      lang==='en'
+      ?'ko'
+      :'en';
 
-  localStorage.setItem(
-    'innereye_lang',
-    lang
-  );
+    localStorage.setItem(
+      'innereye_lang',
+      lang
+    );
 
-  applyLanguage();
-};
+    applyLanguage();
+  };
 
 el('excelBrowseBtn').onclick=
-  ()=>el('excelInput').click();
+  ()=>
+    el(
+      'excelInput'
+    ).click();
 
 el('excelInput')
 .addEventListener(
@@ -714,52 +1702,69 @@ el('excelInput')
     el('filename').textContent=
       state.file
       ?state.file.name
-      :tr('noFile');
+      :tr(
+        'noFile'
+      );
 
     clearDescription({
       keepStatus:true
     });
 
-    setStatus(tr('ready'));
+    setStatus(
+      tr('ready')
+    );
   }
 );
 
-el('folderBtn').onclick=async()=>{
-  if(!window.showDirectoryPicker){
-    setStatus(
-      tr('folderUnsupported'),
-      'bad'
-    );
-
-    return;
-  }
-
-  try{
-    state.saveHandle=
-      await window.showDirectoryPicker({
-        mode:'readwrite',
-        id:'innereye-zr-rawdata-output'
-      });
-
-    el('folderName').textContent=
-      state.saveHandle.name;
-
-    setStatus(
-      tr('folderSelected'),
-      'good'
-    );
-
-  }catch(e){
-    if(e.name!=='AbortError'){
+el('folderBtn').onclick=
+  async()=>{
+    if(
+      !window.showDirectoryPicker
+    ){
       setStatus(
-        e.message||String(e),
+        tr(
+          'folderUnsupported'
+        ),
         'bad'
       );
-    }
-  }
-};
 
-const PLOT_COLOR_DEFAULTS_KEY='innereye_zr_rawdata_plot_colors';
+      return;
+    }
+
+    try{
+      state.saveHandle=
+        await window
+        .showDirectoryPicker({
+          mode:'readwrite',
+          id:
+            'innereye-zr-rawdata-output'
+        });
+
+      el('folderName').textContent=
+        state.saveHandle.name;
+
+      setStatus(
+        tr(
+          'folderSelected'
+        ),
+        'good'
+      );
+
+    }catch(e){
+      if(
+        e.name!=='AbortError'
+      ){
+        setStatus(
+          e.message||
+          String(e),
+          'bad'
+        );
+      }
+    }
+  };
+
+const PLOT_COLOR_DEFAULTS_KEY=
+  'innereye_zr_rawdata_plot_colors';
 
 const FACTORY_PLOT_COLORS={
   p0:'#2563eb',
@@ -767,21 +1772,40 @@ const FACTORY_PLOT_COLORS={
   diff:'#059669'
 };
 
-function isValidHexColor(value){
-  return /^#[0-9a-fA-F]{6}$/.test(String(value||'').trim());
+function isValidHexColor(
+  value
+){
+  return(
+    /^#[0-9a-fA-F]{6}$/
+    .test(
+      String(
+        value||''
+      ).trim()
+    )
+  );
 }
 
 function loadPlotColorDefaults(){
   try{
-    const saved=JSON.parse(
-      localStorage.getItem(PLOT_COLOR_DEFAULTS_KEY)||'null'
-    );
+    const saved=
+      JSON.parse(
+        localStorage.getItem(
+          PLOT_COLOR_DEFAULTS_KEY
+        )||
+        'null'
+      );
 
     if(
       saved&&
-      isValidHexColor(saved.p0)&&
-      isValidHexColor(saved.p1)&&
-      isValidHexColor(saved.diff)
+      isValidHexColor(
+        saved.p0
+      )&&
+      isValidHexColor(
+        saved.p1
+      )&&
+      isValidHexColor(
+        saved.diff
+      )
     ){
       return{
         p0:saved.p0,
@@ -789,8 +1813,12 @@ function loadPlotColorDefaults(){
         diff:saved.diff
       };
     }
+
   }catch(e){
-    console.warn('Failed to load plot color defaults.',e);
+    console.warn(
+      'Failed to load plot color defaults.',
+      e
+    );
   }
 
   return{
@@ -802,34 +1830,60 @@ function resetPlotColors(){
   const defaults=
     loadPlotColorDefaults();
 
-  el('p0Color').value=defaults.p0;
-  el('p1Color').value=defaults.p1;
-  el('diffColor').value=defaults.diff;
+  el('p0Color').value=
+    defaults.p0;
+
+  el('p1Color').value=
+    defaults.p1;
+
+  el('diffColor').value=
+    defaults.diff;
 }
 
 function savePlotColorDefaults(){
   const defaults={
-    p0:el('p0Color').value,
-    p1:el('p1Color').value,
-    diff:el('diffColor').value
+    p0:
+      el(
+        'p0Color'
+      ).value,
+
+    p1:
+      el(
+        'p1Color'
+      ).value,
+
+    diff:
+      el(
+        'diffColor'
+      ).value
   };
 
   try{
     localStorage.setItem(
       PLOT_COLOR_DEFAULTS_KEY,
-      JSON.stringify(defaults)
+      JSON.stringify(
+        defaults
+      )
     );
 
     return true;
+
   }catch(e){
-    console.error('Failed to save plot color defaults.',e);
+    console.error(
+      'Failed to save plot color defaults.',
+      e
+    );
+
     return false;
   }
 }
 
 function resetPlotView(){
-  state.plotView.channel='Ch1';
-  state.plotView.type='bar';
+  state.plotView.channel=
+    'Ch1';
+
+  state.plotView.type=
+    'bar';
 
   state.plotView.yRanges={
     Ch1:{
@@ -859,8 +1913,11 @@ function resetPlotView(){
     }
   };
 
-  el('channelSelect').value='Ch1';
-  el('plotTypeSelect').value='bar';
+  el('channelSelect').value=
+    'Ch1';
+
+  el('plotTypeSelect').value=
+    'bar';
 }
 
 function resetAll(){
@@ -870,10 +1927,14 @@ function resetAll(){
   el('excelInput').value='';
 
   el('filename').textContent=
-    tr('noFile');
+    tr(
+      'noFile'
+    );
 
   el('folderName').textContent=
-    tr('notSelected');
+    tr(
+      'notSelected'
+    );
 
   resetPlotColors();
   resetPlotView();
@@ -883,7 +1944,9 @@ function resetAll(){
   });
 
   setStatus(
-    tr('fullResetDone'),
+    tr(
+      'fullResetDone'
+    ),
     'good'
   );
 }
@@ -897,7 +1960,9 @@ function resetCurrentAnalysis(){
   });
 
   setStatus(
-    tr('tabResetDone'),
+    tr(
+      'tabResetDone'
+    ),
     'good'
   );
 }
@@ -908,21 +1973,28 @@ el('globalResetBtn').onclick=
 el('tabResetBtn').onclick=
   resetCurrentAnalysis;
 
-el('defaultColorsBtn').onclick=()=>{
-  const saved=
-    savePlotColorDefaults();
+el('defaultColorsBtn').onclick=
+  ()=>{
+    const saved=
+      savePlotColorDefaults();
 
-  setStatus(
-    saved
-    ?tr('defaultColorsSaved')
-    :tr('defaultColorsSaveFailed'),
-    saved?'good':'bad'
-  );
+    setStatus(
+      saved
+      ?tr(
+        'defaultColorsSaved'
+      )
+      :tr(
+        'defaultColorsSaveFailed'
+      ),
+      saved
+      ?'good'
+      :'bad'
+    );
 
-  if(state.dataset){
-    renderPlots();
-  }
-};
+    if(state.dataset){
+      renderPlots();
+    }
+  };
 
 function buildTemplateWorkbook(){
   const wb=
@@ -934,64 +2006,88 @@ function buildTemplateWorkbook(){
     {wch:18}
   ];
 
-  for(const name of ['Ch1','Ch2']){
+  for(
+    const name of
+    ['Ch1','Ch2']
+  ){
     const ws=
-      XLSX.utils.aoa_to_sheet([
-        ['N','P1','P0 - P1']
+      XLSX.utils
+      .aoa_to_sheet([
+        [
+          'N',
+          'P1',
+          'P0 - P1'
+        ]
       ]);
 
-    ws['!cols']=cols;
+    ws['!cols']=
+      cols;
 
-    XLSX.utils.book_append_sheet(
-      wb,
-      ws,
-      name
-    );
+    XLSX.utils
+      .book_append_sheet(
+        wb,
+        ws,
+        name
+      );
   }
 
   const summary=
-    XLSX.utils.aoa_to_sheet([
-      ['Notation'],
-      ['Standard value = P1'],
-      ['Measured value = P0 - P1']
+    XLSX.utils
+    .aoa_to_sheet([
+      [
+        'Notation'
+      ],
+
+      [
+        'Standard value = P1'
+      ],
+
+      [
+        'Measured value = P0 - P1'
+      ]
     ]);
 
   summary['!cols']=[
     {wch:32}
   ];
 
-  XLSX.utils.book_append_sheet(
-    wb,
-    summary,
-    'Summary'
-  );
+  XLSX.utils
+    .book_append_sheet(
+      wb,
+      summary,
+      'Summary'
+    );
 
   return wb;
 }
 
-el('downloadTemplateBtn').onclick=()=>{
-  try{
-    XLSX.writeFile(
-      buildTemplateWorkbook(),
-      'ZR rawdata analysis sheet.xlsx',
-      {
-        bookType:'xlsx',
-        compression:true
-      }
-    );
+el('downloadTemplateBtn').onclick=
+  ()=>{
+    try{
+      XLSX.writeFile(
+        buildTemplateWorkbook(),
+        'ZR rawdata analysis sheet.xlsx',
+        {
+          bookType:'xlsx',
+          compression:true
+        }
+      );
 
-    setStatus(
-      tr('templateDownloadStarted'),
-      'good'
-    );
+      setStatus(
+        tr(
+          'templateDownloadStarted'
+        ),
+        'good'
+      );
 
-  }catch(e){
-    setStatus(
-      e.message||String(e),
-      'bad'
-    );
-  }
-};
+    }catch(e){
+      setStatus(
+        e.message||
+        String(e),
+        'bad'
+      );
+    }
+  };
 
 function validateHeaders(
   aoa,
@@ -1002,10 +2098,12 @@ function validateHeaders(
     [];
 
   const actual=
-    [0,1,2].map(
-      i=>String(
-        row[i]??''
-      ).trim()
+    [0,1,2]
+    .map(
+      i=>
+        String(
+          row[i]??''
+        ).trim()
     );
 
   const expected=[
@@ -1016,7 +2114,8 @@ function validateHeaders(
 
   if(
     expected.some(
-      (h,i)=>actual[i]!==h
+      (h,i)=>
+        actual[i]!==h
     )
   ){
     throw new Error(
@@ -1030,7 +2129,8 @@ function parseChannelSheet(
   name
 ){
   const aoa=
-    XLSX.utils.sheet_to_json(
+    XLSX.utils
+    .sheet_to_json(
       ws,
       {
         header:1,
@@ -1088,18 +2188,25 @@ function parseChannelSheet(
       );
 
     if(
-      !Number.isFinite(p1)||
-      !Number.isFinite(diff)
+      !Number.isFinite(
+        p1
+      )||
+      !Number.isFinite(
+        diff
+      )
     ){
       invalidCount++;
       continue;
     }
 
     valid.push({
-      N:valid.length+1,
+      N:
+        valid.length+1,
 
       Original_N:
-        isBlank(rawN)
+        isBlank(
+          rawN
+        )
         ?''
         :rawN,
 
@@ -1139,7 +2246,8 @@ function parseChannelSheet(
     name,
     inputRows,
     invalidCount,
-    validCount:valid.length,
+    validCount:
+      valid.length,
     valid,
 
     stats:{
@@ -1150,62 +2258,136 @@ function parseChannelSheet(
   };
 }
 
-el('readBtn').onclick=async()=>{
-  if(!state.file){
-    setStatus(
-      tr('needFile'),
-      'bad'
-    );
-
-    return;
-  }
-
-  setStatus(
-    tr('reading')
-  );
-
-  try{
-    clearDescription({
-      keepStatus:true
-    });
-
-    const buf=
-      await state.file.arrayBuffer();
-
-    const wb=
-      XLSX.read(
-        buf,
-        {
-          type:'array'
-        }
+el('readBtn').onclick=
+  async()=>{
+    if(!state.file){
+      setStatus(
+        tr(
+          'needFile'
+        ),
+        'bad'
       );
 
-    if(
-      !wb.Sheets.Ch1||
-      !wb.Sheets.Ch2
-    ){
-      throw new Error(
-        tr('sheetMissing')
-      );
+      return;
     }
 
-    const channels={
-      Ch1:
-        parseChannelSheet(
-          wb.Sheets.Ch1,
-          'Ch1'
+    setStatus(
+      tr(
+        'reading'
+      )
+    );
+
+    try{
+      clearDescription({
+        keepStatus:true
+      });
+
+      const buf=
+        await state.file
+        .arrayBuffer();
+
+      const wb=
+        XLSX.read(
+          buf,
+          {
+            type:'array'
+          }
+        );
+
+      if(
+        !wb.Sheets.Ch1||
+        !wb.Sheets.Ch2
+      ){
+        throw new Error(
+          tr(
+            'sheetMissing'
+          )
+        );
+      }
+
+      const channels={
+        Ch1:
+          parseChannelSheet(
+            wb.Sheets.Ch1,
+            'Ch1'
+          ),
+
+        Ch2:
+          parseChannelSheet(
+            wb.Sheets.Ch2,
+            'Ch2'
+          )
+      };
+
+      state.dataset={
+        channels
+      };
+
+      el('descriptionBtn')
+        .classList.add(
+          'active'
+        );
+
+      el('analysisControls')
+        .classList.add(
+          'visible'
+        );
+
+      el('actions')
+        .classList.add(
+          'visible'
+        );
+
+      el('colorsSection').hidden=
+        false;
+
+      el('resultTitle').textContent=
+        'Description';
+
+      el('resultSub').textContent=
+        '';
+
+      renderDetected();
+      renderSummaryTable();
+
+      await renderPlots();
+
+      setStatus(
+        tr(
+          'readDone'
         ),
+        'good'
+      );
 
-      Ch2:
-        parseChannelSheet(
-          wb.Sheets.Ch2,
-          'Ch2'
-        )
-    };
+    }catch(e){
+      console.error(
+        e
+      );
 
-    state.dataset={
-      channels
-    };
+      clearDescription({
+        keepStatus:true
+      });
+
+      setStatus(
+        e.message||
+        String(e),
+        'bad'
+      );
+    }
+  };
+
+el('descriptionBtn').onclick=
+  ()=>{
+    if(!state.dataset){
+      setStatus(
+        tr(
+          'needFile'
+        ),
+        'warn'
+      );
+
+      return;
+    }
 
     el('descriptionBtn')
       .classList.add(
@@ -1222,82 +2404,29 @@ el('readBtn').onclick=async()=>{
         'visible'
       );
 
-    el('colorsSection').hidden=
-      false;
-
     el('resultTitle').textContent=
       'Description';
 
-    el('resultSub').textContent='';
+    el('resultSub').textContent=
+      '';
 
-    renderDetected();
     renderSummaryTable();
-
-    await renderPlots();
-
-    setStatus(
-      tr('readDone'),
-      'good'
-    );
-
-  }catch(e){
-    console.error(e);
-
-    clearDescription({
-      keepStatus:true
-    });
-
-    setStatus(
-      e.message||String(e),
-      'bad'
-    );
-  }
-};
-
-el('descriptionBtn').onclick=()=>{
-  if(!state.dataset){
-    setStatus(
-      tr('needFile'),
-      'warn'
-    );
-
-    return;
-  }
-
-  el('descriptionBtn')
-    .classList.add(
-      'active'
-    );
-
-  el('analysisControls')
-    .classList.add(
-      'visible'
-    );
-
-  el('actions')
-    .classList.add(
-      'visible'
-    );
-
-  el('resultTitle').textContent=
-    'Description';
-
-  el('resultSub').textContent='';
-
-  renderSummaryTable();
-  renderPlots();
-};
+    renderPlots();
+  };
 
 function renderDetected(){
   if(!state.dataset){
-    el('detected').innerHTML='';
+    el('detected').innerHTML=
+      '';
+
     return;
   }
 
   const chips=[];
 
   for(
-    const name of [
+    const name of
+    [
       'Ch1',
       'Ch2'
     ]
@@ -1321,8 +2450,10 @@ function renderDetected(){
 
 function renderSummaryTable(){
   if(!state.dataset){
-    el('resultTableWrap')
-      .innerHTML='';
+    el(
+      'resultTableWrap'
+    ).innerHTML=
+      '';
 
     return;
   }
@@ -1340,26 +2471,31 @@ function renderSummaryTable(){
   ];
 
   const body=
-    ['Ch1','Ch2']
-    .map(name=>{
-      const c=
-        state.dataset
-        .channels[name];
+    [
+      'Ch1',
+      'Ch2'
+    ]
+    .map(
+      name=>{
+        const c=
+          state.dataset
+          .channels[name];
 
-      return(
-        `<tr>`+
-        `<td>${name}</td>`+
-        `<td>${c.validCount}</td>`+
-        `<td>${fmt(c.stats.p0.mean)}</td>`+
-        `<td>${fmt(c.stats.p0.sd)}</td>`+
-        `<td>${fmt(c.stats.p1.mean)}</td>`+
-        `<td>${fmt(c.stats.p1.sd)}</td>`+
-        `<td>${fmt(c.stats.diff.mean)}</td>`+
-        `<td>${fmt(c.stats.diff.sd)}</td>`+
-        `<td>${tr('invalidNote')}: ${c.invalidCount}</td>`+
-        `</tr>`
-      );
-    })
+        return(
+          `<tr>`+
+          `<td>${name}</td>`+
+          `<td>${c.validCount}</td>`+
+          `<td>${fmt(c.stats.p0.mean)}</td>`+
+          `<td>${fmt(c.stats.p0.sd)}</td>`+
+          `<td>${fmt(c.stats.p1.mean)}</td>`+
+          `<td>${fmt(c.stats.p1.sd)}</td>`+
+          `<td>${fmt(c.stats.diff.mean)}</td>`+
+          `<td>${fmt(c.stats.diff.sd)}</td>`+
+          `<td>${tr('invalidNote')}: ${c.invalidCount}</td>`+
+          `</tr>`
+        );
+      }
+    )
     .join('');
 
   el('resultTableWrap').innerHTML=
@@ -1368,10 +2504,11 @@ function renderSummaryTable(){
     `<thead>`+
     `<tr>`+
     head
-      .map(
-        h=>`<th>${h}</th>`
-      )
-      .join('')+
+    .map(
+      h=>
+        `<th>${h}</th>`
+    )
+    .join('')+
     `</tr>`+
     `</thead>`+
     `<tbody>${body}</tbody>`+
@@ -1379,7 +2516,9 @@ function renderSummaryTable(){
     `</div>`;
 }
 
-function niceSampleTickStep(count){
+function niceSampleTickStep(
+  count
+){
   if(count<=20){
     return 1;
   }
@@ -1399,9 +2538,13 @@ function niceSampleTickStep(count){
   }
 
   let best=1;
-  let bestScore=Infinity;
+  let bestScore=
+    Infinity;
 
-  for(const step of candidates){
+  for(
+    const step of
+    candidates
+  ){
     if(step<1){
       continue;
     }
@@ -1416,42 +2559,73 @@ function niceSampleTickStep(count){
         tickCount-15
       );
 
-    if(tickCount<10){
+    if(
+      tickCount<10
+    ){
       score+=
-        (10-tickCount)*100;
+        (
+          10-
+          tickCount
+        )*100;
     }
 
-    if(tickCount>20){
+    if(
+      tickCount>20
+    ){
       score+=
-        (tickCount-20)*100;
+        (
+          tickCount-
+          20
+        )*100;
     }
 
-    if(score<bestScore){
-      best=step;
-      bestScore=score;
+    if(
+      score<
+      bestScore
+    ){
+      best=
+        step;
+
+      bestScore=
+        score;
     }
   }
 
   return best;
 }
 
-function autoDataRange(values){
+function autoDataRange(
+  values
+){
   const finite=
     values.filter(
       Number.isFinite
     );
 
-  if(!finite.length){
+  if(
+    !finite.length
+  ){
     return null;
   }
 
-  let min=Math.min(...finite);
-  let max=Math.max(...finite);
+  let min=
+    Math.min(
+      ...finite
+    );
 
-  if(min===max){
+  let max=
+    Math.max(
+      ...finite
+    );
+
+  if(
+    min===max
+  ){
     const pad=
       Math.max(
-        Math.abs(min)*.05,
+        Math.abs(
+          min
+        )*.05,
         1e-9
       );
 
@@ -1460,7 +2634,9 @@ function autoDataRange(values){
 
   }else{
     const pad=
-      (max-min)*.06;
+      (
+        max-min
+      )*.06;
 
     min-=pad;
     max+=pad;
@@ -1477,41 +2653,70 @@ function resolveYRange(
   rangeState
 ){
   const rawMin=
-    String(rangeState.min??'').trim();
+    String(
+      rangeState.min??
+      ''
+    ).trim();
 
   const rawMax=
-    String(rangeState.max??'').trim();
+    String(
+      rangeState.max??
+      ''
+    ).trim();
 
   const min=
-    rawMin===''?NaN:Number(rawMin);
+    rawMin===''
+    ?NaN
+    :Number(
+      rawMin
+    );
 
   const max=
-    rawMax===''?NaN:Number(rawMax);
+    rawMax===''
+    ?NaN
+    :Number(
+      rawMax
+    );
 
   const hasMin=
-    Number.isFinite(min);
+    Number.isFinite(
+      min
+    );
 
   const hasMax=
-    Number.isFinite(max);
+    Number.isFinite(
+      max
+    );
 
-  if(!hasMin&&!hasMax){
+  if(
+    !hasMin&&
+    !hasMax
+  ){
     return null;
   }
 
   const auto=
-    autoDataRange(values);
+    autoDataRange(
+      values
+    );
 
   if(!auto){
     return null;
   }
 
   let lo=
-    hasMin?min:auto[0];
+    hasMin
+    ?min
+    :auto[0];
 
   let hi=
-    hasMax?max:auto[1];
+    hasMax
+    ?max
+    :auto[1];
 
-  if(lo>=hi){
+  if(
+    lo>=hi
+  ){
     return null;
   }
 
@@ -1546,15 +2751,22 @@ function singlePlotLayout(
       xref:'x',
       yref:'y',
       x0:.5,
-      x1:sampleCount+.5,
-      y0:assessment.lower,
-      y1:assessment.upper,
+      x1:
+        sampleCount+
+        .5,
 
-      fillcolor:lightenHexToRgba(
-        color,
-        .45,
-        .50
-      ),
+      y0:
+        assessment.lower,
+
+      y1:
+        assessment.upper,
+
+      fillcolor:
+        lightenHexToRgba(
+          color,
+          .45,
+          .50
+        ),
 
       line:{
         width:0
@@ -1568,9 +2780,15 @@ function singlePlotLayout(
       xref:'x',
       yref:'y',
       x0:.5,
-      x1:sampleCount+.5,
-      y0:assessment.mean,
-      y1:assessment.mean,
+      x1:
+        sampleCount+
+        .5,
+
+      y0:
+        assessment.mean,
+
+      y1:
+        assessment.mean,
 
       line:{
         color:'#000000',
@@ -1599,13 +2817,19 @@ function singlePlotLayout(
         `${tr('badCount')}: ${assessment.bad}`,
 
       font:{
-        family:'Inter, sans-serif',
+        family:
+          'Inter, sans-serif',
+
         size:12,
         color:'#111827'
       },
 
-      bgcolor:'rgba(255,255,255,.86)',
-      bordercolor:'rgba(17,24,39,.18)',
+      bgcolor:
+        'rgba(255,255,255,.86)',
+
+      bordercolor:
+        'rgba(17,24,39,.18)',
+
       borderwidth:1,
       borderpad:7
     }
@@ -1621,11 +2845,16 @@ function singlePlotLayout(
       b:70
     },
 
-    paper_bgcolor:'#fff',
-    plot_bgcolor:'#fff',
+    paper_bgcolor:
+      '#fff',
+
+    plot_bgcolor:
+      '#fff',
 
     font:{
-      family:'Inter, sans-serif',
+      family:
+        'Inter, sans-serif',
+
       color:'#111827'
     },
 
@@ -1637,7 +2866,10 @@ function singlePlotLayout(
 
     xaxis:{
       title:{
-        text:tr('sampleAxis'),
+        text:
+          tr(
+            'sampleAxis'
+          ),
 
         font:{
           size:12
@@ -1650,7 +2882,8 @@ function singlePlotLayout(
       linewidth:1.1,
       tickmode:'linear',
       tick0:1,
-      dtick:tickStep,
+      dtick:
+        tickStep,
 
       range:[
         .5,
@@ -1662,7 +2895,8 @@ function singlePlotLayout(
 
     yaxis:{
       title:{
-        text:metricLabel,
+        text:
+          metricLabel,
 
         font:{
           size:12
@@ -1673,8 +2907,18 @@ function singlePlotLayout(
       zeroline:false,
       linecolor:'#9aa1ad',
       linewidth:1.1,
-      autorange:!yRange,
-      ...(yRange?{range:yRange}:{})
+
+      autorange:
+        !yRange,
+
+      ...(
+        yRange
+        ?{
+          range:
+            yRange
+        }
+        :{}
+      )
     }
   };
 }
@@ -1690,7 +2934,9 @@ const plotConfig={
 
   toImageButtonOptions:{
     format:'png',
-    filename:'ZR_rawdata_plot',
+    filename:
+      'ZR_rawdata_plot',
+
     height:900,
     width:1600,
     scale:2
@@ -1704,7 +2950,10 @@ function buildPlotTrace(
   color,
   channel
 ){
-  if(state.plotView.type==='line'){
+  if(
+    state.plotView.type===
+    'line'
+  ){
     return{
       type:'scatter',
       mode:'lines+markers',
@@ -1745,13 +2994,16 @@ function buildPlotTrace(
 }
 
 async function renderPlots(){
-  if(!state.dataset){
+  if(
+    !state.dataset
+  ){
     return;
   }
 
   purgePlots();
 
-  el('plotControls').hidden=false;
+  el('plotControls').hidden=
+    false;
 
   el('channelSelect').value=
     state.plotView.channel;
@@ -1759,7 +3011,8 @@ async function renderPlots(){
   el('plotTypeSelect').value=
     state.plotView.type;
 
-  el('plots').innerHTML='';
+  el('plots').innerHTML=
+    '';
 
   const name=
     state.plotView.channel;
@@ -1768,7 +3021,9 @@ async function renderPlots(){
     state.dataset
     .channels[name];
 
-  if(!c.valid.length){
+  if(
+    !c.valid.length
+  ){
     el('plots').innerHTML=
       `<div class="empty">${tr('noValid')}</div>`;
 
@@ -1785,40 +3040,61 @@ async function renderPlots(){
       key:'p0',
       label:'P0',
 
-      values:c.valid.map(
-        r=>r.P0
-      ),
+      values:
+        c.valid.map(
+          r=>r.P0
+        ),
 
-      stats:c.stats.p0,
-      color:el('p0Color').value
+      stats:
+        c.stats.p0,
+
+      color:
+        el(
+          'p0Color'
+        ).value
     },
 
     {
       key:'p1',
       label:'P1',
 
-      values:c.valid.map(
-        r=>r.P1
-      ),
+      values:
+        c.valid.map(
+          r=>r.P1
+        ),
 
-      stats:c.stats.p1,
-      color:el('p1Color').value
+      stats:
+        c.stats.p1,
+
+      color:
+        el(
+          'p1Color'
+        ).value
     },
 
     {
       key:'diff',
       label:'P0 - P1',
 
-      values:c.valid.map(
-        r=>r.Diff
-      ),
+      values:
+        c.valid.map(
+          r=>r.Diff
+        ),
 
-      stats:c.stats.diff,
-      color:el('diffColor').value
+      stats:
+        c.stats.diff,
+
+      color:
+        el(
+          'diffColor'
+        ).value
     }
   ];
 
-  for(const spec of specs){
+  for(
+    const spec of
+    specs
+  ){
     const card=
       document.createElement(
         'div'
@@ -1874,7 +3150,9 @@ async function renderPlots(){
       `<div class="plot"></div>`;
 
     el('plots')
-      .appendChild(card);
+      .appendChild(
+        card
+      );
 
     const sigmaInput=
       card.querySelector(
@@ -1983,9 +3261,13 @@ el('channelSelect')
   'change',
   ()=>{
     state.plotView.channel=
-      el('channelSelect').value;
+      el(
+        'channelSelect'
+      ).value;
 
-    if(state.dataset){
+    if(
+      state.dataset
+    ){
       renderPlots();
     }
   }
@@ -1996,9 +3278,13 @@ el('plotTypeSelect')
   'change',
   ()=>{
     state.plotView.type=
-      el('plotTypeSelect').value;
+      el(
+        'plotTypeSelect'
+      ).value;
 
-    if(state.dataset){
+    if(
+      state.dataset
+    ){
       renderPlots();
     }
   }
@@ -2008,37 +3294,46 @@ el('plotTypeSelect')
   'p0Color',
   'p1Color',
   'diffColor'
-].forEach(id=>{
-  el(id)
-  .addEventListener(
-    'change',
-    ()=>{
-      if(state.dataset){
-        renderPlots();
+]
+.forEach(
+  id=>{
+    el(id)
+    .addEventListener(
+      'change',
+      ()=>{
+        if(
+          state.dataset
+        ){
+          renderPlots();
+        }
       }
-    }
-  );
-});
+    );
+  }
+);
 
-function buildOutputWorkbook(){
+function buildValidDataWorkbook(){
   const wb=
-    XLSX.utils.book_new();
+    XLSX.utils
+    .book_new();
+
+  const rows=[
+    [
+      'Channel',
+      'N',
+      'Original N',
+      'P0',
+      'P1',
+      'P0 - P1'
+    ]
+  ];
 
   for(
-    const name of [
+    const name of
+    [
       'Ch1',
       'Ch2'
     ]
   ){
-    const rows=[
-      [
-        'N',
-        'P0',
-        'P1',
-        'P0 - P1'
-      ]
-    ];
-
     for(
       const r of
       state.dataset
@@ -2046,48 +3341,108 @@ function buildOutputWorkbook(){
       .valid
     ){
       rows.push([
+        name,
         r.N,
+        r.Original_N,
         r.P0,
         r.P1,
         r.Diff
       ]);
     }
-
-    const ws=
-      XLSX.utils
-      .aoa_to_sheet(
-        rows
-      );
-
-    ws['!cols']=[
-      {wch:10},
-      {wch:18},
-      {wch:18},
-      {wch:18}
-    ];
-
-    XLSX.utils
-      .book_append_sheet(
-        wb,
-        ws,
-        name
-      );
   }
 
-  const sigmaRows=[
+  const ws=
+    XLSX.utils
+    .aoa_to_sheet(
+      rows
+    );
+
+  ws['!cols']=[
+    {wch:12},
+    {wch:10},
+    {wch:16},
+    {wch:18},
+    {wch:18},
+    {wch:18}
+  ];
+
+  XLSX.utils
+    .book_append_sheet(
+      wb,
+      ws,
+      'Valid Data'
+    );
+
+  return wb;
+}
+
+function buildResultsWorkbook(){
+  const wb=
+    XLSX.utils
+    .book_new();
+
+  const rows=[
+    [
+      'Description Summary'
+    ],
+
     [
       'Channel',
-      'Metric',
-      'Sigma',
-      'Mean',
-      'SD',
-      'Lower limit',
-      'Upper limit',
-      'Good Count',
-      'Bad Count',
-      'Valid Samples'
+      'Valid Samples',
+      'P0 Mean',
+      'P0 SD',
+      'P1 Mean',
+      'P1 SD',
+      'P0 - P1 Mean',
+      'P0 - P1 SD',
+      'Invalid Samples',
+      'Input Rows'
     ]
   ];
+
+  for(
+    const name of
+    [
+      'Ch1',
+      'Ch2'
+    ]
+  ){
+    const channel=
+      state.dataset
+      .channels[name];
+
+    rows.push([
+      name,
+      channel.validCount,
+      channel.stats.p0.mean,
+      channel.stats.p0.sd,
+      channel.stats.p1.mean,
+      channel.stats.p1.sd,
+      channel.stats.diff.mean,
+      channel.stats.diff.sd,
+      channel.invalidCount,
+      channel.inputRows
+    ]);
+  }
+
+  rows.push([]);
+
+  rows.push([
+    'Sigma Summary'
+  ]);
+
+  rows.push([
+    'Channel',
+    'Metric',
+    'Sigma',
+    'Mean',
+    'SD',
+    'Lower limit',
+    'Upper limit',
+    'Good Count',
+    'Bad Count',
+    'Valid Samples'
+  ]);
 
   const metricSpecs=[
     {
@@ -2110,7 +3465,8 @@ function buildOutputWorkbook(){
   ];
 
   for(
-    const name of [
+    const name of
+    [
       'Ch1',
       'Ch2'
     ]
@@ -2119,21 +3475,30 @@ function buildOutputWorkbook(){
       state.dataset
       .channels[name];
 
-    for(const metric of metricSpecs){
+    for(
+      const metric of
+      metricSpecs
+    ){
       const values=
         channel.valid.map(
-          r=>r[metric.valueKey]
+          r=>
+            r[
+              metric.valueKey
+            ]
         );
 
       const assessment=
         sigmaAssessment(
           values,
-          channel.stats[metric.key],
+          channel.stats[
+            metric.key
+          ],
+
           state.plotView
           .sigmas[name][metric.key]
         );
 
-      sigmaRows.push([
+      rows.push([
         name,
         metric.label,
         assessment.sigma,
@@ -2148,33 +3513,55 @@ function buildOutputWorkbook(){
     }
   }
 
-  const sigmaWs=
+  const ws=
     XLSX.utils
     .aoa_to_sheet(
-      sigmaRows
+      rows
     );
 
-  sigmaWs['!cols']=[
-    {wch:12},
-    {wch:14},
-    {wch:10},
+  ws['!cols']=[
     {wch:18},
     {wch:18},
     {wch:18},
     {wch:18},
-    {wch:14},
-    {wch:14},
+    {wch:18},
+    {wch:18},
+    {wch:18},
+    {wch:16},
+    {wch:16},
     {wch:16}
   ];
 
   XLSX.utils
     .book_append_sheet(
       wb,
-      sigmaWs,
-      'Sigma Summary'
+      ws,
+      'Description Results'
     );
 
   return wb;
+}
+
+function workbookToBlob(
+  wb
+){
+  const out=
+    XLSX.write(
+      wb,
+      {
+        bookType:'xlsx',
+        type:'array',
+        compression:true
+      }
+    );
+
+  return new Blob(
+    [out],
+    {
+      type:
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    }
+  );
 }
 
 async function writeBlobToSelectedFolder(
@@ -2191,7 +3578,8 @@ async function writeBlobToSelectedFolder(
     );
 
   const writable=
-    await fh.createWritable();
+    await fh
+    .createWritable();
 
   await writable.write(
     blob
@@ -2200,86 +3588,327 @@ async function writeBlobToSelectedFolder(
   await writable.close();
 }
 
-el('saveBtn').onclick=async()=>{
-  if(!state.dataset){
-    setStatus(
-      tr('chooseAnalysis'),
-      'bad'
+async function dataUrlToBlob(
+  dataUrl
+){
+  const response=
+    await fetch(
+      dataUrl
     );
 
-    return;
-  }
+  return await response.blob();
+}
 
-  if(!state.saveHandle){
-    setStatus(
-      tr('needFolder'),
-      'bad'
+async function saveDescriptionPlotImages(){
+  const exportHost=
+    document.createElement(
+      'div'
     );
 
-    return;
-  }
+  exportHost.style.position=
+    'fixed';
 
-  el('saveBtn').disabled=true;
+  exportHost.style.left=
+    '-20000px';
 
-  el('progress')
-    .classList.add(
-      'visible'
+  exportHost.style.top=
+    '0';
+
+  exportHost.style.width=
+    '1600px';
+
+  exportHost.style.height=
+    '900px';
+
+  exportHost.style.pointerEvents=
+    'none';
+
+  exportHost.style.opacity=
+    '0';
+
+  document.body
+    .appendChild(
+      exportHost
     );
 
-  el('progress').textContent=
-    tr('saving');
+  const metricSpecs=[
+    {
+      key:'p0',
+      label:'P0',
+      valueKey:'P0',
+      colorId:'p0Color',
+      fileLabel:'P0'
+    },
+
+    {
+      key:'p1',
+      label:'P1',
+      valueKey:'P1',
+      colorId:'p1Color',
+      fileLabel:'P1'
+    },
+
+    {
+      key:'diff',
+      label:'P0 - P1',
+      valueKey:'Diff',
+      colorId:'diffColor',
+      fileLabel:'P0_minus_P1'
+    }
+  ];
 
   try{
-    const wb=
-      buildOutputWorkbook();
+    for(
+      const name of
+      [
+        'Ch1',
+        'Ch2'
+      ]
+    ){
+      const channel=
+        state.dataset
+        .channels[name];
 
-    const out=
-      XLSX.write(
-        wb,
-        {
-          bookType:'xlsx',
-          type:'array',
-          compression:true
-        }
-      );
+      if(
+        !channel.valid.length
+      ){
+        continue;
+      }
 
-    const blob=
-      new Blob(
-        [out],
-        {
-          type:
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        }
-      );
+      const x=
+        channel.valid.map(
+          r=>r.N
+        );
 
-    await writeBlobToSelectedFolder(
-      'ZR_rawdata_Description_Results.xlsx',
-      blob
-    );
+      for(
+        const metric of
+        metricSpecs
+      ){
+        const values=
+          channel.valid.map(
+            r=>
+              r[
+                metric.valueKey
+              ]
+          );
 
-    setStatus(
-      tr('saved'),
-      'good'
-    );
+        const color=
+          el(
+            metric.colorId
+          ).value;
 
-  }catch(e){
-    console.error(e);
+        const rangeState=
+          state.plotView
+          .yRanges[name][metric.key];
 
-    setStatus(
-      `${tr('saveFailed')}: ${e.message||e}`,
-      'bad'
-    );
+        const sigma=
+          normalizeSigma(
+            state.plotView
+            .sigmas[name][metric.key]
+          );
+
+        const assessment=
+          sigmaAssessment(
+            values,
+            channel.stats[
+              metric.key
+            ],
+            sigma
+          );
+
+        const trace=
+          buildPlotTrace(
+            x,
+            values,
+            metric.label,
+            color,
+            name
+          );
+
+        const layout=
+          singlePlotLayout(
+            metric.label,
+            values,
+            x.length,
+            rangeState,
+            assessment,
+            color
+          );
+
+        layout.width=
+          1600;
+
+        layout.height=
+          900;
+
+        layout.autosize=
+          false;
+
+        layout.margin={
+          l:110,
+          r:60,
+          t:95,
+          b:95
+        };
+
+        layout.title={
+          text:
+            `${name} - ${metric.label}`,
+
+          x:.5,
+          xanchor:'center',
+
+          font:{
+            family:
+              'Inter, sans-serif',
+
+            size:24,
+            color:'#111827'
+          }
+        };
+
+        await Plotly.newPlot(
+          exportHost,
+          [trace],
+          layout,
+          {
+            responsive:false,
+            displaylogo:false,
+            displayModeBar:false
+          }
+        );
+
+        const dataUrl=
+          await Plotly.toImage(
+            exportHost,
+            {
+              format:'png',
+              width:1600,
+              height:900,
+              scale:2
+            }
+          );
+
+        const blob=
+          await dataUrlToBlob(
+            dataUrl
+          );
+
+        await writeBlobToSelectedFolder(
+          `ZR_rawdata_Description_${name}_${metric.fileLabel}.png`,
+          blob
+        );
+
+        Plotly.purge(
+          exportHost
+        );
+      }
+    }
 
   }finally{
+    try{
+      Plotly.purge(
+        exportHost
+      );
+    }catch(_){}
+
+    exportHost.remove();
+  }
+}
+
+el('saveBtn').onclick=
+  async()=>{
+    if(
+      !state.dataset
+    ){
+      setStatus(
+        tr(
+          'chooseAnalysis'
+        ),
+        'bad'
+      );
+
+      return;
+    }
+
+    if(
+      !state.saveHandle
+    ){
+      setStatus(
+        tr(
+          'needFolder'
+        ),
+        'bad'
+      );
+
+      return;
+    }
+
     el('saveBtn').disabled=
-      false;
+      true;
 
     el('progress')
-      .classList.remove(
+      .classList.add(
         'visible'
       );
-  }
-};
+
+    el('progress').textContent=
+      tr(
+        'saving'
+      );
+
+    try{
+      const validDataWb=
+        buildValidDataWorkbook();
+
+      await writeBlobToSelectedFolder(
+        'ZR_rawdata_Description_Valid_Data.xlsx',
+
+        workbookToBlob(
+          validDataWb
+        )
+      );
+
+      const resultsWb=
+        buildResultsWorkbook();
+
+      await writeBlobToSelectedFolder(
+        'ZR_rawdata_Description_Results.xlsx',
+
+        workbookToBlob(
+          resultsWb
+        )
+      );
+
+      await saveDescriptionPlotImages();
+
+      setStatus(
+        tr(
+          'saved'
+        ),
+        'good'
+      );
+
+    }catch(e){
+      console.error(
+        e
+      );
+
+      setStatus(
+        `${tr('saveFailed')}: ${e.message||e}`,
+        'bad'
+      );
+
+    }finally{
+      el('saveBtn').disabled=
+        false;
+
+      el('progress')
+        .classList.remove(
+          'visible'
+        );
+    }
+  };
 
 resetPlotColors();
 applyLanguage();
