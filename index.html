@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     :root{
       --ink:#111827;
@@ -14,7 +15,9 @@
       --line:#e5e7eb;
     }
 
-    *{box-sizing:border-box}
+    *{
+      box-sizing:border-box;
+    }
 
     html,body{
       margin:0;
@@ -140,44 +143,142 @@
       padding-right:8px;
     }
 
+    .tab-group{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:8px;
+      width:280px;
+    }
+
+    .group-toggle,
     .tab{
       display:inline-flex;
       align-items:center;
       gap:10px;
       min-height:54px;
       min-width:280px;
+      width:280px;
       padding:0 20px;
       border:1px solid var(--line);
       border-radius:16px;
       background:#fff;
       color:var(--ink);
       text-decoration:none;
+      font-family:inherit;
       font-size:15px;
       font-weight:800;
       box-shadow:0 10px 32px rgba(17,24,39,.08);
-      transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+      transition:
+        transform .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
     }
 
+    .group-toggle{
+      cursor:pointer;
+      text-align:left;
+    }
+
+    .group-toggle:hover,
     .tab:hover{
       transform:translateY(-2px);
       border-color:#c9cdd5;
       box-shadow:0 14px 38px rgba(17,24,39,.12);
     }
 
+    .group-toggle.active{
+      border-color:#c9cdd5;
+      box-shadow:0 14px 38px rgba(17,24,39,.12);
+    }
+
+    .group-toggle .dot,
     .tab .dot{
       width:9px;
       height:9px;
       border-radius:50%;
-      background:#1f7a4d;
       flex:0 0 auto;
     }
 
-    .tab.normalization .dot{background:#2563eb}
-    .tab.multi .dot{background:#7c3aed}
-    .tab.scan .dot{background:#d97706}
-    .tab.decomposition .dot{background:#dc2626}
-    .tab.quality .dot{background:#0f766e}
-    .tab.zr .dot{background:#be185d}
+    .group-toggle .label{
+      flex:1;
+    }
+
+    .group-toggle .arrow{
+      margin-left:auto;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1;
+      transition:transform .2s ease;
+    }
+
+    .group-toggle[aria-expanded="true"] .arrow{
+      transform:rotate(180deg);
+    }
+
+    .group-toggle.cid-group .dot{
+      background:#1f7a4d;
+    }
+
+    .group-toggle.zr-group .dot{
+      background:#be185d;
+    }
+
+    .group-toggle.general-group .dot{
+      background:#2563eb;
+    }
+
+    .submenu{
+      display:none;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:7px;
+      padding-left:14px;
+      width:100%;
+    }
+
+    .submenu.open{
+      display:flex;
+    }
+
+    .submenu .tab{
+      min-height:48px;
+      min-width:266px;
+      width:266px;
+      padding:0 17px;
+      border-radius:14px;
+      font-size:13px;
+      box-shadow:0 7px 24px rgba(17,24,39,.07);
+    }
+
+    .tab.cid .dot{
+      background:#1f7a4d;
+    }
+
+    .tab.multi .dot{
+      background:#7c3aed;
+    }
+
+    .tab.scan .dot{
+      background:#d97706;
+    }
+
+    .tab.decomposition .dot{
+      background:#dc2626;
+    }
+
+    .tab.zr .dot{
+      background:#be185d;
+    }
+
+    .tab.normalization .dot{
+      background:#2563eb;
+    }
+
+    .tab.quality .dot{
+      background:#0f766e;
+    }
 
     .homepage-credit{
       position:fixed;
@@ -207,35 +308,105 @@
     }
 
     @media(max-width:720px){
-      .shell{padding:28px 22px}
-      .hero{margin-top:16vh}
+      .shell{
+        padding:28px 22px;
+      }
+
+      .hero{
+        margin-top:16vh;
+      }
+
       .tabs{
         left:20px;
         bottom:22px;
         max-width:calc(100vw - 40px);
       }
+
+      .tab-group{
+        width:min(300px,calc(100vw - 40px));
+      }
+
+      .group-toggle,
       .tab{
         min-height:50px;
         min-width:min(300px,calc(100vw - 40px));
+        width:min(300px,calc(100vw - 40px));
         padding:0 17px;
         font-size:13px;
       }
-      .top-controls{top:20px;right:20px;gap:8px}
-      .lang-btn{width:44px;height:44px;font-size:20px}
-      .visitor-counter{height:44px;padding:0 13px;gap:6px}
-      .visitor-label{font-size:9px}
-      .visitor-value{font-size:12px}
-      .homepage-credit{right:20px;bottom:22px}
-      .homepage-credit img{width:90px;max-height:70px}
-      .homepage-credit span{font-size:9px}
+
+      .submenu{
+        padding-left:12px;
+      }
+
+      .submenu .tab{
+        min-height:46px;
+        min-width:calc(min(300px,100vw - 40px) - 12px);
+        width:calc(min(300px,100vw - 40px) - 12px);
+        padding:0 15px;
+        font-size:12px;
+      }
+
+      .top-controls{
+        top:20px;
+        right:20px;
+        gap:8px;
+      }
+
+      .lang-btn{
+        width:44px;
+        height:44px;
+        font-size:20px;
+      }
+
+      .visitor-counter{
+        height:44px;
+        padding:0 13px;
+        gap:6px;
+      }
+
+      .visitor-label{
+        font-size:9px;
+      }
+
+      .visitor-value{
+        font-size:12px;
+      }
+
+      .homepage-credit{
+        right:20px;
+        bottom:22px;
+      }
+
+      .homepage-credit img{
+        width:90px;
+        max-height:70px;
+      }
+
+      .homepage-credit span{
+        font-size:9px;
+      }
     }
   </style>
 </head>
+
 <body>
   <main class="shell">
+
     <div class="top-controls">
-      <button id="langBtn" class="lang-btn" type="button" aria-label="Change language" title="Language">🌐</button>
-      <div class="visitor-counter" aria-label="Homepage visitor count" title="Homepage visitors">
+      <button
+        id="langBtn"
+        class="lang-btn"
+        type="button"
+        aria-label="Change language"
+        title="Language"
+      >🌐</button>
+
+      <div
+        class="visitor-counter"
+        aria-label="Homepage visitor count"
+        title="Homepage visitors"
+      >
         <span class="visitor-label" data-i18n="visitors">Visitors</span>
         <span id="visitorCount" class="visitor-value" aria-live="polite">...</span>
       </div>
@@ -246,46 +417,103 @@
     </section>
 
     <nav class="tabs" aria-label="Processing modules">
-      <a class="tab" href="./CID%20preprocessing.html">
-        <span class="dot" aria-hidden="true"></span>
-        <span data-i18n="cid">CID preprocessing</span>
-      </a>
 
-      <a class="tab normalization" href="./Normalization%20assessment.html">
-        <span class="dot" aria-hidden="true"></span>
-        <span data-i18n="normalization">Normalization assessment</span>
-      </a>
+      <div class="tab-group">
+        <button
+          class="group-toggle cid-group"
+          type="button"
+          aria-expanded="false"
+          aria-controls="cidMenu"
+          data-menu="cidMenu"
+        >
+          <span class="dot" aria-hidden="true"></span>
+          <span class="label" data-i18n="cidGroup">CID</span>
+          <span class="arrow" aria-hidden="true">▼</span>
+        </button>
 
-      <a class="tab multi" href="./CID%20multi%20point%20analysis.html">
-        <span class="dot" aria-hidden="true"></span>
-        <span data-i18n="multi">CID multi point analysis</span>
-      </a>
+        <div id="cidMenu" class="submenu">
 
-      <a class="tab scan" href="./CID%20Scan%20analysis.html">
-        <span class="dot" aria-hidden="true"></span>
-        <span data-i18n="scan">CID Scan analysis</span>
-      </a>
+          <a class="tab cid" href="./CID%20preprocessing.html">
+            <span class="dot" aria-hidden="true"></span>
+            <span data-i18n="cid">CID preprocessing</span>
+          </a>
 
-      <a class="tab decomposition" href="./CID%20Scan%20Data%20Decomposition.html">
-        <span class="dot" aria-hidden="true"></span>
-        <span data-i18n="decomposition">CID Scan Data Decomposition</span>
-      </a>
+          <a class="tab multi" href="./CID%20multi%20point%20analysis.html">
+            <span class="dot" aria-hidden="true"></span>
+            <span data-i18n="multi">CID multi point analysis</span>
+          </a>
 
-      <a class="tab quality" href="./Quality%20Control.html">
-        <span class="dot" aria-hidden="true"></span>
-        <span data-i18n="quality">Quality Control</span>
-      </a>
+          <a class="tab scan" href="./CID%20Scan%20analysis.html">
+            <span class="dot" aria-hidden="true"></span>
+            <span data-i18n="scan">CID Scan analysis</span>
+          </a>
 
-      <a class="tab zr" href="./ZR%20rawdata%20analysis.html">
-        <span class="dot" aria-hidden="true"></span>
-        <span data-i18n="zr">ZR rawdata analysis</span>
-      </a>
+          <a class="tab decomposition" href="./CID%20Scan%20Data%20Decomposition.html">
+            <span class="dot" aria-hidden="true"></span>
+            <span data-i18n="decomposition">CID Scan Data Decomposition</span>
+          </a>
+
+        </div>
+      </div>
+
+      <div class="tab-group">
+        <button
+          class="group-toggle zr-group"
+          type="button"
+          aria-expanded="false"
+          aria-controls="zrMenu"
+          data-menu="zrMenu"
+        >
+          <span class="dot" aria-hidden="true"></span>
+          <span class="label" data-i18n="zrGroup">ZR</span>
+          <span class="arrow" aria-hidden="true">▼</span>
+        </button>
+
+        <div id="zrMenu" class="submenu">
+
+          <a class="tab zr" href="./ZR%20rawdata%20analysis.html">
+            <span class="dot" aria-hidden="true"></span>
+            <span data-i18n="zr">ZR rawdata analysis</span>
+          </a>
+
+        </div>
+      </div>
+
+      <div class="tab-group">
+        <button
+          class="group-toggle general-group"
+          type="button"
+          aria-expanded="false"
+          aria-controls="generalMenu"
+          data-menu="generalMenu"
+        >
+          <span class="dot" aria-hidden="true"></span>
+          <span class="label" data-i18n="generalGroup">General analysis</span>
+          <span class="arrow" aria-hidden="true">▼</span>
+        </button>
+
+        <div id="generalMenu" class="submenu">
+
+          <a class="tab normalization" href="./Normalization%20assessment.html">
+            <span class="dot" aria-hidden="true"></span>
+            <span data-i18n="normalization">Normalization assessment</span>
+          </a>
+
+          <a class="tab quality" href="./Quality%20Control.html">
+            <span class="dot" aria-hidden="true"></span>
+            <span data-i18n="quality">Quality Control</span>
+          </a>
+
+        </div>
+      </div>
+
     </nav>
 
     <div class="homepage-credit">
       <img src="./Homepage%20Logo.jpg" alt="Homepage Logo">
       <span>made by GangMin Shin</span>
     </div>
+
   </main>
 
   <script>
@@ -293,29 +521,41 @@
       en: {
         title: "Homepage.",
         visitors: "Visitors",
+
+        cidGroup: "CID",
+        zrGroup: "ZR",
+        generalGroup: "General analysis",
+
         cid: "CID preprocessing",
-        normalization: "Normalization assessment",
         multi: "CID multi point analysis",
         scan: "CID Scan analysis",
         decomposition: "CID Scan Data Decomposition",
-        quality: "Quality Control",
-        zr: "ZR rawdata analysis"
+        zr: "ZR rawdata analysis",
+        normalization: "Normalization assessment",
+        quality: "Quality Control"
       },
+
       ko: {
         title: "홈페이지.",
         visitors: "방문자",
+
+        cidGroup: "CID",
+        zrGroup: "ZR",
+        generalGroup: "일반 분석",
+
         cid: "CID 전처리",
-        normalization: "정규분포 평가",
         multi: "CID 멀티 포인트 분석",
         scan: "CID 스캔 분석",
         decomposition: "CID 스캔 데이터 분해",
-        quality: "품질 관리",
-        zr: "ZR rawdata 분석"
+        zr: "ZR rawdata 분석",
+        normalization: "정규분포 평가",
+        quality: "품질 관리"
       }
     };
 
     const langButton = document.getElementById("langBtn");
     const visitorCountElement = document.getElementById("visitorCount");
+    const groupButtons = document.querySelectorAll(".group-toggle");
 
     function getSavedLanguage() {
       try {
@@ -339,10 +579,15 @@
 
     function renderLanguage() {
       const dictionary = T[lang] || T.en;
+
       document.documentElement.lang = lang;
+
       document.querySelectorAll("[data-i18n]").forEach(el => {
         const translatedText = dictionary[el.dataset.i18n];
-        if (typeof translatedText === "string") el.textContent = translatedText;
+
+        if (typeof translatedText === "string") {
+          el.textContent = translatedText;
+        }
       });
     }
 
@@ -354,11 +599,65 @@
 
     renderLanguage();
 
+    function closeAllMenus(exceptButton = null) {
+      groupButtons.forEach(button => {
+        if (button === exceptButton) return;
+
+        const menuId = button.dataset.menu;
+        const menu = document.getElementById(menuId);
+
+        button.setAttribute("aria-expanded", "false");
+        button.classList.remove("active");
+
+        if (menu) {
+          menu.classList.remove("open");
+        }
+      });
+    }
+
+    groupButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        const menuId = button.dataset.menu;
+        const menu = document.getElementById(menuId);
+
+        if (!menu) return;
+
+        const isOpen = button.getAttribute("aria-expanded") === "true";
+
+        closeAllMenus(button);
+
+        if (isOpen) {
+          button.setAttribute("aria-expanded", "false");
+          button.classList.remove("active");
+          menu.classList.remove("open");
+        } else {
+          button.setAttribute("aria-expanded", "true");
+          button.classList.add("active");
+          menu.classList.add("open");
+        }
+      });
+    });
+
+    document.addEventListener("click", event => {
+      const clickedInsideTabs = event.target.closest(".tabs");
+
+      if (!clickedInsideTabs) {
+        closeAllMenus();
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        closeAllMenus();
+      }
+    });
+
     const COUNTER_BASE = "https://countapi.mileshilliard.com/api/v1";
     const COUNTER_KEY = "gangmin-shin-github-io-innereye-data-processing-homepage-visitors";
 
     function displayVisitorCount(value) {
       const number = Number(value);
+
       visitorCountElement.textContent = Number.isFinite(number)
         ? new Intl.NumberFormat().format(number)
         : "--";
@@ -367,12 +666,29 @@
     async function loadVisitorCount() {
       try {
         visitorCountElement.textContent = "...";
-        const endpoint = `${COUNTER_BASE}/hit/${COUNTER_KEY}?_=${Date.now()}`;
-        const response = await fetch(endpoint, { method: "GET", cache: "no-store" });
-        if (!response.ok) throw new Error(`Visitor counter error: ${response.status}`);
+
+        const endpoint =
+          `${COUNTER_BASE}/hit/${COUNTER_KEY}?_=${Date.now()}`;
+
+        const response = await fetch(endpoint, {
+          method: "GET",
+          cache: "no-store"
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Visitor counter error: ${response.status}`
+          );
+        }
+
         const data = await response.json();
-        if (data && typeof data.value !== "undefined") displayVisitorCount(data.value);
-        else throw new Error("Invalid visitor counter response");
+
+        if (data && typeof data.value !== "undefined") {
+          displayVisitorCount(data.value);
+        } else {
+          throw new Error("Invalid visitor counter response");
+        }
+
       } catch (error) {
         console.error("Visitor counter failed:", error);
         visitorCountElement.textContent = "--";
