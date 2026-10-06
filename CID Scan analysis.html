@@ -4,350 +4,1183 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>CID Scan analysis</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
 <style>
-:root{--ink:#111827;--muted:#667085;--line:#e5e7eb;--green:#1f8a57;--green-soft:#eaf8f0;--danger:#b42318;--amber:#b54708;--amber-soft:#fff7e8;--shadow:0 12px 38px rgba(17,24,39,.08)}
+:root{
+  --ink:#111827;
+  --muted:#667085;
+  --line:#e5e7eb;
+  --green:#1f8a57;
+  --green-soft:#eaf8f0;
+  --danger:#b42318;
+  --amber:#b54708;
+  --amber-soft:#fff7e8;
+  --shadow:0 12px 38px rgba(17,24,39,.08)
+}
+
 *{box-sizing:border-box}
+
 html{scroll-behavior:smooth}
-body{margin:0;background:#fff;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;position:relative}
-body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.60),rgba(255,255,255,.60)),url("./CID%20Scan%20analysis.jpg");background-size:cover;background-position:center;background-repeat:no-repeat;opacity:.20;filter:saturate(.72) brightness(1.08) contrast(.92);z-index:-2}
-body::after{content:"";position:fixed;inset:0;background:rgba(255,255,255,.24);z-index:-1}
+
+body{
+  margin:0;
+  background:#fff;
+  color:var(--ink);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  position:relative
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.60),rgba(255,255,255,.60)),
+    url("./CID%20Scan%20analysis.jpg");
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  opacity:.20;
+  filter:saturate(.72) brightness(1.08) contrast(.92);
+  z-index:-2
+}
+
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(255,255,255,.24);
+  z-index:-1
+}
+
 button,input,select{font:inherit}
 button{cursor:pointer}
-.topbar{position:sticky;top:0;z-index:30;height:82px;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px 0 330px}
-.title-wrap h1{font-size:24px;margin:0;font-weight:800;letter-spacing:-.03em}
-.topbar-actions{display:flex;align-items:center;gap:10px}
-.lang-btn,.global-reset-btn{width:46px;height:46px;border:1px solid var(--line);border-radius:50%;background:#fff;box-shadow:0 6px 18px rgba(17,24,39,.06);display:inline-flex;align-items:center;justify-content:center}
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:30;
+  height:82px;
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 34px 0 330px
+}
+
+.title-wrap h1{
+  font-size:24px;
+  margin:0;
+  font-weight:800;
+  letter-spacing:-.03em
+}
+
+.topbar-actions{
+  display:flex;
+  align-items:center;
+  gap:10px
+}
+
+.lang-btn,.global-reset-btn{
+  width:46px;
+  height:46px;
+  border:1px solid var(--line);
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 6px 18px rgba(17,24,39,.06);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center
+}
+
 .lang-btn{font-size:21px}
-.global-reset-btn{font-size:25px;font-weight:700;line-height:1;transition:.18s ease}
-.global-reset-btn:hover,.tab-reset-btn:hover{background:#f8f9fb;transform:translateY(-1px);border-color:#bdc3cc}
-.global-reset-btn:active,.tab-reset-btn:active{transform:translateY(0)}
-.dock{position:fixed;z-index:40;left:22px;bottom:22px;width:280px;max-height:calc(100vh - 44px);overflow:auto;background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:var(--shadow);backdrop-filter:blur(10px)}
+
+.global-reset-btn{
+  font-size:25px;
+  font-weight:700;
+  line-height:1;
+  transition:.18s ease
+}
+
+.global-reset-btn:hover,.tab-reset-btn:hover{
+  background:#f8f9fb;
+  transform:translateY(-1px);
+  border-color:#bdc3cc
+}
+
+.global-reset-btn:active,.tab-reset-btn:active{
+  transform:translateY(0)
+}
+
+.dock{
+  position:fixed;
+  z-index:40;
+  left:22px;
+  bottom:22px;
+  width:280px;
+  max-height:calc(100vh - 44px);
+  overflow:auto;
+  background:rgba(255,255,255,.88);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:14px;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(10px)
+}
+
 .dock-head{padding:8px 8px 12px}
 .dock-head strong{display:block;font-size:15px}
 .dock-head span{display:block;font-size:12px;color:var(--muted);margin-top:4px}
-.nav-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.nav-btn,.analysis-btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;font-weight:800}
+
+.nav-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:10px
+}
+
+.nav-btn,.analysis-btn{
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--ink);
+  border-radius:12px;
+  font-weight:800
+}
+
 .nav-btn{height:42px}
-.analysis-btn{width:100%;text-align:left;padding:13px 14px;margin-top:8px;line-height:1.35;font-size:13px;transition:.18s ease}
-.analysis-btn:hover{transform:translateY(-1px);border-color:#bdc3cc}
-.analysis-btn.active{background:#111827;color:#fff;border-color:#111827}
-.dock hr{border:0;border-top:1px solid var(--line);margin:10px 0}
-.dock-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:800;padding:4px 8px}
-.workspace{margin-left:316px;padding:30px 36px 80px;max-width:1800px}
-.setup-card,.plot-card,.analysis-card{border:1px solid var(--line);border-radius:20px;background:rgba(255,255,255,.90);box-shadow:0 8px 28px rgba(17,24,39,.05);backdrop-filter:blur(8px)}
-.setup-card{padding:24px;margin-bottom:22px}
-.section-title{font-size:18px;font-weight:800;margin:0 0 18px;letter-spacing:-.02em}
-.setup-grid{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:14px;align-items:end}
-.field label{display:block;font-size:12px;font-weight:800;color:#344054;margin-bottom:7px}
-.field input[type="number"],.field input[type="text"],.field select{width:100%;height:46px;border:1px solid #d9dde4;border-radius:12px;padding:0 12px;background:#fff;color:var(--ink);outline:none}
-.field input:focus,.field select:focus{border-color:#88909d;box-shadow:0 0 0 3px #f0f2f5}
-.file-line{display:flex;gap:8px;align-items:center}
+
+.analysis-btn{
+  width:100%;
+  text-align:left;
+  padding:13px 14px;
+  margin-top:8px;
+  line-height:1.35;
+  font-size:13px;
+  transition:.18s ease
+}
+
+.analysis-btn:hover{
+  transform:translateY(-1px);
+  border-color:#bdc3cc
+}
+
+.analysis-btn.active{
+  background:#111827;
+  color:#fff;
+  border-color:#111827
+}
+
+.dock hr{
+  border:0;
+  border-top:1px solid var(--line);
+  margin:10px 0
+}
+
+.dock-label{
+  font-size:11px;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  font-weight:800;
+  padding:4px 8px
+}
+
+.workspace{
+  margin-left:316px;
+  padding:30px 36px 80px;
+  max-width:1800px
+}
+
+.setup-card,.plot-card,.analysis-card{
+  border:1px solid var(--line);
+  border-radius:20px;
+  background:rgba(255,255,255,.90);
+  box-shadow:0 8px 28px rgba(17,24,39,.05);
+  backdrop-filter:blur(8px)
+}
+
+.setup-card{
+  padding:24px;
+  margin-bottom:22px
+}
+
+.section-title{
+  font-size:18px;
+  font-weight:800;
+  margin:0 0 18px;
+  letter-spacing:-.02em
+}
+
+.setup-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(180px,1fr));
+  gap:14px;
+  align-items:end
+}
+
+.field label{
+  display:block;
+  font-size:12px;
+  font-weight:800;
+  color:#344054;
+  margin-bottom:7px
+}
+
+.field input[type="number"],
+.field input[type="text"],
+.field select{
+  width:100%;
+  height:46px;
+  border:1px solid #d9dde4;
+  border-radius:12px;
+  padding:0 12px;
+  background:#fff;
+  color:var(--ink);
+  outline:none
+}
+
+.field input:focus,.field select:focus{
+  border-color:#88909d;
+  box-shadow:0 0 0 3px #f0f2f5
+}
+
+.file-line{
+  display:flex;
+  gap:8px;
+  align-items:center
+}
+
 .file-line input[type=file]{display:none}
-.primary,.secondary,.dangerless{height:46px;border-radius:12px;padding:0 18px;font-size:14px;font-weight:800;border:1px solid var(--line);white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;line-height:1}
-.primary{background:#111827;color:#fff;border-color:#111827}
-.secondary,.dangerless{background:#fff;color:#111827}
-.secondary:hover,.dangerless:hover{background:#f8f9fb}
-.filename{flex:1;height:46px;display:flex;align-items:center;padding:0 12px;border:1px dashed #cfd4dc;border-radius:12px;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.read-row{display:flex;gap:10px;align-items:center;margin-top:15px;flex-wrap:wrap}
-.status{font-size:12px;font-weight:700;color:var(--muted)}
+
+.primary,.secondary,.dangerless{
+  height:46px;
+  border-radius:12px;
+  padding:0 18px;
+  font-size:14px;
+  font-weight:800;
+  border:1px solid var(--line);
+  white-space:nowrap;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1
+}
+
+.primary{
+  background:#111827;
+  color:#fff;
+  border-color:#111827
+}
+
+.secondary,.dangerless{
+  background:#fff;
+  color:#111827
+}
+
+.secondary:hover,.dangerless:hover{
+  background:#f8f9fb
+}
+
+.filename{
+  flex:1;
+  height:46px;
+  display:flex;
+  align-items:center;
+  padding:0 12px;
+  border:1px dashed #cfd4dc;
+  border-radius:12px;
+  color:var(--muted);
+  font-size:12px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.read-row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-top:15px;
+  flex-wrap:wrap
+}
+
+.status{
+  font-size:12px;
+  font-weight:700;
+  color:var(--muted)
+}
+
 .status.good{color:var(--green)}
 .status.bad{color:var(--danger)}
 .status.warn{color:var(--amber)}
-.detected{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
-.badge{padding:7px 10px;border:1px solid var(--line);border-radius:999px;font-size:11px;font-weight:800;color:#344054;background:#fafafa}
-.badge.good{background:var(--green-soft);color:#16653f;border-color:#ccebd9}
-.badge.warn{background:var(--amber-soft);color:#9a6700;border-color:#f4dfad}
-.colors{margin-top:18px;padding-top:18px;border-top:1px solid var(--line);display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+
+.detected{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:13px
+}
+
+.badge{
+  padding:7px 10px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  font-size:11px;
+  font-weight:800;
+  color:#344054;
+  background:#fafafa
+}
+
+.badge.good{
+  background:var(--green-soft);
+  color:#16653f;
+  border-color:#ccebd9
+}
+
+.badge.warn{
+  background:var(--amber-soft);
+  color:#9a6700;
+  border-color:#f4dfad
+}
+
+.colors{
+  margin-top:18px;
+  padding-top:18px;
+  border-top:1px solid var(--line);
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+  align-items:center
+}
+
 .colors[hidden]{display:none!important}
-.color-opt{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;color:#475467}
-.color-opt input{width:30px;height:30px;padding:0;border:0;background:none}
-.result-header{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:28px 0 14px}
-.result-header h2{margin:0;font-size:21px;font-weight:800;letter-spacing:-.03em}
-.result-header .sub{font-size:12px;color:var(--muted);font-weight:600;margin-top:5px}
-.actions{display:none;align-items:center;gap:10px;flex-wrap:wrap}
+
+.color-opt{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:11px;
+  font-weight:800;
+  color:#475467
+}
+
+.color-opt input{
+  width:30px;
+  height:30px;
+  padding:0;
+  border:0;
+  background:none
+}
+
+.result-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  margin:28px 0 14px
+}
+
+.result-header h2{
+  margin:0;
+  font-size:21px;
+  font-weight:800;
+  letter-spacing:-.03em
+}
+
+.result-header .sub{
+  font-size:12px;
+  color:var(--muted);
+  font-weight:600;
+  margin-top:5px
+}
+
+.actions{
+  display:none;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap
+}
+
 .actions.visible{display:flex}
-.toggle{height:44px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:0 13px;display:flex;gap:9px;align-items:center;font-size:12px;font-weight:800}
-.lamp{width:11px;height:11px;border-radius:50%;background:#c7cbd1;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
-.toggle.on .lamp{background:#24b26b;box-shadow:0 0 0 4px rgba(36,178,107,.12)}
-.save-btn{height:44px;border:0;border-radius:12px;background:#111827;color:#fff;padding:0 17px;font-weight:800}
-.save-btn:disabled{opacity:.45;cursor:not-allowed}
-.analysis-card{padding:18px;margin-bottom:16px;display:none}
+
+.toggle{
+  height:44px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fff;
+  padding:0 13px;
+  display:flex;
+  gap:9px;
+  align-items:center;
+  font-size:12px;
+  font-weight:800
+}
+
+.lamp{
+  width:11px;
+  height:11px;
+  border-radius:50%;
+  background:#c7cbd1;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)
+}
+
+.toggle.on .lamp{
+  background:#24b26b;
+  box-shadow:0 0 0 4px rgba(36,178,107,.12)
+}
+
+.save-btn{
+  height:44px;
+  border:0;
+  border-radius:12px;
+  background:#111827;
+  color:#fff;
+  padding:0 17px;
+  font-weight:800
+}
+
+.save-btn:disabled{
+  opacity:.45;
+  cursor:not-allowed
+}
+
+.analysis-card{
+  padding:18px;
+  margin-bottom:16px;
+  display:none
+}
+
 .analysis-card.visible{display:block}
-.analysis-card-head{display:flex;align-items:center;justify-content:flex-end;margin-bottom:10px}
-.tab-reset-btn{width:38px;height:38px;border:1px solid var(--line);border-radius:50%;background:#fff;color:#111827;font-size:21px;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(17,24,39,.05);transition:.18s ease}
-.control-grid{display:grid;grid-template-columns:minmax(150px,.7fr) minmax(180px,1fr) minmax(180px,1fr) minmax(220px,1.2fr);gap:12px;align-items:end}
-.line-row{display:flex;gap:8px;flex-wrap:wrap}
-.line-toggle{height:42px;min-width:56px;border:1px solid var(--line);border-radius:12px;background:#fff;font-weight:800}
-.line-toggle.active{background:#111827;color:#fff;border-color:#111827}
-.range-row{display:flex;gap:8px;align-items:end;flex-wrap:wrap}
-.range-field{min-width:130px;flex:1}
-.range-field label{display:block;font-size:11px;font-weight:800;color:#475467;margin-bottom:6px}
-.range-field input{width:100%;height:42px;border:1px solid #d9dde4;border-radius:11px;padding:0 10px}
-.analysis-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.analysis-actions button{height:42px;border:1px solid var(--line);border-radius:11px;background:#fff;font-weight:800;padding:0 14px}
-.analysis-actions button.primary-mini{background:#111827;color:#fff;border-color:#111827}
-.hint{font-size:11px;line-height:1.55;color:var(--muted);font-weight:600;margin-top:10px}
-.plots{display:grid;gap:18px}
-.plot-card{padding:16px;min-height:470px}
-.plot-title{display:flex;align-items:center;justify-content:space-between;padding:3px 4px 10px;font-size:13px;font-weight:800}
-.plot{width:100%;height:540px}
-.empty{min-height:500px;border:1px dashed #d5dae1;border-radius:20px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-weight:700;line-height:1.6;padding:30px}
-.progress{display:none;margin-top:10px;font-size:12px;font-weight:700;color:var(--muted)}
+
+.analysis-card-head{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  margin-bottom:10px
+}
+
+.tab-reset-btn{
+  width:38px;
+  height:38px;
+  border:1px solid var(--line);
+  border-radius:50%;
+  background:#fff;
+  color:#111827;
+  font-size:21px;
+  font-weight:700;
+  line-height:1;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 4px 12px rgba(17,24,39,.05);
+  transition:.18s ease
+}
+
+.control-grid{
+  display:grid;
+  grid-template-columns:minmax(150px,.7fr) minmax(180px,1fr) minmax(180px,1fr) minmax(220px,1.2fr);
+  gap:12px;
+  align-items:end
+}
+
+.line-row{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap
+}
+
+.line-toggle{
+  height:42px;
+  min-width:56px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fff;
+  font-weight:800
+}
+
+.line-toggle.active{
+  background:#111827;
+  color:#fff;
+  border-color:#111827
+}
+
+.range-row{
+  display:flex;
+  gap:8px;
+  align-items:end;
+  flex-wrap:wrap
+}
+
+.range-field{
+  min-width:130px;
+  flex:1
+}
+
+.range-field label{
+  display:block;
+  font-size:11px;
+  font-weight:800;
+  color:#475467;
+  margin-bottom:6px
+}
+
+.range-field input{
+  width:100%;
+  height:42px;
+  border:1px solid #d9dde4;
+  border-radius:11px;
+  padding:0 10px
+}
+
+.analysis-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center
+}
+
+.analysis-actions button{
+  height:42px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:#fff;
+  font-weight:800;
+  padding:0 14px
+}
+
+.analysis-actions button.primary-mini{
+  background:#111827;
+  color:#fff;
+  border-color:#111827
+}
+
+.hint{
+  font-size:11px;
+  line-height:1.55;
+  color:var(--muted);
+  font-weight:600;
+  margin-top:10px
+}
+
+.plots{
+  display:grid;
+  gap:18px
+}
+
+.plot-card{
+  padding:16px;
+  min-height:470px
+}
+
+.plot-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:3px 4px 10px;
+  font-size:13px;
+  font-weight:800
+}
+
+.plot{
+  width:100%;
+  height:540px
+}
+
+.empty{
+  min-height:500px;
+  border:1px dashed #d5dae1;
+  border-radius:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:var(--muted);
+  font-weight:700;
+  line-height:1.6;
+  padding:30px
+}
+
+.progress{
+  display:none;
+  margin-top:10px;
+  font-size:12px;
+  font-weight:700;
+  color:var(--muted)
+}
+
 .progress.visible{display:block}
-.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;margin-top:14px;background:#fff}
-.result-table{width:100%;border-collapse:collapse;min-width:980px;font-size:12px}
-.result-table th,.result-table td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-.result-table th:first-child,.result-table td:first-child,.result-table th:nth-child(2),.result-table td:nth-child(2){text-align:left}
-.result-table th{background:#f8f9fb;font-weight:800;color:#344054;position:sticky;top:0}
+
+.table-wrap{
+  overflow:auto;
+  border:1px solid var(--line);
+  border-radius:14px;
+  margin-top:14px;
+  background:#fff
+}
+
+.result-table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:980px;
+  font-size:12px
+}
+
+.result-table th,.result-table td{
+  padding:10px 12px;
+  border-bottom:1px solid var(--line);
+  text-align:right;
+  white-space:nowrap
+}
+
+.result-table th:first-child,
+.result-table td:first-child,
+.result-table th:nth-child(2),
+.result-table td:nth-child(2){
+  text-align:left
+}
+
+.result-table th{
+  background:#f8f9fb;
+  font-weight:800;
+  color:#344054;
+  position:sticky;
+  top:0
+}
+
 .result-table tr:last-child td{border-bottom:0}
-.excel-table-wrap{overflow:auto;border:1px solid #a6a6a6;border-radius:0;margin-top:14px;background:#fff}
-.excel-result-table{width:auto;min-width:620px;border-collapse:collapse;border-spacing:0;font-family:Arial,"Segoe UI",sans-serif;font-size:12px;color:#111;user-select:text}
-.excel-result-table th,.excel-result-table td{min-width:110px;padding:7px 10px;border:1px solid #b7b7b7;white-space:nowrap}
-.excel-result-table th{background:#e7e6e6;font-weight:700;text-align:center;position:sticky;top:0;z-index:1}
-.excel-result-table td:nth-child(1),.excel-result-table td:nth-child(2),.excel-result-table td:nth-child(3){text-align:left}
-.excel-result-table td:nth-child(4),.excel-result-table td:nth-child(5),.excel-result-table td:nth-child(6){text-align:right}
-.excel-result-table tr.region-start td{border-top:2px solid #7f7f7f}
-.region-manager{display:none;margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#fbfcfd}
+
+.excel-table-wrap{
+  overflow:auto;
+  border:1px solid #a6a6a6;
+  border-radius:0;
+  margin-top:14px;
+  background:#fff
+}
+
+.excel-result-table{
+  width:auto;
+  min-width:620px;
+  border-collapse:collapse;
+  border-spacing:0;
+  font-family:Arial,"Segoe UI",sans-serif;
+  font-size:12px;
+  color:#111;
+  user-select:text
+}
+
+.excel-result-table th,.excel-result-table td{
+  min-width:110px;
+  padding:7px 10px;
+  border:1px solid #b7b7b7;
+  white-space:nowrap
+}
+
+.excel-result-table th{
+  background:#e7e6e6;
+  font-weight:700;
+  text-align:center;
+  position:sticky;
+  top:0;
+  z-index:1
+}
+
+.excel-result-table td:nth-child(1),
+.excel-result-table td:nth-child(2),
+.excel-result-table td:nth-child(3){
+  text-align:left
+}
+
+.excel-result-table td:nth-child(4),
+.excel-result-table td:nth-child(5),
+.excel-result-table td:nth-child(6){
+  text-align:right
+}
+
+.excel-result-table tr.region-start td{
+  border-top:2px solid #7f7f7f
+}
+
+.region-manager{
+  display:none;
+  margin-top:14px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#fbfcfd
+}
+
 .region-manager.visible{display:block}
-.region-manager-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
-.region-manager-title{font-size:12px;font-weight:800;color:#344054}
-.region-list{display:flex;gap:8px;flex-wrap:wrap}
-.region-chip{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #d9dde4;border-radius:999px;background:#fff;font-size:11px;font-weight:800;color:#344054}
-.region-remove{width:22px;height:22px;border:0;border-radius:50%;background:#f2f4f7;color:#475467;font-weight:800;line-height:1}
+
+.region-manager-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px
+}
+
+.region-manager-title{
+  font-size:12px;
+  font-weight:800;
+  color:#344054
+}
+
+.region-list{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap
+}
+
+.region-chip{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;
+  border:1px solid #d9dde4;
+  border-radius:999px;
+  background:#fff;
+  font-size:11px;
+  font-weight:800;
+  color:#344054
+}
+
+.region-remove{
+  width:22px;
+  height:22px;
+  border:0;
+  border-radius:50%;
+  background:#f2f4f7;
+  color:#475467;
+  font-weight:800;
+  line-height:1
+}
+
 .region-remove:hover{background:#e4e7ec}
-.region-empty{font-size:11px;color:var(--muted);font-weight:600}
-.step-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:11px;font-weight:800;color:#475467}
-.step-badge.ready{background:var(--green-soft);color:#16653f;border-color:#ccebd9}
+
+.region-empty{
+  font-size:11px;
+  color:var(--muted);
+  font-weight:600
+}
+
+.step-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:7px 10px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:#fff;
+  font-size:11px;
+  font-weight:800;
+  color:#475467
+}
+
+.step-badge.ready{
+  background:var(--green-soft);
+  color:#16653f;
+  border-color:#ccebd9
+}
+
 .app-shell[hidden]{display:none!important}
-.cid-selector-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px;position:relative}
-.cid-selector-card{width:min(760px,100%);padding:42px;border:1px solid var(--line);border-radius:28px;background:rgba(255,255,255,.94);box-shadow:0 20px 60px rgba(17,24,39,.12);backdrop-filter:blur(14px);text-align:center}
-.cid-selector-kicker{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
-.cid-selector-card h1{margin:0;font-size:34px;line-height:1.18;font-weight:800;letter-spacing:-.04em}
-.cid-selector-card p{margin:12px auto 0;max-width:560px;color:var(--muted);font-size:14px;line-height:1.7;font-weight:600}
-.cid-choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:30px}
-.cid-choice-btn{min-height:150px;border:1px solid #d9dde4;border-radius:22px;background:#fff;color:var(--ink);box-shadow:0 8px 24px rgba(17,24,39,.05);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:.18s ease}
-.cid-choice-btn:hover{transform:translateY(-3px);border-color:#9ca3af;box-shadow:0 14px 30px rgba(17,24,39,.10)}
+
+.cid-selector-screen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:32px;
+  position:relative
+}
+
+.cid-selector-card{
+  width:min(760px,100%);
+  padding:42px;
+  border:1px solid var(--line);
+  border-radius:28px;
+  background:rgba(255,255,255,.94);
+  box-shadow:0 20px 60px rgba(17,24,39,.12);
+  backdrop-filter:blur(14px);
+  text-align:center
+}
+
+.cid-selector-kicker{
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:12px
+}
+
+.cid-selector-card h1{
+  margin:0;
+  font-size:34px;
+  line-height:1.18;
+  font-weight:800;
+  letter-spacing:-.04em
+}
+
+.cid-selector-card p{
+  margin:12px auto 0;
+  max-width:560px;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.7;
+  font-weight:600
+}
+
+.cid-choice-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  margin-top:30px
+}
+
+.cid-choice-btn{
+  min-height:150px;
+  border:1px solid #d9dde4;
+  border-radius:22px;
+  background:#fff;
+  color:var(--ink);
+  box-shadow:0 8px 24px rgba(17,24,39,.05);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  transition:.18s ease
+}
+
+.cid-choice-btn:hover{
+  transform:translateY(-3px);
+  border-color:#9ca3af;
+  box-shadow:0 14px 30px rgba(17,24,39,.10)
+}
+
 .cid-choice-btn:active{transform:translateY(-1px)}
-.cid-choice-number{font-size:38px;font-weight:800;letter-spacing:-.04em}
-.cid-choice-label{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+
+.cid-choice-number{
+  font-size:38px;
+  font-weight:800;
+  letter-spacing:-.04em
+}
+
+.cid-choice-label{
+  font-size:12px;
+  font-weight:800;
+  color:var(--muted);
+  letter-spacing:.08em;
+  text-transform:uppercase
+}
+
 @media(max-width:1200px){
-.setup-grid{grid-template-columns:1fr 1fr}
-.control-grid{grid-template-columns:1fr 1fr}
+  .setup-grid{grid-template-columns:1fr 1fr}
+  .control-grid{grid-template-columns:1fr 1fr}
 }
+
 @media(max-width:1050px){
-.dock{position:static;width:auto;max-height:none;margin:18px}
-.topbar{padding-left:24px}
-.workspace{margin-left:0;padding:12px 18px 60px}
-.analysis-btn{font-size:12px}
+  .dock{
+    position:static;
+    width:auto;
+    max-height:none;
+    margin:18px
+  }
+
+  .topbar{padding-left:24px}
+  .workspace{margin-left:0;padding:12px 18px 60px}
+  .analysis-btn{font-size:12px}
 }
+
 @media(max-width:650px){
-.setup-grid,.control-grid{grid-template-columns:1fr}
-.topbar{height:auto;padding:16px 18px}
-.title-wrap h1{font-size:19px}
-.workspace{padding:10px 12px 50px}
-.plot{height:420px}
-.result-header{align-items:flex-start;flex-direction:column}
-.cid-selector-screen{padding:18px}
-.cid-selector-card{padding:30px 20px}
-.cid-selector-card h1{font-size:28px}
-.cid-choice-grid{grid-template-columns:1fr}
-.cid-choice-btn{min-height:118px}
+  .setup-grid,.control-grid{grid-template-columns:1fr}
+  .topbar{height:auto;padding:16px 18px}
+  .title-wrap h1{font-size:19px}
+  .workspace{padding:10px 12px 50px}
+  .plot{height:420px}
+  .result-header{align-items:flex-start;flex-direction:column}
+  .cid-selector-screen{padding:18px}
+  .cid-selector-card{padding:30px 20px}
+  .cid-selector-card h1{font-size:28px}
+  .cid-choice-grid{grid-template-columns:1fr}
+  .cid-choice-btn{min-height:118px}
 }
 </style>
 </head>
+
 <body>
+
 <section id="cidSelector" class="cid-selector-screen">
-<div class="cid-selector-card">
-<div class="cid-selector-kicker">INNEREYE · CID</div>
-<h1 data-i18n="selectCidTitle">Select CID type</h1>
-<p data-i18n="selectCidHint">Choose the CID model to open the scan analysis workspace.</p>
-<div class="cid-choice-grid">
-<button class="cid-choice-btn" type="button" data-cid="2170">
-<span class="cid-choice-number">2170</span>
-<span class="cid-choice-label" data-i18n="openAnalysis">Open analysis</span>
-</button>
-<button class="cid-choice-btn" type="button" data-cid="4680">
-<span class="cid-choice-number">4680</span>
-<span class="cid-choice-label" data-i18n="openAnalysis">Open analysis</span>
-</button>
-</div>
-</div>
+  <div class="cid-selector-card">
+    <div class="cid-selector-kicker">INNEREYE · CID</div>
+    <h1 data-i18n="selectCidTitle">Select CID type</h1>
+    <p data-i18n="selectCidHint">Choose the CID model to open the scan analysis workspace.</p>
+
+    <div class="cid-choice-grid">
+      <button class="cid-choice-btn" type="button" data-cid="2170">
+        <span class="cid-choice-number">2170</span>
+        <span class="cid-choice-label" data-i18n="openAnalysis">Open analysis</span>
+      </button>
+
+      <button class="cid-choice-btn" type="button" data-cid="4680">
+        <span class="cid-choice-number">4680</span>
+        <span class="cid-choice-label" data-i18n="openAnalysis">Open analysis</span>
+      </button>
+    </div>
+  </div>
 </section>
+
 <div id="appShell" class="app-shell" hidden>
+
 <aside class="dock">
-<div class="dock-head">
-<strong id="dockModuleTitle">CID Scan analysis</strong>
-<span data-i18n="dockHint">Select an analysis function.</span>
-</div>
-<div class="nav-row">
-<button class="nav-btn" onclick="history.back()" data-i18n="back">← Back</button>
-<button class="nav-btn" onclick="location.href='./'" data-i18n="home">Home</button>
-</div>
-<hr>
-<div class="dock-label" data-i18n="analysis">Analysis</div>
-<button class="analysis-btn" data-mode="raw" data-i18n="rawBtn">Raw data plot</button>
-<button class="analysis-btn" data-mode="sg" data-i18n="sgBtn">SG smoothing plot</button>
-<button class="analysis-btn" data-mode="interval" data-i18n="intervalBtn">Interval analysis</button>
-<button class="analysis-btn" data-mode="intervalMean" data-i18n="intervalMeanBtn">Min / Before / Notch regions Interval analysis</button>
+  <div class="dock-head">
+    <strong id="dockModuleTitle">CID Scan analysis</strong>
+    <span data-i18n="dockHint">Select an analysis function.</span>
+  </div>
+
+  <div class="nav-row">
+    <button class="nav-btn" onclick="history.back()" data-i18n="back">← Back</button>
+    <button class="nav-btn" onclick="location.href='./'" data-i18n="home">Home</button>
+  </div>
+
+  <hr>
+
+  <div class="dock-label" data-i18n="analysis">Analysis</div>
+
+  <button class="analysis-btn" data-mode="raw" data-i18n="rawBtn">Raw data plot</button>
+  <button class="analysis-btn" data-mode="sg" data-i18n="sgBtn">SG smoothing plot</button>
+  <button class="analysis-btn" data-mode="interval" data-i18n="intervalBtn">Interval analysis</button>
+  <button class="analysis-btn" data-mode="intervalMean" data-i18n="intervalMeanBtn">Min / Before / Notch regions Interval analysis</button>
 </aside>
+
 <header class="topbar">
-<div class="title-wrap">
-<h1 id="moduleTitle">CID Scan analysis</h1>
-</div>
-<div class="topbar-actions">
-<button id="globalResetBtn" class="global-reset-btn" type="button" title="Reset all" aria-label="Reset all">↻</button>
-<button id="langBtn" class="lang-btn" type="button" title="Language" aria-label="Change language">🌐</button>
-</div>
+  <div class="title-wrap">
+    <h1 id="moduleTitle">CID Scan analysis</h1>
+  </div>
+
+  <div class="topbar-actions">
+    <button id="globalResetBtn" class="global-reset-btn" type="button" title="Reset all" aria-label="Reset all">↻</button>
+    <button id="langBtn" class="lang-btn" type="button" title="Language" aria-label="Change language">🌐</button>
+  </div>
 </header>
+
 <main class="workspace">
+
 <section class="setup-card">
+
 <h2 class="section-title" data-i18n="inputSetup">Input & output setup</h2>
+
 <div class="setup-grid">
+
 <div class="field">
-<label data-i18n="excelFile">Excel workbook</label>
-<div class="file-line">
-<button id="excelBrowseBtn" type="button" class="secondary" data-i18n="browse">Browse</button>
-<input id="excelInput" type="file" accept=".xlsx,.xlsm,.xls">
-<div id="filename" class="filename" data-i18n="noFile">No file selected</div>
+  <label data-i18n="excelFile">Excel workbook</label>
+  <div class="file-line">
+    <button id="excelBrowseBtn" type="button" class="secondary" data-i18n="browse">Browse</button>
+    <input id="excelInput" type="file" accept=".xlsx,.xlsm,.xls">
+    <div id="filename" class="filename" data-i18n="noFile">No file selected</div>
+  </div>
 </div>
-</div>
+
 <div class="field">
-<label data-i18n="savePath">Save path</label>
-<div class="file-line">
-<button id="folderBtn" class="secondary" data-i18n="browse">Browse</button>
-<div id="folderName" class="filename" data-i18n="notSelected">No folder selected</div>
+  <label data-i18n="savePath">Save path</label>
+  <div class="file-line">
+    <button id="folderBtn" class="secondary" data-i18n="browse">Browse</button>
+    <div id="folderName" class="filename" data-i18n="notSelected">No folder selected</div>
+  </div>
 </div>
-</div>
+
 <div class="field">
-<label data-i18n="excitation">Excitation frequency (kHz)</label>
-<input id="excitation" type="number" min="0" step="0.1" value="100">
+  <label data-i18n="excitation">Excitation frequency (kHz)</label>
+  <input id="excitation" type="number" min="0" step="0.1" value="100">
 </div>
+
 <div class="field">
-<label data-i18n="sgWindowInput">SG window size (s)</label>
-<input id="sgWindowSec" type="number" min="0.000001" step="0.001" value="0.01">
+  <label data-i18n="sgWindowInput">SG window size (s)</label>
+  <input id="sgWindowSec" type="number" min="0.000001" step="0.001" value="0.01">
 </div>
+
 <div class="field">
-<label data-i18n="signalType">Signal type</label>
-<select id="signalType">
-<option value="Phase">Phase</option>
-<option value="EMF">EMF</option>
-</select>
+  <label data-i18n="signalType">Signal type</label>
+  <select id="signalType">
+    <option value="Phase">Phase</option>
+    <option value="EMF">EMF</option>
+  </select>
 </div>
+
 <div class="field">
-<label data-i18n="scanSpeed">Scan speed (mm/s)</label>
-<input id="scanSpeed" type="number" min="0.000001" step="0.01" value="1">
+  <label data-i18n="scanSpeed">Scan speed (mm/s)</label>
+  <input id="scanSpeed" type="number" min="0.000001" step="0.01" value="1">
 </div>
+
 <div class="field">
-<label data-i18n="scanLength">Scan length (mm)</label>
-<input id="scanLength" type="number" min="0.000001" step="0.01" value="6">
+  <label data-i18n="scanLength">Scan length (mm)</label>
+  <input id="scanLength" type="number" min="0.000001" step="0.01" value="6">
 </div>
+
 <div class="field">
-<label data-i18n="notchPosition">Estimated notch position from start (mm)</label>
-<input id="notchPosition" type="number" min="0" step="0.01" value="2">
+  <label data-i18n="notchPosition">Estimated notch position from start (mm)</label>
+  <input id="notchPosition" type="number" min="0" step="0.01" value="2">
 </div>
+
 <div class="field">
-<label data-i18n="expectedSamples">Measured samples</label>
-<input id="expectedSamples" type="number" min="1" step="1" value="6">
+  <label data-i18n="expectedSamples">Measured samples</label>
+  <input id="expectedSamples" type="number" min="1" step="1" value="6">
 </div>
+
 </div>
+
 <div class="read-row">
-<button id="readBtn" class="primary" data-i18n="readOnly">Read Excel</button>
-<button id="downloadTemplateBtn" class="secondary" data-i18n="downloadTemplate">Download template</button>
-<button id="setDefaultBtn" class="secondary" data-i18n="setDefault">Default</button>
-<button id="analyzeBtn" class="secondary" data-i18n="analyze" hidden>Analyze</button>
-<span id="status" class="status" data-i18n="ready">Ready</span>
+  <button id="readBtn" class="primary" data-i18n="readOnly">Read Excel</button>
+  <button id="downloadTemplateBtn" class="secondary" data-i18n="downloadTemplate">Download template</button>
+  <button id="setDefaultBtn" class="secondary" data-i18n="setDefault">Default</button>
+  <button id="analyzeBtn" class="secondary" data-i18n="analyze" hidden>Analyze</button>
+  <span id="status" class="status" data-i18n="ready">Ready</span>
 </div>
+
 <div id="detected" class="detected"></div>
+
 <div id="colorsSection" class="colors" hidden>
-<span style="font-size:11px;font-weight:800;color:#344054" data-i18n="plotColors">Plot colors</span>
-<div id="colorOptions" style="display:flex;gap:16px;flex-wrap:wrap;align-items:center"></div>
+  <span style="font-size:11px;font-weight:800;color:#344054" data-i18n="plotColors">Plot colors</span>
+
+  <button
+    id="colorDefaultBtn"
+    type="button"
+    class="secondary"
+    data-i18n="colorDefault"
+  >Default</button>
+
+  <div
+    id="colorOptions"
+    style="display:flex;gap:16px;flex-wrap:wrap;align-items:center"
+  ></div>
 </div>
+
 </section>
+
 <section>
+
 <div class="result-header">
+
 <div>
-<h2 id="resultTitle" data-i18n="result">Processing result</h2>
-<div id="resultSub" class="sub" data-i18n="chooseAnalysis">Read an Excel file, then choose an analysis.</div>
+  <h2 id="resultTitle" data-i18n="result">Processing result</h2>
+  <div id="resultSub" class="sub" data-i18n="chooseAnalysis">Read an Excel file, then choose an analysis.</div>
 </div>
+
 <div id="actions" class="actions">
-<button id="exportAllToggle" class="toggle">
-<span class="lamp"></span>
-<span data-i18n="exportAll">Export all sample plots</span>
-</button>
-<button id="saveBtn" class="save-btn" data-i18n="save">Save</button>
+  <button id="exportAllToggle" class="toggle">
+    <span class="lamp"></span>
+    <span data-i18n="exportAll">Export all sample plots</span>
+  </button>
+
+  <button id="saveBtn" class="save-btn" data-i18n="save">Save</button>
 </div>
+
 </div>
+
 <div id="analysisControls" class="analysis-card">
+
 <div class="analysis-card-head">
-<button id="tabResetBtn" class="tab-reset-btn" type="button" title="Reset current analysis" aria-label="Reset current analysis">↻</button>
+  <button id="tabResetBtn" class="tab-reset-btn" type="button" title="Reset current analysis" aria-label="Reset current analysis">↻</button>
 </div>
+
 <div class="control-grid">
+
 <div class="field">
-<label data-i18n="sample">Sample</label>
-<select id="sampleSelect"></select>
+  <label data-i18n="sample">Sample</label>
+  <select id="sampleSelect"></select>
 </div>
+
 <div class="field">
-<label id="lineControlLabel" data-i18n="lines">Displayed lines</label>
-<div id="lineRow" class="line-row"></div>
+  <label id="lineControlLabel" data-i18n="lines">Displayed lines</label>
+  <div id="lineRow" class="line-row"></div>
 </div>
+
 <div id="rangeControls" class="range-row" style="display:none">
-<div class="range-field">
-<label data-i18n="rangeStart">Range start (mm)</label>
-<input id="rangeStart" type="number" step="0.001">
+  <div class="range-field">
+    <label data-i18n="rangeStart">Range start (mm)</label>
+    <input id="rangeStart" type="number" step="0.001">
+  </div>
+
+  <div class="range-field">
+    <label data-i18n="rangeEnd">Range end (mm)</label>
+    <input id="rangeEnd" type="number" step="0.001">
+  </div>
 </div>
-<div class="range-field">
-<label data-i18n="rangeEnd">Range end (mm)</label>
-<input id="rangeEnd" type="number" step="0.001">
-</div>
-</div>
+
 <div id="meanSetup" class="range-row" style="display:none">
+
 <div class="range-field">
-<label data-i18n="meanWindowLength">Calculation window length (mm)</label>
-<input id="meanWindowLength" type="number" min="0.001" step="0.001" value="0.01">
+  <label data-i18n="meanWindowLength">Calculation window length (mm)</label>
+  <input id="meanWindowLength" type="number" min="0.001" step="0.001" value="0.01">
 </div>
+
 <div class="range-field">
-<label data-i18n="beforeOffset">Before offset from first minimum (mm)</label>
-<input id="meanBeforeOffset" type="number" min="0" step="0.001" value="0.2">
+  <label data-i18n="beforeOffset">Before offset from first minimum (mm)</label>
+  <input id="meanBeforeOffset" type="number" min="0" step="0.001" value="0.2">
 </div>
+
 <div class="range-field">
-<label data-i18n="minMinimaSpacing">Minimum spacing (mm)</label>
-<input id="meanMinSpacing" type="number" min="0" step="0.001" value="0.05">
+  <label data-i18n="minMinimaSpacing">Minimum spacing (mm)</label>
+  <input id="meanMinSpacing" type="number" min="0" step="0.001" value="0.05">
 </div>
+
 </div>
+
 <div id="intervalActions" class="analysis-actions" style="display:none">
+
 <button id="intervalApplyAllToggle" class="toggle" type="button" aria-pressed="false">
-<span class="lamp"></span>
-<span data-i18n="applyAll">Apply to all</span>
+  <span class="lamp"></span>
+  <span data-i18n="applyAll">Apply to all</span>
 </button>
+
 <button id="intervalCalcBtn" class="primary-mini" data-i18n="calcMean">Calculate</button>
+
 </div>
+
 <div id="meanActions" class="analysis-actions" style="display:none">
-<button id="calcMeanBtn" class="primary-mini" data-i18n="calcMean">Calculate</button>
+  <button id="calcMeanBtn" class="primary-mini" data-i18n="calcMean">Calculate</button>
 </div>
+
 </div>
+
 <div id="controlHint" class="hint"></div>
+
 <div id="regionManager" class="region-manager">
-<div class="region-manager-head">
-<span class="region-manager-title" data-i18n="selectedRegions">Selected regions</span>
+  <div class="region-manager-head">
+    <span class="region-manager-title" data-i18n="selectedRegions">Selected regions</span>
+  </div>
+
+  <div id="regionList" class="region-list"></div>
 </div>
-<div id="regionList" class="region-list"></div>
-</div>
+
 <div id="resultTableWrap"></div>
+
 </div>
+
 <div id="plots" class="plots">
-<div class="empty" data-i18n="empty">
-No plot yet.<br>Load a valid workbook and select a function from the lower-left panel.
+  <div class="empty" data-i18n="empty">
+    No plot yet.<br>
+    Load a valid workbook and select a function from the lower-left panel.
+  </div>
 </div>
-</div>
+
 <div id="progress" class="progress"></div>
+
 </section>
+
 </main>
+
 </div>
+
 <script>
 const I18N={
 en:{
@@ -384,6 +1217,8 @@ templateDownloadStarted:'Template download started.',
 analyze:'Analyze',
 ready:'Ready',
 plotColors:'Plot colors',
+colorDefault:'Default',
+colorDefaultSaved:'Current plot colors were saved as the default for this CID type.',
 result:'Processing result',
 chooseAnalysis:'Read the Excel workbook, set the detected line colors, then press Analyze.',
 exportAll:'Export all sample plots',
@@ -477,6 +1312,7 @@ fullResetDone:'All inputs and analysis states were reset.',
 tabResetDone:'The current analysis tab was reset.',
 inputsChanged:'Input parameters changed. Read the workbook again before analysis.'
 },
+
 ko:{
 module:'CID 스캔 분석',
 selectCidTitle:'CID 종류 선택',
@@ -511,6 +1347,8 @@ templateDownloadStarted:'Excel 양식 다운로드를 시작했습니다.',
 analyze:'분석 시작',
 ready:'준비 완료',
 plotColors:'그래프 색상',
+colorDefault:'Default',
+colorDefaultSaved:'현재 그래프 색상을 이 CID 종류의 디폴트값으로 저장했습니다.',
 result:'처리 결과',
 chooseAnalysis:'Excel을 읽고 검출된 라인별 색상을 설정한 뒤 분석 시작을 눌러주세요.',
 exportAll:'전체 샘플 그래프 저장',
@@ -605,3463 +1443,6248 @@ tabResetDone:'현재 분석 탭을 초기화했습니다.',
 inputsChanged:'입력 파라미터가 변경되었습니다. 분석 전에 Excel을 다시 읽어주세요.'
 }
 };
+
 let lang=localStorage.getItem('innereye_lang')||'en';
+
 const state={
-cidType:null,
-file:null,
-saveHandle:null,
-readCache:null,
-dataset:null,
-currentMode:null,
-exportAll:false,
-selectedSample:null,
-selectedLines:new Set(),
-lineColors:{},
-ranges:{},
-rangeApplyAll:{
-interval:false
-},
-meanSettings:{},
-results:{
-extrema:{},
-auc:{},
-mean:{},
-notchSlope:{}
-},
-currentPlot:null
+  cidType:null,
+  file:null,
+  saveHandle:null,
+  readCache:null,
+  dataset:null,
+  currentMode:null,
+  exportAll:false,
+  selectedSample:null,
+  selectedLines:new Set(),
+  lineColors:{},
+  ranges:{},
+
+  rangeApplyAll:{
+    interval:false
+  },
+
+  meanSettings:{},
+
+  results:{
+    extrema:{},
+    auc:{},
+    mean:{},
+    notchSlope:{}
+  },
+
+  currentPlot:null
 };
+
 const el=id=>document.getElementById(id);
-const tr=k=>Object.prototype.hasOwnProperty.call(I18N[lang],k)?I18N[lang][k]:k;
+
+const tr=k=>
+  Object.prototype.hasOwnProperty.call(I18N[lang],k)
+  ?I18N[lang][k]
+  :k;
+
 function setStatus(text,kind=''){
-el('status').textContent=text;
-el('status').className='status '+kind;
+  el('status').textContent=text;
+  el('status').className='status '+kind;
 }
+
 function naturalNum(s){
-const m=String(s).match(/(\d+)/);
-return m?Number(m[1]):Number.MAX_SAFE_INTEGER;
+  const m=String(s).match(/(\d+)/);
+  return m?Number(m[1]):Number.MAX_SAFE_INTEGER;
 }
+
 function fmt(v,d=6){
-return Number.isFinite(v)?Number(v).toFixed(d):'';
+  return Number.isFinite(v)
+    ?Number(v).toFixed(d)
+    :'';
 }
+
 function clamp(v,a,b){
-return Math.max(a,Math.min(b,v));
+  return Math.max(a,Math.min(b,v));
 }
+
 function sensorAxis(){
-return el('signalType').value==='EMF'?tr('sensorAxisEMF'):tr('sensorAxisPhase');
+  return el('signalType').value==='EMF'
+    ?tr('sensorAxisEMF')
+    :tr('sensorAxisPhase');
 }
+
 function lineColor(line){
-return state.lineColors[line]||'#111827';
+  return state.lineColors[line]||'#111827';
 }
+
 function lightLineFill(line,alpha=.8,mix=.72){
-const hex=lineColor(line).replace('#','');
-const full=hex.length===3?hex.split('').map(c=>c+c).join(''):hex;
-if(!/^[0-9a-fA-F]{6}$/.test(full)){
-return `rgba(209,213,219,${alpha})`;
+  const hex=lineColor(line).replace('#','');
+  const full=hex.length===3
+    ?hex.split('').map(c=>c+c).join('')
+    :hex;
+
+  if(!/^[0-9a-fA-F]{6}$/.test(full)){
+    return `rgba(209,213,219,${alpha})`;
+  }
+
+  const r=parseInt(full.slice(0,2),16);
+  const g=parseInt(full.slice(2,4),16);
+  const b=parseInt(full.slice(4,6),16);
+
+  const blend=v=>Math.round(v+(255-v)*mix);
+
+  return `rgba(${blend(r)},${blend(g)},${blend(b)},${alpha})`;
 }
-const r=parseInt(full.slice(0,2),16);
-const g=parseInt(full.slice(2,4),16);
-const b=parseInt(full.slice(4,6),16);
-const blend=v=>Math.round(v+(255-v)*mix);
-return `rgba(${blend(r)},${blend(g)},${blend(b)},${alpha})`;
-}
+
 function currentModuleTitle(){
-if(!state.cidType)return tr('module');
-return lang==='ko'
-?`CID ${state.cidType} 스캔 분석`
-:`CID ${state.cidType} Scan analysis`;
+  if(!state.cidType)return tr('module');
+
+  return lang==='ko'
+    ?`CID ${state.cidType} 스캔 분석`
+    :`CID ${state.cidType} Scan analysis`;
 }
+
 function updateCidIdentity(){
-const title=currentModuleTitle();
-if(el('moduleTitle')){
-el('moduleTitle').textContent=title;
+  const title=currentModuleTitle();
+
+  if(el('moduleTitle')){
+    el('moduleTitle').textContent=title;
+  }
+
+  if(el('dockModuleTitle')){
+    el('dockModuleTitle').textContent=title;
+  }
+
+  document.title=title;
 }
-if(el('dockModuleTitle')){
-el('dockModuleTitle').textContent=title;
-}
-document.title=title;
-}
+
 function updateModeAvailability(){
-const meanBtn=document.querySelector(
-'.analysis-btn[data-mode="intervalMean"]'
-);
-if(meanBtn){
-meanBtn.hidden=state.cidType==='4680';
+  const meanBtn=document.querySelector(
+    '.analysis-btn[data-mode="intervalMean"]'
+  );
+
+  if(meanBtn){
+    meanBtn.hidden=state.cidType==='4680';
+  }
 }
-}
+
 const BASE_DEFAULTS={
-excitation:100,
-sgWindowSec:0.01,
-signalType:'Phase',
-scanSpeed:1,
-scanLength:6,
-notchPosition:2,
-expectedSamples:6
+  excitation:100,
+  sgWindowSec:0.01,
+  signalType:'Phase',
+  scanSpeed:1,
+  scanLength:6,
+  notchPosition:2,
+  expectedSamples:6
 };
+
 function defaultStorageKey(type=state.cidType){
-return `innereye_cid_scan_defaults_${type||'common'}`;
+  return `innereye_cid_scan_defaults_${type||'common'}`;
 }
+
+function colorDefaultStorageKey(type=state.cidType){
+  return `innereye_cid_scan_color_defaults_${type||'common'}`;
+}
+
+function loadStoredColorDefaults(type=state.cidType){
+  try{
+    const raw=localStorage.getItem(
+      colorDefaultStorageKey(type)
+    );
+
+    const parsed=raw
+      ?JSON.parse(raw)
+      :{};
+
+    return (
+      parsed &&
+      typeof parsed==='object' &&
+      !Array.isArray(parsed)
+    )
+      ?parsed
+      :{};
+  }catch(_){
+    return{};
+  }
+}
+
 function inputSettings(){
-return{
-excitation:Number(el('excitation').value),
-sgWindowSec:Number(el('sgWindowSec').value),
-signalType:el('signalType').value,
-scanSpeed:Number(el('scanSpeed').value),
-scanLength:Number(el('scanLength').value),
-notchPosition:Number(el('notchPosition').value),
-expectedSamples:Number(el('expectedSamples').value)
-};
+  return{
+    excitation:Number(el('excitation').value),
+    sgWindowSec:Number(el('sgWindowSec').value),
+    signalType:el('signalType').value,
+    scanSpeed:Number(el('scanSpeed').value),
+    scanLength:Number(el('scanLength').value),
+    notchPosition:Number(el('notchPosition').value),
+    expectedSamples:Number(el('expectedSamples').value)
+  };
 }
+
 function applyInputSettings(v){
-const x={...BASE_DEFAULTS,...(v||{})};
-el('excitation').value=x.excitation;
-el('sgWindowSec').value=x.sgWindowSec;
-el('signalType').value=x.signalType==='EMF'?'EMF':'Phase';
-el('scanSpeed').value=x.scanSpeed;
-el('scanLength').value=x.scanLength;
-el('notchPosition').value=x.notchPosition;
-el('expectedSamples').value=x.expectedSamples;
+  const x={
+    ...BASE_DEFAULTS,
+    ...(v||{})
+  };
+
+  el('excitation').value=x.excitation;
+  el('sgWindowSec').value=x.sgWindowSec;
+  el('signalType').value=x.signalType==='EMF'?'EMF':'Phase';
+  el('scanSpeed').value=x.scanSpeed;
+  el('scanLength').value=x.scanLength;
+  el('notchPosition').value=x.notchPosition;
+  el('expectedSamples').value=x.expectedSamples;
 }
+
 function loadStoredDefaults(type=state.cidType){
-try{
-const raw=localStorage.getItem(defaultStorageKey(type));
-return raw?{...BASE_DEFAULTS,...JSON.parse(raw)}:{...BASE_DEFAULTS};
-}catch(_){
-return{...BASE_DEFAULTS};
+  try{
+    const raw=localStorage.getItem(
+      defaultStorageKey(type)
+    );
+
+    return raw
+      ?{
+        ...BASE_DEFAULTS,
+        ...JSON.parse(raw)
+      }
+      :{
+        ...BASE_DEFAULTS
+      };
+
+  }catch(_){
+    return{
+      ...BASE_DEFAULTS
+    };
+  }
 }
-}
+
 function applyStoredDefaults(type=state.cidType){
-applyInputSettings(loadStoredDefaults(type));
+  applyInputSettings(
+    loadStoredDefaults(type)
+  );
 }
+
 function selectCidType(type){
-if(type!=='2170'&&type!=='4680')return;
-state.cidType=type;
-applyStoredDefaults(type);
-el('cidSelector').style.display='none';
-el('appShell').hidden=false;
-updateCidIdentity();
-updateModeAvailability();
+  if(type!=='2170'&&type!=='4680'){
+    return;
+  }
+
+  state.cidType=type;
+
+  applyStoredDefaults(type);
+
+  el('cidSelector').style.display='none';
+  el('appShell').hidden=false;
+
+  updateCidIdentity();
+  updateModeAvailability();
 }
+
 document.querySelectorAll('.cid-choice-btn').forEach(btn=>{
-btn.addEventListener('click',()=>selectCidType(btn.dataset.cid));
+  btn.addEventListener(
+    'click',
+    ()=>selectCidType(btn.dataset.cid)
+  );
 });
+
 function applyLanguage(){
-document.documentElement.lang=lang;
-document.querySelectorAll('[data-i18n]').forEach(node=>{
-const k=node.dataset.i18n;
-if(I18N[lang][k]){
-node.innerHTML=I18N[lang][k].replace(/\n/g,'<br>');
+
+  document.documentElement.lang=lang;
+
+  document.querySelectorAll('[data-i18n]').forEach(node=>{
+    const k=node.dataset.i18n;
+
+    if(I18N[lang][k]){
+      node.innerHTML=
+        I18N[lang][k].replace(/\n/g,'<br>');
+    }
+  });
+
+  updateCidIdentity();
+  updateModeAvailability();
+  syncRangeApplyAllToggle();
+
+  if(state.file){
+    el('filename').textContent=
+      state.file.name;
+  }
+
+  if(state.saveHandle){
+    el('folderName').textContent=
+      state.saveHandle.name;
+  }
+
+  if(state.readCache||state.dataset){
+    renderDetected(
+      state.dataset||state.readCache
+    );
+  }
+
+  renderColorOptions();
+
+  if(state.dataset){
+    renderLineToggles();
+  }
+
+  if(state.currentMode==='intervalMean'){
+    el('lineControlLabel').textContent=
+      tr('lines');
+
+    syncMeanControls();
+    renderRegionManager();
+  }
+
+  el('globalResetBtn').title=
+    tr('globalResetTitle');
+
+  el('globalResetBtn').setAttribute(
+    'aria-label',
+    tr('globalResetTitle')
+  );
+
+  el('tabResetBtn').title=
+    tr('tabResetTitle');
+
+  el('tabResetBtn').setAttribute(
+    'aria-label',
+    tr('tabResetTitle')
+  );
+
+  if(state.currentMode&&state.dataset){
+    activateMode(
+      state.currentMode,
+      false
+    );
+  }
 }
-});
-updateCidIdentity();
-updateModeAvailability();
-syncRangeApplyAllToggle();
-if(state.file){
-el('filename').textContent=state.file.name;
-}
-if(state.saveHandle){
-el('folderName').textContent=state.saveHandle.name;
-}
-if(state.readCache||state.dataset){
-renderDetected(state.dataset||state.readCache);
-}
-renderColorOptions();
-if(state.dataset){
-renderLineToggles();
-}
-if(state.currentMode==='intervalMean'){
-el('lineControlLabel').textContent=tr('lines');
-syncMeanControls();
-renderRegionManager();
-}
-el('globalResetBtn').title=tr('globalResetTitle');
-el('globalResetBtn').setAttribute('aria-label',tr('globalResetTitle'));
-el('tabResetBtn').title=tr('tabResetTitle');
-el('tabResetBtn').setAttribute('aria-label',tr('tabResetTitle'));
-if(state.currentMode&&state.dataset){
-activateMode(state.currentMode,false);
-}
-}
+
 el('langBtn').onclick=()=>{
-lang=lang==='en'?'ko':'en';
-localStorage.setItem('innereye_lang',lang);
-applyLanguage();
+
+  lang=lang==='en'
+    ?'ko'
+    :'en';
+
+  localStorage.setItem(
+    'innereye_lang',
+    lang
+  );
+
+  applyLanguage();
 };
+
 applyLanguage();
+
 function purgeCurrentPlot(){
-if(state.currentPlot){
-try{
-Plotly.purge(state.currentPlot);
-}catch(_){}
+
+  if(state.currentPlot){
+    try{
+      Plotly.purge(
+        state.currentPlot
+      );
+    }catch(_){}
+  }
+
+  state.currentPlot=null;
 }
-state.currentPlot=null;
-}
+
 function clearAnalysisUi(){
-purgeCurrentPlot();
-state.dataset=null;
-state.currentMode=null;
-state.selectedSample=null;
-state.ranges={};
-state.rangeApplyAll={
-interval:false
-};
-state.meanSettings={};
-state.results={
-extrema:{},
-auc:{},
-mean:{},
-notchSlope:{}
-};
-state.selectedLines=new Set();
-state.exportAll=false;
-document.querySelectorAll('.analysis-btn').forEach(b=>b.classList.remove('active'));
-el('exportAllToggle').classList.remove('on');
-el('intervalApplyAllToggle').classList.remove('on');
-el('intervalApplyAllToggle').setAttribute('aria-pressed','false');
-el('actions').classList.remove('visible');
-el('analysisControls').classList.remove('visible');
-el('sampleSelect').innerHTML='';
-el('lineRow').innerHTML='';
-el('rangeStart').value='';
-el('rangeEnd').value='';
-el('resultTableWrap').innerHTML='';
-el('regionList').innerHTML='';
-el('regionManager').classList.remove('visible');
-el('resultTitle').textContent=tr('result');
-el('resultSub').textContent=tr('chooseAnalysis');
-el('plots').innerHTML=`<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;
-el('progress').textContent='';
-el('progress').classList.remove('visible');
-el('saveBtn').disabled=false;
+
+  purgeCurrentPlot();
+
+  state.dataset=null;
+  state.currentMode=null;
+  state.selectedSample=null;
+  state.ranges={};
+
+  state.rangeApplyAll={
+    interval:false
+  };
+
+  state.meanSettings={};
+
+  state.results={
+    extrema:{},
+    auc:{},
+    mean:{},
+    notchSlope:{}
+  };
+
+  state.selectedLines=new Set();
+  state.exportAll=false;
+
+  document.querySelectorAll('.analysis-btn').forEach(b=>
+    b.classList.remove('active')
+  );
+
+  el('exportAllToggle').classList.remove('on');
+
+  el('intervalApplyAllToggle').classList.remove('on');
+
+  el('intervalApplyAllToggle').setAttribute(
+    'aria-pressed',
+    'false'
+  );
+
+  el('actions').classList.remove('visible');
+  el('analysisControls').classList.remove('visible');
+
+  el('sampleSelect').innerHTML='';
+  el('lineRow').innerHTML='';
+
+  el('rangeStart').value='';
+  el('rangeEnd').value='';
+
+  el('resultTableWrap').innerHTML='';
+  el('regionList').innerHTML='';
+
+  el('regionManager').classList.remove('visible');
+
+  el('resultTitle').textContent=
+    tr('result');
+
+  el('resultSub').textContent=
+    tr('chooseAnalysis');
+
+  el('plots').innerHTML=
+    `<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;
+
+  el('progress').textContent='';
+  el('progress').classList.remove('visible');
+
+  el('saveBtn').disabled=false;
 }
+
 function resetDataset(){
-clearAnalysisUi();
-state.readCache=null;
-state.lineColors={};
-el('detected').innerHTML='';
-el('colorOptions').innerHTML='';
-el('colorsSection').hidden=true;
-el('analyzeBtn').hidden=true;
-setStatus(tr('ready'));
+
+  clearAnalysisUi();
+
+  state.readCache=null;
+  state.lineColors={};
+
+  el('detected').innerHTML='';
+  el('colorOptions').innerHTML='';
+  el('colorsSection').hidden=true;
+  el('analyzeBtn').hidden=true;
+
+  setStatus(
+    tr('ready')
+  );
 }
+
 function invalidatePreparedData(){
-if(!state.readCache&&!state.dataset)return;
-resetDataset();
-setStatus(tr('inputsChanged'),'warn');
+
+  if(
+    !state.readCache &&
+    !state.dataset
+  ){
+    return;
+  }
+
+  resetDataset();
+
+  setStatus(
+    tr('inputsChanged'),
+    'warn'
+  );
 }
-const TEMPLATE_DOWNLOAD_NAME='CID Scan data 분석용 양식.xlsx';
+
+const TEMPLATE_DOWNLOAD_NAME=
+  'CID Scan data 분석용 양식.xlsx';
+
 function buildTemplateWorkbook(){
-const sampleCount=Math.max(
-1,
-Math.trunc(Number(el('expectedSamples').value)||BASE_DEFAULTS.expectedSamples)
-);
-const wb=XLSX.utils.book_new();
-for(let i=1;i<=sampleCount;i++){
-const ws=XLSX.utils.aoa_to_sheet([['L1']]);
-ws['!cols']=[{wch:18}];
-XLSX.utils.book_append_sheet(wb,ws,`S${i}`);
+
+  const sampleCount=Math.max(
+    1,
+    Math.trunc(
+      Number(el('expectedSamples').value)||
+      BASE_DEFAULTS.expectedSamples
+    )
+  );
+
+  const wb=XLSX.utils.book_new();
+
+  for(let i=1;i<=sampleCount;i++){
+
+    const ws=
+      XLSX.utils.aoa_to_sheet([
+        ['L1']
+      ]);
+
+    ws['!cols']=[
+      {wch:18}
+    ];
+
+    XLSX.utils.book_append_sheet(
+      wb,
+      ws,
+      `S${i}`
+    );
+  }
+
+  return wb;
 }
-return wb;
-}
-el('excelBrowseBtn').onclick=()=>el('excelInput').click();
+
+el('excelBrowseBtn').onclick=()=>
+  el('excelInput').click();
+
 el('downloadTemplateBtn').onclick=()=>{
-try{
-const wb=buildTemplateWorkbook();
-XLSX.writeFile(
-wb,
-TEMPLATE_DOWNLOAD_NAME,
-{
-bookType:'xlsx',
-compression:true
-}
-);
-setStatus(tr('templateDownloadStarted'),'good');
-}catch(e){
-console.error(e);
-setStatus(e.message||String(e),'bad');
-}
+
+  try{
+
+    const wb=
+      buildTemplateWorkbook();
+
+    XLSX.writeFile(
+      wb,
+      TEMPLATE_DOWNLOAD_NAME,
+      {
+        bookType:'xlsx',
+        compression:true
+      }
+    );
+
+    setStatus(
+      tr('templateDownloadStarted'),
+      'good'
+    );
+
+  }catch(e){
+
+    console.error(e);
+
+    setStatus(
+      e.message||String(e),
+      'bad'
+    );
+  }
 };
+
 el('setDefaultBtn').onclick=()=>{
-try{
-const p=getParams();
-localStorage.setItem(defaultStorageKey(),JSON.stringify(p));
-setStatus(tr('defaultSaved'),'good');
-}catch(e){
-setStatus(e.message||String(e),'bad');
-}
+
+  try{
+
+    const p=getParams();
+
+    localStorage.setItem(
+      defaultStorageKey(),
+      JSON.stringify(p)
+    );
+
+    setStatus(
+      tr('defaultSaved'),
+      'good'
+    );
+
+  }catch(e){
+
+    setStatus(
+      e.message||String(e),
+      'bad'
+    );
+  }
 };
-el('excelInput').addEventListener('change',e=>{
-state.file=e.target.files[0]||null;
-el('filename').textContent=state.file?state.file.name:tr('noFile');
-resetDataset();
-});
+
+el('excelInput').addEventListener(
+  'change',
+  e=>{
+
+    state.file=
+      e.target.files[0]||null;
+
+    el('filename').textContent=
+      state.file
+      ?state.file.name
+      :tr('noFile');
+
+    resetDataset();
+  }
+);
+
 el('folderBtn').onclick=async()=>{
-if(!window.showDirectoryPicker){
-setStatus(tr('folderUnsupported'),'bad');
-return;
-}
-try{
-state.saveHandle=await window.showDirectoryPicker({
-mode:'readwrite',
-id:'innereye-cid-scan-output'
-});
-el('folderName').textContent=state.saveHandle.name;
-setStatus(tr('folderSelected'),'good');
-}catch(e){
-if(e.name!=='AbortError'){
-setStatus(String(e.message||e),'bad');
-}
-}
+
+  if(!window.showDirectoryPicker){
+
+    setStatus(
+      tr('folderUnsupported'),
+      'bad'
+    );
+
+    return;
+  }
+
+  try{
+
+    state.saveHandle=
+      await window.showDirectoryPicker({
+        mode:'readwrite',
+        id:'innereye-cid-scan-output'
+      });
+
+    el('folderName').textContent=
+      state.saveHandle.name;
+
+    setStatus(
+      tr('folderSelected'),
+      'good'
+    );
+
+  }catch(e){
+
+    if(e.name!=='AbortError'){
+      setStatus(
+        String(e.message||e),
+        'bad'
+      );
+    }
+  }
 };
+
 [
-'excitation',
-'sgWindowSec',
-'signalType',
-'scanSpeed',
-'scanLength',
-'notchPosition',
-'expectedSamples'
+  'excitation',
+  'sgWindowSec',
+  'signalType',
+  'scanSpeed',
+  'scanLength',
+  'notchPosition',
+  'expectedSamples'
 ].forEach(id=>{
-el(id).addEventListener('change',invalidatePreparedData);
+
+  el(id).addEventListener(
+    'change',
+    invalidatePreparedData
+  );
 });
+
 function resetAll(){
-state.file=null;
-state.saveHandle=null;
-el('excelInput').value='';
-el('filename').textContent=tr('noFile');
-el('folderName').textContent=tr('notSelected');
-applyStoredDefaults();
-resetDataset();
-setStatus(tr('fullResetDone'),'good');
+
+  state.file=null;
+  state.saveHandle=null;
+
+  el('excelInput').value='';
+  el('filename').textContent=
+    tr('noFile');
+
+  el('folderName').textContent=
+    tr('notSelected');
+
+  applyStoredDefaults();
+
+  resetDataset();
+
+  setStatus(
+    tr('fullResetDone'),
+    'good'
+  );
 }
+
 async function resetCurrentAnalysis(){
-if(!state.dataset||!state.currentMode){
-setStatus(tr('needRead'),'bad');
-return;
+
+  if(
+    !state.dataset ||
+    !state.currentMode
+  ){
+
+    setStatus(
+      tr('needRead'),
+      'bad'
+    );
+
+    return;
+  }
+
+  const mode=
+    state.currentMode;
+
+  purgeCurrentPlot();
+
+  state.selectedSample=
+    state.dataset.samples[0];
+
+  resetSelectedLines();
+
+  state.exportAll=false;
+
+  el('exportAllToggle').classList.remove('on');
+
+  el('resultTableWrap').innerHTML='';
+
+  if(mode==='interval'){
+
+    state.rangeApplyAll.interval=false;
+
+    syncRangeApplyAllToggle();
+  }
+
+  if(mode==='interval'){
+
+    state.results.extrema={};
+    state.results.auc={};
+    state.ranges={};
+
+    state.dataset.samples.forEach(s=>{
+      state.ranges[s]=[
+        0,
+        state.dataset.params.scanLength
+      ];
+    });
+  }
+
+  if(mode==='intervalMean'){
+
+    state.ranges={};
+    state.meanSettings={};
+
+    state.results.mean={};
+    state.results.notchSlope={};
+
+    state.dataset.samples.forEach(s=>{
+      state.ranges[s]=[
+        0,
+        state.dataset.params.scanLength
+      ];
+    });
+
+    ensureMeanSetting(
+      state.selectedSample
+    );
+  }
+
+  populateSampleSelect();
+  renderLineToggles();
+  syncRangeInputs();
+
+  if(mode==='intervalMean'){
+    syncMeanControls();
+  }
+
+  renderRegionManager();
+
+  await renderCurrentMode();
+
+  setStatus(
+    tr('tabResetDone'),
+    'good'
+  );
 }
-const mode=state.currentMode;
-purgeCurrentPlot();
-state.selectedSample=state.dataset.samples[0];
-resetSelectedLines();
-state.exportAll=false;
-el('exportAllToggle').classList.remove('on');
-el('resultTableWrap').innerHTML='';
-if(mode==='interval'){
-state.rangeApplyAll.interval=false;
-syncRangeApplyAllToggle();
-}
-if(mode==='interval'){
-state.results.extrema={};
-state.results.auc={};
-state.ranges={};
-state.dataset.samples.forEach(s=>{
-state.ranges[s]=[0,state.dataset.params.scanLength];
-});
-}
-if(mode==='intervalMean'){
-state.ranges={};
-state.meanSettings={};
-state.results.mean={};
-state.results.notchSlope={};
-state.dataset.samples.forEach(s=>{
-state.ranges[s]=[0,state.dataset.params.scanLength];
-});
-ensureMeanSetting(state.selectedSample);
-}
-populateSampleSelect();
-renderLineToggles();
-syncRangeInputs();
-if(mode==='intervalMean'){
-syncMeanControls();
-}
-renderRegionManager();
-await renderCurrentMode();
-setStatus(tr('tabResetDone'),'good');
-}
-el('globalResetBtn').onclick=resetAll;
-el('tabResetBtn').onclick=resetCurrentAnalysis;
+
+el('globalResetBtn').onclick=
+  resetAll;
+
+el('tabResetBtn').onclick=
+  resetCurrentAnalysis;
+
 function getParams(){
-const p={
-excitation:Number(el('excitation').value),
-sgWindowSec:Number(el('sgWindowSec').value),
-signalType:el('signalType').value,
-scanSpeed:Number(el('scanSpeed').value),
-scanLength:Number(el('scanLength').value),
-notchPosition:Number(el('notchPosition').value),
-expectedSamples:Number(el('expectedSamples').value)
-};
-if(
-!(
-p.excitation>0&&
-p.sgWindowSec>0&&
-p.scanSpeed>0&&
-p.scanLength>0&&
-Number.isInteger(p.expectedSamples)&&
-p.expectedSamples>0&&
-Number.isFinite(p.notchPosition)
-)
-){
-throw new Error(tr('invalidParams'));
+
+  const p={
+    excitation:Number(el('excitation').value),
+    sgWindowSec:Number(el('sgWindowSec').value),
+    signalType:el('signalType').value,
+    scanSpeed:Number(el('scanSpeed').value),
+    scanLength:Number(el('scanLength').value),
+    notchPosition:Number(el('notchPosition').value),
+    expectedSamples:Number(el('expectedSamples').value)
+  };
+
+  if(
+    !(
+      p.excitation>0 &&
+      p.sgWindowSec>0 &&
+      p.scanSpeed>0 &&
+      p.scanLength>0 &&
+      Number.isInteger(p.expectedSamples) &&
+      p.expectedSamples>0 &&
+      Number.isFinite(p.notchPosition)
+    )
+  ){
+    throw new Error(
+      tr('invalidParams')
+    );
+  }
+
+  return p;
 }
-return p;
-}
+
 function parseFilenameMeta(name){
-const freq=String(name).match(/(\d+(?:\.\d+)?)\s*kHz/i);
-const sig=String(name).match(/\b(Phase|EMF)\b/i);
-return{
-frequency:freq?Number(freq[1]):NaN,
-signal:sig
-?(sig[1].toLowerCase()==='phase'?'Phase':'EMF')
-:null
-};
+
+  const freq=
+    String(name).match(
+      /(\d+(?:\.\d+)?)\s*kHz/i
+    );
+
+  const sig=
+    String(name).match(
+      /\b(Phase|EMF)\b/i
+    );
+
+  return{
+    frequency:
+      freq
+      ?Number(freq[1])
+      :NaN,
+
+    signal:
+      sig
+      ?(
+        sig[1].toLowerCase()==='phase'
+        ?'Phase'
+        :'EMF'
+      )
+      :null
+  };
 }
+
 function cleanLineValues(aoa,col){
-const out=[];
-for(let r=1;r<aoa.length;r++){
-const raw=aoa[r]?.[col];
-if(
-raw===null||
-raw===undefined||
-String(raw).trim()===''
-){
-continue;
+
+  const out=[];
+
+  for(let r=1;r<aoa.length;r++){
+
+    const raw=
+      aoa[r]?.[col];
+
+    if(
+      raw===null ||
+      raw===undefined ||
+      String(raw).trim()===''
+    ){
+      continue;
+    }
+
+    const v=
+      Number(raw);
+
+    if(
+      Number.isFinite(v) &&
+      v!==0
+    ){
+      out.push(v);
+    }
+  }
+
+  return out;
 }
-const v=Number(raw);
-if(Number.isFinite(v)&&v!==0){
-out.push(v);
-}
-}
-return out;
-}
+
 function detectLineHeaders(row){
-const vals=(row||[]).map(v=>String(v??'').trim());
-let last=-1;
-for(let i=0;i<vals.length;i++){
-if(vals[i]!==''){
-last=i;
+
+  const vals=
+    (row||[]).map(
+      v=>String(v??'').trim()
+    );
+
+  let last=-1;
+
+  for(let i=0;i<vals.length;i++){
+    if(vals[i]!==''){
+      last=i;
+    }
+  }
+
+  if(last<0){
+    throw new Error(
+      tr('noLines')
+    );
+  }
+
+  const headers=
+    vals
+      .slice(0,last+1)
+      .map(
+        v=>v.toUpperCase()
+      );
+
+  for(let i=0;i<headers.length;i++){
+
+    if(headers[i]!==`L${i+1}`){
+
+      throw new Error(
+        tr('headerMismatch')
+      );
+    }
+  }
+
+  return headers;
 }
-}
-if(last<0){
-throw new Error(tr('noLines'));
-}
-const headers=vals
-.slice(0,last+1)
-.map(v=>v.toUpperCase());
-for(let i=0;i<headers.length;i++){
-if(headers[i]!==`L${i+1}`){
-throw new Error(tr('headerMismatch'));
-}
-}
-return headers;
-}
+
 function invertMatrix(A){
-const n=A.length;
-const M=A.map((row,i)=>
-row.slice().concat(
-Array.from(
-{length:n},
-(_,j)=>i===j?1:0
-)
-)
-);
-for(let c=0;c<n;c++){
-let pivot=c;
-for(let r=c+1;r<n;r++){
-if(Math.abs(M[r][c])>Math.abs(M[pivot][c])){
-pivot=r;
+
+  const n=A.length;
+
+  const M=A.map((row,i)=>
+    row.slice().concat(
+      Array.from(
+        {length:n},
+        (_,j)=>i===j?1:0
+      )
+    )
+  );
+
+  for(let c=0;c<n;c++){
+
+    let pivot=c;
+
+    for(let r=c+1;r<n;r++){
+
+      if(
+        Math.abs(M[r][c])>
+        Math.abs(M[pivot][c])
+      ){
+        pivot=r;
+      }
+    }
+
+    if(
+      Math.abs(M[pivot][c])<
+      1e-14
+    ){
+      throw new Error(
+        'Singular matrix in SG filter.'
+      );
+    }
+
+    [M[c],M[pivot]]=
+      [M[pivot],M[c]];
+
+    const div=M[c][c];
+
+    for(let j=0;j<2*n;j++){
+      M[c][j]/=div;
+    }
+
+    for(let r=0;r<n;r++){
+
+      if(r===c)continue;
+
+      const f=M[r][c];
+
+      for(let j=0;j<2*n;j++){
+        M[r][j]-=
+          f*M[c][j];
+      }
+    }
+  }
+
+  return M.map(
+    row=>row.slice(n)
+  );
 }
-}
-if(Math.abs(M[pivot][c])<1e-14){
-throw new Error('Singular matrix in SG filter.');
-}
-[M[c],M[pivot]]=[M[pivot],M[c]];
-const div=M[c][c];
-for(let j=0;j<2*n;j++){
-M[c][j]/=div;
-}
-for(let r=0;r<n;r++){
-if(r===c)continue;
-const f=M[r][c];
-for(let j=0;j<2*n;j++){
-M[r][j]-=f*M[c][j];
-}
-}
-}
-return M.map(row=>row.slice(n));
-}
-const sgCoeffCache=new Map();
+
+const sgCoeffCache=
+  new Map();
+
 function sgCoefficients(window,order){
-const key=`${window}:${order}`;
-if(sgCoeffCache.has(key)){
-return sgCoeffCache.get(key);
+
+  const key=
+    `${window}:${order}`;
+
+  if(sgCoeffCache.has(key)){
+    return sgCoeffCache.get(key);
+  }
+
+  const m=
+    (window-1)/2;
+
+  const A=[];
+
+  for(let i=-m;i<=m;i++){
+
+    const row=[];
+
+    for(let p=0;p<=order;p++){
+      row.push(i**p);
+    }
+
+    A.push(row);
+  }
+
+  const k=
+    order+1;
+
+  const ATA=
+    Array.from(
+      {length:k},
+      ()=>Array(k).fill(0)
+    );
+
+  for(let r=0;r<k;r++){
+
+    for(let c=0;c<k;c++){
+
+      for(let i=0;i<window;i++){
+        ATA[r][c]+=
+          A[i][r]*A[i][c];
+      }
+    }
+  }
+
+  const inv=
+    invertMatrix(ATA);
+
+  const coeff=[];
+
+  for(let i=0;i<window;i++){
+
+    let v=0;
+
+    for(let p=0;p<k;p++){
+      v+=
+        inv[0][p]*
+        A[i][p];
+    }
+
+    coeff.push(v);
+  }
+
+  sgCoeffCache.set(
+    key,
+    coeff
+  );
+
+  return coeff;
 }
-const m=(window-1)/2;
-const A=[];
-for(let i=-m;i<=m;i++){
-const row=[];
-for(let p=0;p<=order;p++){
-row.push(i**p);
-}
-A.push(row);
-}
-const k=order+1;
-const ATA=Array.from(
-{length:k},
-()=>Array(k).fill(0)
-);
-for(let r=0;r<k;r++){
-for(let c=0;c<k;c++){
-for(let i=0;i<window;i++){
-ATA[r][c]+=A[i][r]*A[i][c];
-}
-}
-}
-const inv=invertMatrix(ATA);
-const coeff=[];
-for(let i=0;i<window;i++){
-let v=0;
-for(let p=0;p<k;p++){
-v+=inv[0][p]*A[i][p];
-}
-coeff.push(v);
-}
-sgCoeffCache.set(key,coeff);
-return coeff;
-}
+
 function reflectIndex(i,n){
-while(i<0||i>=n){
-if(i<0){
-i=-i-1;
+
+  while(
+    i<0 ||
+    i>=n
+  ){
+
+    if(i<0){
+      i=-i-1;
+    }
+
+    if(i>=n){
+      i=2*n-i-1;
+    }
+  }
+
+  return i;
 }
-if(i>=n){
-i=2*n-i-1;
-}
-}
-return i;
-}
+
 function savgol(y,window,order=3){
-const c=sgCoefficients(window,order);
-const m=(window-1)/2;
-const out=new Array(y.length);
-for(let i=0;i<y.length;i++){
-let s=0;
-for(let j=-m;j<=m;j++){
-s+=c[j+m]*y[reflectIndex(i+j,y.length)];
+
+  const c=
+    sgCoefficients(
+      window,
+      order
+    );
+
+  const m=
+    (window-1)/2;
+
+  const out=
+    new Array(y.length);
+
+  for(let i=0;i<y.length;i++){
+
+    let s=0;
+
+    for(let j=-m;j<=m;j++){
+
+      s+=
+        c[j+m]*
+        y[
+          reflectIndex(
+            i+j,
+            y.length
+          )
+        ];
+    }
+
+    out[i]=s;
+  }
+
+  return out;
 }
-out[i]=s;
-}
-return out;
-}
+
 function validSgWindow(fs,n,windowSec){
-let w=Math.round(fs*windowSec);
-if(w%2===0){
-w+=1;
+
+  let w=
+    Math.round(
+      fs*windowSec
+    );
+
+  if(w%2===0){
+    w+=1;
+  }
+
+  w=Math.max(
+    5,
+    w
+  );
+
+  if(w>n){
+    w=
+      n%2===1
+      ?n
+      :n-1;
+  }
+
+  if(w<5){
+
+    throw new Error(
+      'The common data length is too short for a 3rd-order SG filter.'
+    );
+  }
+
+  return w;
 }
-w=Math.max(5,w);
-if(w>n){
-w=n%2===1?n:n-1;
-}
-if(w<5){
-throw new Error('The common data length is too short for a 3rd-order SG filter.');
-}
-return w;
-}
+
 function hslToHex(h,s,l){
-s/=100;
-l/=100;
-const k=n=>(n+h/30)%12;
-const a=s*Math.min(l,1-l);
-const f=n=>
-l-a*Math.max(
--1,
-Math.min(
-k(n)-3,
-Math.min(9-k(n),1)
-)
-);
-return '#'+[f(0),f(8),f(4)]
-.map(x=>
-Math.round(x*255)
-.toString(16)
-.padStart(2,'0')
-)
-.join('');
+
+  s/=100;
+  l/=100;
+
+  const k=n=>
+    (n+h/30)%12;
+
+  const a=
+    s*Math.min(l,1-l);
+
+  const f=n=>
+    l-
+    a*Math.max(
+      -1,
+      Math.min(
+        k(n)-3,
+        Math.min(
+          9-k(n),
+          1
+        )
+      )
+    );
+
+  return '#'+
+    [f(0),f(8),f(4)]
+    .map(x=>
+      Math.round(x*255)
+        .toString(16)
+        .padStart(2,'0')
+    )
+    .join('');
 }
+
 function defaultColorForIndex(i){
-const base=[
-'#111827',
-'#2563eb',
-'#d97706',
-'#059669',
-'#dc2626',
-'#7c3aed',
-'#0891b2',
-'#be185d',
-'#4d7c0f',
-'#9333ea',
-'#0f766e',
-'#c2410c'
-];
-if(i<base.length){
-return base[i];
+
+  const base=[
+    '#111827',
+    '#2563eb',
+    '#d97706',
+    '#059669',
+    '#dc2626',
+    '#7c3aed',
+    '#0891b2',
+    '#be185d',
+    '#4d7c0f',
+    '#9333ea',
+    '#0f766e',
+    '#c2410c'
+  ];
+
+  if(i<base.length){
+    return base[i];
+  }
+
+  return hslToHex(
+    (i*137.508)%360,
+    62,
+    43
+  );
 }
-return hslToHex(
-(i*137.508)%360,
-62,
-43
-);
-}
+
 function initializeLineColors(lines){
-const next={};
-lines.forEach((line,i)=>{
-next[line]=state.lineColors[line]||defaultColorForIndex(i);
-});
-state.lineColors=next;
+
+  const stored=
+    loadStoredColorDefaults();
+
+  const next={};
+
+  lines.forEach((line,i)=>{
+
+    next[line]=
+      state.lineColors[line] ||
+      stored[line] ||
+      defaultColorForIndex(i);
+  });
+
+  state.lineColors=next;
 }
+
 function renderColorOptions(){
-const d=state.readCache||state.dataset;
-if(!d){
-el('colorOptions').innerHTML='';
-el('colorsSection').hidden=true;
-return;
+
+  const d=
+    state.readCache||
+    state.dataset;
+
+  if(!d){
+
+    el('colorOptions').innerHTML='';
+    el('colorsSection').hidden=true;
+
+    return;
+  }
+
+  initializeLineColors(
+    d.lines
+  );
+
+  el('colorOptions').innerHTML=
+    d.lines.map(
+      line=>`
+        <label class="color-opt">
+          <input
+            type="color"
+            data-color-line="${line}"
+            value="${lineColor(line)}"
+          >
+          <span>${line}</span>
+        </label>
+      `
+    ).join('');
+
+  el('colorsSection').hidden=false;
+
+  el('colorOptions')
+    .querySelectorAll(
+      'input[data-color-line]'
+    )
+    .forEach(input=>{
+
+      const syncColorFromInput=async()=>{
+
+        state.lineColors[
+          input.dataset.colorLine
+        ]=
+          input.value;
+
+        if(state.currentMode){
+          await renderCurrentMode();
+        }
+      };
+
+      input.addEventListener(
+        'input',
+        syncColorFromInput
+      );
+
+      input.addEventListener(
+        'change',
+        syncColorFromInput
+      );
+    });
 }
-initializeLineColors(d.lines);
-el('colorOptions').innerHTML=d.lines.map(
-line=>`
-<label class="color-opt">
-<input type="color" data-color-line="${line}" value="${lineColor(line)}">
-<span>${line}</span>
-</label>
-`
-).join('');
-el('colorsSection').hidden=false;
-el('colorOptions')
-.querySelectorAll('input[data-color-line]')
-.forEach(input=>{
-input.addEventListener('change',async()=>{
-state.lineColors[input.dataset.colorLine]=input.value;
-if(state.currentMode){
-await renderCurrentMode();
-}
-});
-});
-}
+
+el('colorDefaultBtn').onclick=()=>{
+
+  const d=
+    state.readCache||
+    state.dataset;
+
+  if(!d){
+    return;
+  }
+
+  const savedColors={};
+
+  el('colorOptions')
+    .querySelectorAll(
+      'input[data-color-line]'
+    )
+    .forEach(input=>{
+
+      const line=
+        input.dataset.colorLine;
+
+      const color=
+        input.value;
+
+      state.lineColors[line]=color;
+      savedColors[line]=color;
+    });
+
+  d.lines.forEach((line,i)=>{
+
+    if(!savedColors[line]){
+
+      savedColors[line]=
+        state.lineColors[line]||
+        defaultColorForIndex(i);
+    }
+  });
+
+  state.lineColors={
+    ...savedColors
+  };
+
+  localStorage.setItem(
+    colorDefaultStorageKey(),
+    JSON.stringify(
+      savedColors
+    )
+  );
+
+  setStatus(
+    tr('colorDefaultSaved'),
+    'good'
+  );
+};
+
 function resetSelectedLines(){
-const d=state.dataset||state.readCache;
-state.selectedLines=new Set(
-d?d.lines:[]
-);
-renderLineToggles();
+
+  const d=
+    state.dataset||
+    state.readCache;
+
+  state.selectedLines=
+    new Set(
+      d
+      ?d.lines
+      :[]
+    );
+
+  renderLineToggles();
 }
+
 function renderLineToggles(){
-const d=state.dataset;
-if(!d){
-el('lineRow').innerHTML='';
-return;
+
+  const d=
+    state.dataset;
+
+  if(!d){
+
+    el('lineRow').innerHTML='';
+
+    return;
+  }
+
+  const available=
+    d.sampleLines?.[
+      state.selectedSample
+    ]||
+    d.lines;
+
+  if(
+    !available.some(
+      line=>
+        state.selectedLines.has(line)
+    )
+  ){
+
+    available.forEach(
+      line=>
+        state.selectedLines.add(line)
+    );
+  }
+
+  el('lineRow').innerHTML=
+    available.map(
+      line=>`
+        <button
+          type="button"
+          class="line-toggle ${
+            state.selectedLines.has(line)
+            ?'active'
+            :''
+          }"
+          data-line="${line}"
+        >${line}</button>
+      `
+    ).join('');
+
+  el('lineRow')
+    .querySelectorAll('.line-toggle')
+    .forEach(btn=>{
+
+      btn.addEventListener(
+        'click',
+        async()=>{
+
+          const line=
+            btn.dataset.line;
+
+          if(
+            state.selectedLines.has(line)
+          ){
+
+            if(
+              selectedLineList(
+                state.selectedSample
+              ).length===1
+            ){
+
+              setStatus(
+                tr('lineRequired'),
+                'warn'
+              );
+
+              return;
+            }
+
+            state.selectedLines.delete(
+              line
+            );
+
+          }else{
+
+            state.selectedLines.add(
+              line
+            );
+          }
+
+          renderLineToggles();
+
+          await renderCurrentMode();
+        }
+      );
+    });
 }
-const available=
-d.sampleLines?.[state.selectedSample]||
-d.lines;
-if(
-!available.some(
-line=>state.selectedLines.has(line)
-)
-){
-available.forEach(
-line=>state.selectedLines.add(line)
-);
-}
-el('lineRow').innerHTML=available.map(
-line=>`
-<button
-type="button"
-class="line-toggle ${state.selectedLines.has(line)?'active':''}"
-data-line="${line}"
->${line}</button>
-`
-).join('');
-el('lineRow')
-.querySelectorAll('.line-toggle')
-.forEach(btn=>{
-btn.addEventListener('click',async()=>{
-const line=btn.dataset.line;
-if(state.selectedLines.has(line)){
-if(selectedLineList(state.selectedSample).length===1){
-setStatus(tr('lineRequired'),'warn');
-return;
-}
-state.selectedLines.delete(line);
-}else{
-state.selectedLines.add(line);
-}
-renderLineToggles();
-await renderCurrentMode();
-});
-});
-}
+
 el('readBtn').onclick=async()=>{
-if(!state.file){
-setStatus(tr('needFile'),'bad');
-return;
-}
-setStatus(tr('reading'));
-try{
-clearAnalysisUi();
-state.readCache=null;
-state.lineColors={};
-el('detected').innerHTML='';
-el('colorsSection').hidden=true;
-el('analyzeBtn').hidden=true;
-const p=getParams();
-const buf=await state.file.arrayBuffer();
-const wb=XLSX.read(buf,{type:'array'});
-const expected=Array.from(
-{length:p.expectedSamples},
-(_,i)=>`S${i+1}`
-);
-const sampleSheets=wb.SheetNames
-.filter(n=>/^S\d+$/i.test(n))
-.sort((a,b)=>naturalNum(a)-naturalNum(b));
-if(
-sampleSheets.length!==expected.length||
-expected.some((s,i)=>sampleSheets[i]!==s)
-){
-throw new Error(
-`${tr('sheetMismatch')} [${sampleSheets.join(', ')}]`
-);
-}
-const raw={};
-const lengths=[];
-const sampleLines={};
-const allLineSet=new Set();
-for(const s of expected){
-const aoa=XLSX.utils.sheet_to_json(
-wb.Sheets[s],
-{
-header:1,
-defval:null,
-raw:true
-}
-);
-let headers;
-try{
-headers=detectLineHeaders(aoa[0]);
-}catch(e){
-throw new Error(`${e.message} (${s})`);
-}
-sampleLines[s]=headers;
-headers.forEach(
-line=>allLineSet.add(line)
-);
-raw[s]={};
-headers.forEach((line,c)=>{
-raw[s][line]=cleanLineValues(aoa,c);
-lengths.push({
-Sample:s,
-Line:line,
-Valid_Length:raw[s][line].length
-});
-});
-}
-const lines=[...allLineSet].sort(
-(a,b)=>naturalNum(a)-naturalNum(b)
-);
-if(!lines.length){
-throw new Error(tr('noLines'));
-}
-const minLength=Math.min(
-...lengths.map(x=>x.Valid_Length)
-);
-if(!Number.isFinite(minLength)||minLength<5){
-throw new Error(tr('noValid'));
-}
-const duration=p.scanLength/p.scanSpeed;
-const fs=minLength/duration;
-const dx=p.scanSpeed/fs;
-const distance=Array.from(
-{length:minLength},
-(_,i)=>i*dx
-);
-const window=validSgWindow(
-fs,
-minLength,
-p.sgWindowSec
-);
-const cleaned={};
-const smoothed={};
-for(const s of expected){
-cleaned[s]={};
-smoothed[s]={};
-for(const line of sampleLines[s]){
-cleaned[s][line]=raw[s][line].slice(
-0,
-minLength
-);
-smoothed[s][line]=savgol(
-cleaned[s][line],
-window,
-3
-);
-}
-}
-const meta=parseFilenameMeta(state.file.name);
-state.readCache={
-workbook:wb,
-params:p,
-samples:expected,
-lines,
-sampleLines,
-raw:cleaned,
-smoothed,
-distance,
-minLength,
-duration,
-fs,
-dx,
-sgWindow:window,
-sgWindowRequestedSec:p.sgWindowSec,
-sgWindowSec:window/fs,
-sgWindowMm:window*dx,
-lengths,
-filenameMeta:meta
+
+  if(!state.file){
+
+    setStatus(
+      tr('needFile'),
+      'bad'
+    );
+
+    return;
+  }
+
+  setStatus(
+    tr('reading')
+  );
+
+  try{
+
+    clearAnalysisUi();
+
+    state.readCache=null;
+    state.lineColors={};
+
+    el('detected').innerHTML='';
+    el('colorsSection').hidden=true;
+    el('analyzeBtn').hidden=true;
+
+    const p=
+      getParams();
+
+    const buf=
+      await state.file.arrayBuffer();
+
+    const wb=
+      XLSX.read(
+        buf,
+        {type:'array'}
+      );
+
+    const expected=
+      Array.from(
+        {
+          length:p.expectedSamples
+        },
+        (_,i)=>`S${i+1}`
+      );
+
+    const sampleSheets=
+      wb.SheetNames
+        .filter(
+          n=>/^S\d+$/i.test(n)
+        )
+        .sort(
+          (a,b)=>
+            naturalNum(a)-
+            naturalNum(b)
+        );
+
+    if(
+      sampleSheets.length!==expected.length ||
+      expected.some(
+        (s,i)=>
+          sampleSheets[i]!==s
+      )
+    ){
+
+      throw new Error(
+        `${tr('sheetMismatch')} [${sampleSheets.join(', ')}]`
+      );
+    }
+
+    const raw={};
+    const lengths=[];
+    const sampleLines={};
+    const allLineSet=
+      new Set();
+
+    for(const s of expected){
+
+      const aoa=
+        XLSX.utils.sheet_to_json(
+          wb.Sheets[s],
+          {
+            header:1,
+            defval:null,
+            raw:true
+          }
+        );
+
+      let headers;
+
+      try{
+
+        headers=
+          detectLineHeaders(
+            aoa[0]
+          );
+
+      }catch(e){
+
+        throw new Error(
+          `${e.message} (${s})`
+        );
+      }
+
+      sampleLines[s]=headers;
+
+      headers.forEach(
+        line=>
+          allLineSet.add(line)
+      );
+
+      raw[s]={};
+
+      headers.forEach(
+        (line,c)=>{
+
+          raw[s][line]=
+            cleanLineValues(
+              aoa,
+              c
+            );
+
+          lengths.push({
+            Sample:s,
+            Line:line,
+            Valid_Length:
+              raw[s][line].length
+          });
+        }
+      );
+    }
+
+    const lines=
+      [...allLineSet]
+        .sort(
+          (a,b)=>
+            naturalNum(a)-
+            naturalNum(b)
+        );
+
+    if(!lines.length){
+
+      throw new Error(
+        tr('noLines')
+      );
+    }
+
+    const minLength=
+      Math.min(
+        ...lengths.map(
+          x=>x.Valid_Length
+        )
+      );
+
+    if(
+      !Number.isFinite(minLength) ||
+      minLength<5
+    ){
+
+      throw new Error(
+        tr('noValid')
+      );
+    }
+
+    const duration=
+      p.scanLength/
+      p.scanSpeed;
+
+    const fs=
+      minLength/
+      duration;
+
+    const dx=
+      p.scanSpeed/
+      fs;
+
+    const distance=
+      Array.from(
+        {length:minLength},
+        (_,i)=>i*dx
+      );
+
+    const window=
+      validSgWindow(
+        fs,
+        minLength,
+        p.sgWindowSec
+      );
+
+    const cleaned={};
+    const smoothed={};
+
+    for(const s of expected){
+
+      cleaned[s]={};
+      smoothed[s]={};
+
+      for(
+        const line
+        of sampleLines[s]
+      ){
+
+        cleaned[s][line]=
+          raw[s][line].slice(
+            0,
+            minLength
+          );
+
+        smoothed[s][line]=
+          savgol(
+            cleaned[s][line],
+            window,
+            3
+          );
+      }
+    }
+
+    const meta=
+      parseFilenameMeta(
+        state.file.name
+      );
+
+    state.readCache={
+      workbook:wb,
+      params:p,
+      samples:expected,
+      lines,
+      sampleLines,
+      raw:cleaned,
+      smoothed,
+      distance,
+      minLength,
+      duration,
+      fs,
+      dx,
+      sgWindow:window,
+      sgWindowRequestedSec:
+        p.sgWindowSec,
+      sgWindowSec:
+        window/fs,
+      sgWindowMm:
+        window*dx,
+      lengths,
+      filenameMeta:meta
+    };
+
+    initializeLineColors(
+      lines
+    );
+
+    state.selectedLines=
+      new Set(lines);
+
+    renderDetected(
+      state.readCache
+    );
+
+    renderColorOptions();
+
+    el('analyzeBtn').hidden=false;
+
+    setStatus(
+      tr('readyToAnalyze'),
+      'good'
+    );
+
+  }catch(err){
+
+    console.error(err);
+
+    state.readCache=null;
+    state.dataset=null;
+
+    el('detected').innerHTML='';
+    el('colorOptions').innerHTML='';
+    el('colorsSection').hidden=true;
+    el('analyzeBtn').hidden=true;
+
+    setStatus(
+      err.message||String(err),
+      'bad'
+    );
+  }
 };
-initializeLineColors(lines);
-state.selectedLines=new Set(lines);
-renderDetected(state.readCache);
-renderColorOptions();
-el('analyzeBtn').hidden=false;
-setStatus(tr('readyToAnalyze'),'good');
-}catch(err){
-console.error(err);
-state.readCache=null;
-state.dataset=null;
-el('detected').innerHTML='';
-el('colorOptions').innerHTML='';
-el('colorsSection').hidden=true;
-el('analyzeBtn').hidden=true;
-setStatus(
-err.message||String(err),
-'bad'
-);
-}
-};
+
 el('analyzeBtn').onclick=async()=>{
-if(!state.readCache){
-setStatus(tr('needReadFirst'),'bad');
-return;
+
+  if(!state.readCache){
+
+    setStatus(
+      tr('needReadFirst'),
+      'bad'
+    );
+
+    return;
+  }
+
+  state.dataset=
+    state.readCache;
+
+  state.currentMode=null;
+
+  state.selectedSample=
+    state.dataset.samples[0];
+
+  state.selectedLines=
+    new Set(
+      state.dataset.lines
+    );
+
+  state.ranges={};
+
+  state.rangeApplyAll={
+    interval:false
+  };
+
+  state.meanSettings={};
+
+  state.results={
+    extrema:{},
+    auc:{},
+    mean:{},
+    notchSlope:{}
+  };
+
+  state.dataset.samples.forEach(s=>{
+
+    state.ranges[s]=[
+      0,
+      state.dataset.params.scanLength
+    ];
+  });
+
+  populateSampleSelect();
+  renderLineToggles();
+  renderRegionManager();
+
+  setStatus(
+    tr('analysisStarted'),
+    'good'
+  );
+
+  await activateMode(
+    'raw',
+    true
+  );
+};
+
+function renderDetected(
+  d=state.dataset||
+    state.readCache
+){
+
+  if(!d)return;
+
+  const m=
+    d.filenameMeta;
+
+  const p=
+    d.params;
+
+  const freqState=
+    Number.isFinite(
+      m.frequency
+    )
+    ?(
+      Math.abs(
+        m.frequency-
+        p.excitation
+      )<1e-9
+      ?tr('match')
+      :tr('mismatch')
+    )
+    :tr('notDetected');
+
+  const sigState=
+    m.signal
+    ?(
+      m.signal===p.signalType
+      ?tr('match')
+      :tr('mismatch')
+    )
+    :tr('notDetected');
+
+  const lineCounts=
+    d.samples.map(
+      s=>
+        `${s}:${
+          (
+            d.sampleLines?.[s]||
+            d.lines
+          ).length
+        }`
+    ).join(' · ');
+
+  const chips=[
+    `<span class="badge good">${tr('detectedLines')}: ${d.lines.length} · ${d.lines.join(', ')}</span>`,
+    `<span class="badge good">Lines/sample: ${lineCounts}</span>`,
+    `<span class="badge good">${tr('minLength')}: ${d.minLength}</span>`,
+    `<span class="badge good">${tr('duration')}: ${fmt(d.duration,4)} s</span>`,
+    `<span class="badge good">${tr('samplingRate')}: ${fmt(d.fs,3)} Hz</span>`,
+    `<span class="badge good">${tr('distanceStep')}: ${fmt(d.dx,6)} mm</span>`,
+    `<span class="badge good">${tr('sgWindow')}: ${d.sgWindow} samples · ${(d.sgWindowSec*1000).toFixed(1)} ms · ${(d.sgWindowMm*1000).toFixed(1)} µm</span>`,
+    `<span class="badge ${
+      freqState===tr('match')
+      ?'good'
+      :'warn'
+    }">${tr('filenameMeta')} F: ${
+      Number.isFinite(m.frequency)
+      ?m.frequency+' kHz'
+      :tr('notDetected')
+    } · ${freqState}</span>`,
+    `<span class="badge ${
+      sigState===tr('match')
+      ?'good'
+      :'warn'
+    }">${tr('filenameMeta')} Signal: ${
+      m.signal||
+      tr('notDetected')
+    } · ${sigState}</span>`
+  ];
+
+  el('detected').innerHTML=
+    chips.join('');
 }
-state.dataset=state.readCache;
-state.currentMode=null;
-state.selectedSample=state.dataset.samples[0];
-state.selectedLines=new Set(state.dataset.lines);
-state.ranges={};
-state.rangeApplyAll={
-interval:false
-};
-state.meanSettings={};
-state.results={
-extrema:{},
-auc:{},
-mean:{},
-notchSlope:{}
-};
-state.dataset.samples.forEach(s=>{
-state.ranges[s]=[
-0,
-state.dataset.params.scanLength
-];
-});
-populateSampleSelect();
-renderLineToggles();
-renderRegionManager();
-setStatus(tr('analysisStarted'),'good');
-await activateMode('raw',true);
-};
-function renderDetected(d=state.dataset||state.readCache){
-if(!d)return;
-const m=d.filenameMeta;
-const p=d.params;
-const freqState=
-Number.isFinite(m.frequency)
-?(
-Math.abs(m.frequency-p.excitation)<1e-9
-?tr('match')
-:tr('mismatch')
-)
-:tr('notDetected');
-const sigState=
-m.signal
-?(
-m.signal===p.signalType
-?tr('match')
-:tr('mismatch')
-)
-:tr('notDetected');
-const lineCounts=d.samples.map(
-s=>`${s}:${(d.sampleLines?.[s]||d.lines).length}`
-).join(' · ');
-const chips=[
-`<span class="badge good">${tr('detectedLines')}: ${d.lines.length} · ${d.lines.join(', ')}</span>`,
-`<span class="badge good">Lines/sample: ${lineCounts}</span>`,
-`<span class="badge good">${tr('minLength')}: ${d.minLength}</span>`,
-`<span class="badge good">${tr('duration')}: ${fmt(d.duration,4)} s</span>`,
-`<span class="badge good">${tr('samplingRate')}: ${fmt(d.fs,3)} Hz</span>`,
-`<span class="badge good">${tr('distanceStep')}: ${fmt(d.dx,6)} mm</span>`,
-`<span class="badge good">${tr('sgWindow')}: ${d.sgWindow} samples · ${(d.sgWindowSec*1000).toFixed(1)} ms · ${(d.sgWindowMm*1000).toFixed(1)} µm</span>`,
-`<span class="badge ${freqState===tr('match')?'good':'warn'}">${tr('filenameMeta')} F: ${Number.isFinite(m.frequency)?m.frequency+' kHz':tr('notDetected')} · ${freqState}</span>`,
-`<span class="badge ${sigState===tr('match')?'good':'warn'}">${tr('filenameMeta')} Signal: ${m.signal||tr('notDetected')} · ${sigState}</span>`
-];
-el('detected').innerHTML=chips.join('');
-}
+
 function populateSampleSelect(){
-el('sampleSelect').innerHTML=state.dataset.samples.map(
-s=>`<option value="${s}">${s}</option>`
-).join('');
-el('sampleSelect').value=state.selectedSample;
+
+  el('sampleSelect').innerHTML=
+    state.dataset.samples
+      .map(
+        s=>
+          `<option value="${s}">${s}</option>`
+      )
+      .join('');
+
+  el('sampleSelect').value=
+    state.selectedSample;
 }
-el('sampleSelect').addEventListener('change',async()=>{
-state.selectedSample=el('sampleSelect').value;
-if(state.currentMode==='intervalMean'){
-ensureMeanSetting(state.selectedSample);
-syncMeanControls();
-}
-renderLineToggles();
-syncRangeInputs();
-renderRegionManager();
-await renderCurrentMode();
-if(state.currentMode==='intervalMean'){
-renderMeanResultTable(state.selectedSample);
-}
-});
+
+el('sampleSelect').addEventListener(
+  'change',
+  async()=>{
+
+    state.selectedSample=
+      el('sampleSelect').value;
+
+    if(
+      state.currentMode===
+      'intervalMean'
+    ){
+      ensureMeanSetting(
+        state.selectedSample
+      );
+
+      syncMeanControls();
+    }
+
+    renderLineToggles();
+    syncRangeInputs();
+    renderRegionManager();
+
+    await renderCurrentMode();
+
+    if(
+      state.currentMode===
+      'intervalMean'
+    ){
+      renderMeanResultTable(
+        state.selectedSample
+      );
+    }
+  }
+);
+
 const modeInfo={
+
 raw:{
-title:'modeRaw',
-sub:'rawSub',
-folder:'Raw data'
+  title:'modeRaw',
+  sub:'rawSub',
+  folder:'Raw data'
 },
+
 sg:{
-title:'modeSG',
-sub:'sgSub',
-folder:'SG smoothing'
+  title:'modeSG',
+  sub:'sgSub',
+  folder:'SG smoothing'
 },
+
 interval:{
-title:'modeInterval',
-sub:'intervalSub',
-folder:'Interval analysis'
+  title:'modeInterval',
+  sub:'intervalSub',
+  folder:'Interval analysis'
 },
+
 intervalMean:{
-title:'modeIntervalMean',
-sub:'intervalMeanSub',
-folder:'Interval Mean Cal'
+  title:'modeIntervalMean',
+  sub:'intervalMeanSub',
+  folder:'Interval Mean Cal'
 }
+
 };
-document.querySelectorAll('.analysis-btn').forEach(btn=>{
-btn.addEventListener(
-'click',
-()=>activateMode(btn.dataset.mode,true)
-);
+
+document.querySelectorAll(
+  '.analysis-btn'
+).forEach(btn=>{
+
+  btn.addEventListener(
+    'click',
+    ()=>activateMode(
+      btn.dataset.mode,
+      true
+    )
+  );
 });
-async function activateMode(mode,updateButtons=true){
-if(mode==='intervalMean'&&state.cidType==='4680'){
-return;
+
+async function activateMode(
+  mode,
+  updateButtons=true
+){
+
+  if(
+    mode==='intervalMean' &&
+    state.cidType==='4680'
+  ){
+    return;
+  }
+
+  if(!state.dataset){
+
+    setStatus(
+      state.readCache
+      ?tr('needAnalyze')
+      :tr('needRead'),
+      'bad'
+    );
+
+    return;
+  }
+
+  state.currentMode=mode;
+
+  if(updateButtons){
+
+    document.querySelectorAll(
+      '.analysis-btn'
+    ).forEach(b=>{
+
+      b.classList.toggle(
+        'active',
+        b.dataset.mode===mode
+      );
+    });
+  }
+
+  el('actions').classList.add(
+    'visible'
+  );
+
+  el('analysisControls').classList.add(
+    'visible'
+  );
+
+  el('resultTitle').textContent=
+    tr(
+      modeInfo[mode].title
+    );
+
+  el('resultSub').textContent=
+    tr(
+      modeInfo[mode].sub
+    );
+
+  const interval=
+    mode==='interval';
+
+  const mean=
+    mode==='intervalMean';
+
+  const needsRange=
+    interval||mean;
+
+  el('rangeControls').style.display=
+    needsRange
+    ?'flex'
+    :'none';
+
+  el('meanSetup').style.display=
+    mean
+    ?'flex'
+    :'none';
+
+  el('intervalActions').style.display=
+    interval
+    ?'flex'
+    :'none';
+
+  syncRangeApplyAllToggle();
+
+  el('meanActions').style.display=
+    mean
+    ?'flex'
+    :'none';
+
+  el('regionManager').classList.toggle(
+    'visible',
+    mean
+  );
+
+  el('lineControlLabel').textContent=
+    tr('lines');
+
+  const hintText=
+    mean
+    ?''
+    :tr(
+      interval
+      ?'hintInterval'
+      :(
+        mode==='sg'
+        ?'hintSG'
+        :'hintRaw'
+      )
+    );
+
+  el('controlHint').textContent=
+    hintText;
+
+  el('controlHint').style.display=
+    hintText
+    ?'block'
+    :'none';
+
+  el('resultTableWrap').innerHTML='';
+
+  if(mean){
+
+    ensureMeanSetting(
+      state.selectedSample
+    );
+
+    syncMeanControls();
+    renderLineToggles();
+  }
+
+  syncRangeInputs();
+  renderRegionManager();
+
+  await renderCurrentMode();
+
+  if(mean){
+    renderMeanResultTable(
+      state.selectedSample
+    );
+  }
 }
-if(!state.dataset){
-setStatus(
-state.readCache?tr('needAnalyze'):tr('needRead'),
-'bad'
-);
-return;
+
+function rangeApplyAllEnabled(
+  mode=state.currentMode
+){
+
+  return(
+    mode==='interval' &&
+    !!state.rangeApplyAll?.interval
+  );
 }
-state.currentMode=mode;
-if(updateButtons){
-document.querySelectorAll('.analysis-btn').forEach(b=>{
-b.classList.toggle(
-'active',
-b.dataset.mode===mode
-);
-});
-}
-el('actions').classList.add('visible');
-el('analysisControls').classList.add('visible');
-el('resultTitle').textContent=tr(modeInfo[mode].title);
-el('resultSub').textContent=tr(modeInfo[mode].sub);
-const interval=mode==='interval';
-const mean=mode==='intervalMean';
-const needsRange=interval||mean;
-el('rangeControls').style.display=
-needsRange?'flex':'none';
-el('meanSetup').style.display=
-mean?'flex':'none';
-el('intervalActions').style.display=
-interval?'flex':'none';
-syncRangeApplyAllToggle();
-el('meanActions').style.display=
-mean?'flex':'none';
-el('regionManager').classList.toggle(
-'visible',
-mean
-);
-el('lineControlLabel').textContent=tr('lines');
-const hintText=
-mean
-?''
-:tr(
-interval
-?'hintInterval'
-:(
-mode==='sg'
-?'hintSG'
-:'hintRaw'
-)
-);
-el('controlHint').textContent=hintText;
-el('controlHint').style.display=
-hintText?'block':'none';
-el('resultTableWrap').innerHTML='';
-if(mean){
-ensureMeanSetting(state.selectedSample);
-syncMeanControls();
-renderLineToggles();
-}
-syncRangeInputs();
-renderRegionManager();
-await renderCurrentMode();
-if(mean){
-renderMeanResultTable(state.selectedSample);
-}
-}
-function rangeApplyAllEnabled(mode=state.currentMode){
-return(
-mode==='interval'&&
-!!state.rangeApplyAll?.interval
-);
-}
+
 function syncRangeApplyAllToggle(){
-const btn=el('intervalApplyAllToggle');
-if(!btn){
-return;
+
+  const btn=
+    el('intervalApplyAllToggle');
+
+  if(!btn){
+    return;
+  }
+
+  const on=
+    rangeApplyAllEnabled();
+
+  btn.classList.toggle(
+    'on',
+    on
+  );
+
+  btn.setAttribute(
+    'aria-pressed',
+    on
+    ?'true'
+    :'false'
+  );
 }
-const on=rangeApplyAllEnabled();
-btn.classList.toggle('on',on);
-btn.setAttribute(
-'aria-pressed',
-on?'true':'false'
-);
-}
+
 function applyRangeToAllSamples(range){
-if(!state.dataset){
-return;
+
+  if(!state.dataset){
+    return;
+  }
+
+  for(
+    const sample
+    of state.dataset.samples
+  ){
+
+    state.ranges[sample]=[
+      range[0],
+      range[1]
+    ];
+  }
 }
-for(const sample of state.dataset.samples){
-state.ranges[sample]=[
-range[0],
-range[1]
-];
-}
-}
-el('intervalApplyAllToggle').onclick=async()=>{
-if(state.currentMode!=='interval'){
-return;
-}
-const mode='interval';
-state.rangeApplyAll.interval=!state.rangeApplyAll.interval;
-syncRangeApplyAllToggle();
-if(state.rangeApplyAll.interval){
-try{
-const range=readRangeInputs();
-applyRangeToAllSamples(range);
-setStatus(tr('rangeApplyAllOn'),'good');
-await renderCurrentMode();
-}catch(e){
-state.rangeApplyAll.interval=false;
-syncRangeApplyAllToggle();
-setStatus(e.message||String(e),'bad');
-}
-}else{
-setStatus(tr('rangeApplyAllOff'));
-}
+
+el('intervalApplyAllToggle').onclick=
+async()=>{
+
+  if(
+    state.currentMode!=='interval'
+  ){
+    return;
+  }
+
+  state.rangeApplyAll.interval=
+    !state.rangeApplyAll.interval;
+
+  syncRangeApplyAllToggle();
+
+  if(
+    state.rangeApplyAll.interval
+  ){
+
+    try{
+
+      const range=
+        readRangeInputs();
+
+      applyRangeToAllSamples(
+        range
+      );
+
+      setStatus(
+        tr('rangeApplyAllOn'),
+        'good'
+      );
+
+      await renderCurrentMode();
+
+    }catch(e){
+
+      state.rangeApplyAll.interval=false;
+
+      syncRangeApplyAllToggle();
+
+      setStatus(
+        e.message||String(e),
+        'bad'
+      );
+    }
+
+  }else{
+
+    setStatus(
+      tr('rangeApplyAllOff')
+    );
+  }
 };
+
 function syncRangeInputs(){
-if(!state.dataset||!state.selectedSample){
-return;
+
+  if(
+    !state.dataset ||
+    !state.selectedSample
+  ){
+    return;
+  }
+
+  const r=
+    state.ranges[
+      state.selectedSample
+    ]||
+    [
+      0,
+      state.dataset.params.scanLength
+    ];
+
+  el('rangeStart').value=
+    fmt(
+      r[0],
+      4
+    );
+
+  el('rangeEnd').value=
+    fmt(
+      r[1],
+      4
+    );
 }
-const r=
-state.ranges[state.selectedSample]||
-[0,state.dataset.params.scanLength];
-el('rangeStart').value=fmt(r[0],4);
-el('rangeEnd').value=fmt(r[1],4);
-}
+
 function readRangeInputs(){
-const d=state.dataset;
-let a=Number(el('rangeStart').value);
-let b=Number(el('rangeEnd').value);
-a=clamp(
-a,
-0,
-d.params.scanLength
-);
-b=clamp(
-b,
-0,
-d.params.scanLength
-);
-if(!(b>a)){
-throw new Error(tr('rangeInvalid'));
+
+  const d=
+    state.dataset;
+
+  let a=
+    Number(
+      el('rangeStart').value
+    );
+
+  let b=
+    Number(
+      el('rangeEnd').value
+    );
+
+  a=clamp(
+    a,
+    0,
+    d.params.scanLength
+  );
+
+  b=clamp(
+    b,
+    0,
+    d.params.scanLength
+  );
+
+  if(!(b>a)){
+
+    throw new Error(
+      tr('rangeInvalid')
+    );
+  }
+
+  state.ranges[
+    state.selectedSample
+  ]=[
+    a,
+    b
+  ];
+
+  return[
+    a,
+    b
+  ];
 }
-state.ranges[state.selectedSample]=[a,b];
-return[a,b];
-}
+
 [
-'rangeStart',
-'rangeEnd'
+  'rangeStart',
+  'rangeEnd'
 ].forEach(id=>{
-el(id).addEventListener('change',async()=>{
-try{
-const range=readRangeInputs();
-if(rangeApplyAllEnabled()){
-applyRangeToAllSamples(range);
-}
-if(state.currentMode==='intervalMean'){
-invalidateMeanSample(state.selectedSample);
-}
-if(
-state.currentMode==='interval'||
-state.currentMode==='intervalMean'
-){
-await renderCurrentMode();
-}
-}catch(e){
-setStatus(e.message,'bad');
-}
+
+  el(id).addEventListener(
+    'change',
+    async()=>{
+
+      try{
+
+        const range=
+          readRangeInputs();
+
+        if(
+          rangeApplyAllEnabled()
+        ){
+
+          applyRangeToAllSamples(
+            range
+          );
+        }
+
+        if(
+          state.currentMode===
+          'intervalMean'
+        ){
+
+          invalidateMeanSample(
+            state.selectedSample
+          );
+        }
+
+        if(
+          state.currentMode==='interval' ||
+          state.currentMode==='intervalMean'
+        ){
+
+          await renderCurrentMode();
+        }
+
+      }catch(e){
+
+        setStatus(
+          e.message,
+          'bad'
+        );
+      }
+    }
+  );
 });
-});
+
 function regionFill(i){
-const fills=[
-'rgba(37,99,235,.10)',
-'rgba(5,150,105,.10)',
-'rgba(217,119,6,.11)',
-'rgba(124,58,237,.10)',
-'rgba(220,38,38,.09)',
-'rgba(8,145,178,.10)'
-];
-return fills[i%fills.length];
+
+  const fills=[
+    'rgba(37,99,235,.10)',
+    'rgba(5,150,105,.10)',
+    'rgba(217,119,6,.11)',
+    'rgba(124,58,237,.10)',
+    'rgba(220,38,38,.09)',
+    'rgba(8,145,178,.10)'
+  ];
+
+  return fills[
+    i%fills.length
+  ];
 }
-function baseLayout(title,mode,sample){
-const d=state.dataset;
-const layout={
-margin:{
-l:76,
-r:28,
-t:30,
-b:78
-},
-paper_bgcolor:'#fff',
-plot_bgcolor:'#fff',
-font:{
-family:'Inter, sans-serif',
-color:'#111827'
-},
-xaxis:{
-title:{
-text:tr('distanceAxis'),
-font:{size:13}
-},
-showgrid:false,
-zeroline:false,
-linecolor:'#9aa1ad',
-linewidth:1.3,
-range:[0,d.params.scanLength]
-},
-yaxis:{
-title:{
-text:sensorAxis(),
-font:{size:13}
-},
-showgrid:false,
-zeroline:false,
-linecolor:'#9aa1ad',
-linewidth:1.3
-},
-legend:{
-orientation:'h',
-y:-.20,
-x:.5,
-xanchor:'center'
-},
-hovermode:'x unified',
-dragmode:'zoom',
-title:{
-text:`${title} · ${sample}`,
-font:{size:14},
-x:.01,
-xanchor:'left'
-},
-shapes:[
-{
-type:'line',
-x0:d.params.notchPosition,
-x1:d.params.notchPosition,
-y0:0,
-y1:1,
-yref:'paper',
-editable:false,
-line:{
-color:'#000000',
-width:2.5,
-dash:'dash'
-}
-}
-],
-annotations:[
-{
-x:d.params.notchPosition,
-y:1.02,
-yref:'paper',
-text:tr('notch'),
-showarrow:false,
-font:{
-size:11,
-color:'#000000'
-}
-}
-]
-};
-if(
-mode==='interval'||
-mode==='intervalMean'
+
+function baseLayout(
+  title,
+  mode,
+  sample
 ){
-const r=
-state.ranges[sample]||
-[0,d.params.scanLength];
-layout.shapes.push(
-{
-type:'line',
-x0:r[0],
-x1:r[0],
-y0:0,
-y1:1,
-yref:'paper',
-editable:false,
-line:{
-color:'#b00000',
-width:2.5,
-dash:'dash'
+
+  const d=
+    state.dataset;
+
+  const layout={
+
+    margin:{
+      l:76,
+      r:28,
+      t:30,
+      b:78
+    },
+
+    paper_bgcolor:'#fff',
+    plot_bgcolor:'#fff',
+
+    font:{
+      family:'Inter, sans-serif',
+      color:'#111827'
+    },
+
+    xaxis:{
+      title:{
+        text:tr('distanceAxis'),
+        font:{
+          size:13
+        }
+      },
+      showgrid:false,
+      zeroline:false,
+      linecolor:'#9aa1ad',
+      linewidth:1.3,
+      range:[
+        0,
+        d.params.scanLength
+      ]
+    },
+
+    yaxis:{
+      title:{
+        text:sensorAxis(),
+        font:{
+          size:13
+        }
+      },
+      showgrid:false,
+      zeroline:false,
+      linecolor:'#9aa1ad',
+      linewidth:1.3
+    },
+
+    legend:{
+      orientation:'h',
+      y:-.20,
+      x:.5,
+      xanchor:'center'
+    },
+
+    hovermode:'x unified',
+    dragmode:'zoom',
+
+    title:{
+      text:`${title} · ${sample}`,
+      font:{
+        size:14
+      },
+      x:.01,
+      xanchor:'left'
+    },
+
+    shapes:[
+      {
+        type:'line',
+        x0:d.params.notchPosition,
+        x1:d.params.notchPosition,
+        y0:0,
+        y1:1,
+        yref:'paper',
+        editable:false,
+        line:{
+          color:'#000000',
+          width:2.5,
+          dash:'dash'
+        }
+      }
+    ],
+
+    annotations:[
+      {
+        x:d.params.notchPosition,
+        y:1.02,
+        yref:'paper',
+        text:tr('notch'),
+        showarrow:false,
+        font:{
+          size:11,
+          color:'#000000'
+        }
+      }
+    ]
+  };
+
+  if(
+    mode==='interval' ||
+    mode==='intervalMean'
+  ){
+
+    const r=
+      state.ranges[sample]||
+      [
+        0,
+        d.params.scanLength
+      ];
+
+    layout.shapes.push(
+      {
+        type:'line',
+        x0:r[0],
+        x1:r[0],
+        y0:0,
+        y1:1,
+        yref:'paper',
+        editable:false,
+        line:{
+          color:'#b00000',
+          width:2.5,
+          dash:'dash'
+        }
+      },
+
+      {
+        type:'line',
+        x0:r[1],
+        x1:r[1],
+        y0:0,
+        y1:1,
+        yref:'paper',
+        editable:false,
+        line:{
+          color:'#b00000',
+          width:2.5,
+          dash:'dash'
+        }
+      }
+    );
+  }
+
+  return layout;
 }
-},
-{
-type:'line',
-x0:r[1],
-x1:r[1],
-y0:0,
-y1:1,
-yref:'paper',
-editable:false,
-line:{
-color:'#b00000',
-width:2.5,
-dash:'dash'
-}
-}
-);
-}
-return layout;
-}
-function selectedLineList(sample=state.selectedSample){
-const available=
-state.dataset.sampleLines?.[sample]||
-state.dataset.lines;
-return available.filter(
-l=>state.selectedLines.has(l)
-);
-}
-function displayLineList(sample=state.selectedSample){
-return selectedLineList(sample);
-}
-function interpolatedYAtX(x,y,targetX){
-const n=Math.min(
-Array.isArray(x)?x.length:0,
-Array.isArray(y)?y.length:0
-);
-if(
-n===0||
-!Number.isFinite(targetX)||
-targetX<x[0]||
-targetX>x[n-1]
+
+function selectedLineList(
+  sample=state.selectedSample
 ){
-return NaN;
+
+  const available=
+    state.dataset.sampleLines?.[
+      sample
+    ]||
+    state.dataset.lines;
+
+  return available.filter(
+    l=>
+      state.selectedLines.has(l)
+  );
 }
-if(n===1){
-return y[0];
-}
-let hi=1;
-while(
-hi<n&&
-x[hi]<targetX
+
+function displayLineList(
+  sample=state.selectedSample
 ){
-hi++;
+  return selectedLineList(sample);
 }
-if(hi>=n){
-return y[n-1];
-}
-const lo=Math.max(0,hi-1);
-const x0=x[lo];
-const x1=x[hi];
-const y0=y[lo];
-const y1=y[hi];
-if(Math.abs(x1-x0)<=1e-15){
-return y0;
-}
-const t=clamp(
-(targetX-x0)/(x1-x0),
-0,
-1
-);
-return y0+(y1-y0)*t;
-}
-function notchValueForLine(sample,line){
-return interpolatedYAtX(
-state.dataset.distance,
-state.dataset.smoothed?.[sample]?.[line],
-state.dataset.params.notchPosition
-);
-}
-function appendNotchPointTrace(traces,sample,line){
-const x=state.dataset.params.notchPosition;
-const y=notchValueForLine(sample,line);
-if(!Number.isFinite(y)){
-return;
-}
-traces.push({
-x:[x],
-y:[y],
-type:'scatter',
-mode:'markers',
-name:`${line} Notch`,
-showlegend:false,
-marker:{
-size:11,
-symbol:'circle',
-color:lineColor(line),
-line:{
-color:'#000000',
-width:1.3
-}
-},
-hovertemplate:
-'x=%{x:.4f} mm<br>Notch=%{y:.6f}<extra>'+
-line+
-'</extra>'
-});
-}
-function aucSegmentData(sample,line,au){
-if(
-!au||
-!Number.isFinite(au.peak1X)||
-!Number.isFinite(au.peak2X)||
-!Number.isFinite(au.peak1Y)||
-!Number.isFinite(au.peak2Y)||
-!Number.isFinite(au.valleyY)||
-!(au.peak2X>au.peak1X)
+
+function interpolatedYAtX(
+  x,
+  y,
+  targetX
 ){
-return null;
+
+  const n=
+    Math.min(
+      Array.isArray(x)
+      ?x.length
+      :0,
+
+      Array.isArray(y)
+      ?y.length
+      :0
+    );
+
+  if(
+    n===0 ||
+    !Number.isFinite(targetX) ||
+    targetX<x[0] ||
+    targetX>x[n-1]
+  ){
+    return NaN;
+  }
+
+  if(n===1){
+    return y[0];
+  }
+
+  let hi=1;
+
+  while(
+    hi<n &&
+    x[hi]<targetX
+  ){
+    hi++;
+  }
+
+  if(hi>=n){
+    return y[n-1];
+  }
+
+  const lo=
+    Math.max(
+      0,
+      hi-1
+    );
+
+  const x0=x[lo];
+  const x1=x[hi];
+  const y0=y[lo];
+  const y1=y[hi];
+
+  if(
+    Math.abs(x1-x0)<=1e-15
+  ){
+    return y0;
+  }
+
+  const t=
+    clamp(
+      (targetX-x0)/
+      (x1-x0),
+      0,
+      1
+    );
+
+  return y0+
+    (y1-y0)*t;
 }
-const d=state.dataset;
-const yAll=d.smoothed?.[sample]?.[line];
-if(!Array.isArray(yAll)){
-return null;
-}
-const i0=clamp(
-Math.round(au.peak1X/d.dx),
-0,
-d.minLength-1
-);
-const i1=clamp(
-Math.round(au.peak2X/d.dx),
-0,
-d.minLength-1
-);
-if(i1-i0<1){
-return null;
-}
-const x=d.distance.slice(i0,i1+1);
-const y=yAll.slice(i0,i1+1);
-const lowerBaseline=x.map(
-()=>au.valleyY
-);
-return{
-x,
-y,
-lowerBaseline
-};
-}
-function lowerAucAreaTrace(sample,line,au){
-const seg=aucSegmentData(sample,line,au);
-if(!seg){
-return null;
-}
-return{
-x:seg.x.concat(seg.x.slice().reverse()),
-y:seg.y.concat(seg.lowerBaseline.slice().reverse()),
-type:'scatter',
-mode:'lines',
-name:`${line} AUC (P1 & P2) area`,
-line:{
-width:0,
-color:'rgba(0,0,0,0)'
-},
-fill:'toself',
-fillcolor:lightLineFill(line,.40,.78),
-showlegend:false,
-hoverinfo:'skip'
-};
-}
-function appendAucOverlayTraces(traces,sample,line,au){
-if(!au){
-return;
-}
-const seg=aucSegmentData(sample,line,au);
-if(!seg){
-return;
-}
-traces.push(
-{
-x:seg.x,
-y:seg.lowerBaseline,
-type:'scatter',
-mode:'lines',
-name:`${line} AUC (P1 & P2) baseline`,
-line:{
-width:1.4,
-dash:'dash',
-color:lineColor(line)
-},
-opacity:.75,
-hovertemplate:
-'x=%{x:.4f} mm<br>MIN baseline=%{y:.6f}<extra>'+line+'</extra>'
-}
-);
-traces.push(
-{
-x:[au.peak1X,au.valleyX,au.peak2X],
-y:[au.peak1Y,au.valleyY,au.peak2Y],
-type:'scatter',
-mode:'lines',
-name:`${line} P1-MIN-P2 slopes`,
-showlegend:false,
-line:{
-width:1.3,
-dash:'dot',
-color:lineColor(line)
-},
-hoverinfo:'skip'
-}
-);
-traces.push(
-{
-x:[au.peak1X,au.peak2X],
-y:[au.peak1Y,au.peak2Y],
-type:'scatter',
-mode:'markers',
-name:`${line} P1 / P2`,
-marker:{
-size:10,
-symbol:'circle-open',
-color:lineColor(line),
-line:{
-color:'#111827',
-width:1.2
-}
-}
-}
-);
-traces.push(
-{
-x:[au.valleyX],
-y:[au.valleyY],
-type:'scatter',
-mode:'markers',
-name:`${line} MIN`,
-marker:{
-size:10,
-symbol:'triangle-down',
-color:lineColor(line),
-line:{
-color:'#111827',
-width:1.1
-}
-}
-}
-);
-if(
-Number.isFinite(au.firstSlopeRefX)&&
-Number.isFinite(au.firstSlopeRefY)
+
+function notchValueForLine(
+  sample,
+  line
 ){
-traces.push(
-{
-x:[au.firstSlopeRefX,au.peak1X],
-y:[au.firstSlopeRefY,au.peak1Y],
-type:'scatter',
-mode:'lines',
-name:`${line} First Slope`,
-showlegend:false,
-line:{
-width:1.4,
-dash:'dot',
-color:lineColor(line)
-},
-hoverinfo:'skip'
+
+  return interpolatedYAtX(
+    state.dataset.distance,
+    state.dataset.smoothed?.[
+      sample
+    ]?.[
+      line
+    ],
+    state.dataset.params.notchPosition
+  );
 }
-);
-traces.push(
-{
-x:[au.firstSlopeRefX],
-y:[au.firstSlopeRefY],
-type:'scatter',
-mode:'markers',
-name:`${line} Notch - 1 mm`,
-marker:{
-size:10,
-symbol:'square',
-color:lineColor(line),
-line:{
-color:'#111827',
-width:1.2
-}
-},
-hovertemplate:
-'x=%{x:.4f} mm<br>y=%{y:.6f}<extra>'+line+' · Notch - 1 mm</extra>'
-}
-);
-}
-}
-function makeTraces(sample,mode){
-const d=state.dataset;
-const source=mode==='raw'?d.raw:d.smoothed;
-const traces=[];
-if(mode==='interval'){
-for(const line of selectedLineList(sample)){
-const au=
-state.results.auc?.[sample]?.[line];
-const lowerArea=
-lowerAucAreaTrace(sample,line,au);
-if(lowerArea){
-traces.push(lowerArea);
-}
-}
-}
-for(const line of displayLineList(sample)){
-traces.push(
-{
-x:d.distance,
-y:source[sample][line],
-type:'scatter',
-mode:'lines',
-name:
-`${line} · ${
-mode==='raw'
-?tr('rawLegend')
-:tr('sgLegend')
-}`,
-showlegend:true,
-line:{
-width:mode==='raw'?1.5:2.2,
-color:lineColor(line)
-},
-hovertemplate:
-'x=%{x:.4f} mm<br>y=%{y:.6f}<extra>'+
-line+
-'</extra>'
-}
-);
-}
-if(mode==='interval'){
-for(const line of selectedLineList(sample)){
-appendAucOverlayTraces(
-traces,
-sample,
-line,
-state.results.auc?.[sample]?.[line]
-);
-appendNotchPointTrace(
-traces,
-sample,
-line
-);
-}
-}
-if(mode==='intervalMean'){
-for(const line of selectedLineList(sample)){
-const rows=
-state.results.mean?.[sample]?.[line]||
-[];
-const meta=rows[0];
-if(
-meta&&
-Number.isFinite(meta.Min1_X_mm)&&
-Number.isFinite(meta.Min2_X_mm)
+
+function appendNotchPointTrace(
+  traces,
+  sample,
+  line
 ){
-traces.push(
-{
-x:[
-meta.Min1_X_mm,
-meta.Min2_X_mm
-],
-y:[
-meta.Min1_Y,
-meta.Min2_Y
-],
-type:'scatter',
-mode:'markers',
-name:`${line} minima`,
-marker:{
-size:10,
-symbol:'triangle-down',
-color:lineColor(line),
-line:{
-color:'#111827',
-width:1
+
+  const x=
+    state.dataset.params.notchPosition;
+
+  const y=
+    notchValueForLine(
+      sample,
+      line
+    );
+
+  if(!Number.isFinite(y)){
+    return;
+  }
+
+  traces.push({
+    x:[x],
+    y:[y],
+    type:'scatter',
+    mode:'markers',
+    name:`${line} Notch`,
+    showlegend:false,
+    marker:{
+      size:11,
+      symbol:'circle',
+      color:lineColor(line),
+      line:{
+        color:'#000000',
+        width:1.3
+      }
+    },
+    hovertemplate:
+      'x=%{x:.4f} mm<br>Notch=%{y:.6f}<extra>'+
+      line+
+      '</extra>'
+  });
 }
+
+function aucSegmentData(
+  sample,
+  line,
+  au
+){
+
+  if(
+    !au ||
+    !Number.isFinite(au.peak1X) ||
+    !Number.isFinite(au.peak2X) ||
+    !Number.isFinite(au.peak1Y) ||
+    !Number.isFinite(au.peak2Y) ||
+    !Number.isFinite(au.valleyY) ||
+    !(au.peak2X>au.peak1X)
+  ){
+    return null;
+  }
+
+  const d=
+    state.dataset;
+
+  const yAll=
+    d.smoothed?.[
+      sample
+    ]?.[
+      line
+    ];
+
+  if(!Array.isArray(yAll)){
+    return null;
+  }
+
+  const i0=
+    clamp(
+      Math.round(
+        au.peak1X/
+        d.dx
+      ),
+      0,
+      d.minLength-1
+    );
+
+  const i1=
+    clamp(
+      Math.round(
+        au.peak2X/
+        d.dx
+      ),
+      0,
+      d.minLength-1
+    );
+
+  if(i1-i0<1){
+    return null;
+  }
+
+  const x=
+    d.distance.slice(
+      i0,
+      i1+1
+    );
+
+  const y=
+    yAll.slice(
+      i0,
+      i1+1
+    );
+
+  const lowerBaseline=
+    x.map(
+      ()=>au.valleyY
+    );
+
+  return{
+    x,
+    y,
+    lowerBaseline
+  };
 }
+
+function lowerAucAreaTrace(
+  sample,
+  line,
+  au
+){
+
+  const seg=
+    aucSegmentData(
+      sample,
+      line,
+      au
+    );
+
+  if(!seg){
+    return null;
+  }
+
+  return{
+    x:
+      seg.x.concat(
+        seg.x
+          .slice()
+          .reverse()
+      ),
+
+    y:
+      seg.y.concat(
+        seg.lowerBaseline
+          .slice()
+          .reverse()
+      ),
+
+    type:'scatter',
+    mode:'lines',
+    name:`${line} AUC (P1 & P2) area`,
+
+    line:{
+      width:0,
+      color:'rgba(0,0,0,0)'
+    },
+
+    fill:'toself',
+
+    fillcolor:
+      lightLineFill(
+        line,
+        .40,
+        .78
+      ),
+
+    showlegend:false,
+    hoverinfo:'skip'
+  };
 }
-);
+
+function appendAucOverlayTraces(
+  traces,
+  sample,
+  line,
+  au
+){
+
+  if(!au){
+    return;
+  }
+
+  const seg=
+    aucSegmentData(
+      sample,
+      line,
+      au
+    );
+
+  if(!seg){
+    return;
+  }
+
+  traces.push(
+    {
+      x:seg.x,
+      y:seg.lowerBaseline,
+      type:'scatter',
+      mode:'lines',
+      name:`${line} AUC (P1 & P2) baseline`,
+      line:{
+        width:1.4,
+        dash:'dash',
+        color:lineColor(line)
+      },
+      opacity:.75,
+      hovertemplate:
+        'x=%{x:.4f} mm<br>MIN baseline=%{y:.6f}<extra>'+
+        line+
+        '</extra>'
+    }
+  );
+
+  traces.push(
+    {
+      x:[
+        au.peak1X,
+        au.valleyX,
+        au.peak2X
+      ],
+
+      y:[
+        au.peak1Y,
+        au.valleyY,
+        au.peak2Y
+      ],
+
+      type:'scatter',
+      mode:'lines',
+      name:`${line} P1-MIN-P2 slopes`,
+      showlegend:false,
+
+      line:{
+        width:1.3,
+        dash:'dot',
+        color:lineColor(line)
+      },
+
+      hoverinfo:'skip'
+    }
+  );
+
+  traces.push(
+    {
+      x:[
+        au.peak1X,
+        au.peak2X
+      ],
+
+      y:[
+        au.peak1Y,
+        au.peak2Y
+      ],
+
+      type:'scatter',
+      mode:'markers',
+      name:`${line} P1 / P2`,
+
+      marker:{
+        size:10,
+        symbol:'circle-open',
+        color:lineColor(line),
+        line:{
+          color:'#111827',
+          width:1.2
+        }
+      }
+    }
+  );
+
+  traces.push(
+    {
+      x:[
+        au.valleyX
+      ],
+
+      y:[
+        au.valleyY
+      ],
+
+      type:'scatter',
+      mode:'markers',
+      name:`${line} MIN`,
+
+      marker:{
+        size:10,
+        symbol:'triangle-down',
+        color:lineColor(line),
+        line:{
+          color:'#111827',
+          width:1.1
+        }
+      }
+    }
+  );
+
+  if(
+    Number.isFinite(
+      au.firstSlopeRefX
+    ) &&
+    Number.isFinite(
+      au.firstSlopeRefY
+    )
+  ){
+
+    traces.push(
+      {
+        x:[
+          au.firstSlopeRefX,
+          au.peak1X
+        ],
+
+        y:[
+          au.firstSlopeRefY,
+          au.peak1Y
+        ],
+
+        type:'scatter',
+        mode:'lines',
+        name:`${line} First Slope`,
+        showlegend:false,
+
+        line:{
+          width:1.4,
+          dash:'dot',
+          color:lineColor(line)
+        },
+
+        hoverinfo:'skip'
+      }
+    );
+
+    traces.push(
+      {
+        x:[
+          au.firstSlopeRefX
+        ],
+
+        y:[
+          au.firstSlopeRefY
+        ],
+
+        type:'scatter',
+        mode:'markers',
+        name:`${line} Notch - 1 mm`,
+
+        marker:{
+          size:10,
+          symbol:'square',
+          color:lineColor(line),
+          line:{
+            color:'#111827',
+            width:1.2
+          }
+        },
+
+        hovertemplate:
+          'x=%{x:.4f} mm<br>y=%{y:.6f}<extra>'+
+          line+
+          ' · Notch - 1 mm</extra>'
+      }
+    );
+  }
 }
+
+function makeTraces(
+  sample,
+  mode
+){
+
+  const d=
+    state.dataset;
+
+  const source=
+    mode==='raw'
+    ?d.raw
+    :d.smoothed;
+
+  const traces=[];
+
+  if(mode==='interval'){
+
+    for(
+      const line
+      of selectedLineList(sample)
+    ){
+
+      const au=
+        state.results.auc?.[
+          sample
+        ]?.[
+          line
+        ];
+
+      const lowerArea=
+        lowerAucAreaTrace(
+          sample,
+          line,
+          au
+        );
+
+      if(lowerArea){
+        traces.push(
+          lowerArea
+        );
+      }
+    }
+  }
+
+  for(
+    const line
+    of displayLineList(sample)
+  ){
+
+    traces.push({
+      x:d.distance,
+      y:source[sample][line],
+      type:'scatter',
+      mode:'lines',
+
+      name:
+        `${line} · ${
+          mode==='raw'
+          ?tr('rawLegend')
+          :tr('sgLegend')
+        }`,
+
+      showlegend:true,
+
+      line:{
+        width:
+          mode==='raw'
+          ?1.5
+          :2.2,
+
+        color:
+          lineColor(line)
+      },
+
+      hovertemplate:
+        'x=%{x:.4f} mm<br>y=%{y:.6f}<extra>'+
+        line+
+        '</extra>'
+    });
+  }
+
+  if(mode==='interval'){
+
+    for(
+      const line
+      of selectedLineList(sample)
+    ){
+
+      appendAucOverlayTraces(
+        traces,
+        sample,
+        line,
+        state.results.auc?.[
+          sample
+        ]?.[
+          line
+        ]
+      );
+
+      appendNotchPointTrace(
+        traces,
+        sample,
+        line
+      );
+    }
+  }
+
+  if(mode==='intervalMean'){
+
+    for(
+      const line
+      of selectedLineList(sample)
+    ){
+
+      const rows=
+        state.results.mean?.[
+          sample
+        ]?.[
+          line
+        ]||
+        [];
+
+      const meta=
+        rows[0];
+
+      if(
+        meta &&
+        Number.isFinite(
+          meta.Min1_X_mm
+        ) &&
+        Number.isFinite(
+          meta.Min2_X_mm
+        )
+      ){
+
+        traces.push(
+          {
+            x:[
+              meta.Min1_X_mm,
+              meta.Min2_X_mm
+            ],
+
+            y:[
+              meta.Min1_Y,
+              meta.Min2_Y
+            ],
+
+            type:'scatter',
+            mode:'markers',
+            name:`${line} minima`,
+
+            marker:{
+              size:10,
+              symbol:'triangle-down',
+              color:lineColor(line),
+
+              line:{
+                color:'#111827',
+                width:1
+              }
+            }
+          }
+        );
+      }
+    }
+  }
+
+  return traces;
 }
-}
-return traces;
-}
+
 const plotConfig={
-responsive:true,
-displaylogo:false,
-modeBarButtonsToRemove:[
-'select2d',
-'lasso2d'
-],
-scrollZoom:false,
-edits:{
-shapePosition:false
-},
-toImageButtonOptions:{
-format:'png',
-filename:'plot',
-height:900,
-width:1600,
-scale:2
-}
+  responsive:true,
+  displaylogo:false,
+
+  modeBarButtonsToRemove:[
+    'select2d',
+    'lasso2d'
+  ],
+
+  scrollZoom:false,
+
+  edits:{
+    shapePosition:false
+  },
+
+  toImageButtonOptions:{
+    format:'png',
+    filename:'plot',
+    height:900,
+    width:1600,
+    scale:2
+  }
 };
+
 async function renderCurrentMode(){
-if(!state.dataset||!state.currentMode){
-return;
+
+  if(
+    !state.dataset ||
+    !state.currentMode
+  ){
+    return;
+  }
+
+  purgeCurrentPlot();
+
+  const sample=
+    state.selectedSample;
+
+  const mode=
+    state.currentMode;
+
+  const title=
+    tr(
+      modeInfo[mode].title
+    );
+
+  el('plots').innerHTML=
+    '<div class="plot-card">'+
+    '<div class="plot-title">'+
+    '<span>'+
+    title+
+    ' · '+
+    sample+
+    '</span>'+
+    '</div>'+
+    '<div id="plot-main" class="plot"></div>'+
+    '</div>';
+
+  const div=
+    el('plot-main');
+
+  const traces=
+    makeTraces(
+      sample,
+      mode
+    );
+
+  const layout=
+    baseLayout(
+      title,
+      mode,
+      sample
+    );
+
+  await Plotly.newPlot(
+    div,
+    traces,
+    layout,
+    plotConfig
+  );
+
+  state.currentPlot=div;
 }
-purgeCurrentPlot();
-const sample=state.selectedSample;
-const mode=state.currentMode;
-const title=tr(modeInfo[mode].title);
-el('plots').innerHTML=
-'<div class="plot-card">'+
-'<div class="plot-title">'+
-'<span>'+
-title+
-' · '+
-sample+
-'</span>'+
-'</div>'+
-'<div id="plot-main" class="plot"></div>'+
-'</div>';
-const div=el('plot-main');
-const traces=makeTraces(sample,mode);
-const layout=baseLayout(
-title,
-mode,
-sample
-);
-await Plotly.newPlot(
-div,
-traces,
-layout,
-plotConfig
-);
-state.currentPlot=div;
-}
+
 function rangeIndices(range){
-const d=state.dataset;
-let i0=Math.ceil(range[0]/d.dx);
-let i1=Math.floor(range[1]/d.dx);
-i0=clamp(
-i0,
-0,
-d.minLength-1
-);
-i1=clamp(
-i1,
-0,
-d.minLength-1
-);
-if(i1-i0<2){
-throw new Error(tr('rangeInvalid'));
+
+  const d=
+    state.dataset;
+
+  let i0=
+    Math.ceil(
+      range[0]/
+      d.dx
+    );
+
+  let i1=
+    Math.floor(
+      range[1]/
+      d.dx
+    );
+
+  i0=
+    clamp(
+      i0,
+      0,
+      d.minLength-1
+    );
+
+  i1=
+    clamp(
+      i1,
+      0,
+      d.minLength-1
+    );
+
+  if(i1-i0<2){
+
+    throw new Error(
+      tr('rangeInvalid')
+    );
+  }
+
+  return[
+    i0,
+    i1
+  ];
 }
-return[i0,i1];
+
+function peakProminence(
+  y,
+  idx,
+  isMax
+){
+
+  const sign=
+    isMax
+    ?1
+    :-1;
+
+  const peak=
+    sign*
+    y[idx];
+
+  let leftMin=peak;
+  let rightMin=peak;
+
+  for(
+    let k=idx-1;
+    k>=0;
+    k--
+  ){
+
+    const v=
+      sign*
+      y[k];
+
+    if(v>peak){
+      break;
+    }
+
+    if(v<leftMin){
+      leftMin=v;
+    }
+  }
+
+  for(
+    let k=idx+1;
+    k<y.length;
+    k++
+  ){
+
+    const v=
+      sign*
+      y[k];
+
+    if(v>peak){
+      break;
+    }
+
+    if(v<rightMin){
+      rightMin=v;
+    }
+  }
+
+  const contour=
+    Math.max(
+      leftMin,
+      rightMin
+    );
+
+  return Math.max(
+    0,
+    peak-contour
+  );
 }
-function peakProminence(y,idx,isMax){
-const sign=isMax?1:-1;
-const peak=sign*y[idx];
-let leftMin=peak;
-let rightMin=peak;
-for(let k=idx-1;k>=0;k--){
-const v=sign*y[k];
-if(v>peak){
-break;
-}
-if(v<leftMin){
-leftMin=v;
-}
-}
-for(let k=idx+1;k<y.length;k++){
-const v=sign*y[k];
-if(v>peak){
-break;
-}
-if(v<rightMin){
-rightMin=v;
-}
-}
-const contour=Math.max(
-leftMin,
-rightMin
-);
-return Math.max(
-0,
-peak-contour
-);
-}
+
 function dominantTwoMaxima(x,y){
-if(y.length<5){
-return null;
+
+  if(y.length<5){
+    return null;
+  }
+
+  const yr=
+    Math.max(...y)-
+    Math.min(...y);
+
+  const threshold=
+    Math.max(
+      1e-12,
+      yr*0.01
+    );
+
+  const maxima=[];
+
+  for(
+    let i=1;
+    i<y.length-1;
+    i++
+  ){
+
+    const d1=
+      y[i]-y[i-1];
+
+    const d2=
+      y[i+1]-y[i];
+
+    if(
+      d1>0 &&
+      d2<=0
+    ){
+
+      const prom=
+        peakProminence(
+          y,
+          i,
+          true
+        );
+
+      if(prom>=threshold){
+
+        maxima.push({
+          i,
+          prom,
+          x:x[i],
+          y:y[i]
+        });
+      }
+    }
+  }
+
+  if(maxima.length<2){
+    return null;
+  }
+
+  maxima.sort(
+    (a,b)=>
+      b.prom-a.prom
+  );
+
+  const selected=
+    maxima
+      .slice(0,2)
+      .sort(
+        (a,b)=>
+          a.i-b.i
+      );
+
+  return{
+    first:selected[0],
+    second:selected[1],
+    maxCandidates:maxima.length,
+    prominenceThreshold:threshold
+  };
 }
-const yr=
-Math.max(...y)-
-Math.min(...y);
-const threshold=Math.max(
-1e-12,
-yr*0.01
-);
-const maxima=[];
-for(let i=1;i<y.length-1;i++){
-const d1=y[i]-y[i-1];
-const d2=y[i+1]-y[i];
-if(d1>0&&d2<=0){
-const prom=peakProminence(
-y,
-i,
-true
-);
-if(prom>=threshold){
-maxima.push({
-i,
-prom,
-x:x[i],
-y:y[i]
-});
-}
-}
-}
-if(maxima.length<2){
-return null;
-}
-maxima.sort(
-(a,b)=>b.prom-a.prom
-);
-const selected=maxima
-.slice(0,2)
-.sort((a,b)=>a.i-b.i);
-return{
-first:selected[0],
-second:selected[1],
-maxCandidates:maxima.length,
-prominenceThreshold:threshold
-};
-}
-function dominantTwoMinima(x,y,minSpacing=0){
-if(y.length<5){
-return null;
-}
-const minima=[];
-for(let i=1;i<y.length-1;i++){
-const d1=y[i]-y[i-1];
-const d2=y[i+1]-y[i];
-if(d1<0&&d2>=0){
-const prom=peakProminence(
-y,
-i,
-false
-);
-minima.push({
-i,
-prom,
-x:x[i],
-y:y[i]
-});
-}
-}
-if(minima.length<2){
-return null;
-}
-minima.sort(
-(a,b)=>a.y-b.y||a.i-b.i
-);
-const first=minima[0];
-const second=minima
-.slice(1)
-.find(
-m=>
-Math.abs(m.x-first.x)>=
-minSpacing-1e-12
-);
-if(!second){
-return null;
-}
-const selected=[
-first,
-second
-].sort(
-(a,b)=>a.i-b.i
-);
-return{
-first:selected[0],
-second:selected[1],
-minCandidates:minima.length,
-prominenceThreshold:NaN
-};
-}
-function lowerAUCFromMinimum(x,y){
-if(
-x.length<3||
-y.length!==x.length
+
+function dominantTwoMinima(
+  x,
+  y,
+  minSpacing=0
 ){
-return null;
+
+  if(y.length<5){
+    return null;
+  }
+
+  const minima=[];
+
+  for(
+    let i=1;
+    i<y.length-1;
+    i++
+  ){
+
+    const d1=
+      y[i]-y[i-1];
+
+    const d2=
+      y[i+1]-y[i];
+
+    if(
+      d1<0 &&
+      d2>=0
+    ){
+
+      const prom=
+        peakProminence(
+          y,
+          i,
+          false
+        );
+
+      minima.push({
+        i,
+        prom,
+        x:x[i],
+        y:y[i]
+      });
+    }
+  }
+
+  if(minima.length<2){
+    return null;
+  }
+
+  minima.sort(
+    (a,b)=>
+      a.y-b.y ||
+      a.i-b.i
+  );
+
+  const first=
+    minima[0];
+
+  const second=
+    minima
+      .slice(1)
+      .find(
+        m=>
+          Math.abs(
+            m.x-first.x
+          )>=
+          minSpacing-
+          1e-12
+      );
+
+  if(!second){
+    return null;
+  }
+
+  const selected=[
+    first,
+    second
+  ].sort(
+    (a,b)=>
+      a.i-b.i
+  );
+
+  return{
+    first:selected[0],
+    second:selected[1],
+    minCandidates:minima.length,
+    prominenceThreshold:NaN
+  };
 }
-const minima=[];
-for(let i=1;i<y.length-1;i++){
-const d1=y[i]-y[i-1];
-const d2=y[i+1]-y[i];
-if(d1<0&&d2>=0){
-minima.push(i);
-}
-}
-let minIndex;
-if(minima.length){
-minIndex=minima[0];
-for(const i of minima){
-if(y[i]<y[minIndex]){
-minIndex=i;
-}
-}
-}else{
-minIndex=1;
-for(let i=2;i<y.length-1;i++){
-if(y[i]<y[minIndex]){
-minIndex=i;
-}
-}
-}
-const valleyX=x[minIndex];
-const valleyY=y[minIndex];
-let signed=0;
-for(let i=0;i<x.length-1;i++){
-const c0=y[i]-valleyY;
-const c1=y[i+1]-valleyY;
-const dx=x[i+1]-x[i];
-signed+=
-(c0+c1)*
-0.5*
-dx;
-}
-return{
-valleyIndex:minIndex,
-valleyX,
-valleyY,
-signedLowerAUC:signed,
-lowerAUC:Math.abs(signed)
-};
-}
-function boundedAUCByIndices(xAll,yAll,startIndex,endIndex,baselineY,capY){
-const a=Math.min(startIndex,endIndex);
-const b=Math.max(startIndex,endIndex);
-if(
-b-a<1||
-a<0||
-b>=Math.min(xAll.length,yAll.length)||
-!Number.isFinite(baselineY)||
-!Number.isFinite(capY)||
-!(capY>baselineY)
+
+function lowerAUCFromMinimum(
+  x,
+  y
 ){
-return null;
+
+  if(
+    x.length<3 ||
+    y.length!==x.length
+  ){
+    return null;
+  }
+
+  const minima=[];
+
+  for(
+    let i=1;
+    i<y.length-1;
+    i++
+  ){
+
+    const d1=
+      y[i]-y[i-1];
+
+    const d2=
+      y[i+1]-y[i];
+
+    if(
+      d1<0 &&
+      d2>=0
+    ){
+      minima.push(i);
+    }
+  }
+
+  let minIndex;
+
+  if(minima.length){
+
+    minIndex=
+      minima[0];
+
+    for(const i of minima){
+
+      if(
+        y[i]<
+        y[minIndex]
+      ){
+        minIndex=i;
+      }
+    }
+
+  }else{
+
+    minIndex=1;
+
+    for(
+      let i=2;
+      i<y.length-1;
+      i++
+    ){
+
+      if(
+        y[i]<
+        y[minIndex]
+      ){
+        minIndex=i;
+      }
+    }
+  }
+
+  const valleyX=
+    x[minIndex];
+
+  const valleyY=
+    y[minIndex];
+
+  let signed=0;
+
+  for(
+    let i=0;
+    i<x.length-1;
+    i++
+  ){
+
+    const c0=
+      y[i]-
+      valleyY;
+
+    const c1=
+      y[i+1]-
+      valleyY;
+
+    const dx=
+      x[i+1]-
+      x[i];
+
+    signed+=
+      (c0+c1)*
+      0.5*
+      dx;
+  }
+
+  return{
+    valleyIndex:minIndex,
+    valleyX,
+    valleyY,
+    signedLowerAUC:signed,
+    lowerAUC:
+      Math.abs(signed)
+  };
 }
-let area=0;
-const boundedY=i=>
-Math.min(
-capY,
-Math.max(
-baselineY,
-yAll[i]
-)
-);
-for(let i=a;i<b;i++){
-const y0=boundedY(i)-baselineY;
-const y1=boundedY(i+1)-baselineY;
-const dx=xAll[i+1]-xAll[i];
-area+=
-(y0+y1)*
-0.5*
-dx;
-}
-return{
-startIndex:a,
-endIndex:b,
-x0:xAll[a],
-x1:xAll[b],
-baselineY,
-capY,
-auc:Math.abs(area)
-};
-}
-function slopeBetweenPoints(x1,y1,x2,y2){
-if(
-!Number.isFinite(x1)||
-!Number.isFinite(y1)||
-!Number.isFinite(x2)||
-!Number.isFinite(y2)
+
+function boundedAUCByIndices(
+  xAll,
+  yAll,
+  startIndex,
+  endIndex,
+  baselineY,
+  capY
 ){
-return NaN;
+
+  const a=
+    Math.min(
+      startIndex,
+      endIndex
+    );
+
+  const b=
+    Math.max(
+      startIndex,
+      endIndex
+    );
+
+  if(
+    b-a<1 ||
+    a<0 ||
+    b>=Math.min(
+      xAll.length,
+      yAll.length
+    ) ||
+    !Number.isFinite(baselineY) ||
+    !Number.isFinite(capY) ||
+    !(capY>baselineY)
+  ){
+    return null;
+  }
+
+  let area=0;
+
+  const boundedY=i=>
+    Math.min(
+      capY,
+      Math.max(
+        baselineY,
+        yAll[i]
+      )
+    );
+
+  for(
+    let i=a;
+    i<b;
+    i++
+  ){
+
+    const y0=
+      boundedY(i)-
+      baselineY;
+
+    const y1=
+      boundedY(i+1)-
+      baselineY;
+
+    const dx=
+      xAll[i+1]-
+      xAll[i];
+
+    area+=
+      (y0+y1)*
+      0.5*
+      dx;
+  }
+
+  return{
+    startIndex:a,
+    endIndex:b,
+    x0:xAll[a],
+    x1:xAll[b],
+    baselineY,
+    capY,
+    auc:
+      Math.abs(area)
+  };
 }
-const dx=x2-x1;
-return Math.abs(dx)>1e-15
-?(y2-y1)/dx
-:NaN;
+
+function slopeBetweenPoints(
+  x1,
+  y1,
+  x2,
+  y2
+){
+
+  if(
+    !Number.isFinite(x1) ||
+    !Number.isFinite(y1) ||
+    !Number.isFinite(x2) ||
+    !Number.isFinite(y2)
+  ){
+    return NaN;
+  }
+
+  const dx=
+    x2-x1;
+
+  return Math.abs(dx)>1e-15
+    ?(y2-y1)/dx
+    :NaN;
 }
-function emptyUnifiedIntervalRow(sample,line,notchY=NaN){
-return{
-Sample:sample,
-Line:line,
-'Delta X (P1 & MIN)':NaN,
-'Delta X (P2 & MIN)':NaN,
-'Delta Y (P1 & MIN)':NaN,
-'Delta Y (P2 & MIN)':NaN,
-'AUC (P1 & P2)':NaN,
-'AUC (P1 & MIN)':NaN,
-'AUC (P2 & MIN)':NaN,
-Notch:notchY,
-'First Slope':NaN,
-'Slope (P1 & MIN)':NaN,
-'Slope (P2 & MIN)':NaN,
-'Peak 1 값':NaN,
-'Peak 2 값':NaN,
-'Min 값':NaN
+
+function emptyUnifiedIntervalRow(
+  sample,
+  line,
+  notchY=NaN
+){
+
+  return{
+    Sample:sample,
+    Line:line,
+    'Delta X (P1 & MIN)':NaN,
+    'Delta X (P2 & MIN)':NaN,
+    'Delta Y (P1 & MIN)':NaN,
+    'Delta Y (P2 & MIN)':NaN,
+    'AUC (P1 & P2)':NaN,
+    'AUC (P1 & MIN)':NaN,
+    'AUC (P2 & MIN)':NaN,
+    Notch:notchY,
+    'First Slope':NaN,
+    'Slope (P1 & MIN)':NaN,
+    'Slope (P2 & MIN)':NaN,
+    'Peak 1 값':NaN,
+    'Peak 2 값':NaN,
+    'Min 값':NaN
+  };
+}
+
+function calculateIntervalForSample(
+  sample,
+  range,
+  rows
+){
+
+  const [i0,i1]=
+    rangeIndices(range);
+
+  state.results.auc[sample]=
+    state.results.auc[sample]||
+    {};
+
+  state.results.extrema[sample]=
+    state.results.extrema[sample]||
+    {};
+
+  for(
+    const line
+    of selectedLineList(sample)
+  ){
+
+    const xSearch=
+      state.dataset.distance.slice(
+        i0,
+        i1+1
+      );
+
+    const ySearch=
+      state.dataset.smoothed[sample][line]
+        .slice(
+          i0,
+          i1+1
+        );
+
+    const notchY=
+      notchValueForLine(
+        sample,
+        line
+      );
+
+    const peaks=
+      dominantTwoMaxima(
+        xSearch,
+        ySearch
+      );
+
+    if(!peaks){
+
+      delete state.results.auc[sample][line];
+      delete state.results.extrema[sample][line];
+
+      rows.push(
+        emptyUnifiedIntervalRow(
+          sample,
+          line,
+          notchY
+        )
+      );
+
+      continue;
+    }
+
+    const p1=
+      peaks.first;
+
+    const p2=
+      peaks.second;
+
+    const xAuc=
+      xSearch.slice(
+        p1.i,
+        p2.i+1
+      );
+
+    const yAuc=
+      ySearch.slice(
+        p1.i,
+        p2.i+1
+      );
+
+    const lower=
+      lowerAUCFromMinimum(
+        xAuc,
+        yAuc
+      );
+
+    if(!lower){
+
+      delete state.results.auc[sample][line];
+      delete state.results.extrema[sample][line];
+
+      rows.push(
+        emptyUnifiedIntervalRow(
+          sample,
+          line,
+          notchY
+        )
+      );
+
+      continue;
+    }
+
+    const p1GlobalIndex=
+      i0+p1.i;
+
+    const p2GlobalIndex=
+      i0+p2.i;
+
+    const minGlobalIndex=
+      p1GlobalIndex+
+      lower.valleyIndex;
+
+    const xAll=
+      state.dataset.distance;
+
+    const yAll=
+      state.dataset.smoothed[
+        sample
+      ][
+        line
+      ];
+
+    const aucP1Min=
+      boundedAUCByIndices(
+        xAll,
+        yAll,
+        p1GlobalIndex,
+        minGlobalIndex,
+        lower.valleyY,
+        p1.y
+      );
+
+    const aucP2Min=
+      boundedAUCByIndices(
+        xAll,
+        yAll,
+        minGlobalIndex,
+        p2GlobalIndex,
+        lower.valleyY,
+        p2.y
+      );
+
+    const deltaXP1Min=
+      Math.abs(
+        p1.x-
+        lower.valleyX
+      );
+
+    const deltaXP2Min=
+      Math.abs(
+        p2.x-
+        lower.valleyX
+      );
+
+    const deltaYP1Min=
+      Math.abs(
+        p1.y-
+        lower.valleyY
+      );
+
+    const deltaYP2Min=
+      Math.abs(
+        p2.y-
+        lower.valleyY
+      );
+
+    const slopeP1Min=
+      slopeBetweenPoints(
+        p1.x,
+        p1.y,
+        lower.valleyX,
+        lower.valleyY
+      );
+
+    const slopeP2Min=
+      slopeBetweenPoints(
+        p2.x,
+        p2.y,
+        lower.valleyX,
+        lower.valleyY
+      );
+
+    const firstSlopeRefX=
+      state.dataset.params.notchPosition-
+      1;
+
+    const firstSlopeRefY=
+      interpolatedYAtX(
+        state.dataset.distance,
+        yAll,
+        firstSlopeRefX
+      );
+
+    const firstSlope=
+      slopeBetweenPoints(
+        firstSlopeRefX,
+        firstSlopeRefY,
+        p1.x,
+        p1.y
+      );
+
+    state.results.extrema[
+      sample
+    ][
+      line
+    ]={
+      rangeStart:range[0],
+      rangeEnd:range[1],
+      peak1X:p1.x,
+      peak1Y:p1.y,
+      peak2X:p2.x,
+      peak2Y:p2.y,
+      minX:lower.valleyX,
+      minY:lower.valleyY,
+      notchX:
+        state.dataset.params.notchPosition,
+      notchY
+    };
+
+    state.results.auc[
+      sample
+    ][
+      line
+    ]={
+      searchRangeStart:range[0],
+      searchRangeEnd:range[1],
+      notchX:
+        state.dataset.params.notchPosition,
+      notchY,
+      peak1Index:p1GlobalIndex,
+      peak1X:p1.x,
+      peak1Y:p1.y,
+      peak2Index:p2GlobalIndex,
+      peak2X:p2.x,
+      peak2Y:p2.y,
+      valleyIndex:minGlobalIndex,
+      valleyX:lower.valleyX,
+      valleyY:lower.valleyY,
+      aucP1P2:lower.lowerAUC,
+      aucP1Min,
+      aucP2Min,
+      deltaXP1Min,
+      deltaXP2Min,
+      deltaYP1Min,
+      deltaYP2Min,
+      slopeP1Min,
+      slopeP2Min,
+      firstSlopeRefX,
+      firstSlopeRefY,
+      firstSlope,
+      peak1Prominence:p1.prom,
+      peak2Prominence:p2.prom,
+      maxCandidates:
+        peaks.maxCandidates,
+      prominenceThreshold:
+        peaks.prominenceThreshold
+    };
+
+    rows.push({
+      Sample:sample,
+      Line:line,
+      'Delta X (P1 & MIN)':deltaXP1Min,
+      'Delta X (P2 & MIN)':deltaXP2Min,
+      'Delta Y (P1 & MIN)':deltaYP1Min,
+      'Delta Y (P2 & MIN)':deltaYP2Min,
+      'AUC (P1 & P2)':lower.lowerAUC,
+      'AUC (P1 & MIN)':aucP1Min?.auc??NaN,
+      'AUC (P2 & MIN)':aucP2Min?.auc??NaN,
+      Notch:notchY,
+      'First Slope':firstSlope,
+      'Slope (P1 & MIN)':slopeP1Min,
+      'Slope (P2 & MIN)':slopeP2Min,
+      'Peak 1 값':p1.y,
+      'Peak 2 값':p2.y,
+      'Min 값':lower.valleyY
+    });
+  }
+}
+
+el('intervalCalcBtn').onclick=
+async()=>{
+
+  try{
+
+    const currentRange=
+      readRangeInputs();
+
+    const applyAll=
+      rangeApplyAllEnabled();
+
+    if(applyAll){
+
+      applyRangeToAllSamples(
+        currentRange
+      );
+    }
+
+    const samples=
+      applyAll
+      ?state.dataset.samples.slice()
+      :[
+        state.selectedSample
+      ];
+
+    const rows=[];
+
+    for(
+      let i=0;
+      i<samples.length;
+      i++
+    ){
+
+      const sample=
+        samples[i];
+
+      const range=
+        state.ranges[
+          sample
+        ]||
+        currentRange;
+
+      calculateIntervalForSample(
+        sample,
+        range,
+        rows
+      );
+
+      if(
+        samples.length>20 &&
+        i%10===9
+      ){
+        await new Promise(
+          requestAnimationFrame
+        );
+      }
+    }
+
+    renderResultTable(
+      'interval',
+      rows
+    );
+
+    const hasSuccess=
+      rows.some(
+        r=>
+          Number.isFinite(
+            r['AUC (P1 & P2)']
+          )
+      );
+
+    setStatus(
+      hasSuccess
+      ?tr('aucDone')
+      :tr('noTwoMaxima'),
+
+      hasSuccess
+      ?'good'
+      :'warn'
+    );
+
+    await renderCurrentMode();
+
+  }catch(e){
+
+    setStatus(
+      e.message||String(e),
+      'bad'
+    );
+  }
 };
-}
-function calculateIntervalForSample(sample,range,rows){
-const [i0,i1]=rangeIndices(range);
-state.results.auc[sample]=
-state.results.auc[sample]||{};
-state.results.extrema[sample]=
-state.results.extrema[sample]||{};
-for(const line of selectedLineList(sample)){
-const xSearch=
-state.dataset.distance.slice(
-i0,
-i1+1
-);
-const ySearch=
-state.dataset.smoothed[sample][line]
-.slice(
-i0,
-i1+1
-);
-const notchY=
-notchValueForLine(
-sample,
-line
-);
-const peaks=dominantTwoMaxima(
-xSearch,
-ySearch
-);
-if(!peaks){
-delete state.results.auc[sample][line];
-delete state.results.extrema[sample][line];
-rows.push(
-emptyUnifiedIntervalRow(sample,line,notchY)
-);
-continue;
-}
-const p1=peaks.first;
-const p2=peaks.second;
-const xAuc=
-xSearch.slice(
-p1.i,
-p2.i+1
-);
-const yAuc=
-ySearch.slice(
-p1.i,
-p2.i+1
-);
-const lower=lowerAUCFromMinimum(
-xAuc,
-yAuc
-);
-if(!lower){
-delete state.results.auc[sample][line];
-delete state.results.extrema[sample][line];
-rows.push(
-emptyUnifiedIntervalRow(sample,line,notchY)
-);
-continue;
-}
-const p1GlobalIndex=i0+p1.i;
-const p2GlobalIndex=i0+p2.i;
-const minGlobalIndex=
-p1GlobalIndex+lower.valleyIndex;
-const xAll=state.dataset.distance;
-const yAll=state.dataset.smoothed[sample][line];
-const aucP1Min=boundedAUCByIndices(
-xAll,
-yAll,
-p1GlobalIndex,
-minGlobalIndex,
-lower.valleyY,
-p1.y
-);
-const aucP2Min=boundedAUCByIndices(
-xAll,
-yAll,
-minGlobalIndex,
-p2GlobalIndex,
-lower.valleyY,
-p2.y
-);
-const deltaXP1Min=Math.abs(p1.x-lower.valleyX);
-const deltaXP2Min=Math.abs(p2.x-lower.valleyX);
-const deltaYP1Min=Math.abs(p1.y-lower.valleyY);
-const deltaYP2Min=Math.abs(p2.y-lower.valleyY);
-const slopeP1Min=slopeBetweenPoints(
-p1.x,
-p1.y,
-lower.valleyX,
-lower.valleyY
-);
-const slopeP2Min=slopeBetweenPoints(
-p2.x,
-p2.y,
-lower.valleyX,
-lower.valleyY
-);
-const firstSlopeRefX=
-state.dataset.params.notchPosition-1;
-const firstSlopeRefY=interpolatedYAtX(
-state.dataset.distance,
-yAll,
-firstSlopeRefX
-);
-const firstSlope=slopeBetweenPoints(
-firstSlopeRefX,
-firstSlopeRefY,
-p1.x,
-p1.y
-);
-state.results.extrema[sample][line]={
-rangeStart:range[0],
-rangeEnd:range[1],
-peak1X:p1.x,
-peak1Y:p1.y,
-peak2X:p2.x,
-peak2Y:p2.y,
-minX:lower.valleyX,
-minY:lower.valleyY,
-notchX:state.dataset.params.notchPosition,
-notchY
-};
-state.results.auc[sample][line]={
-searchRangeStart:range[0],
-searchRangeEnd:range[1],
-notchX:state.dataset.params.notchPosition,
-notchY,
-peak1Index:p1GlobalIndex,
-peak1X:p1.x,
-peak1Y:p1.y,
-peak2Index:p2GlobalIndex,
-peak2X:p2.x,
-peak2Y:p2.y,
-valleyIndex:minGlobalIndex,
-valleyX:lower.valleyX,
-valleyY:lower.valleyY,
-aucP1P2:lower.lowerAUC,
-aucP1Min,
-aucP2Min,
-deltaXP1Min,
-deltaXP2Min,
-deltaYP1Min,
-deltaYP2Min,
-slopeP1Min,
-slopeP2Min,
-firstSlopeRefX,
-firstSlopeRefY,
-firstSlope,
-peak1Prominence:p1.prom,
-peak2Prominence:p2.prom,
-maxCandidates:peaks.maxCandidates,
-prominenceThreshold:peaks.prominenceThreshold
-};
-rows.push({
-Sample:sample,
-Line:line,
-'Delta X (P1 & MIN)':deltaXP1Min,
-'Delta X (P2 & MIN)':deltaXP2Min,
-'Delta Y (P1 & MIN)':deltaYP1Min,
-'Delta Y (P2 & MIN)':deltaYP2Min,
-'AUC (P1 & P2)':lower.lowerAUC,
-'AUC (P1 & MIN)':aucP1Min?.auc??NaN,
-'AUC (P2 & MIN)':aucP2Min?.auc??NaN,
-Notch:notchY,
-'First Slope':firstSlope,
-'Slope (P1 & MIN)':slopeP1Min,
-'Slope (P2 & MIN)':slopeP2Min,
-'Peak 1 값':p1.y,
-'Peak 2 값':p2.y,
-'Min 값':lower.valleyY
-});
-}
-}
-el('intervalCalcBtn').onclick=async()=>{
-try{
-const currentRange=readRangeInputs();
-const applyAll=rangeApplyAllEnabled();
-if(applyAll){
-applyRangeToAllSamples(currentRange);
-}
-const samples=
-applyAll
-?state.dataset.samples.slice()
-:[state.selectedSample];
-const rows=[];
-for(let i=0;i<samples.length;i++){
-const sample=samples[i];
-const range=
-state.ranges[sample]||
-currentRange;
-calculateIntervalForSample(
-sample,
-range,
-rows
-);
-if(samples.length>20&&i%10===9){
-await new Promise(requestAnimationFrame);
-}
-}
-renderResultTable(
-'interval',
-rows
-);
-const hasSuccess=rows.some(
-r=>
-Number.isFinite(r['AUC (P1 & P2)'])
-);
-setStatus(
-hasSuccess
-?tr('aucDone')
-:tr('noTwoMaxima'),
-hasSuccess
-?'good'
-:'warn'
-);
-await renderCurrentMode();
-}catch(e){
-setStatus(
-e.message||String(e),
-'bad'
-);
-}
-};
+
 function ensureMeanState(sample){
-state.meanSettings[sample]=
-state.meanSettings[sample]||
-{
-windowLength:
-Math.min(
-.01,
-state.dataset.params.scanLength
-),
-beforeOffset:.2,
-minSpacing:.05
-};
-state.results.mean[sample]=
-state.results.mean[sample]||{};
-state.results.notchSlope[sample]=
-state.results.notchSlope[sample]||{};
+
+  state.meanSettings[sample]=
+    state.meanSettings[sample]||
+    {
+      windowLength:
+        Math.min(
+          .01,
+          state.dataset.params.scanLength
+        ),
+
+      beforeOffset:.2,
+      minSpacing:.05
+    };
+
+  state.results.mean[sample]=
+    state.results.mean[sample]||
+    {};
+
+  state.results.notchSlope[sample]=
+    state.results.notchSlope[sample]||
+    {};
 }
+
 function ensureMeanSetting(sample){
-ensureMeanState(sample);
-return state.meanSettings[sample];
+
+  ensureMeanState(sample);
+
+  return state.meanSettings[
+    sample
+  ];
 }
+
 function syncMeanControls(){
-if(
-!state.dataset||
-state.currentMode!=='intervalMean'
-){
-return;
+
+  if(
+    !state.dataset ||
+    state.currentMode!=='intervalMean'
+  ){
+    return;
+  }
+
+  const cfg=
+    ensureMeanSetting(
+      state.selectedSample
+    );
+
+  el('meanWindowLength').value=
+    fmt(
+      cfg.windowLength,
+      4
+    );
+
+  el('meanBeforeOffset').value=
+    fmt(
+      cfg.beforeOffset,
+      4
+    );
+
+  el('meanMinSpacing').value=
+    fmt(
+      cfg.minSpacing,
+      4
+    );
 }
-const cfg=ensureMeanSetting(
-state.selectedSample
-);
-el('meanWindowLength').value=
-fmt(cfg.windowLength,4);
-el('meanBeforeOffset').value=
-fmt(cfg.beforeOffset,4);
-el('meanMinSpacing').value=
-fmt(cfg.minSpacing,4);
-}
+
 function readMeanSetup(){
-const windowLength=
-Number(el('meanWindowLength').value);
-const beforeOffset=
-Number(el('meanBeforeOffset').value);
-const minSpacing=
-Number(el('meanMinSpacing').value);
-const L=
-state.dataset.params.scanLength;
-if(
-!(windowLength>0)||
-windowLength>L||
-!(beforeOffset>=0)||
-!(minSpacing>=0)
+
+  const windowLength=
+    Number(
+      el('meanWindowLength').value
+    );
+
+  const beforeOffset=
+    Number(
+      el('meanBeforeOffset').value
+    );
+
+  const minSpacing=
+    Number(
+      el('meanMinSpacing').value
+    );
+
+  const L=
+    state.dataset.params.scanLength;
+
+  if(
+    !(windowLength>0) ||
+    windowLength>L ||
+    !(beforeOffset>=0) ||
+    !(minSpacing>=0)
+  ){
+
+    throw new Error(
+      tr('invalidMeanSetup')
+    );
+  }
+
+  return{
+    windowLength,
+    beforeOffset,
+    minSpacing
+  };
+}
+
+function invalidateMeanSample(
+  sample,
+  showStatus=true
 ){
-throw new Error(tr('invalidMeanSetup'));
+
+  ensureMeanState(
+    sample
+  );
+
+  state.results.mean[
+    sample
+  ]={};
+
+  if(
+    state.currentMode==='intervalMean' &&
+    sample===state.selectedSample
+  ){
+
+    renderMeanResultTable(
+      sample
+    );
+
+    renderRegionManager();
+
+    if(showStatus){
+
+      setStatus(
+        tr('meanDirty'),
+        'warn'
+      );
+    }
+  }
 }
-return{
-windowLength,
-beforeOffset,
-minSpacing
-};
-}
-function invalidateMeanSample(sample,showStatus=true){
-ensureMeanState(sample);
-state.results.mean[sample]={};
-if(
-state.currentMode==='intervalMean'&&
-sample===state.selectedSample
-){
-renderMeanResultTable(sample);
-renderRegionManager();
-if(showStatus){
-setStatus(
-tr('meanDirty'),
-'warn'
-);
-}
-}
-}
+
 async function updateMeanSetupFromInputs(){
-try{
-const sample=state.selectedSample;
-state.meanSettings[sample]=
-readMeanSetup();
-invalidateMeanSample(sample);
-await renderCurrentMode();
-}catch(e){
-setStatus(
-e.message||String(e),
-'bad'
-);
-syncMeanControls();
+
+  try{
+
+    const sample=
+      state.selectedSample;
+
+    state.meanSettings[sample]=
+      readMeanSetup();
+
+    invalidateMeanSample(
+      sample
+    );
+
+    await renderCurrentMode();
+
+  }catch(e){
+
+    setStatus(
+      e.message||String(e),
+      'bad'
+    );
+
+    syncMeanControls();
+  }
 }
-}
+
 el('meanWindowLength').addEventListener(
-'change',
-updateMeanSetupFromInputs
+  'change',
+  updateMeanSetupFromInputs
 );
+
 el('meanBeforeOffset').addEventListener(
-'change',
-updateMeanSetupFromInputs
+  'change',
+  updateMeanSetupFromInputs
 );
+
 el('meanMinSpacing').addEventListener(
-'change',
-updateMeanSetupFromInputs
+  'change',
+  updateMeanSetupFromInputs
 );
+
 function meanAndSampleSD(values){
-const n=values.length;
-if(!n){
-return{
-n:0,
-mean:NaN,
-sd:NaN
-};
+
+  const n=
+    values.length;
+
+  if(!n){
+
+    return{
+      n:0,
+      mean:NaN,
+      sd:NaN
+    };
+  }
+
+  const mean=
+    values.reduce(
+      (a,b)=>a+b,
+      0
+    )/n;
+
+  if(n===1){
+
+    return{
+      n,
+      mean,
+      sd:0
+    };
+  }
+
+  let ss=0;
+
+  for(const v of values){
+    ss+=
+      (v-mean)**2;
+  }
+
+  return{
+    n,
+    mean,
+    sd:
+      Math.sqrt(
+        ss/(n-1)
+      )
+  };
 }
-const mean=
-values.reduce(
-(a,b)=>a+b,
-0
-)/n;
-if(n===1){
-return{
-n,
-mean,
-sd:0
-};
-}
-let ss=0;
-for(const v of values){
-ss+=(v-mean)**2;
-}
-return{
-n,
-mean,
-sd:Math.sqrt(
-ss/(n-1)
-)
-};
-}
-function derivativeAtIndex(x,y,i){
-const n=Math.min(
-x.length,
-y.length
-);
-if(n<2){
-return NaN;
-}
-if(i<=0){
-const dx=x[1]-x[0];
-return Math.abs(dx)>1e-15
-?(y[1]-y[0])/dx
-:NaN;
-}
-if(i>=n-1){
-const dx=
-x[n-1]-
-x[n-2];
-return Math.abs(dx)>1e-15
-?(
-y[n-1]-
-y[n-2]
-)/dx
-:NaN;
-}
-const dx=
-x[i+1]-
-x[i-1];
-return Math.abs(dx)>1e-15
-?(
-y[i+1]-
-y[i-1]
-)/dx
-:NaN;
-}
-function tangentSlopeAtX(x,y,targetX){
-const n=Math.min(
-x.length,
-y.length
-);
-if(
-n<2||
-!Number.isFinite(targetX)||
-targetX<x[0]||
-targetX>x[n-1]
+
+function derivativeAtIndex(
+  x,
+  y,
+  i
 ){
-return{
-positionX:targetX,
-slope:NaN
-};
+
+  const n=
+    Math.min(
+      x.length,
+      y.length
+    );
+
+  if(n<2){
+    return NaN;
+  }
+
+  if(i<=0){
+
+    const dx=
+      x[1]-x[0];
+
+    return Math.abs(dx)>1e-15
+      ?(y[1]-y[0])/dx
+      :NaN;
+  }
+
+  if(i>=n-1){
+
+    const dx=
+      x[n-1]-
+      x[n-2];
+
+    return Math.abs(dx)>1e-15
+      ?(
+        y[n-1]-
+        y[n-2]
+      )/dx
+      :NaN;
+  }
+
+  const dx=
+    x[i+1]-
+    x[i-1];
+
+  return Math.abs(dx)>1e-15
+    ?(
+      y[i+1]-
+      y[i-1]
+    )/dx
+    :NaN;
 }
-let hi=1;
-while(
-hi<n-1&&
-x[hi]<targetX
+
+function tangentSlopeAtX(
+  x,
+  y,
+  targetX
 ){
-hi++;
+
+  const n=
+    Math.min(
+      x.length,
+      y.length
+    );
+
+  if(
+    n<2 ||
+    !Number.isFinite(targetX) ||
+    targetX<x[0] ||
+    targetX>x[n-1]
+  ){
+
+    return{
+      positionX:targetX,
+      slope:NaN
+    };
+  }
+
+  let hi=1;
+
+  while(
+    hi<n-1 &&
+    x[hi]<targetX
+  ){
+    hi++;
+  }
+
+  const lo=
+    Math.max(
+      0,
+      hi-1
+    );
+
+  const x0=
+    x[lo];
+
+  const x1=
+    x[hi];
+
+  const d0=
+    derivativeAtIndex(
+      x,
+      y,
+      lo
+    );
+
+  const d1=
+    derivativeAtIndex(
+      x,
+      y,
+      hi
+    );
+
+  if(
+    !Number.isFinite(d0) ||
+    !Number.isFinite(d1)
+  ){
+
+    return{
+      positionX:targetX,
+      slope:NaN
+    };
+  }
+
+  if(
+    Math.abs(
+      x1-x0
+    )<=1e-15
+  ){
+
+    return{
+      positionX:targetX,
+      slope:d0
+    };
+  }
+
+  const t=
+    clamp(
+      (targetX-x0)/
+      (x1-x0),
+      0,
+      1
+    );
+
+  return{
+    positionX:targetX,
+
+    slope:
+      d0+
+      (d1-d0)*
+      t
+  };
 }
-const lo=Math.max(
-0,
-hi-1
-);
-const x0=x[lo];
-const x1=x[hi];
-const d0=derivativeAtIndex(
-x,
-y,
-lo
-);
-const d1=derivativeAtIndex(
-x,
-y,
-hi
-);
-if(
-!Number.isFinite(d0)||
-!Number.isFinite(d1)
+
+function calculateNotchSlopeForLine(
+  sample,
+  line
 ){
-return{
-positionX:targetX,
-slope:NaN
-};
+
+  const targetX=
+    state.dataset.params.notchPosition;
+
+  const r=
+    tangentSlopeAtX(
+      state.dataset.distance,
+      state.dataset.smoothed[
+        sample
+      ][
+        line
+      ],
+      targetX
+    );
+
+  return{
+    Sample:sample,
+    Line:line,
+    Notch_Position_mm:
+      targetX,
+    Notch_Tangent_Slope_Y_per_mm:
+      r.slope
+  };
 }
-if(Math.abs(x1-x0)<=1e-15){
-return{
-positionX:targetX,
-slope:d0
-};
+
+function exactWindow(
+  center,
+  length
+){
+
+  const half=
+    length/2;
+
+  const start=
+    center-half;
+
+  const end=
+    center+half;
+
+  const L=
+    state.dataset.params.scanLength;
+
+  if(
+    start<0 ||
+    end>L
+  ){
+
+    throw new Error(
+      tr('meanWindowOut')
+    );
+  }
+
+  return{
+    center,
+    start,
+    end
+  };
 }
-const t=clamp(
-(targetX-x0)/(x1-x0),
-0,
-1
-);
-return{
-positionX:targetX,
-slope:
-d0+
-(d1-d0)*
-t
-};
+
+function statsInWindow(
+  sample,
+  line,
+  region,
+  window,
+  meta
+){
+
+  const [i0,i1]=
+    rangeIndices([
+      window.start,
+      window.end
+    ]);
+
+  const vals=
+    state.dataset.smoothed[
+      sample
+    ][
+      line
+    ].slice(
+      i0,
+      i1+1
+    );
+
+  const st=
+    meanAndSampleSD(
+      vals
+    );
+
+  return{
+    Sample:sample,
+    Line:line,
+    Region:region,
+    Search_Range_Start_mm:
+      meta.searchStart,
+    Search_Range_End_mm:
+      meta.searchEnd,
+    Min1_X_mm:
+      meta.min1.x,
+    Min1_Y:
+      meta.min1.y,
+    Min1_Prominence:
+      meta.min1.prom,
+    Min2_X_mm:
+      meta.min2.x,
+    Min2_Y:
+      meta.min2.y,
+    Min2_Prominence:
+      meta.min2.prom,
+    Min_Candidates:
+      meta.minCandidates,
+    Prominence_Threshold:
+      meta.prominenceThreshold,
+    Center_mm:
+      window.center,
+    Range_Start_mm:
+      window.start,
+    Range_End_mm:
+      window.end,
+    Interval_Length_mm:
+      window.end-
+      window.start,
+    N:st.n,
+    Mean:st.mean,
+    SD:st.sd
+  };
 }
-function calculateNotchSlopeForLine(sample,line){
-const targetX=
-state.dataset.params.notchPosition;
-const r=tangentSlopeAtX(
-state.dataset.distance,
-state.dataset.smoothed[sample][line],
-targetX
-);
-return{
-Sample:sample,
-Line:line,
-Notch_Position_mm:targetX,
-Notch_Tangent_Slope_Y_per_mm:r.slope
-};
+
+function calculateMeanRegionsForLine(
+  sample,
+  line,
+  range,
+  cfg
+){
+
+  const [i0,i1]=
+    rangeIndices(
+      range
+    );
+
+  const x=
+    state.dataset.distance.slice(
+      i0,
+      i1+1
+    );
+
+  const y=
+    state.dataset.smoothed[
+      sample
+    ][
+      line
+    ].slice(
+      i0,
+      i1+1
+    );
+
+  const mins=
+    dominantTwoMinima(
+      x,
+      y,
+      cfg.minSpacing
+    );
+
+  if(!mins){
+
+    return[
+      {
+        Sample:sample,
+        Line:line,
+        Search_Range_Start_mm:
+          range[0],
+        Search_Range_End_mm:
+          range[1],
+        Status:
+          tr('noTwoMinima')
+      }
+    ];
+  }
+
+  const meta={
+    searchStart:
+      range[0],
+
+    searchEnd:
+      range[1],
+
+    min1:
+      mins.first,
+
+    min2:
+      mins.second,
+
+    minCandidates:
+      mins.minCandidates,
+
+    prominenceThreshold:
+      mins.prominenceThreshold
+  };
+
+  try{
+
+    const minCenter=
+      (
+        mins.first.x+
+        mins.second.x
+      )/2;
+
+    const beforeCenter=
+      mins.first.x-
+      cfg.beforeOffset;
+
+    const notchCenter=
+      state.dataset.params.notchPosition;
+
+    const windows=[
+      [
+        'Min',
+        exactWindow(
+          minCenter,
+          cfg.windowLength
+        )
+      ],
+
+      [
+        'Before',
+        exactWindow(
+          beforeCenter,
+          cfg.windowLength
+        )
+      ],
+
+      [
+        'Notch',
+        exactWindow(
+          notchCenter,
+          cfg.windowLength
+        )
+      ]
+    ];
+
+    return windows.map(
+      ([name,w])=>
+        statsInWindow(
+          sample,
+          line,
+          name,
+          w,
+          meta
+        )
+    );
+
+  }catch(e){
+
+    return[
+      {
+        Sample:sample,
+        Line:line,
+        Search_Range_Start_mm:
+          range[0],
+        Search_Range_End_mm:
+          range[1],
+        Min1_X_mm:
+          mins.first.x,
+        Min1_Y:
+          mins.first.y,
+        Min2_X_mm:
+          mins.second.x,
+        Min2_Y:
+          mins.second.y,
+        Status:
+          e.message||
+          String(e)
+      }
+    ];
+  }
 }
-function exactWindow(center,length){
-const half=length/2;
-const start=center-half;
-const end=center+half;
-const L=state.dataset.params.scanLength;
-if(start<0||end>L){
-throw new Error(tr('meanWindowOut'));
-}
-return{
-center,
-start,
-end
-};
-}
-function statsInWindow(sample,line,region,window,meta){
-const [i0,i1]=rangeIndices([
-window.start,
-window.end
-]);
-const vals=
-state.dataset.smoothed[sample][line]
-.slice(
-i0,
-i1+1
-);
-const st=meanAndSampleSD(vals);
-return{
-Sample:sample,
-Line:line,
-Region:region,
-Search_Range_Start_mm:meta.searchStart,
-Search_Range_End_mm:meta.searchEnd,
-Min1_X_mm:meta.min1.x,
-Min1_Y:meta.min1.y,
-Min1_Prominence:meta.min1.prom,
-Min2_X_mm:meta.min2.x,
-Min2_Y:meta.min2.y,
-Min2_Prominence:meta.min2.prom,
-Min_Candidates:meta.minCandidates,
-Prominence_Threshold:meta.prominenceThreshold,
-Center_mm:window.center,
-Range_Start_mm:window.start,
-Range_End_mm:window.end,
-Interval_Length_mm:
-window.end-
-window.start,
-N:st.n,
-Mean:st.mean,
-SD:st.sd
-};
-}
-function calculateMeanRegionsForLine(sample,line,range,cfg){
-const [i0,i1]=rangeIndices(range);
-const x=
-state.dataset.distance.slice(
-i0,
-i1+1
-);
-const y=
-state.dataset.smoothed[sample][line]
-.slice(
-i0,
-i1+1
-);
-const mins=dominantTwoMinima(
-x,
-y,
-cfg.minSpacing
-);
-if(!mins){
-return[
-{
-Sample:sample,
-Line:line,
-Search_Range_Start_mm:range[0],
-Search_Range_End_mm:range[1],
-Status:tr('noTwoMinima')
-}
-];
-}
-const meta={
-searchStart:range[0],
-searchEnd:range[1],
-min1:mins.first,
-min2:mins.second,
-minCandidates:mins.minCandidates,
-prominenceThreshold:
-mins.prominenceThreshold
-};
-try{
-const minCenter=
-(
-mins.first.x+
-mins.second.x
-)/2;
-const beforeCenter=
-mins.first.x-
-cfg.beforeOffset;
-const notchCenter=
-state.dataset.params.notchPosition;
-const windows=[
-[
-'Min',
-exactWindow(
-minCenter,
-cfg.windowLength
-)
-],
-[
-'Before',
-exactWindow(
-beforeCenter,
-cfg.windowLength
-)
-],
-[
-'Notch',
-exactWindow(
-notchCenter,
-cfg.windowLength
-)
-]
-];
-return windows.map(
-([name,w])=>
-statsInWindow(
-sample,
-line,
-name,
-w,
-meta
-)
-);
-}catch(e){
-return[
-{
-Sample:sample,
-Line:line,
-Search_Range_Start_mm:range[0],
-Search_Range_End_mm:range[1],
-Min1_X_mm:mins.first.x,
-Min1_Y:mins.first.y,
-Min2_X_mm:mins.second.x,
-Min2_Y:mins.second.y,
-Status:e.message||String(e)
-}
-];
-}
-}
+
 function renderRegionManager(){
-if(
-!state.dataset||
-state.currentMode!=='intervalMean'
-){
-el('regionManager').classList.remove('visible');
-return;
+
+  if(
+    !state.dataset ||
+    state.currentMode!=='intervalMean'
+  ){
+
+    el('regionManager').classList.remove(
+      'visible'
+    );
+
+    return;
+  }
+
+  el('regionManager').classList.add(
+    'visible'
+  );
+
+  const sample=
+    state.selectedSample;
+
+  const byLine=
+    state.results.mean?.[
+      sample
+    ]||
+    {};
+
+  const rows=[];
+
+  for(
+    const line
+    of Object.keys(byLine)
+  ){
+
+    for(
+      const r
+      of(
+        byLine[line]||
+        []
+      )
+    ){
+
+      if(
+        Number.isFinite(
+          r.Range_Start_mm
+        ) &&
+        Number.isFinite(
+          r.Range_End_mm
+        )
+      ){
+        rows.push(r);
+      }
+    }
+  }
+
+  if(!rows.length){
+
+    el('regionList').innerHTML=
+      `<span class="region-empty">${tr('noRegions')}</span>`;
+
+    return;
+  }
+
+  el('regionList').innerHTML=
+    rows.map(
+      r=>
+        `<span class="region-chip">`+
+        `<span>`+
+        `${r.Line} · ${r.Region}: `+
+        `${fmt(r.Range_Start_mm,4)}–${fmt(r.Range_End_mm,4)} mm`+
+        `</span>`+
+        `</span>`
+    ).join('');
 }
-el('regionManager').classList.add('visible');
-const sample=state.selectedSample;
-const byLine=
-state.results.mean?.[sample]||
-{};
-const rows=[];
-for(const line of Object.keys(byLine)){
-for(const r of(byLine[line]||[])){
-if(
-Number.isFinite(r.Range_Start_mm)&&
-Number.isFinite(r.Range_End_mm)
-){
-rows.push(r);
-}
-}
-}
-if(!rows.length){
-el('regionList').innerHTML=
-`<span class="region-empty">${tr('noRegions')}</span>`;
-return;
-}
-el('regionList').innerHTML=
-rows.map(
-r=>
-`<span class="region-chip">`+
-`<span>`+
-`${r.Line} · ${r.Region}: `+
-`${fmt(r.Range_Start_mm,4)}–${fmt(r.Range_End_mm,4)} mm`+
-`</span>`+
-`</span>`
-).join('');
-}
+
 function renderMeanResultTable(){
-if(!state.dataset){
-el('resultTableWrap').innerHTML='';
-return;
+
+  if(!state.dataset){
+
+    el('resultTableWrap').innerHTML='';
+
+    return;
+  }
+
+  const tangentRegion=
+    tr('notchTangentRegion');
+
+  const regionOrder={
+    Min:0,
+    Before:1,
+    Notch:2,
+    [tangentRegion]:3
+  };
+
+  const rows=[];
+
+  for(
+    const sample
+    of state.dataset.samples
+  ){
+
+    const byLine=
+      state.results.mean?.[
+        sample
+      ]||
+      {};
+
+    const slopeByLine=
+      state.results.notchSlope?.[
+        sample
+      ]||
+      {};
+
+    for(
+      const line
+      of(
+        state.dataset.sampleLines?.[
+          sample
+        ]||
+        state.dataset.lines
+      )
+    ){
+
+      for(
+        const r
+        of(
+          byLine[line]||
+          []
+        )
+      ){
+
+        if(
+          !Number.isFinite(r.Mean) ||
+          !Number.isFinite(r.SD)
+        ){
+          continue;
+        }
+
+        rows.push({
+          Region:r.Region||'',
+          Sample:r.Sample||sample,
+          Line:r.Line||line,
+          Mean:r.Mean,
+          SD:r.SD,
+          NotchSlope:NaN
+        });
+      }
+
+      const sr=
+        slopeByLine[line];
+
+      if(
+        sr &&
+        Number.isFinite(
+          sr.Notch_Tangent_Slope_Y_per_mm
+        )
+      ){
+
+        rows.push({
+          Region:tangentRegion,
+          Sample:sample,
+          Line:line,
+          Mean:NaN,
+          SD:NaN,
+          NotchSlope:
+            sr.Notch_Tangent_Slope_Y_per_mm
+        });
+      }
+    }
+  }
+
+  rows.sort(
+    (a,b)=>
+      (
+        regionOrder[a.Region]??99
+      )-
+      (
+        regionOrder[b.Region]??99
+      ) ||
+      naturalNum(a.Sample)-
+      naturalNum(b.Sample) ||
+      naturalNum(a.Line)-
+      naturalNum(b.Line)
+  );
+
+  if(!rows.length){
+
+    el('resultTableWrap').innerHTML='';
+
+    return;
+  }
+
+  let lastRegion=null;
+
+  const body=
+    rows.map(r=>{
+
+      const cls=
+        r.Region!==lastRegion
+        ?' class="region-start"'
+        :'';
+
+      lastRegion=
+        r.Region;
+
+      return(
+        `<tr${cls}>`+
+        `<td>${r.Region}</td>`+
+        `<td>${r.Sample}</td>`+
+        `<td>${r.Line}</td>`+
+        `<td>${fmt(r.Mean,6)}</td>`+
+        `<td>${fmt(r.SD,6)}</td>`+
+        `<td>${fmt(r.NotchSlope,6)}</td>`+
+        `</tr>`
+      );
+
+    }).join('');
+
+  el('resultTableWrap').innerHTML=
+    `<div class="excel-table-wrap">`+
+    `<table class="excel-result-table">`+
+    `<thead>`+
+    `<tr>`+
+    `<th>Region</th>`+
+    `<th>Sample</th>`+
+    `<th>Line</th>`+
+    `<th>Mean</th>`+
+    `<th>SD</th>`+
+    `<th>${tr('notchTangentSlope')}</th>`+
+    `</tr>`+
+    `</thead>`+
+    `<tbody>${body}</tbody>`+
+    `</table>`+
+    `</div>`;
 }
-const tangentRegion=
-tr('notchTangentRegion');
-const regionOrder={
-Min:0,
-Before:1,
-Notch:2,
-[tangentRegion]:3
+
+el('calcMeanBtn').onclick=
+async()=>{
+
+  const sample=
+    state.selectedSample;
+
+  try{
+
+    ensureMeanState(
+      sample
+    );
+
+    const lines=
+      state.dataset.sampleLines?.[
+        sample
+      ]||
+      state.dataset.lines;
+
+    state.results.notchSlope[
+      sample
+    ]={};
+
+    for(const line of lines){
+
+      state.results.notchSlope[
+        sample
+      ][
+        line
+      ]=
+        calculateNotchSlopeForLine(
+          sample,
+          line
+        );
+    }
+
+    renderMeanResultTable(
+      sample
+    );
+
+    let range;
+    let cfg;
+
+    try{
+
+      range=
+        readRangeInputs();
+
+      cfg=
+        readMeanSetup();
+
+    }catch(e){
+
+      setStatus(
+        e.message||String(e),
+        'bad'
+      );
+
+      return;
+    }
+
+    state.meanSettings[
+      sample
+    ]=cfg;
+
+    state.results.mean[
+      sample
+    ]={};
+
+    for(const line of lines){
+
+      state.results.mean[
+        sample
+      ][
+        line
+      ]=
+        calculateMeanRegionsForLine(
+          sample,
+          line,
+          range,
+          cfg
+        );
+    }
+
+    renderMeanResultTable(
+      sample
+    );
+
+    renderRegionManager();
+
+    const rows=
+      lines.flatMap(
+        line=>
+          state.results.mean[
+            sample
+          ][
+            line
+          ]||
+          []
+      );
+
+    const ok=
+      rows.some(
+        r=>
+          Number.isFinite(
+            r.Mean
+          )
+      );
+
+    setStatus(
+      ok
+      ?tr('meanDone')
+      :tr('noTwoMinima'),
+
+      ok
+      ?'good'
+      :'warn'
+    );
+
+    await renderCurrentMode();
+
+  }catch(e){
+
+    setStatus(
+      e.message||String(e),
+      'bad'
+    );
+  }
 };
-const rows=[];
-for(const sample of state.dataset.samples){
-const byLine=
-state.results.mean?.[sample]||
-{};
-const slopeByLine=
-state.results.notchSlope?.[sample]||
-{};
-for(
-const line of(
-state.dataset.sampleLines?.[sample]||
-state.dataset.lines
-)
+
+function renderResultTable(
+  kind,
+  rows
 ){
-for(const r of(byLine[line]||[])){
-if(
-!Number.isFinite(r.Mean)||
-!Number.isFinite(r.SD)
-){
-continue;
+
+  if(!rows.length){
+
+    el('resultTableWrap').innerHTML='';
+
+    return;
+  }
+
+  const cols=
+    Object.keys(
+      rows.reduce(
+        (a,r)=>
+          Object.assign(a,r),
+        {}
+      )
+    );
+
+  const head=
+    cols.map(
+      c=>
+        `<th>${c}</th>`
+    ).join('');
+
+  const body=
+    rows.map(
+      r=>
+        '<tr>'+
+        cols.map(
+          c=>
+            `<td>${
+              typeof r[c]==='number'
+              ?fmt(r[c],6)
+              :(r[c]??'')
+            }</td>`
+        ).join('')+
+        '</tr>'
+    ).join('');
+
+  el('resultTableWrap').innerHTML=
+    `<div class="table-wrap">`+
+    `<table class="result-table">`+
+    `<thead>`+
+    `<tr>${head}</tr>`+
+    `</thead>`+
+    `<tbody>${body}</tbody>`+
+    `</table>`+
+    `</div>`;
 }
-rows.push({
-Region:r.Region||'',
-Sample:r.Sample||sample,
-Line:r.Line||line,
-Mean:r.Mean,
-SD:r.SD,
-NotchSlope:NaN
-});
-}
-const sr=slopeByLine[line];
-if(
-sr&&
-Number.isFinite(
-sr.Notch_Tangent_Slope_Y_per_mm
-)
-){
-rows.push({
-Region:tangentRegion,
-Sample:sample,
-Line:line,
-Mean:NaN,
-SD:NaN,
-NotchSlope:
-sr.Notch_Tangent_Slope_Y_per_mm
-});
-}
-}
-}
-rows.sort(
-(a,b)=>
-(
-regionOrder[a.Region]??99
-)-
-(
-regionOrder[b.Region]??99
-)||
-naturalNum(a.Sample)-
-naturalNum(b.Sample)||
-naturalNum(a.Line)-
-naturalNum(b.Line)
-);
-if(!rows.length){
-el('resultTableWrap').innerHTML='';
-return;
-}
-let lastRegion=null;
-const body=rows.map(r=>{
-const cls=
-r.Region!==lastRegion
-?' class="region-start"'
-:'';
-lastRegion=r.Region;
-return(
-`<tr${cls}>`+
-`<td>${r.Region}</td>`+
-`<td>${r.Sample}</td>`+
-`<td>${r.Line}</td>`+
-`<td>${fmt(r.Mean,6)}</td>`+
-`<td>${fmt(r.SD,6)}</td>`+
-`<td>${fmt(r.NotchSlope,6)}</td>`+
-`</tr>`
-);
-}).join('');
-el('resultTableWrap').innerHTML=
-`<div class="excel-table-wrap">`+
-`<table class="excel-result-table">`+
-`<thead>`+
-`<tr>`+
-`<th>Region</th>`+
-`<th>Sample</th>`+
-`<th>Line</th>`+
-`<th>Mean</th>`+
-`<th>SD</th>`+
-`<th>${tr('notchTangentSlope')}</th>`+
-`</tr>`+
-`</thead>`+
-`<tbody>${body}</tbody>`+
-`</table>`+
-`</div>`;
-}
-el('calcMeanBtn').onclick=async()=>{
-const sample=state.selectedSample;
-try{
-ensureMeanState(sample);
-const lines=
-state.dataset.sampleLines?.[sample]||
-state.dataset.lines;
-state.results.notchSlope[sample]={};
-for(const line of lines){
-state.results.notchSlope[sample][line]=
-calculateNotchSlopeForLine(
-sample,
-line
-);
-}
-renderMeanResultTable(sample);
-let range;
-let cfg;
-try{
-range=readRangeInputs();
-cfg=readMeanSetup();
-}catch(e){
-setStatus(
-e.message||String(e),
-'bad'
-);
-return;
-}
-state.meanSettings[sample]=cfg;
-state.results.mean[sample]={};
-for(const line of lines){
-state.results.mean[sample][line]=
-calculateMeanRegionsForLine(
-sample,
-line,
-range,
-cfg
-);
-}
-renderMeanResultTable(sample);
-renderRegionManager();
-const rows=
-lines.flatMap(
-line=>
-state.results.mean[sample][line]||
-[]
-);
-const ok=rows.some(
-r=>Number.isFinite(r.Mean)
-);
-setStatus(
-ok
-?tr('meanDone')
-:tr('noTwoMinima'),
-ok
-?'good'
-:'warn'
-);
-await renderCurrentMode();
-}catch(e){
-setStatus(
-e.message||String(e),
-'bad'
-);
-}
-};
-function renderResultTable(kind,rows){
-if(!rows.length){
-el('resultTableWrap').innerHTML='';
-return;
-}
-const cols=Object.keys(
-rows.reduce(
-(a,r)=>Object.assign(a,r),
-{}
-)
-);
-const head=cols.map(
-c=>`<th>${c}</th>`
-).join('');
-const body=rows.map(
-r=>
-'<tr>'+
-cols.map(
-c=>
-`<td>${
-typeof r[c]==='number'
-?fmt(r[c],6)
-:(r[c]??'')
-}</td>`
-).join('')+
-'</tr>'
-).join('');
-el('resultTableWrap').innerHTML=
-`<div class="table-wrap">`+
-`<table class="result-table">`+
-`<thead>`+
-`<tr>${head}</tr>`+
-`</thead>`+
-`<tbody>${body}</tbody>`+
-`</table>`+
-`</div>`;
-}
+
 el('exportAllToggle').onclick=()=>{
-state.exportAll=!state.exportAll;
-el('exportAllToggle').classList.toggle(
-'on',
-state.exportAll
-);
-setStatus(
-state.exportAll
-?tr('exportOn')
-:tr('exportOff'),
-state.exportAll
-?'good'
-:''
-);
+
+  state.exportAll=
+    !state.exportAll;
+
+  el('exportAllToggle').classList.toggle(
+    'on',
+    state.exportAll
+  );
+
+  setStatus(
+    state.exportAll
+    ?tr('exportOn')
+    :tr('exportOff'),
+
+    state.exportAll
+    ?'good'
+    :''
+  );
 };
+
 function dataURLtoBlob(dataURL){
-const [meta,b64]=dataURL.split(',');
-const mime=meta.match(/:(.*?);/)[1];
-const bin=atob(b64);
-const arr=new Uint8Array(bin.length);
-for(let i=0;i<bin.length;i++){
-arr[i]=bin.charCodeAt(i);
+
+  const [meta,b64]=
+    dataURL.split(',');
+
+  const mime=
+    meta.match(
+      /:(.*?);/
+    )[1];
+
+  const bin=
+    atob(b64);
+
+  const arr=
+    new Uint8Array(
+      bin.length
+    );
+
+  for(
+    let i=0;
+    i<bin.length;
+    i++
+  ){
+    arr[i]=
+      bin.charCodeAt(i);
+  }
+
+  return new Blob(
+    [arr],
+    {
+      type:mime
+    }
+  );
 }
-return new Blob(
-[arr],
-{type:mime}
-);
-}
+
 async function plotDivToBlob(div){
-const url=await Plotly.toImage(
-div,
-{
-format:'png',
-width:1600,
-height:900,
-scale:2
+
+  const url=
+    await Plotly.toImage(
+      div,
+      {
+        format:'png',
+        width:1600,
+        height:900,
+        scale:2
+      }
+    );
+
+  return dataURLtoBlob(
+    url
+  );
 }
-);
-return dataURLtoBlob(url);
-}
-async function imageFromSpec(traces,layout){
-const tmp=document.createElement('div');
-tmp.style.cssText=
-'position:fixed;left:-10000px;top:0;width:1400px;height:800px;background:#fff';
-document.body.appendChild(tmp);
-try{
-await Plotly.newPlot(
-tmp,
-traces,
-layout,
-{
-displayModeBar:false,
-staticPlot:true
-}
-);
-return await plotDivToBlob(tmp);
-}finally{
-try{
-Plotly.purge(tmp);
-}catch(_){}
-tmp.remove();
-}
-}
-async function ensureDirPath(root,path){
-let h=root;
-for(
-const part of path
-.split('/')
-.filter(Boolean)
+
+async function imageFromSpec(
+  traces,
+  layout
 ){
-h=await h.getDirectoryHandle(
-part,
-{create:true}
-);
+
+  const tmp=
+    document.createElement(
+      'div'
+    );
+
+  tmp.style.cssText=
+    'position:fixed;left:-10000px;top:0;width:1400px;height:800px;background:#fff';
+
+  document.body.appendChild(
+    tmp
+  );
+
+  try{
+
+    await Plotly.newPlot(
+      tmp,
+      traces,
+      layout,
+      {
+        displayModeBar:false,
+        staticPlot:true
+      }
+    );
+
+    return await plotDivToBlob(
+      tmp
+    );
+
+  }finally{
+
+    try{
+      Plotly.purge(tmp);
+    }catch(_){}
+
+    tmp.remove();
+  }
 }
-return h;
+
+async function ensureDirPath(
+  root,
+  path
+){
+
+  let h=root;
+
+  for(
+    const part
+    of path
+      .split('/')
+      .filter(Boolean)
+  ){
+
+    h=
+      await h.getDirectoryHandle(
+        part,
+        {
+          create:true
+        }
+      );
+  }
+
+  return h;
 }
-async function writeBlob(root,path,blob){
-const parts=
-path.split('/')
-.filter(Boolean);
-const name=parts.pop();
-const dir=await ensureDirPath(
-root,
-parts.join('/')
-);
-const fh=await dir.getFileHandle(
-name,
-{create:true}
-);
-const w=await fh.createWritable();
-await w.write(blob);
-await w.close();
+
+async function writeBlob(
+  root,
+  path,
+  blob
+){
+
+  const parts=
+    path
+      .split('/')
+      .filter(Boolean);
+
+  const name=
+    parts.pop();
+
+  const dir=
+    await ensureDirPath(
+      root,
+      parts.join('/')
+    );
+
+  const fh=
+    await dir.getFileHandle(
+      name,
+      {
+        create:true
+      }
+    );
+
+  const w=
+    await fh.createWritable();
+
+  await w.write(
+    blob
+  );
+
+  await w.close();
 }
-function appendAoASheet(wb,name,aoa){
-XLSX.utils.book_append_sheet(
-wb,
-XLSX.utils.aoa_to_sheet(aoa),
-name.slice(0,31)
-);
+
+function appendAoASheet(
+  wb,
+  name,
+  aoa
+){
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    XLSX.utils.aoa_to_sheet(
+      aoa
+    ),
+    name.slice(0,31)
+  );
 }
-function appendJsonSheet(wb,name,rows){
-if(rows.length){
-XLSX.utils.book_append_sheet(
-wb,
-XLSX.utils.json_to_sheet(rows),
-name.slice(0,31)
-);
+
+function appendJsonSheet(
+  wb,
+  name,
+  rows
+){
+
+  if(rows.length){
+
+    XLSX.utils.book_append_sheet(
+      wb,
+      XLSX.utils.json_to_sheet(
+        rows
+      ),
+      name.slice(0,31)
+    );
+  }
 }
-}
+
 function parameterRows(){
-const d=state.dataset;
-return[
-{
-Parameter:'Input file',
-Value:state.file?.name||''
-},
-{
-Parameter:'CID type',
-Value:state.cidType||''
-},
-{
-Parameter:'Excitation frequency',
-Value:d.params.excitation,
-Unit:'kHz'
-},
-{
-Parameter:'SG window size input',
-Value:d.sgWindowRequestedSec,
-Unit:'s'
-},
-{
-Parameter:'Signal type',
-Value:d.params.signalType
-},
-{
-Parameter:'Scan speed',
-Value:d.params.scanSpeed,
-Unit:'mm/s'
-},
-{
-Parameter:'Scan length',
-Value:d.params.scanLength,
-Unit:'mm'
-},
-{
-Parameter:'Estimated notch position',
-Value:d.params.notchPosition,
-Unit:'mm'
-},
-{
-Parameter:'Measured samples',
-Value:d.params.expectedSamples
-},
-{
-Parameter:'Detected scan lines',
-Value:d.lines.length
-},
-{
-Parameter:'Scan line labels',
-Value:d.lines.join(', ')
-},
-{
-Parameter:'Scan duration',
-Value:d.duration,
-Unit:'s'
-},
-{
-Parameter:'Common valid length',
-Value:d.minLength,
-Unit:'samples'
-},
-{
-Parameter:'Estimated sampling rate',
-Value:d.fs,
-Unit:'Hz'
-},
-{
-Parameter:'Distance per sample',
-Value:d.dx,
-Unit:'mm/sample'
-},
-{
-Parameter:'SG polynomial order',
-Value:3
-},
-{
-Parameter:'SG window duration',
-Value:d.sgWindowSec,
-Unit:'s'
-},
-{
-Parameter:'SG window samples',
-Value:d.sgWindow
-},
-{
-Parameter:'SG physical window',
-Value:d.sgWindowMm,
-Unit:'mm'
+
+  const d=
+    state.dataset;
+
+  return[
+    {
+      Parameter:'Input file',
+      Value:
+        state.file?.name||
+        ''
+    },
+
+    {
+      Parameter:'CID type',
+      Value:
+        state.cidType||
+        ''
+    },
+
+    {
+      Parameter:'Excitation frequency',
+      Value:
+        d.params.excitation,
+      Unit:'kHz'
+    },
+
+    {
+      Parameter:'SG window size input',
+      Value:
+        d.sgWindowRequestedSec,
+      Unit:'s'
+    },
+
+    {
+      Parameter:'Signal type',
+      Value:
+        d.params.signalType
+    },
+
+    {
+      Parameter:'Scan speed',
+      Value:
+        d.params.scanSpeed,
+      Unit:'mm/s'
+    },
+
+    {
+      Parameter:'Scan length',
+      Value:
+        d.params.scanLength,
+      Unit:'mm'
+    },
+
+    {
+      Parameter:'Estimated notch position',
+      Value:
+        d.params.notchPosition,
+      Unit:'mm'
+    },
+
+    {
+      Parameter:'Measured samples',
+      Value:
+        d.params.expectedSamples
+    },
+
+    {
+      Parameter:'Detected scan lines',
+      Value:
+        d.lines.length
+    },
+
+    {
+      Parameter:'Scan line labels',
+      Value:
+        d.lines.join(', ')
+    },
+
+    {
+      Parameter:'Scan duration',
+      Value:
+        d.duration,
+      Unit:'s'
+    },
+
+    {
+      Parameter:'Common valid length',
+      Value:
+        d.minLength,
+      Unit:'samples'
+    },
+
+    {
+      Parameter:'Estimated sampling rate',
+      Value:
+        d.fs,
+      Unit:'Hz'
+    },
+
+    {
+      Parameter:'Distance per sample',
+      Value:
+        d.dx,
+      Unit:'mm/sample'
+    },
+
+    {
+      Parameter:'SG polynomial order',
+      Value:3
+    },
+
+    {
+      Parameter:'SG window duration',
+      Value:
+        d.sgWindowSec,
+      Unit:'s'
+    },
+
+    {
+      Parameter:'SG window samples',
+      Value:
+        d.sgWindow
+    },
+
+    {
+      Parameter:'SG physical window',
+      Value:
+        d.sgWindowMm,
+      Unit:'mm'
+    }
+  ];
 }
-];
-}
+
 function lineColorRows(){
-return state.dataset.lines.map(
-line=>({
-Line:line,
-Color_HEX:lineColor(line)
-})
-);
+
+  return state.dataset.lines.map(
+    line=>({
+      Line:line,
+      Color_HEX:
+        lineColor(line)
+    })
+  );
 }
-function datasetSheet(sample,source){
-const d=state.dataset;
-const lines=
-d.sampleLines?.[sample]||
-d.lines;
-const aoa=[
-[
-'Distance_mm',
-...lines
-]
-];
-for(let i=0;i<d.minLength;i++){
-aoa.push(
-[
-d.distance[i],
-...lines.map(
-line=>source[sample][line][i]
-)
-]
-);
+
+function datasetSheet(
+  sample,
+  source
+){
+
+  const d=
+    state.dataset;
+
+  const lines=
+    d.sampleLines?.[
+      sample
+    ]||
+    d.lines;
+
+  const aoa=[
+    [
+      'Distance_mm',
+      ...lines
+    ]
+  ];
+
+  for(
+    let i=0;
+    i<d.minLength;
+    i++
+  ){
+
+    aoa.push(
+      [
+        d.distance[i],
+
+        ...lines.map(
+          line=>
+            source[
+              sample
+            ][
+              line
+            ][i]
+        )
+      ]
+    );
+  }
+
+  return aoa;
 }
-return aoa;
-}
+
 function allAucRows(){
-const rows=[];
-for(const s of state.dataset.samples){
-for(
-const line of(
-state.dataset.sampleLines?.[s]||
-state.dataset.lines
-)
-){
-const r=
-state.results.auc?.[s]?.[line];
-if(r){
-rows.push({
-Sample:s,
-Line:line,
-'Delta X (P1 & MIN)':r.deltaXP1Min,
-'Delta X (P2 & MIN)':r.deltaXP2Min,
-'Delta Y (P1 & MIN)':r.deltaYP1Min,
-'Delta Y (P2 & MIN)':r.deltaYP2Min,
-'AUC (P1 & P2)':r.aucP1P2,
-'AUC (P1 & MIN)':r.aucP1Min?.auc??'',
-'AUC (P2 & MIN)':r.aucP2Min?.auc??'',
-Notch:Number.isFinite(r.notchY)?r.notchY:notchValueForLine(s,line),
-'First Slope':r.firstSlope,
-'Slope (P1 & MIN)':r.slopeP1Min,
-'Slope (P2 & MIN)':r.slopeP2Min,
-'Peak 1 값':r.peak1Y,
-'Peak 2 값':r.peak2Y,
-'Min 값':r.valleyY
-});
+
+  const rows=[];
+
+  for(
+    const s
+    of state.dataset.samples
+  ){
+
+    for(
+      const line
+      of(
+        state.dataset.sampleLines?.[
+          s
+        ]||
+        state.dataset.lines
+      )
+    ){
+
+      const r=
+        state.results.auc?.[
+          s
+        ]?.[
+          line
+        ];
+
+      if(r){
+
+        rows.push({
+          Sample:s,
+          Line:line,
+          'Delta X (P1 & MIN)':
+            r.deltaXP1Min,
+          'Delta X (P2 & MIN)':
+            r.deltaXP2Min,
+          'Delta Y (P1 & MIN)':
+            r.deltaYP1Min,
+          'Delta Y (P2 & MIN)':
+            r.deltaYP2Min,
+          'AUC (P1 & P2)':
+            r.aucP1P2,
+          'AUC (P1 & MIN)':
+            r.aucP1Min?.auc??'',
+          'AUC (P2 & MIN)':
+            r.aucP2Min?.auc??'',
+          Notch:
+            Number.isFinite(
+              r.notchY
+            )
+            ?r.notchY
+            :notchValueForLine(
+              s,
+              line
+            ),
+          'First Slope':
+            r.firstSlope,
+          'Slope (P1 & MIN)':
+            r.slopeP1Min,
+          'Slope (P2 & MIN)':
+            r.slopeP2Min,
+          'Peak 1 값':
+            r.peak1Y,
+          'Peak 2 값':
+            r.peak2Y,
+          'Min 값':
+            r.valleyY
+        });
+      }
+    }
+  }
+
+  return rows;
 }
-}
-}
-return rows;
-}
+
 function rangeRows(){
-return state.dataset.samples.map(
-s=>({
-Sample:s,
-Range_Start_mm:
-state.ranges[s]?.[0]??0,
-Range_End_mm:
-state.ranges[s]?.[1]??
-state.dataset.params.scanLength
-})
-);
+
+  return state.dataset.samples.map(
+    s=>({
+      Sample:s,
+
+      Range_Start_mm:
+        state.ranges[s]?.[0]??
+        0,
+
+      Range_End_mm:
+        state.ranges[s]?.[1]??
+        state.dataset.params.scanLength
+    })
+  );
 }
+
 function regionSelectionRows(){
-const rows=[];
-for(const s of state.dataset.samples){
-const byLine=
-state.results.mean?.[s]||
-{};
-for(const line of Object.keys(byLine)){
-for(const r of(byLine[line]||[])){
-rows.push({
-Sample:r.Sample,
-Line:r.Line,
-Region:r.Region||'',
-Search_Range_Start_mm:r.Search_Range_Start_mm,
-Search_Range_End_mm:r.Search_Range_End_mm,
-Center_mm:r.Center_mm,
-Range_Start_mm:r.Range_Start_mm,
-Range_End_mm:r.Range_End_mm,
-Interval_Length_mm:r.Interval_Length_mm,
-Status:r.Status||'Calculated'
-});
+
+  const rows=[];
+
+  for(
+    const s
+    of state.dataset.samples
+  ){
+
+    const byLine=
+      state.results.mean?.[
+        s
+      ]||
+      {};
+
+    for(
+      const line
+      of Object.keys(byLine)
+    ){
+
+      for(
+        const r
+        of(
+          byLine[line]||
+          []
+        )
+      ){
+
+        rows.push({
+          Sample:r.Sample,
+          Line:r.Line,
+          Region:r.Region||'',
+          Search_Range_Start_mm:
+            r.Search_Range_Start_mm,
+          Search_Range_End_mm:
+            r.Search_Range_End_mm,
+          Center_mm:
+            r.Center_mm,
+          Range_Start_mm:
+            r.Range_Start_mm,
+          Range_End_mm:
+            r.Range_End_mm,
+          Interval_Length_mm:
+            r.Interval_Length_mm,
+          Status:
+            r.Status||
+            'Calculated'
+        });
+      }
+    }
+  }
+
+  return rows;
 }
-}
-}
-return rows;
-}
+
 function allMeanRows(){
-const rows=[];
-for(const s of state.dataset.samples){
-const byLine=
-state.results.mean?.[s]||
-{};
-for(const line of Object.keys(byLine)){
-rows.push(
-...(byLine[line]||[])
-);
+
+  const rows=[];
+
+  for(
+    const s
+    of state.dataset.samples
+  ){
+
+    const byLine=
+      state.results.mean?.[
+        s
+      ]||
+      {};
+
+    for(
+      const line
+      of Object.keys(byLine)
+    ){
+
+      rows.push(
+        ...(
+          byLine[line]||
+          []
+        )
+      );
+    }
+  }
+
+  return rows;
 }
-}
-return rows;
-}
+
 function allNotchSlopeRows(){
-const rows=[];
-for(const s of state.dataset.samples){
-const byLine=
-state.results.notchSlope?.[s]||
-{};
-for(
-const line of(
-state.dataset.sampleLines?.[s]||
-state.dataset.lines
-)
-){
-const r=byLine[line];
-if(
-r&&
-Number.isFinite(
-r.Notch_Tangent_Slope_Y_per_mm
-)
-){
-rows.push(r);
+
+  const rows=[];
+
+  for(
+    const s
+    of state.dataset.samples
+  ){
+
+    const byLine=
+      state.results.notchSlope?.[
+        s
+      ]||
+      {};
+
+    for(
+      const line
+      of(
+        state.dataset.sampleLines?.[
+          s
+        ]||
+        state.dataset.lines
+      )
+    ){
+
+      const r=
+        byLine[line];
+
+      if(
+        r &&
+        Number.isFinite(
+          r.Notch_Tangent_Slope_Y_per_mm
+        )
+      ){
+        rows.push(r);
+      }
+    }
+  }
+
+  return rows;
 }
-}
-}
-return rows;
-}
+
 function buildWorkbook(mode){
-const d=state.dataset;
-const wb=XLSX.utils.book_new();
-appendJsonSheet(
-wb,
-'Parameters',
-parameterRows()
-);
-appendJsonSheet(
-wb,
-'Line_Colors',
-lineColorRows()
-);
-appendJsonSheet(
-wb,
-'Length_Audit',
-d.lengths
-);
-if(mode==='raw'){
-for(const s of d.samples){
-appendAoASheet(
-wb,
-`${s}_Raw`,
-datasetSheet(
-s,
-d.raw
-)
-);
+
+  const d=
+    state.dataset;
+
+  const wb=
+    XLSX.utils.book_new();
+
+  appendJsonSheet(
+    wb,
+    'Parameters',
+    parameterRows()
+  );
+
+  appendJsonSheet(
+    wb,
+    'Line_Colors',
+    lineColorRows()
+  );
+
+  appendJsonSheet(
+    wb,
+    'Length_Audit',
+    d.lengths
+  );
+
+  if(mode==='raw'){
+
+    for(
+      const s
+      of d.samples
+    ){
+
+      appendAoASheet(
+        wb,
+        `${s}_Raw`,
+        datasetSheet(
+          s,
+          d.raw
+        )
+      );
+    }
+  }
+
+  if(mode==='interval'){
+
+    appendJsonSheet(
+      wb,
+      'Analysis_Ranges',
+      rangeRows()
+    );
+
+    appendJsonSheet(
+      wb,
+      'Interval_Results',
+      allAucRows()
+    );
+
+    for(
+      const s
+      of d.samples
+    ){
+
+      appendAoASheet(
+        wb,
+        `${s}_SG`,
+        datasetSheet(
+          s,
+          d.smoothed
+        )
+      );
+    }
+  }
+
+  if(mode==='intervalMean'){
+
+    appendJsonSheet(
+      wb,
+      'Region_Selections',
+      regionSelectionRows()
+    );
+
+    appendJsonSheet(
+      wb,
+      'Interval_Mean_Results',
+      allMeanRows()
+    );
+
+    appendJsonSheet(
+      wb,
+      'Notch_Tangent_Slope',
+      allNotchSlopeRows()
+    );
+
+    for(
+      const s
+      of d.samples
+    ){
+
+      appendAoASheet(
+        wb,
+        `${s}_SG`,
+        datasetSheet(
+          s,
+          d.smoothed
+        )
+      );
+    }
+  }
+
+  const out=
+    XLSX.write(
+      wb,
+      {
+        bookType:'xlsx',
+        type:'array'
+      }
+    );
+
+  return new Blob(
+    [out],
+    {
+      type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    }
+  );
 }
-}
-if(mode==='interval'){
-appendJsonSheet(
-wb,
-'Analysis_Ranges',
-rangeRows()
-);
-appendJsonSheet(
-wb,
-'Interval_Results',
-allAucRows()
-);
-for(const s of d.samples){
-appendAoASheet(
-wb,
-`${s}_SG`,
-datasetSheet(
-s,
-d.smoothed
-)
-);
-}
-}
-if(mode==='intervalMean'){
-appendJsonSheet(
-wb,
-'Region_Selections',
-regionSelectionRows()
-);
-appendJsonSheet(
-wb,
-'Interval_Mean_Results',
-allMeanRows()
-);
-appendJsonSheet(
-wb,
-'Notch_Tangent_Slope',
-allNotchSlopeRows()
-);
-for(const s of d.samples){
-appendAoASheet(
-wb,
-`${s}_SG`,
-datasetSheet(
-s,
-d.smoothed
-)
-);
-}
-}
-const out=XLSX.write(
-wb,
-{
-bookType:'xlsx',
-type:'array'
-}
-);
-return new Blob(
-[out],
-{
-type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-}
-);
-}
+
 async function buildAllSamplePlotEntries(mode){
-const d=state.dataset;
-const entries=[];
-for(let i=0;i<d.samples.length;i++){
-const s=d.samples[i];
-el('progress').textContent=
-`${tr('saving')} ${s} (${i+1}/${d.samples.length})`;
-const traces=
-makeTracesForSampleExport(
-s,
-mode
-);
-const layout=
-baseLayout(
-tr(modeInfo[mode].title),
-mode,
-s
-);
-entries.push({
-path:`Individual/${s}_${mode}.png`,
-blob:
-await imageFromSpec(
-traces,
-layout
-)
-});
+
+  const d=
+    state.dataset;
+
+  const entries=[];
+
+  for(
+    let i=0;
+    i<d.samples.length;
+    i++
+  ){
+
+    const s=
+      d.samples[i];
+
+    el('progress').textContent=
+      `${tr('saving')} ${s} (${i+1}/${d.samples.length})`;
+
+    const traces=
+      makeTracesForSampleExport(
+        s,
+        mode
+      );
+
+    const layout=
+      baseLayout(
+        tr(
+          modeInfo[mode].title
+        ),
+        mode,
+        s
+      );
+
+    entries.push({
+      path:
+        `Individual/${s}_${mode}.png`,
+
+      blob:
+        await imageFromSpec(
+          traces,
+          layout
+        )
+    });
+  }
+
+  return entries;
 }
-return entries;
-}
-function makeTracesForSampleExport(sample,mode){
-const d=state.dataset;
-const source=mode==='raw'?d.raw:d.smoothed;
-const traces=[];
-const exportLines=selectedLineList(sample);
-if(mode==='interval'){
-for(const line of exportLines){
-const au=
-state.results.auc?.[sample]?.[line];
-const lowerArea=
-lowerAucAreaTrace(
-sample,
-line,
-au
-);
-if(lowerArea){
-traces.push(lowerArea);
-}
-}
-}
-for(const line of exportLines){
-traces.push({
-x:d.distance,
-y:source[sample][line],
-type:'scatter',
-mode:'lines',
-name:line,
-showlegend:true,
-line:{
-width:mode==='raw'?1.5:2.2,
-color:lineColor(line)
-}
-});
-}
-if(mode==='interval'){
-for(const line of exportLines){
-appendAucOverlayTraces(
-traces,
-sample,
-line,
-state.results.auc?.[sample]?.[line]
-);
-appendNotchPointTrace(
-traces,
-sample,
-line
-);
-}
-}
-if(mode==='intervalMean'){
-for(const line of exportLines){
-const rows=
-state.results.mean?.[sample]?.[line]||
-[];
-const meta=rows[0];
-if(
-meta&&
-Number.isFinite(meta.Min1_X_mm)&&
-Number.isFinite(meta.Min2_X_mm)
+
+function makeTracesForSampleExport(
+  sample,
+  mode
 ){
-traces.push({
-x:[
-meta.Min1_X_mm,
-meta.Min2_X_mm
-],
-y:[
-meta.Min1_Y,
-meta.Min2_Y
-],
-type:'scatter',
-mode:'markers',
-name:`${line} minima`,
-marker:{
-size:10,
-symbol:'triangle-down',
-color:lineColor(line)
+
+  const d=
+    state.dataset;
+
+  const source=
+    mode==='raw'
+    ?d.raw
+    :d.smoothed;
+
+  const traces=[];
+
+  const exportLines=
+    selectedLineList(
+      sample
+    );
+
+  if(mode==='interval'){
+
+    for(
+      const line
+      of exportLines
+    ){
+
+      const au=
+        state.results.auc?.[
+          sample
+        ]?.[
+          line
+        ];
+
+      const lowerArea=
+        lowerAucAreaTrace(
+          sample,
+          line,
+          au
+        );
+
+      if(lowerArea){
+        traces.push(
+          lowerArea
+        );
+      }
+    }
+  }
+
+  for(
+    const line
+    of exportLines
+  ){
+
+    traces.push({
+      x:d.distance,
+      y:source[sample][line],
+      type:'scatter',
+      mode:'lines',
+      name:line,
+      showlegend:true,
+
+      line:{
+        width:
+          mode==='raw'
+          ?1.5
+          :2.2,
+
+        color:
+          lineColor(line)
+      }
+    });
+  }
+
+  if(mode==='interval'){
+
+    for(
+      const line
+      of exportLines
+    ){
+
+      appendAucOverlayTraces(
+        traces,
+        sample,
+        line,
+        state.results.auc?.[
+          sample
+        ]?.[
+          line
+        ]
+      );
+
+      appendNotchPointTrace(
+        traces,
+        sample,
+        line
+      );
+    }
+  }
+
+  if(mode==='intervalMean'){
+
+    for(
+      const line
+      of exportLines
+    ){
+
+      const rows=
+        state.results.mean?.[
+          sample
+        ]?.[
+          line
+        ]||
+        [];
+
+      const meta=
+        rows[0];
+
+      if(
+        meta &&
+        Number.isFinite(
+          meta.Min1_X_mm
+        ) &&
+        Number.isFinite(
+          meta.Min2_X_mm
+        )
+      ){
+
+        traces.push({
+          x:[
+            meta.Min1_X_mm,
+            meta.Min2_X_mm
+          ],
+
+          y:[
+            meta.Min1_Y,
+            meta.Min2_Y
+          ],
+
+          type:'scatter',
+          mode:'markers',
+          name:`${line} minima`,
+
+          marker:{
+            size:10,
+            symbol:'triangle-down',
+            color:
+              lineColor(line)
+          }
+        });
+      }
+    }
+  }
+
+  return traces;
 }
-});
-}
-}
-}
-return traces;
-}
-el('saveBtn').onclick=async()=>{
-if(
-!state.dataset||
-!state.currentMode||
-!state.currentPlot
-){
-setStatus(
-tr('needRead'),
-'bad'
-);
-return;
-}
-if(!state.saveHandle){
-setStatus(
-tr('needFolder'),
-'bad'
-);
-return;
-}
-el('saveBtn').disabled=true;
-el('progress').classList.add('visible');
-el('progress').textContent=tr('saving');
-try{
-const mode=state.currentMode;
-const folder=modeInfo[mode].folder;
-const entries=[
-{
-path:
-`${state.selectedSample}_${mode}_current.png`,
-blob:
-await plotDivToBlob(
-state.currentPlot
-)
-}
-];
-if(mode!=='sg'){
-entries.push({
-path:
-`CID_Scan_${mode}_Results.xlsx`,
-blob:
-buildWorkbook(mode)
-});
-}
-if(state.exportAll){
-entries.push(
-...await buildAllSamplePlotEntries(mode)
-);
-}
-for(let i=0;i<entries.length;i++){
-el('progress').textContent=
-`${tr('saving')} ${i+1}/${entries.length}`;
-await writeBlob(
-state.saveHandle,
-`${folder}/${entries[i].path}`,
-entries[i].blob
-);
-}
-setStatus(
-tr('saved'),
-'good'
-);
-}catch(err){
-console.error(err);
-setStatus(
-`${tr('saveFailed')}: ${err.message||err}`,
-'bad'
-);
-}finally{
-el('saveBtn').disabled=false;
-el('progress').classList.remove('visible');
-}
+
+el('saveBtn').onclick=
+async()=>{
+
+  if(
+    !state.dataset ||
+    !state.currentMode ||
+    !state.currentPlot
+  ){
+
+    setStatus(
+      tr('needRead'),
+      'bad'
+    );
+
+    return;
+  }
+
+  if(!state.saveHandle){
+
+    setStatus(
+      tr('needFolder'),
+      'bad'
+    );
+
+    return;
+  }
+
+  el('saveBtn').disabled=true;
+
+  el('progress').classList.add(
+    'visible'
+  );
+
+  el('progress').textContent=
+    tr('saving');
+
+  try{
+
+    const mode=
+      state.currentMode;
+
+    const folder=
+      modeInfo[mode].folder;
+
+    const entries=[
+      {
+        path:
+          `${state.selectedSample}_${mode}_current.png`,
+
+        blob:
+          await plotDivToBlob(
+            state.currentPlot
+          )
+      }
+    ];
+
+    if(mode!=='sg'){
+
+      entries.push({
+        path:
+          `CID_Scan_${mode}_Results.xlsx`,
+
+        blob:
+          buildWorkbook(
+            mode
+          )
+      });
+    }
+
+    if(state.exportAll){
+
+      entries.push(
+        ...await buildAllSamplePlotEntries(
+          mode
+        )
+      );
+    }
+
+    for(
+      let i=0;
+      i<entries.length;
+      i++
+    ){
+
+      el('progress').textContent=
+        `${tr('saving')} ${i+1}/${entries.length}`;
+
+      await writeBlob(
+        state.saveHandle,
+        `${folder}/${entries[i].path}`,
+        entries[i].blob
+      );
+    }
+
+    setStatus(
+      tr('saved'),
+      'good'
+    );
+
+  }catch(err){
+
+    console.error(err);
+
+    setStatus(
+      `${tr('saveFailed')}: ${err.message||err}`,
+      'bad'
+    );
+
+  }finally{
+
+    el('saveBtn').disabled=false;
+
+    el('progress').classList.remove(
+      'visible'
+    );
+  }
 };
 </script>
+
 </body>
 </html>
