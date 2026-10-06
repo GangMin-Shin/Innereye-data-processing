@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ZR rawdata analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+:root{--ink:#111827;--muted:#667085;--line:#e5e7eb;--green:#1f8a57;--green-soft:#eaf8f0;--danger:#b42318;--amber:#b54708;--amber-soft:#fff7e8;--shadow:0 12px 38px rgba(17,24,39,.08)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#fff;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;position:relative}
+body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.60),rgba(255,255,255,.60)),url("./ZR%20rawdata%20analysis.png");background-size:cover;background-position:center;background-repeat:no-repeat;opacity:.20;filter:saturate(.72) brightness(1.08) contrast(.92);z-index:-2}
+body::after{content:"";position:fixed;inset:0;background:rgba(255,255,255,.24);z-index:-1}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.topbar{position:sticky;top:0;z-index:30;height:82px;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px 0 330px}
+.title-wrap h1{font-size:24px;margin:0;font-weight:800;letter-spacing:-.03em}
+.topbar-actions{display:flex;align-items:center;gap:10px}
+.lang-btn,.global-reset-btn{width:46px;height:46px;border:1px solid var(--line);border-radius:50%;background:#fff;box-shadow:0 6px 18px rgba(17,24,39,.06);display:inline-flex;align-items:center;justify-content:center}
+.lang-btn{font-size:21px}
+.global-reset-btn{font-size:25px;font-weight:700;line-height:1;transition:.18s ease}
+.global-reset-btn:hover,.tab-reset-btn:hover{background:#f8f9fb;transform:translateY(-1px);border-color:#bdc3cc}
+.global-reset-btn:active,.tab-reset-btn:active{transform:translateY(0)}
+.dock{position:fixed;z-index:40;left:22px;bottom:22px;width:280px;max-height:calc(100vh - 44px);overflow:auto;background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:var(--shadow);backdrop-filter:blur(10px)}
+.dock-head{padding:8px 8px 12px}
+.dock-head strong{display:block;font-size:15px}
+.dock-head span{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.nav-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.nav-btn,.analysis-btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;font-weight:800}
+.nav-btn{height:42px}
+.analysis-btn{width:100%;text-align:left;padding:13px 14px;margin-top:8px;line-height:1.35;font-size:13px;transition:.18s ease}
+.analysis-btn:hover{transform:translateY(-1px);border-color:#bdc3cc}
+.analysis-btn.active{background:#111827;color:#fff;border-color:#111827}
+.dock hr{border:0;border-top:1px solid var(--line);margin:10px 0}
+.dock-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:800;padding:4px 8px}
+.workspace{margin-left:316px;padding:30px 36px 80px;max-width:1800px}
+.setup-card,.plot-card,.analysis-card{border:1px solid var(--line);border-radius:20px;background:rgba(255,255,255,.90);box-shadow:0 8px 28px rgba(17,24,39,.05);backdrop-filter:blur(8px)}
+.setup-card{padding:24px;margin-bottom:22px}
+.section-title{font-size:18px;font-weight:800;margin:0 0 18px;letter-spacing:-.02em}
+.setup-grid{display:grid;grid-template-columns:repeat(2,minmax(280px,1fr));gap:14px;align-items:end}
+.field label{display:block;font-size:12px;font-weight:800;color:#344054;margin-bottom:7px}
+.file-line{display:flex;gap:8px;align-items:center}
+.file-line input[type=file]{display:none}
+.primary,.secondary{height:46px;border-radius:12px;padding:0 18px;font-size:14px;font-weight:800;border:1px solid var(--line);white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+.primary{background:#111827;color:#fff;border-color:#111827}
+.secondary{background:#fff;color:#111827}
+.secondary:hover{background:#f8f9fb}
+.filename{flex:1;height:46px;display:flex;align-items:center;padding:0 12px;border:1px dashed #cfd4dc;border-radius:12px;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.read-row{display:flex;gap:10px;align-items:center;margin-top:15px;flex-wrap:wrap}
+.status{font-size:12px;font-weight:700;color:var(--muted)}
+.status.good{color:var(--green)}
+.status.bad{color:var(--danger)}
+.status.warn{color:var(--amber)}
+.detected{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.badge{padding:7px 10px;border:1px solid var(--line);border-radius:999px;font-size:11px;font-weight:800;color:#344054;background:#fafafa}
+.badge.good{background:var(--green-soft);color:#16653f;border-color:#ccebd9}
+.badge.warn{background:var(--amber-soft);color:#9a6700;border-color:#f4dfad}
+.colors{margin-top:18px;padding-top:18px;border-top:1px solid var(--line);display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.colors[hidden]{display:none!important}
+.color-opt{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;color:#475467}
+.color-opt input{width:30px;height:30px;padding:0;border:0;background:none}
+.result-header{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:28px 0 14px}
+.result-header h2{margin:0;font-size:21px;font-weight:800;letter-spacing:-.03em}
+.result-header .sub{font-size:12px;color:var(--muted);font-weight:600;margin-top:5px}
+.actions{display:none;align-items:center;gap:10px;flex-wrap:wrap}
+.actions.visible{display:flex}
+.save-btn{height:44px;border:0;border-radius:12px;background:#111827;color:#fff;padding:0 17px;font-weight:800}
+.save-btn:disabled{opacity:.45;cursor:not-allowed}
+.analysis-card{padding:18px;margin-bottom:18px;display:none}
+.analysis-card.visible{display:block}
+.analysis-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.analysis-card-title{font-size:13px;font-weight:800;color:#344054}
+.tab-reset-btn{width:38px;height:38px;border:1px solid var(--line);border-radius:50%;background:#fff;color:#111827;font-size:21px;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(17,24,39,.05);transition:.18s ease}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}
+.result-table{width:100%;border-collapse:collapse;min-width:1180px;font-size:12px}
+.result-table th,.result-table td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.result-table th:first-child,.result-table td:first-child,.result-table th:last-child,.result-table td:last-child{text-align:left}
+.result-table th{background:#f8f9fb;font-weight:800;color:#344054;position:sticky;top:0}
+.result-table tr:last-child td{border-bottom:0}
+.plots{display:grid;gap:18px}
+.plot-card{padding:16px;min-height:500px}
+.plot-title{display:flex;align-items:center;justify-content:space-between;padding:3px 4px 10px;font-size:13px;font-weight:800}
+.plot{width:100%;height:500px}
+.empty{min-height:500px;border:1px dashed #d5dae1;border-radius:20px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-weight:700;line-height:1.6;padding:30px}
+.progress{display:none;margin-top:10px;font-size:12px;font-weight:700;color:var(--muted)}
+.progress.visible{display:block}
+
+@media(max-width:1050px){
+  .dock{position:static;width:auto;max-height:none;margin:18px}
+  .topbar{padding-left:24px}
+  .workspace{margin-left:0;padding:12px 18px 60px}
+}
+
+@media(max-width:650px){
+  .setup-grid{grid-template-columns:1fr}
+  .topbar{height:auto;padding:16px 18px}
+  .title-wrap h1{font-size:19px}
+  .workspace{padding:10px 12px 50px}
+  .plot{height:430px}
+  .result-header{align-items:flex-start;flex-direction:column}
+}
+</style>
+</head>
+<body>
+<aside class="dock">
+  <div class="dock-head">
+    <strong data-i18n="module">ZR rawdata analysis</strong>
+    <span data-i18n="dockHint">Select an analysis function.</span>
+  </div>
+
+  <div class="nav-row">
+    <button class="nav-btn" onclick="history.back()" data-i18n="back">← Back</button>
+    <button class="nav-btn" onclick="location.href='./'" data-i18n="home">Home</button>
+  </div>
+
+  <hr>
+  <div class="dock-label" data-i18n="analysis">Analysis</div>
+  <button id="descriptionBtn" class="analysis-btn" data-mode="description" data-i18n="descriptionBtn">Description</button>
+</aside>
+
+<header class="topbar">
+  <div class="title-wrap">
+    <h1 data-i18n="module">ZR rawdata analysis</h1>
+  </div>
+  <div class="topbar-actions">
+    <button id="globalResetBtn" class="global-reset-btn" type="button" title="Reset all" aria-label="Reset all">↻</button>
+    <button id="langBtn" class="lang-btn" type="button" title="Language" aria-label="Change language">🌐</button>
+  </div>
+</header>
+
+<main class="workspace">
+  <section class="setup-card">
+    <h2 class="section-title" data-i18n="inputSetup">Input & output setup</h2>
+
+    <div class="setup-grid">
+      <div class="field">
+        <label data-i18n="excelFile">Excel workbook</label>
+        <div class="file-line">
+          <button id="excelBrowseBtn" type="button" class="secondary" data-i18n="browse">Browse</button>
+          <input id="excelInput" type="file" accept=".xlsx,.xlsm,.xls">
+          <div id="filename" class="filename" data-i18n="noFile">No file selected</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label data-i18n="savePath">Save path</label>
+        <div class="file-line">
+          <button id="folderBtn" type="button" class="secondary" data-i18n="browse">Browse</button>
+          <div id="folderName" class="filename" data-i18n="notSelected">No folder selected</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="read-row">
+      <button id="readBtn" class="primary" data-i18n="readExcel">Read Excel</button>
+      <button id="downloadTemplateBtn" class="secondary" data-i18n="downloadTemplate">Download template</button>
+      <span id="status" class="status" data-i18n="ready">Ready</span>
+    </div>
+
+    <div id="detected" class="detected"></div>
+
+    <div id="colorsSection" class="colors" hidden>
+      <span style="font-size:11px;font-weight:800;color:#344054" data-i18n="plotColors">Plot colors</span>
+      <label class="color-opt"><input id="p0Color" type="color" value="#2563eb"><span>P0</span></label>
+      <label class="color-opt"><input id="p1Color" type="color" value="#d97706"><span>P1</span></label>
+      <label class="color-opt"><input id="diffColor" type="color" value="#059669"><span>P0 - P1</span></label>
+    </div>
+  </section>
+
+  <section>
+    <div class="result-header">
+      <div>
+        <h2 id="resultTitle" data-i18n="result">Processing result</h2>
+        <div id="resultSub" class="sub" data-i18n="chooseAnalysis">Read a valid workbook to generate the Description results.</div>
+      </div>
+      <div id="actions" class="actions">
+        <button id="saveBtn" class="save-btn" data-i18n="save">Save</button>
+      </div>
+    </div>
+
+    <div id="analysisControls" class="analysis-card">
+      <div class="analysis-card-head">
+        <span class="analysis-card-title" data-i18n="descriptionSummary">Description summary</span>
+        <button id="tabResetBtn" class="tab-reset-btn" type="button" title="Reset current analysis" aria-label="Reset current analysis">↻</button>
+      </div>
+      <div id="resultTableWrap"></div>
+    </div>
+
+    <div id="plots" class="plots">
+      <div class="empty" data-i18n="empty">No plot yet.<br>Read a valid workbook to start analysis.</div>
+    </div>
+
+    <div id="progress" class="progress"></div>
+  </section>
+</main>
+
+<script>
+const I18N={
+  en:{
+    module:'ZR rawdata analysis',
+    dockHint:'Select an analysis function.',
+    back:'← Back',
+    home:'🏠 Home',
+    analysis:'Analysis',
+    descriptionBtn:'Description',
+    inputSetup:'Input & output setup',
+    excelFile:'Excel workbook',
+    savePath:'Save path',
+    browse:'Browse',
+    noFile:'No file selected',
+    notSelected:'No folder selected',
+    readExcel:'Read Excel',
+    downloadTemplate:'Download template',
+    ready:'Ready',
+    plotColors:'Plot colors',
+    result:'Processing result',
+    chooseAnalysis:'Read a valid workbook to generate the Description results.',
+    save:'Save',
+    descriptionSummary:'Description summary',
+    descriptionSub:'Valid samples only. P0 = P1 + (P0 - P1). SD is sample standard deviation (n-1).',
+    empty:'No plot yet.\nRead a valid workbook to start analysis.',
+    needFile:'Please select an Excel workbook.',
+    needFolder:'Please select a save folder.',
+    folderSelected:'Save folder selected.',
+    folderUnsupported:'This browser does not support folder selection. Use a browser with the File System Access API.',
+    reading:'Reading Ch1 / Ch2 and validating P1 and P0 - P1…',
+    readDone:'Description analysis completed.',
+    templateDownloadStarted:'Template download started.',
+    sheetMissing:'The workbook must contain both Ch1 and Ch2 sheets.',
+    headerMismatch:'Each channel sheet must have A1=N, B1=P1, C1=P0 - P1.',
+    saving:'Saving workbook…',
+    saved:'Save completed.',
+    saveFailed:'Save failed',
+    globalResetTitle:'Reset all',
+    tabResetTitle:'Reset current analysis',
+    fullResetDone:'All inputs and analysis states were reset.',
+    tabResetDone:'The Description analysis was reset.',
+    channel:'Channel',
+    validSamples:'Valid samples',
+    p0Mean:'P0 Mean',
+    p0SD:'P0 SD',
+    p1Mean:'P1 Mean',
+    p1SD:'P1 SD',
+    diffMean:'P0 - P1 Mean',
+    diffSD:'P0 - P1 SD',
+    note:'Note',
+    invalidNote:'Invalid samples',
+    rawSamples:'Input rows',
+    valid:'Valid',
+    invalid:'Invalid',
+    sampleAxis:'Sample',
+    noValid:'No valid samples',
+    plotTitle:'Valid-sample bar plots'
+  },
+  ko:{
+    module:'ZR rawdata 분석',
+    dockHint:'분석 기능을 선택하세요.',
+    back:'← 뒤로가기',
+    home:'🏠 Home',
+    analysis:'분석',
+    descriptionBtn:'Description',
+    inputSetup:'입력 및 저장 설정',
+    excelFile:'입력 Excel 파일',
+    savePath:'저장 경로',
+    browse:'Browse',
+    noFile:'선택된 파일 없음',
+    notSelected:'선택된 폴더 없음',
+    readExcel:'Excel 읽기',
+    downloadTemplate:'양식 다운로드',
+    ready:'준비 완료',
+    plotColors:'그래프 색상',
+    result:'처리 결과',
+    chooseAnalysis:'유효한 Excel을 읽으면 Description 결과를 생성합니다.',
+    save:'세이브',
+    descriptionSummary:'Description 요약',
+    descriptionSub:'유효 샘플만 사용합니다. P0 = P1 + (P0 - P1), SD는 표본 표준편차(n-1)입니다.',
+    empty:'아직 플롯이 없습니다.\n유효한 Excel을 읽어 분석을 시작하세요.',
+    needFile:'입력 Excel 파일을 선택해주세요.',
+    needFolder:'저장 폴더를 선택해주세요.',
+    folderSelected:'저장 폴더 선택 완료.',
+    folderUnsupported:'이 브라우저는 저장 폴더 선택을 지원하지 않습니다. File System Access API 지원 브라우저를 사용해주세요.',
+    reading:'Ch1 / Ch2를 읽고 P1 및 P0 - P1 유효성을 확인하는 중…',
+    readDone:'Description 분석이 완료되었습니다.',
+    templateDownloadStarted:'Excel 양식 다운로드를 시작했습니다.',
+    sheetMissing:'Excel에는 Ch1과 Ch2 시트가 모두 있어야 합니다.',
+    headerMismatch:'각 채널 시트의 A1=N, B1=P1, C1=P0 - P1이어야 합니다.',
+    saving:'Excel 파일 저장 중…',
+    saved:'저장이 완료되었습니다.',
+    saveFailed:'저장 실패',
+    globalResetTitle:'전체 리셋',
+    tabResetTitle:'현재 분석 탭 리셋',
+    fullResetDone:'입력과 분석 상태를 모두 초기화했습니다.',
+    tabResetDone:'Description 분석 탭을 초기화했습니다.',
+    channel:'채널',
+    validSamples:'유효 샘플 수',
+    p0Mean:'P0 평균',
+    p0SD:'P0 표준편차',
+    p1Mean:'P1 평균',
+    p1SD:'P1 표준편차',
+    diffMean:'P0 - P1 평균',
+    diffSD:'P0 - P1 표준편차',
+    note:'비고',
+    invalidNote:'유효하지 않은 샘플',
+    rawSamples:'입력 행 수',
+    valid:'유효',
+    invalid:'무효',
+    sampleAxis:'샘플',
+    noValid:'유효 샘플 없음',
+    plotTitle:'유효 샘플 바 플롯'
+  }
+};
+
+let lang=localStorage.getItem('innereye_lang')||'en';
+if(!I18N[lang])lang='en';
+
+const state={
+  file:null,
+  saveHandle:null,
+  dataset:null,
+  plotDivs:[]
+};
+
+const el=id=>document.getElementById(id);
+const tr=k=>Object.prototype.hasOwnProperty.call(I18N[lang],k)?I18N[lang][k]:k;
+
+function setStatus(text,kind=''){
+  el('status').textContent=text;
+  el('status').className='status '+kind;
+}
+
+function fmt(v,d=6){
+  return Number.isFinite(v)?Number(v).toFixed(d):'';
+}
+
+function isBlank(v){
+  return v===null||v===undefined||String(v).trim()==='';
+}
+
+function toFiniteNumber(v){
+  if(isBlank(v))return NaN;
+  if(typeof v==='number')return Number.isFinite(v)?v:NaN;
+
+  const s=String(v).trim().replace(/,/g,'');
+
+  if(
+    !s||
+    /^nan$/i.test(s)||
+    /^#(n\/a|value!|num!|div\/0!|ref!|name\?)$/i.test(s)
+  ){
+    return NaN;
+  }
+
+  const n=Number(s);
+
+  return Number.isFinite(n)?n:NaN;
+}
+
+function meanAndSampleSD(values){
+  const n=values.length;
+
+  if(!n){
+    return{
+      mean:NaN,
+      sd:NaN
+    };
+  }
+
+  const mean=
+    values.reduce(
+      (a,b)=>a+b,
+      0
+    )/n;
+
+  if(n===1){
+    return{
+      mean,
+      sd:0
+    };
+  }
+
+  let ss=0;
+
+  for(const v of values){
+    ss+=(v-mean)**2;
+  }
+
+  return{
+    mean,
+    sd:Math.sqrt(
+      ss/(n-1)
+    )
+  };
+}
+
+function purgePlots(){
+  for(const div of state.plotDivs){
+    try{
+      Plotly.purge(div);
+    }catch(_){}
+  }
+
+  state.plotDivs=[];
+}
+
+function clearDescription({keepStatus=false}={}){
+  purgePlots();
+
+  state.dataset=null;
+
+  el('descriptionBtn').classList.remove('active');
+  el('analysisControls').classList.remove('visible');
+  el('actions').classList.remove('visible');
+
+  el('resultTableWrap').innerHTML='';
+  el('detected').innerHTML='';
+  el('colorsSection').hidden=true;
+
+  el('resultTitle').textContent=tr('result');
+  el('resultSub').textContent=tr('chooseAnalysis');
+
+  el('plots').innerHTML=
+    `<div class="empty">${tr('empty').replace(/\n/g,'<br>')}</div>`;
+
+  el('progress').textContent='';
+  el('progress').classList.remove('visible');
+
+  if(!keepStatus){
+    setStatus(tr('ready'));
+  }
+}
+
+function applyLanguage(){
+  document.documentElement.lang=lang;
+
+  document.querySelectorAll('[data-i18n]').forEach(node=>{
+    const k=node.dataset.i18n;
+
+    if(I18N[lang][k]){
+      node.innerHTML=
+        I18N[lang][k]
+        .replace(/\n/g,'<br>');
+    }
+  });
+
+  if(state.file){
+    el('filename').textContent=
+      state.file.name;
+  }
+
+  if(state.saveHandle){
+    el('folderName').textContent=
+      state.saveHandle.name;
+  }
+
+  el('globalResetBtn').title=
+    tr('globalResetTitle');
+
+  el('globalResetBtn')
+    .setAttribute(
+      'aria-label',
+      tr('globalResetTitle')
+    );
+
+  el('tabResetBtn').title=
+    tr('tabResetTitle');
+
+  el('tabResetBtn')
+    .setAttribute(
+      'aria-label',
+      tr('tabResetTitle')
+    );
+
+  if(state.dataset){
+    el('descriptionBtn')
+      .classList.add('active');
+
+    el('analysisControls')
+      .classList.add('visible');
+
+    el('actions')
+      .classList.add('visible');
+
+    el('resultTitle').textContent=
+      'Description';
+
+    el('resultSub').textContent=
+      tr('descriptionSub');
+
+    renderDetected();
+    renderSummaryTable();
+    renderPlots();
+  }
+}
+
+el('langBtn').onclick=()=>{
+  lang=
+    lang==='en'
+    ?'ko'
+    :'en';
+
+  localStorage.setItem(
+    'innereye_lang',
+    lang
+  );
+
+  applyLanguage();
+};
+
+el('excelBrowseBtn').onclick=
+  ()=>el('excelInput').click();
+
+el('excelInput')
+.addEventListener(
+  'change',
+  e=>{
+    state.file=
+      e.target.files[0]||
+      null;
+
+    el('filename').textContent=
+      state.file
+      ?state.file.name
+      :tr('noFile');
+
+    clearDescription({
+      keepStatus:true
+    });
+
+    setStatus(tr('ready'));
+  }
+);
+
+el('folderBtn').onclick=async()=>{
+  if(!window.showDirectoryPicker){
+    setStatus(
+      tr('folderUnsupported'),
+      'bad'
+    );
+
+    return;
+  }
+
+  try{
+    state.saveHandle=
+      await window.showDirectoryPicker({
+        mode:'readwrite',
+        id:'innereye-zr-rawdata-output'
+      });
+
+    el('folderName').textContent=
+      state.saveHandle.name;
+
+    setStatus(
+      tr('folderSelected'),
+      'good'
+    );
+  }catch(e){
+    if(e.name!=='AbortError'){
+      setStatus(
+        e.message||String(e),
+        'bad'
+      );
+    }
+  }
+};
+
+function resetPlotColors(){
+  el('p0Color').value='#2563eb';
+  el('p1Color').value='#d97706';
+  el('diffColor').value='#059669';
+}
+
+function resetAll(){
+  state.file=null;
+  state.saveHandle=null;
+
+  el('excelInput').value='';
+  el('filename').textContent=
+    tr('noFile');
+
+  el('folderName').textContent=
+    tr('notSelected');
+
+  resetPlotColors();
+
+  clearDescription({
+    keepStatus:true
+  });
+
+  setStatus(
+    tr('fullResetDone'),
+    'good'
+  );
+}
+
+function resetCurrentAnalysis(){
+  resetPlotColors();
+
+  clearDescription({
+    keepStatus:true
+  });
+
+  setStatus(
+    tr('tabResetDone'),
+    'good'
+  );
+}
+
+el('globalResetBtn').onclick=
+  resetAll;
+
+el('tabResetBtn').onclick=
+  resetCurrentAnalysis;
+
+function buildTemplateWorkbook(){
+  const wb=
+    XLSX.utils.book_new();
+
+  const cols=[
+    {wch:12},
+    {wch:18},
+    {wch:18}
+  ];
+
+  for(const name of ['Ch1','Ch2']){
+    const ws=
+      XLSX.utils.aoa_to_sheet([
+        ['N','P1','P0 - P1']
+      ]);
+
+    ws['!cols']=cols;
+
+    XLSX.utils.book_append_sheet(
+      wb,
+      ws,
+      name
+    );
+  }
+
+  const summary=
+    XLSX.utils.aoa_to_sheet([
+      ['Notation'],
+      ['Standard value = P1'],
+      ['Measured value = P0 - P1']
+    ]);
+
+  summary['!cols']=[
+    {wch:32}
+  ];
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    summary,
+    'Summary'
+  );
+
+  return wb;
+}
+
+el('downloadTemplateBtn').onclick=()=>{
+  try{
+    XLSX.writeFile(
+      buildTemplateWorkbook(),
+      'ZR rawdata analysis sheet.xlsx',
+      {
+        bookType:'xlsx',
+        compression:true
+      }
+    );
+
+    setStatus(
+      tr('templateDownloadStarted'),
+      'good'
+    );
+  }catch(e){
+    setStatus(
+      e.message||String(e),
+      'bad'
+    );
+  }
+};
+
+function validateHeaders(
+  aoa,
+  sheetName
+){
+  const row=
+    aoa[0]||
+    [];
+
+  const actual=
+    [0,1,2].map(
+      i=>String(
+        row[i]??''
+      ).trim()
+    );
+
+  const expected=[
+    'N',
+    'P1',
+    'P0 - P1'
+  ];
+
+  if(
+    expected.some(
+      (h,i)=>actual[i]!==h
+    )
+  ){
+    throw new Error(
+      `${tr('headerMismatch')} (${sheetName})`
+    );
+  }
+}
+
+function parseChannelSheet(
+  ws,
+  name
+){
+  const aoa=
+    XLSX.utils.sheet_to_json(
+      ws,
+      {
+        header:1,
+        defval:null,
+        raw:true
+      }
+    );
+
+  validateHeaders(
+    aoa,
+    name
+  );
+
+  const valid=[];
+
+  let inputRows=0;
+  let invalidCount=0;
+
+  for(
+    let r=1;
+    r<aoa.length;
+    r++
+  ){
+    const row=
+      aoa[r]||
+      [];
+
+    const rawN=
+      row[0];
+
+    const rawP1=
+      row[1];
+
+    const rawDiff=
+      row[2];
+
+    if(
+      isBlank(rawN)&&
+      isBlank(rawP1)&&
+      isBlank(rawDiff)
+    ){
+      continue;
+    }
+
+    inputRows++;
+
+    const p1=
+      toFiniteNumber(
+        rawP1
+      );
+
+    const diff=
+      toFiniteNumber(
+        rawDiff
+      );
+
+    if(
+      !Number.isFinite(p1)||
+      !Number.isFinite(diff)
+    ){
+      invalidCount++;
+      continue;
+    }
+
+    valid.push({
+      N:valid.length+1,
+
+      Original_N:
+        isBlank(rawN)
+        ?''
+        :rawN,
+
+      P0:
+        p1+diff,
+
+      P1:
+        p1,
+
+      Diff:
+        diff
+    });
+  }
+
+  const p0Stats=
+    meanAndSampleSD(
+      valid.map(
+        r=>r.P0
+      )
+    );
+
+  const p1Stats=
+    meanAndSampleSD(
+      valid.map(
+        r=>r.P1
+      )
+    );
+
+  const diffStats=
+    meanAndSampleSD(
+      valid.map(
+        r=>r.Diff
+      )
+    );
+
+  return{
+    name,
+    inputRows,
+    invalidCount,
+    validCount:valid.length,
+    valid,
+
+    stats:{
+      p0:p0Stats,
+      p1:p1Stats,
+      diff:diffStats
+    }
+  };
+}
+
+el('readBtn').onclick=async()=>{
+  if(!state.file){
+    setStatus(
+      tr('needFile'),
+      'bad'
+    );
+
+    return;
+  }
+
+  setStatus(
+    tr('reading')
+  );
+
+  try{
+    clearDescription({
+      keepStatus:true
+    });
+
+    const buf=
+      await state.file.arrayBuffer();
+
+    const wb=
+      XLSX.read(
+        buf,
+        {
+          type:'array'
+        }
+      );
+
+    if(
+      !wb.Sheets.Ch1||
+      !wb.Sheets.Ch2
+    ){
+      throw new Error(
+        tr('sheetMissing')
+      );
+    }
+
+    const channels={
+      Ch1:
+        parseChannelSheet(
+          wb.Sheets.Ch1,
+          'Ch1'
+        ),
+
+      Ch2:
+        parseChannelSheet(
+          wb.Sheets.Ch2,
+          'Ch2'
+        )
+    };
+
+    state.dataset={
+      channels
+    };
+
+    el('descriptionBtn')
+      .classList.add(
+        'active'
+      );
+
+    el('analysisControls')
+      .classList.add(
+        'visible'
+      );
+
+    el('actions')
+      .classList.add(
+        'visible'
+      );
+
+    el('colorsSection').hidden=
+      false;
+
+    el('resultTitle').textContent=
+      'Description';
+
+    el('resultSub').textContent=
+      tr('descriptionSub');
+
+    renderDetected();
+    renderSummaryTable();
+
+    await renderPlots();
+
+    setStatus(
+      tr('readDone'),
+      'good'
+    );
+  }catch(e){
+    console.error(e);
+
+    clearDescription({
+      keepStatus:true
+    });
+
+    setStatus(
+      e.message||String(e),
+      'bad'
+    );
+  }
+};
+
+el('descriptionBtn').onclick=()=>{
+  if(!state.dataset){
+    setStatus(
+      tr('needFile'),
+      'warn'
+    );
+
+    return;
+  }
+
+  el('descriptionBtn')
+    .classList.add(
+      'active'
+    );
+
+  el('analysisControls')
+    .classList.add(
+      'visible'
+    );
+
+  el('actions')
+    .classList.add(
+      'visible'
+    );
+
+  el('resultTitle').textContent=
+    'Description';
+
+  el('resultSub').textContent=
+    tr('descriptionSub');
+
+  renderSummaryTable();
+  renderPlots();
+};
+
+function renderDetected(){
+  if(!state.dataset){
+    el('detected').innerHTML='';
+    return;
+  }
+
+  const chips=[];
+
+  for(
+    const name of [
+      'Ch1',
+      'Ch2'
+    ]
+  ){
+    const c=
+      state.dataset
+      .channels[name];
+
+    chips.push(
+      `<span class="badge good">${name} · ${tr('rawSamples')}: ${c.inputRows}</span>`,
+
+      `<span class="badge good">${name} · ${tr('valid')}: ${c.validCount}</span>`,
+
+      `<span class="badge ${c.invalidCount?'warn':'good'}">${name} · ${tr('invalid')}: ${c.invalidCount}</span>`
+    );
+  }
+
+  el('detected').innerHTML=
+    chips.join('');
+}
+
+function renderSummaryTable(){
+  if(!state.dataset){
+    el('resultTableWrap')
+      .innerHTML='';
+
+    return;
+  }
+
+  const head=[
+    tr('channel'),
+    tr('validSamples'),
+    tr('p0Mean'),
+    tr('p0SD'),
+    tr('p1Mean'),
+    tr('p1SD'),
+    tr('diffMean'),
+    tr('diffSD'),
+    tr('note')
+  ];
+
+  const body=
+    ['Ch1','Ch2']
+    .map(name=>{
+      const c=
+        state.dataset
+        .channels[name];
+
+      return(
+        `<tr>`+
+        `<td>${name}</td>`+
+        `<td>${c.validCount}</td>`+
+        `<td>${fmt(c.stats.p0.mean)}</td>`+
+        `<td>${fmt(c.stats.p0.sd)}</td>`+
+        `<td>${fmt(c.stats.p1.mean)}</td>`+
+        `<td>${fmt(c.stats.p1.sd)}</td>`+
+        `<td>${fmt(c.stats.diff.mean)}</td>`+
+        `<td>${fmt(c.stats.diff.sd)}</td>`+
+        `<td>${tr('invalidNote')}: ${c.invalidCount}</td>`+
+        `</tr>`
+      );
+    })
+    .join('');
+
+  el('resultTableWrap').innerHTML=
+    `<div class="table-wrap">`+
+    `<table class="result-table">`+
+    `<thead>`+
+    `<tr>`+
+    head
+      .map(
+        h=>`<th>${h}</th>`
+      )
+      .join('')+
+    `</tr>`+
+    `</thead>`+
+    `<tbody>${body}</tbody>`+
+    `</table>`+
+    `</div>`;
+}
+
+function subplotLayout(
+  channel
+){
+  const commonX={
+    title:{
+      text:tr('sampleAxis'),
+      font:{
+        size:12
+      }
+    },
+
+    showgrid:false,
+    zeroline:false,
+    linecolor:'#9aa1ad',
+    linewidth:1.1,
+    tickmode:'linear',
+    dtick:1,
+    rangemode:'tozero'
+  };
+
+  const commonY={
+    showgrid:false,
+    zeroline:false,
+    linecolor:'#9aa1ad',
+    linewidth:1.1
+  };
+
+  return{
+    height:500,
+
+    margin:{
+      l:72,
+      r:32,
+      t:72,
+      b:72
+    },
+
+    paper_bgcolor:'#fff',
+    plot_bgcolor:'#fff',
+
+    font:{
+      family:'Inter, sans-serif',
+      color:'#111827'
+    },
+
+    showlegend:false,
+    bargap:.2,
+
+    title:{
+      text:
+        `${channel} · ${tr('plotTitle')}`,
+      font:{
+        size:14
+      },
+      x:.01,
+      xanchor:'left'
+    },
+
+    xaxis:{
+      ...commonX,
+      domain:[
+        0,
+        .29
+      ],
+      anchor:'y'
+    },
+
+    yaxis:{
+      ...commonY,
+      domain:[
+        0,
+        1
+      ],
+      anchor:'x',
+
+      title:{
+        text:'P0',
+        font:{
+          size:12
+        }
+      }
+    },
+
+    xaxis2:{
+      ...commonX,
+      domain:[
+        .355,
+        .645
+      ],
+      anchor:'y2'
+    },
+
+    yaxis2:{
+      ...commonY,
+      domain:[
+        0,
+        1
+      ],
+      anchor:'x2',
+
+      title:{
+        text:'P1',
+        font:{
+          size:12
+        }
+      }
+    },
+
+    xaxis3:{
+      ...commonX,
+      domain:[
+        .71,
+        1
+      ],
+      anchor:'y3'
+    },
+
+    yaxis3:{
+      ...commonY,
+      domain:[
+        0,
+        1
+      ],
+      anchor:'x3',
+
+      title:{
+        text:'P0 - P1',
+        font:{
+          size:12
+        }
+      }
+    },
+
+    annotations:[
+      {
+        xref:'paper',
+        yref:'paper',
+        x:.145,
+        y:1.07,
+        text:'P0',
+        showarrow:false,
+        font:{
+          size:13
+        }
+      },
+      {
+        xref:'paper',
+        yref:'paper',
+        x:.5,
+        y:1.07,
+        text:'P1',
+        showarrow:false,
+        font:{
+          size:13
+        }
+      },
+      {
+        xref:'paper',
+        yref:'paper',
+        x:.855,
+        y:1.07,
+        text:'P0 - P1',
+        showarrow:false,
+        font:{
+          size:13
+        }
+      }
+    ]
+  };
+}
+
+const plotConfig={
+  responsive:true,
+  displaylogo:false,
+
+  modeBarButtonsToRemove:[
+    'select2d',
+    'lasso2d'
+  ],
+
+  toImageButtonOptions:{
+    format:'png',
+    filename:'ZR_rawdata_plot',
+    height:900,
+    width:1600,
+    scale:2
+  }
+};
+
+async function renderPlots(){
+  if(!state.dataset){
+    return;
+  }
+
+  purgePlots();
+
+  el('plots').innerHTML='';
+
+  for(
+    const name of [
+      'Ch1',
+      'Ch2'
+    ]
+  ){
+    const c=
+      state.dataset
+      .channels[name];
+
+    const card=
+      document.createElement(
+        'div'
+      );
+
+    card.className=
+      'plot-card';
+
+    card.innerHTML=
+      `<div class="plot-title">`+
+      `<span>${name}</span>`+
+      `</div>`+
+      `<div class="plot"></div>`;
+
+    el('plots')
+      .appendChild(card);
+
+    const div=
+      card.querySelector(
+        '.plot'
+      );
+
+    state.plotDivs.push(
+      div
+    );
+
+    if(!c.valid.length){
+      div.innerHTML=
+        `<div class="empty" style="min-height:430px">`+
+        `${tr('noValid')}`+
+        `</div>`;
+
+      continue;
+    }
+
+    const x=
+      c.valid.map(
+        r=>r.N
+      );
+
+    const traces=[
+      {
+        type:'bar',
+        x,
+        y:c.valid.map(
+          r=>r.P0
+        ),
+        xaxis:'x',
+        yaxis:'y',
+
+        marker:{
+          color:
+            el('p0Color').value
+        },
+
+        hovertemplate:
+          `${tr('sampleAxis')}=%{x}<br>`+
+          `P0=%{y:.6f}`+
+          `<extra>${name}</extra>`
+      },
+
+      {
+        type:'bar',
+        x,
+        y:c.valid.map(
+          r=>r.P1
+        ),
+        xaxis:'x2',
+        yaxis:'y2',
+
+        marker:{
+          color:
+            el('p1Color').value
+        },
+
+        hovertemplate:
+          `${tr('sampleAxis')}=%{x}<br>`+
+          `P1=%{y:.6f}`+
+          `<extra>${name}</extra>`
+      },
+
+      {
+        type:'bar',
+        x,
+        y:c.valid.map(
+          r=>r.Diff
+        ),
+        xaxis:'x3',
+        yaxis:'y3',
+
+        marker:{
+          color:
+            el('diffColor').value
+        },
+
+        hovertemplate:
+          `${tr('sampleAxis')}=%{x}<br>`+
+          `P0 - P1=%{y:.6f}`+
+          `<extra>${name}</extra>`
+      }
+    ];
+
+    await Plotly.newPlot(
+      div,
+      traces,
+      subplotLayout(name),
+      plotConfig
+    );
+  }
+}
+
+[
+  'p0Color',
+  'p1Color',
+  'diffColor'
+].forEach(id=>{
+  el(id)
+  .addEventListener(
+    'change',
+    ()=>{
+      if(state.dataset){
+        renderPlots();
+      }
+    }
+  );
+});
+
+function buildOutputWorkbook(){
+  const wb=
+    XLSX.utils.book_new();
+
+  for(
+    const name of [
+      'Ch1',
+      'Ch2'
+    ]
+  ){
+    const rows=[
+      [
+        'N',
+        'P0',
+        'P1',
+        'P0 - P1'
+      ]
+    ];
+
+    for(
+      const r of
+      state.dataset
+      .channels[name]
+      .valid
+    ){
+      rows.push([
+        r.N,
+        r.P0,
+        r.P1,
+        r.Diff
+      ]);
+    }
+
+    const ws=
+      XLSX.utils
+      .aoa_to_sheet(
+        rows
+      );
+
+    ws['!cols']=[
+      {wch:10},
+      {wch:18},
+      {wch:18},
+      {wch:18}
+    ];
+
+    XLSX.utils
+      .book_append_sheet(
+        wb,
+        ws,
+        name
+      );
+  }
+
+  return wb;
+}
+
+async function writeBlobToSelectedFolder(
+  filename,
+  blob
+){
+  const fh=
+    await state.saveHandle
+    .getFileHandle(
+      filename,
+      {
+        create:true
+      }
+    );
+
+  const writable=
+    await fh.createWritable();
+
+  await writable.write(
+    blob
+  );
+
+  await writable.close();
+}
+
+el('saveBtn').onclick=async()=>{
+  if(!state.dataset){
+    setStatus(
+      tr('chooseAnalysis'),
+      'bad'
+    );
+
+    return;
+  }
+
+  if(!state.saveHandle){
+    setStatus(
+      tr('needFolder'),
+      'bad'
+    );
+
+    return;
+  }
+
+  el('saveBtn').disabled=true;
+
+  el('progress')
+    .classList.add(
+      'visible'
+    );
+
+  el('progress').textContent=
+    tr('saving');
+
+  try{
+    const wb=
+      buildOutputWorkbook();
+
+    const out=
+      XLSX.write(
+        wb,
+        {
+          bookType:'xlsx',
+          type:'array',
+          compression:true
+        }
+      );
+
+    const blob=
+      new Blob(
+        [out],
+        {
+          type:
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        }
+      );
+
+    await writeBlobToSelectedFolder(
+      'ZR_rawdata_Description_Results.xlsx',
+      blob
+    );
+
+    setStatus(
+      tr('saved'),
+      'good'
+    );
+  }catch(e){
+    console.error(e);
+
+    setStatus(
+      `${tr('saveFailed')}: ${e.message||e}`,
+      'bad'
+    );
+  }finally{
+    el('saveBtn').disabled=
+      false;
+
+    el('progress')
+      .classList.remove(
+        'visible'
+      );
+  }
+};
+
+applyLanguage();
+</script>
+</body>
+</html>
