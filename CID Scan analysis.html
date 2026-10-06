@@ -261,7 +261,7 @@ button{cursor:pointer}
 
 .file-line input[type=file]{display:none}
 
-.primary,.secondary,.dangerless{
+.primary,.secondary{
   height:46px;
   border-radius:12px;
   padding:0 18px;
@@ -281,12 +281,12 @@ button{cursor:pointer}
   border-color:#111827
 }
 
-.secondary,.dangerless{
+.secondary{
   background:#fff;
   color:#111827
 }
 
-.secondary:hover,.dangerless:hover{
+.secondary:hover{
   background:#f8f9fb
 }
 
@@ -753,42 +753,10 @@ button{cursor:pointer}
   color:#344054
 }
 
-.region-remove{
-  width:22px;
-  height:22px;
-  border:0;
-  border-radius:50%;
-  background:#f2f4f7;
-  color:#475467;
-  font-weight:800;
-  line-height:1
-}
-
-.region-remove:hover{background:#e4e7ec}
-
 .region-empty{
   font-size:11px;
   color:var(--muted);
   font-weight:600
-}
-
-.step-badge{
-  display:inline-flex;
-  align-items:center;
-  gap:7px;
-  padding:7px 10px;
-  border:1px solid var(--line);
-  border-radius:999px;
-  background:#fff;
-  font-size:11px;
-  font-weight:800;
-  color:#475467
-}
-
-.step-badge.ready{
-  background:var(--green-soft);
-  color:#16653f;
-  border-color:#ccebd9
 }
 
 .app-shell[hidden]{display:none!important}
@@ -1475,7 +1443,14 @@ const state={
   currentPlot:null
 };
 
-const el=id=>document.getElementById(id);
+const domCache=new Map();
+const el=id=>{
+  const cached=domCache.get(id);
+  if(cached?.isConnected)return cached;
+  const node=document.getElementById(id);
+  if(node)domCache.set(id,node);
+  return node;
+};
 
 const tr=k=>
   Object.prototype.hasOwnProperty.call(I18N[lang],k)
@@ -1603,18 +1578,6 @@ function loadStoredColorDefaults(type=state.cidType){
   }
 }
 
-function inputSettings(){
-  return{
-    excitation:Number(el('excitation').value),
-    sgWindowSec:Number(el('sgWindowSec').value),
-    signalType:el('signalType').value,
-    scanSpeed:Number(el('scanSpeed').value),
-    scanLength:Number(el('scanLength').value),
-    notchPosition:Number(el('notchPosition').value),
-    expectedSamples:Number(el('expectedSamples').value)
-  };
-}
-
 function applyInputSettings(v){
   const x={
     ...BASE_DEFAULTS,
@@ -1656,6 +1619,24 @@ function applyStoredDefaults(type=state.cidType){
   applyInputSettings(
     loadStoredDefaults(type)
   );
+}
+
+function emptyResults(){
+  return{
+    extrema:{},
+    auc:{},
+    mean:{},
+    notchSlope:{}
+  };
+}
+
+function resetRanges(){
+  state.ranges={};
+  if(!state.dataset)return;
+  const end=state.dataset.params.scanLength;
+  for(const sample of state.dataset.samples){
+    state.ranges[sample]=[0,end];
+  }
 }
 
 function selectCidType(type){
@@ -1796,12 +1777,7 @@ function clearAnalysisUi(){
 
   state.meanSettings={};
 
-  state.results={
-    extrema:{},
-    auc:{},
-    mean:{},
-    notchSlope:{}
-  };
+  state.results=emptyResults();
 
   state.selectedLines=new Set();
   state.exportAll=false;
@@ -2103,41 +2079,18 @@ async function resetCurrentAnalysis(){
   el('resultTableWrap').innerHTML='';
 
   if(mode==='interval'){
-
     state.rangeApplyAll.interval=false;
-
+    state.results.extrema={};
+    state.results.auc={};
+    resetRanges();
     syncRangeApplyAllToggle();
   }
 
-  if(mode==='interval'){
-
-    state.results.extrema={};
-    state.results.auc={};
-    state.ranges={};
-
-    state.dataset.samples.forEach(s=>{
-      state.ranges[s]=[
-        0,
-        state.dataset.params.scanLength
-      ];
-    });
-  }
-
   if(mode==='intervalMean'){
-
-    state.ranges={};
     state.meanSettings={};
-
     state.results.mean={};
     state.results.notchSlope={};
-
-    state.dataset.samples.forEach(s=>{
-      state.ranges[s]=[
-        0,
-        state.dataset.params.scanLength
-      ];
-    });
-
+    resetRanges();
     ensureMeanSetting(
       state.selectedSample
     );
@@ -2227,35 +2180,30 @@ function parseFilenameMeta(name){
   };
 }
 
-function cleanLineValues(aoa,col){
-
-  const out=[];
+function extractLineValues(aoa,headers){
+  const values=Object.fromEntries(
+    headers.map(line=>[line,[]])
+  );
 
   for(let r=1;r<aoa.length;r++){
-
-    const raw=
-      aoa[r]?.[col];
-
-    if(
-      raw===null ||
-      raw===undefined ||
-      String(raw).trim()===''
-    ){
-      continue;
-    }
-
-    const v=
-      Number(raw);
-
-    if(
-      Number.isFinite(v) &&
-      v!==0
-    ){
-      out.push(v);
+    const row=aoa[r]||[];
+    for(let c=0;c<headers.length;c++){
+      const raw=row[c];
+      if(
+        raw===null ||
+        raw===undefined ||
+        String(raw).trim()===''
+      ){
+        continue;
+      }
+      const v=Number(raw);
+      if(Number.isFinite(v)&&v!==0){
+        values[headers[c]].push(v);
+      }
     }
   }
 
-  return out;
+  return values;
 }
 
 function detectLineHeaders(row){
@@ -2456,36 +2404,22 @@ function reflectIndex(i,n){
 }
 
 function savgol(y,window,order=3){
+  const c=sgCoefficients(window,order);
+  const m=(window-1)/2;
+  const n=y.length;
+  const padded=new Array(n+2*m);
+  const out=new Array(n);
 
-  const c=
-    sgCoefficients(
-      window,
-      order
-    );
+  for(let i=0;i<padded.length;i++){
+    padded[i]=y[reflectIndex(i-m,n)];
+  }
 
-  const m=
-    (window-1)/2;
-
-  const out=
-    new Array(y.length);
-
-  for(let i=0;i<y.length;i++){
-
-    let s=0;
-
-    for(let j=-m;j<=m;j++){
-
-      s+=
-        c[j+m]*
-        y[
-          reflectIndex(
-            i+j,
-            y.length
-          )
-        ];
+  for(let i=0;i<n;i++){
+    let sum=0;
+    for(let j=0;j<window;j++){
+      sum+=c[j]*padded[i+j];
     }
-
-    out[i]=s;
+    out[i]=sum;
   }
 
   return out;
@@ -2604,6 +2538,16 @@ function initializeLineColors(lines){
   state.lineColors=next;
 }
 
+let renderFrame=0;
+function scheduleCurrentRender(){
+  if(!state.currentMode)return;
+  cancelAnimationFrame(renderFrame);
+  renderFrame=requestAnimationFrame(()=>{
+    renderFrame=0;
+    void renderCurrentMode();
+  });
+}
+
 function renderColorOptions(){
 
   const d=
@@ -2644,27 +2588,13 @@ function renderColorOptions(){
     )
     .forEach(input=>{
 
-      const syncColorFromInput=async()=>{
-
-        state.lineColors[
-          input.dataset.colorLine
-        ]=
-          input.value;
-
-        if(state.currentMode){
-          await renderCurrentMode();
-        }
+      const syncColorFromInput=()=>{
+        state.lineColors[input.dataset.colorLine]=input.value;
+        scheduleCurrentRender();
       };
 
-      input.addEventListener(
-        'input',
-        syncColorFromInput
-      );
-
-      input.addEventListener(
-        'change',
-        syncColorFromInput
-      );
+      input.addEventListener('input',syncColorFromInput);
+      input.addEventListener('change',syncColorFromInput);
     });
 }
 
@@ -2945,25 +2875,15 @@ el('readBtn').onclick=async()=>{
           allLineSet.add(line)
       );
 
-      raw[s]={};
+      raw[s]=extractLineValues(aoa,headers);
 
-      headers.forEach(
-        (line,c)=>{
-
-          raw[s][line]=
-            cleanLineValues(
-              aoa,
-              c
-            );
-
-          lengths.push({
-            Sample:s,
-            Line:line,
-            Valid_Length:
-              raw[s][line].length
-          });
-        }
-      );
+      for(const line of headers){
+        lengths.push({
+          Sample:s,
+          Line:line,
+          Valid_Length:raw[s][line].length
+        });
+      }
     }
 
     const lines=
@@ -3144,28 +3064,13 @@ el('analyzeBtn').onclick=async()=>{
       state.dataset.lines
     );
 
-  state.ranges={};
-
   state.rangeApplyAll={
     interval:false
   };
 
   state.meanSettings={};
-
-  state.results={
-    extrema:{},
-    auc:{},
-    mean:{},
-    notchSlope:{}
-  };
-
-  state.dataset.samples.forEach(s=>{
-
-    state.ranges[s]=[
-      0,
-      state.dataset.params.scanLength
-    ];
-  });
+  state.results=emptyResults();
+  resetRanges();
 
   populateSampleSelect();
   renderLineToggles();
@@ -3728,22 +3633,6 @@ function readRangeInputs(){
   );
 });
 
-function regionFill(i){
-
-  const fills=[
-    'rgba(37,99,235,.10)',
-    'rgba(5,150,105,.10)',
-    'rgba(217,119,6,.11)',
-    'rgba(124,58,237,.10)',
-    'rgba(220,38,38,.09)',
-    'rgba(8,145,178,.10)'
-  ];
-
-  return fills[
-    i%fills.length
-  ];
-}
-
 function baseLayout(
   title,
   mode,
@@ -3915,28 +3804,22 @@ function selectedLineList(
   );
 }
 
-function displayLineList(
-  sample=state.selectedSample
-){
-  return selectedLineList(sample);
+function lowerBoundIndex(x,target,n=x.length){
+  let lo=0;
+  let hi=n;
+  while(lo<hi){
+    const mid=(lo+hi)>>1;
+    if(x[mid]<target)lo=mid+1;
+    else hi=mid;
+  }
+  return lo;
 }
 
-function interpolatedYAtX(
-  x,
-  y,
-  targetX
-){
-
-  const n=
-    Math.min(
-      Array.isArray(x)
-      ?x.length
-      :0,
-
-      Array.isArray(y)
-      ?y.length
-      :0
-    );
+function interpolatedYAtX(x,y,targetX){
+  const n=Math.min(
+    Array.isArray(x)?x.length:0,
+    Array.isArray(y)?y.length:0
+  );
 
   if(
     n===0 ||
@@ -3946,51 +3829,21 @@ function interpolatedYAtX(
   ){
     return NaN;
   }
+  if(n===1)return y[0];
 
-  if(n===1){
-    return y[0];
-  }
+  const hi=lowerBoundIndex(x,targetX,n);
+  if(hi>=n)return y[n-1];
+  if(hi===0)return y[0];
 
-  let hi=1;
-
-  while(
-    hi<n &&
-    x[hi]<targetX
-  ){
-    hi++;
-  }
-
-  if(hi>=n){
-    return y[n-1];
-  }
-
-  const lo=
-    Math.max(
-      0,
-      hi-1
-    );
-
+  const lo=hi-1;
   const x0=x[lo];
   const x1=x[hi];
   const y0=y[lo];
   const y1=y[hi];
+  if(Math.abs(x1-x0)<=1e-15)return y0;
 
-  if(
-    Math.abs(x1-x0)<=1e-15
-  ){
-    return y0;
-  }
-
-  const t=
-    clamp(
-      (targetX-x0)/
-      (x1-x0),
-      0,
-      1
-    );
-
-  return y0+
-    (y1-y0)*t;
+  const t=clamp((targetX-x0)/(x1-x0),0,1);
+  return y0+(y1-y0)*t;
 }
 
 function notchValueForLine(
@@ -4426,7 +4279,7 @@ function makeTraces(
 
   for(
     const line
-    of displayLineList(sample)
+    of selectedLineList(sample)
   ){
 
     traces.push({
@@ -4575,62 +4428,31 @@ const plotConfig={
 };
 
 async function renderCurrentMode(){
+  if(!state.dataset||!state.currentMode)return;
 
-  if(
-    !state.dataset ||
-    !state.currentMode
-  ){
-    return;
+  const sample=state.selectedSample;
+  const mode=state.currentMode;
+  const title=tr(modeInfo[mode].title);
+  let div=el('plot-main');
+
+  if(!div||!div.isConnected){
+    el('plots').innerHTML=
+      '<div class="plot-card">'+
+      '<div class="plot-title"><span id="plotTitleText"></span></div>'+
+      '<div id="plot-main" class="plot"></div>'+
+      '</div>';
+    domCache.delete('plot-main');
+    domCache.delete('plotTitleText');
+    div=el('plot-main');
   }
 
-  purgeCurrentPlot();
+  const titleNode=el('plotTitleText');
+  if(titleNode)titleNode.textContent=`${title} · ${sample}`;
 
-  const sample=
-    state.selectedSample;
+  const traces=makeTraces(sample,mode);
+  const layout=baseLayout(title,mode,sample);
 
-  const mode=
-    state.currentMode;
-
-  const title=
-    tr(
-      modeInfo[mode].title
-    );
-
-  el('plots').innerHTML=
-    '<div class="plot-card">'+
-    '<div class="plot-title">'+
-    '<span>'+
-    title+
-    ' · '+
-    sample+
-    '</span>'+
-    '</div>'+
-    '<div id="plot-main" class="plot"></div>'+
-    '</div>';
-
-  const div=
-    el('plot-main');
-
-  const traces=
-    makeTraces(
-      sample,
-      mode
-    );
-
-  const layout=
-    baseLayout(
-      title,
-      mode,
-      sample
-    );
-
-  await Plotly.newPlot(
-    div,
-    traces,
-    layout,
-    plotConfig
-  );
-
+  await Plotly.react(div,traces,layout,plotConfig);
   state.currentPlot=div;
 }
 
@@ -5497,10 +5319,7 @@ async()=>{
       }
     }
 
-    renderResultTable(
-      'interval',
-      rows
-    );
+    renderResultTable(rows);
 
     const hasSuccess=
       rows.some(
@@ -5835,20 +5654,9 @@ function tangentSlopeAtX(
     };
   }
 
-  let hi=1;
-
-  while(
-    hi<n-1 &&
-    x[hi]<targetX
-  ){
-    hi++;
-  }
-
-  const lo=
-    Math.max(
-      0,
-      hi-1
-    );
+  let hi=lowerBoundIndex(x,targetX,n);
+  hi=clamp(hi,1,n-1);
+  const lo=hi-1;
 
   const x0=
     x[lo];
@@ -6556,10 +6364,7 @@ async()=>{
   }
 };
 
-function renderResultTable(
-  kind,
-  rows
-){
+function renderResultTable(rows){
 
   if(!rows.length){
 
@@ -6631,38 +6436,11 @@ el('exportAllToggle').onclick=()=>{
 };
 
 function dataURLtoBlob(dataURL){
-
-  const [meta,b64]=
-    dataURL.split(',');
-
-  const mime=
-    meta.match(
-      /:(.*?);/
-    )[1];
-
-  const bin=
-    atob(b64);
-
-  const arr=
-    new Uint8Array(
-      bin.length
-    );
-
-  for(
-    let i=0;
-    i<bin.length;
-    i++
-  ){
-    arr[i]=
-      bin.charCodeAt(i);
-  }
-
-  return new Blob(
-    [arr],
-    {
-      type:mime
-    }
-  );
+  const [meta,b64]=dataURL.split(',');
+  const mime=meta.match(/:(.*?);/)?.[1]||'image/png';
+  const bin=atob(b64);
+  const arr=Uint8Array.from(bin,ch=>ch.charCodeAt(0));
+  return new Blob([arr],{type:mime});
 }
 
 async function plotDivToBlob(div){
@@ -7361,53 +7139,23 @@ function buildWorkbook(mode){
   );
 }
 
-async function buildAllSamplePlotEntries(mode){
-
-  const d=
-    state.dataset;
-
-  const entries=[];
-
-  for(
-    let i=0;
-    i<d.samples.length;
-    i++
-  ){
-
-    const s=
-      d.samples[i];
-
-    el('progress').textContent=
-      `${tr('saving')} ${s} (${i+1}/${d.samples.length})`;
-
-    const traces=
-      makeTracesForSampleExport(
-        s,
-        mode
-      );
-
-    const layout=
-      baseLayout(
-        tr(
-          modeInfo[mode].title
-        ),
-        mode,
-        s
-      );
-
-    entries.push({
-      path:
-        `Individual/${s}_${mode}.png`,
-
-      blob:
-        await imageFromSpec(
-          traces,
-          layout
-        )
-    });
+async function saveAllSamplePlots(mode,folder){
+  const d=state.dataset;
+  for(let i=0;i<d.samples.length;i++){
+    const sample=d.samples[i];
+    el('progress').textContent=`${tr('saving')} ${sample} (${i+1}/${d.samples.length})`;
+    const traces=makeTracesForSampleExport(sample,mode);
+    const layout=baseLayout(tr(modeInfo[mode].title),mode,sample);
+    const blob=await imageFromSpec(traces,layout);
+    await writeBlob(
+      state.saveHandle,
+      `${folder}/Individual/${sample}_${mode}.png`,
+      blob
+    );
+    if(i%2===1){
+      await new Promise(requestAnimationFrame);
+    }
   }
-
-  return entries;
 }
 
 function makeTracesForSampleExport(
@@ -7567,121 +7315,58 @@ function makeTracesForSampleExport(
   return traces;
 }
 
-el('saveBtn').onclick=
-async()=>{
-
-  if(
-    !state.dataset ||
-    !state.currentMode ||
-    !state.currentPlot
-  ){
-
-    setStatus(
-      tr('needRead'),
-      'bad'
-    );
-
+el('saveBtn').onclick=async()=>{
+  if(!state.dataset||!state.currentMode||!state.currentPlot){
+    setStatus(tr('needRead'),'bad');
     return;
   }
 
   if(!state.saveHandle){
-
-    setStatus(
-      tr('needFolder'),
-      'bad'
-    );
-
+    setStatus(tr('needFolder'),'bad');
     return;
   }
 
-  el('saveBtn').disabled=true;
-
-  el('progress').classList.add(
-    'visible'
-  );
-
-  el('progress').textContent=
-    tr('saving');
+  const saveBtn=el('saveBtn');
+  const progress=el('progress');
+  saveBtn.disabled=true;
+  progress.classList.add('visible');
+  progress.textContent=tr('saving');
 
   try{
+    const mode=state.currentMode;
+    const folder=modeInfo[mode].folder;
+    let step=1;
+    const baseSteps=mode==='sg'?1:2;
+    const totalSteps=baseSteps+(state.exportAll?state.dataset.samples.length:0);
 
-    const mode=
-      state.currentMode;
-
-    const folder=
-      modeInfo[mode].folder;
-
-    const entries=[
-      {
-        path:
-          `${state.selectedSample}_${mode}_current.png`,
-
-        blob:
-          await plotDivToBlob(
-            state.currentPlot
-          )
-      }
-    ];
+    progress.textContent=`${tr('saving')} ${step}/${totalSteps}`;
+    await writeBlob(
+      state.saveHandle,
+      `${folder}/${state.selectedSample}_${mode}_current.png`,
+      await plotDivToBlob(state.currentPlot)
+    );
 
     if(mode!=='sg'){
-
-      entries.push({
-        path:
-          `CID_Scan_${mode}_Results.xlsx`,
-
-        blob:
-          buildWorkbook(
-            mode
-          )
-      });
+      step++;
+      progress.textContent=`${tr('saving')} ${step}/${totalSteps}`;
+      await writeBlob(
+        state.saveHandle,
+        `${folder}/CID_Scan_${mode}_Results.xlsx`,
+        buildWorkbook(mode)
+      );
     }
 
     if(state.exportAll){
-
-      entries.push(
-        ...await buildAllSamplePlotEntries(
-          mode
-        )
-      );
+      await saveAllSamplePlots(mode,folder);
     }
 
-    for(
-      let i=0;
-      i<entries.length;
-      i++
-    ){
-
-      el('progress').textContent=
-        `${tr('saving')} ${i+1}/${entries.length}`;
-
-      await writeBlob(
-        state.saveHandle,
-        `${folder}/${entries[i].path}`,
-        entries[i].blob
-      );
-    }
-
-    setStatus(
-      tr('saved'),
-      'good'
-    );
-
+    setStatus(tr('saved'),'good');
   }catch(err){
-
     console.error(err);
-
-    setStatus(
-      `${tr('saveFailed')}: ${err.message||err}`,
-      'bad'
-    );
-
+    setStatus(`${tr('saveFailed')}: ${err.message||err}`,'bad');
   }finally{
-
-    el('saveBtn').disabled=false;
-
-    el('progress').classList.remove(
-      'visible'
-    );
+    saveBtn.disabled=false;
+    progress.classList.remove('visible');
   }
 };
 </script>
