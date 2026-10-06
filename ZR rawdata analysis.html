@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Source request: :chatgpt-content-reference{index="0"} -->
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -78,14 +79,28 @@ button{cursor:pointer}
 .tab-reset-btn{width:38px;height:38px;border:1px solid var(--line);border-radius:50%;background:#fff;color:#111827;font-size:21px;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(17,24,39,.05);transition:.18s ease}
 .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}
 .result-table{width:100%;border-collapse:collapse;min-width:1180px;font-size:12px}
-.result-table th,.result-table td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-.result-table th:first-child,.result-table td:first-child,.result-table th:last-child,.result-table td:last-child{text-align:left}
+.result-table th,.result-table td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
 .result-table th{background:#f8f9fb;font-weight:800;color:#344054;position:sticky;top:0}
+.result-table th:nth-child(3),.result-table td:nth-child(3),.result-table th:nth-child(5),.result-table td:nth-child(5),.result-table th:nth-child(7),.result-table td:nth-child(7){border-left:2px solid #cbd5e1}
+.result-table th:nth-child(4),.result-table td:nth-child(4),.result-table th:nth-child(6),.result-table td:nth-child(6),.result-table th:nth-child(8),.result-table td:nth-child(8){border-right:2px solid #cbd5e1}
 .result-table tr:last-child td{border-bottom:0}
+.result-header .sub:empty{display:none}
+.plot-controls{display:flex;justify-content:flex-end;align-items:end;gap:12px;flex-wrap:wrap;margin:0 0 14px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.90);box-shadow:0 6px 20px rgba(17,24,39,.04);backdrop-filter:blur(8px)}
+.plot-controls[hidden]{display:none!important}
+.plot-control-group{display:flex;flex-direction:column;gap:6px;min-width:150px}
+.plot-control-group label,.y-control label{font-size:11px;font-weight:800;color:#475467}
+.plot-control-group select,.y-control input{height:38px;border:1px solid #cfd4dc;border-radius:10px;background:#fff;color:#111827;padding:0 10px;font-size:12px;font-weight:700;outline:none}
+.plot-control-group select:focus,.y-control input:focus{border-color:#98a2b3;box-shadow:0 0 0 3px rgba(17,24,39,.05)}
 .plots{display:grid;gap:18px}
 .plot-card{padding:16px;min-height:500px}
-.plot-title{display:flex;align-items:center;justify-content:space-between;padding:3px 4px 10px;font-size:13px;font-weight:800}
-.plot{width:100%;height:500px}
+.plot-title{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:3px 4px 10px;font-size:14px;font-weight:800}
+.plot-title-name{font-size:15px;font-weight:800;color:#111827}
+.y-controls{display:flex;align-items:end;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.y-control{display:flex;flex-direction:column;gap:5px}
+.y-control input{width:128px}
+.auto-scale-btn{height:38px;border:1px solid var(--line);border-radius:10px;background:#fff;color:#111827;padding:0 12px;font-size:12px;font-weight:800}
+.auto-scale-btn:hover{background:#f8f9fb;border-color:#bdc3cc}
+.plot{width:100%;height:460px}
 .empty{min-height:500px;border:1px dashed #d5dae1;border-radius:20px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-weight:700;line-height:1.6;padding:30px}
 .progress{display:none;margin-top:10px;font-size:12px;font-weight:700;color:var(--muted)}
 .progress.visible{display:block}
@@ -103,6 +118,12 @@ button{cursor:pointer}
   .workspace{padding:10px 12px 50px}
   .plot{height:430px}
   .result-header{align-items:flex-start;flex-direction:column}
+  .plot-controls{justify-content:stretch}
+  .plot-control-group{min-width:0;flex:1 1 140px}
+  .plot-title{align-items:flex-start;flex-direction:column}
+  .y-controls{width:100%;justify-content:flex-start}
+  .y-control{flex:1 1 120px}
+  .y-control input{width:100%}
 }
 </style>
 </head>
@@ -191,6 +212,23 @@ button{cursor:pointer}
       <div id="resultTableWrap"></div>
     </div>
 
+    <div id="plotControls" class="plot-controls" hidden>
+      <div class="plot-control-group">
+        <label for="channelSelect" data-i18n="channelSelect">Channel</label>
+        <select id="channelSelect">
+          <option value="Ch1">Ch1</option>
+          <option value="Ch2">Ch2</option>
+        </select>
+      </div>
+      <div class="plot-control-group">
+        <label for="plotTypeSelect" data-i18n="plotType">Plot type</label>
+        <select id="plotTypeSelect">
+          <option value="bar" data-i18n="barPlot">Bar plot</option>
+          <option value="line" data-i18n="linePlot">Line plot</option>
+        </select>
+      </div>
+    </div>
+
     <div id="plots" class="plots">
       <div class="empty" data-i18n="empty">No plot yet.<br>Read a valid workbook to start analysis.</div>
     </div>
@@ -222,7 +260,6 @@ const I18N={
     chooseAnalysis:'Read a valid workbook to generate the Description results.',
     save:'Save',
     descriptionSummary:'Description summary',
-    descriptionSub:'Valid samples only. P0 = P1 + (P0 - P1). SD is sample standard deviation (n-1).',
     empty:'No plot yet.\nRead a valid workbook to start analysis.',
     needFile:'Please select an Excel workbook.',
     needFolder:'Please select a save folder.',
@@ -255,7 +292,13 @@ const I18N={
     invalid:'Invalid',
     sampleAxis:'Sample',
     noValid:'No valid samples',
-    plotTitle:'Valid-sample bar plots'
+    channelSelect:'Channel',
+    plotType:'Plot type',
+    barPlot:'Bar plot',
+    linePlot:'Line plot',
+    yMin:'Y min',
+    yMax:'Y max',
+    autoScale:'Auto'
   },
   ko:{
     module:'ZR rawdata 분석',
@@ -278,7 +321,6 @@ const I18N={
     chooseAnalysis:'유효한 Excel을 읽으면 Description 결과를 생성합니다.',
     save:'세이브',
     descriptionSummary:'Description 요약',
-    descriptionSub:'유효 샘플만 사용합니다. P0 = P1 + (P0 - P1), SD는 표본 표준편차(n-1)입니다.',
     empty:'아직 플롯이 없습니다.\n유효한 Excel을 읽어 분석을 시작하세요.',
     needFile:'입력 Excel 파일을 선택해주세요.',
     needFolder:'저장 폴더를 선택해주세요.',
@@ -311,7 +353,13 @@ const I18N={
     invalid:'무효',
     sampleAxis:'샘플',
     noValid:'유효 샘플 없음',
-    plotTitle:'유효 샘플 바 플롯'
+    channelSelect:'Ch 선택',
+    plotType:'플롯 선택',
+    barPlot:'바 플롯',
+    linePlot:'꺾은선 그래프',
+    yMin:'Y축 최소',
+    yMax:'Y축 최대',
+    autoScale:'Auto'
   }
 };
 
@@ -322,7 +370,23 @@ const state={
   file:null,
   saveHandle:null,
   dataset:null,
-  plotDivs:[]
+  plotDivs:[],
+  plotView:{
+    channel:'Ch1',
+    type:'bar',
+    yRanges:{
+      Ch1:{
+        p0:{min:'',max:''},
+        p1:{min:'',max:''},
+        diff:{min:'',max:''}
+      },
+      Ch2:{
+        p0:{min:'',max:''},
+        p1:{min:'',max:''},
+        diff:{min:'',max:''}
+      }
+    }
+  }
 };
 
 const el=id=>document.getElementById(id);
@@ -419,6 +483,7 @@ function clearDescription({keepStatus=false}={}){
   el('resultTableWrap').innerHTML='';
   el('detected').innerHTML='';
   el('colorsSection').hidden=true;
+  el('plotControls').hidden=true;
 
   el('resultTitle').textContent=tr('result');
   el('resultSub').textContent=tr('chooseAnalysis');
@@ -488,8 +553,7 @@ function applyLanguage(){
     el('resultTitle').textContent=
       'Description';
 
-    el('resultSub').textContent=
-      tr('descriptionSub');
+    el('resultSub').textContent='';
 
     renderDetected();
     renderSummaryTable();
@@ -575,6 +639,26 @@ function resetPlotColors(){
   el('diffColor').value='#059669';
 }
 
+function resetPlotView(){
+  state.plotView.channel='Ch1';
+  state.plotView.type='bar';
+  state.plotView.yRanges={
+    Ch1:{
+      p0:{min:'',max:''},
+      p1:{min:'',max:''},
+      diff:{min:'',max:''}
+    },
+    Ch2:{
+      p0:{min:'',max:''},
+      p1:{min:'',max:''},
+      diff:{min:'',max:''}
+    }
+  };
+
+  el('channelSelect').value='Ch1';
+  el('plotTypeSelect').value='bar';
+}
+
 function resetAll(){
   state.file=null;
   state.saveHandle=null;
@@ -587,6 +671,7 @@ function resetAll(){
     tr('notSelected');
 
   resetPlotColors();
+  resetPlotView();
 
   clearDescription({
     keepStatus:true
@@ -600,6 +685,7 @@ function resetAll(){
 
 function resetCurrentAnalysis(){
   resetPlotColors();
+  resetPlotView();
 
   clearDescription({
     keepStatus:true
@@ -920,8 +1006,7 @@ el('readBtn').onclick=async()=>{
     el('resultTitle').textContent=
       'Description';
 
-    el('resultSub').textContent=
-      tr('descriptionSub');
+    el('resultSub').textContent='';
 
     renderDetected();
     renderSummaryTable();
@@ -974,8 +1059,7 @@ el('descriptionBtn').onclick=()=>{
   el('resultTitle').textContent=
     'Description';
 
-  el('resultSub').textContent=
-    tr('descriptionSub');
+  el('resultSub').textContent='';
 
   renderSummaryTable();
   renderPlots();
@@ -1072,41 +1156,172 @@ function renderSummaryTable(){
     `</div>`;
 }
 
-function subplotLayout(
-  channel
+function niceSampleTickStep(count){
+  if(count<=20){
+    return 1;
+  }
+
+  const candidates=[];
+
+  for(
+    let power=1;
+    power<=count;
+    power*=10
+  ){
+    candidates.push(
+      power,
+      2*power,
+      5*power
+    );
+  }
+
+  let best=1;
+  let bestScore=Infinity;
+
+  for(const step of candidates){
+    if(step<1){
+      continue;
+    }
+
+    const tickCount=
+      Math.ceil(
+        count/step
+      );
+
+    let score=
+      Math.abs(
+        tickCount-15
+      );
+
+    if(tickCount<10){
+      score+=
+        (10-tickCount)*100;
+    }
+
+    if(tickCount>20){
+      score+=
+        (tickCount-20)*100;
+    }
+
+    if(score<bestScore){
+      best=step;
+      bestScore=score;
+    }
+  }
+
+  return best;
+}
+
+function autoDataRange(values){
+  const finite=
+    values.filter(
+      Number.isFinite
+    );
+
+  if(!finite.length){
+    return null;
+  }
+
+  let min=Math.min(...finite);
+  let max=Math.max(...finite);
+
+  if(min===max){
+    const pad=
+      Math.max(
+        Math.abs(min)*.05,
+        1e-9
+      );
+
+    min-=pad;
+    max+=pad;
+  }else{
+    const pad=
+      (max-min)*.06;
+
+    min-=pad;
+    max+=pad;
+  }
+
+  return[
+    min,
+    max
+  ];
+}
+
+function resolveYRange(
+  values,
+  rangeState
 ){
-  const commonX={
-    title:{
-      text:tr('sampleAxis'),
-      font:{
-        size:12
-      }
-    },
+  const rawMin=
+    String(rangeState.min??'').trim();
 
-    showgrid:false,
-    zeroline:false,
-    linecolor:'#9aa1ad',
-    linewidth:1.1,
-    tickmode:'linear',
-    dtick:1,
-    rangemode:'tozero'
-  };
+  const rawMax=
+    String(rangeState.max??'').trim();
 
-  const commonY={
-    showgrid:false,
-    zeroline:false,
-    linecolor:'#9aa1ad',
-    linewidth:1.1
-  };
+  const min=
+    rawMin===''?NaN:Number(rawMin);
+
+  const max=
+    rawMax===''?NaN:Number(rawMax);
+
+  const hasMin=
+    Number.isFinite(min);
+
+  const hasMax=
+    Number.isFinite(max);
+
+  if(!hasMin&&!hasMax){
+    return null;
+  }
+
+  const auto=
+    autoDataRange(values);
+
+  if(!auto){
+    return null;
+  }
+
+  let lo=
+    hasMin?min:auto[0];
+
+  let hi=
+    hasMax?max:auto[1];
+
+  if(lo>=hi){
+    return null;
+  }
+
+  return[
+    lo,
+    hi
+  ];
+}
+
+function singlePlotLayout(
+  metricLabel,
+  values,
+  sampleCount,
+  rangeState
+){
+  const yRange=
+    resolveYRange(
+      values,
+      rangeState
+    );
+
+  const tickStep=
+    niceSampleTickStep(
+      sampleCount
+    );
 
   return{
-    height:500,
+    height:460,
 
     margin:{
-      l:72,
-      r:32,
-      t:72,
-      b:72
+      l:82,
+      r:34,
+      t:24,
+      b:70
     },
 
     paper_bgcolor:'#fff',
@@ -1118,128 +1333,43 @@ function subplotLayout(
     },
 
     showlegend:false,
-    bargap:.2,
-
-    title:{
-      text:
-        `${channel} · ${tr('plotTitle')}`,
-      font:{
-        size:14
-      },
-      x:.01,
-      xanchor:'left'
-    },
+    bargap:.18,
 
     xaxis:{
-      ...commonX,
-      domain:[
-        0,
-        .29
+      title:{
+        text:tr('sampleAxis'),
+        font:{
+          size:12
+        }
+      },
+      showgrid:false,
+      zeroline:false,
+      linecolor:'#9aa1ad',
+      linewidth:1.1,
+      tickmode:'linear',
+      tick0:1,
+      dtick:tickStep,
+      range:[
+        .5,
+        sampleCount+.5
       ],
-      anchor:'y'
+      fixedrange:false
     },
 
     yaxis:{
-      ...commonY,
-      domain:[
-        0,
-        1
-      ],
-      anchor:'x',
-
       title:{
-        text:'P0',
+        text:metricLabel,
         font:{
           size:12
-        }
-      }
-    },
-
-    xaxis2:{
-      ...commonX,
-      domain:[
-        .355,
-        .645
-      ],
-      anchor:'y2'
-    },
-
-    yaxis2:{
-      ...commonY,
-      domain:[
-        0,
-        1
-      ],
-      anchor:'x2',
-
-      title:{
-        text:'P1',
-        font:{
-          size:12
-        }
-      }
-    },
-
-    xaxis3:{
-      ...commonX,
-      domain:[
-        .71,
-        1
-      ],
-      anchor:'y3'
-    },
-
-    yaxis3:{
-      ...commonY,
-      domain:[
-        0,
-        1
-      ],
-      anchor:'x3',
-
-      title:{
-        text:'P0 - P1',
-        font:{
-          size:12
-        }
-      }
-    },
-
-    annotations:[
-      {
-        xref:'paper',
-        yref:'paper',
-        x:.145,
-        y:1.07,
-        text:'P0',
-        showarrow:false,
-        font:{
-          size:13
         }
       },
-      {
-        xref:'paper',
-        yref:'paper',
-        x:.5,
-        y:1.07,
-        text:'P1',
-        showarrow:false,
-        font:{
-          size:13
-        }
-      },
-      {
-        xref:'paper',
-        yref:'paper',
-        x:.855,
-        y:1.07,
-        text:'P0 - P1',
-        showarrow:false,
-        font:{
-          size:13
-        }
-      }
-    ]
+      showgrid:false,
+      zeroline:false,
+      linecolor:'#9aa1ad',
+      linewidth:1.1,
+      autorange:!yRange,
+      ...(yRange?{range:yRange}:{})
+    }
   };
 }
 
@@ -1261,6 +1391,48 @@ const plotConfig={
   }
 };
 
+function buildPlotTrace(
+  x,
+  y,
+  metricLabel,
+  color,
+  channel
+){
+  if(state.plotView.type==='line'){
+    return{
+      type:'scatter',
+      mode:'lines+markers',
+      x,
+      y,
+      line:{
+        color,
+        width:2
+      },
+      marker:{
+        color,
+        size:5
+      },
+      hovertemplate:
+        `${tr('sampleAxis')}=%{x}<br>`+
+        `${metricLabel}=%{y:.6f}`+
+        `<extra>${channel}</extra>`
+    };
+  }
+
+  return{
+    type:'bar',
+    x,
+    y,
+    marker:{
+      color
+    },
+    hovertemplate:
+      `${tr('sampleAxis')}=%{x}<br>`+
+      `${metricLabel}=%{y:.6f}`+
+      `<extra>${channel}</extra>`
+  };
+}
+
 async function renderPlots(){
   if(!state.dataset){
     return;
@@ -1268,18 +1440,61 @@ async function renderPlots(){
 
   purgePlots();
 
+  el('plotControls').hidden=false;
+  el('channelSelect').value=
+    state.plotView.channel;
+  el('plotTypeSelect').value=
+    state.plotView.type;
+
   el('plots').innerHTML='';
 
-  for(
-    const name of [
-      'Ch1',
-      'Ch2'
-    ]
-  ){
-    const c=
-      state.dataset
-      .channels[name];
+  const name=
+    state.plotView.channel;
 
+  const c=
+    state.dataset
+    .channels[name];
+
+  if(!c.valid.length){
+    el('plots').innerHTML=
+      `<div class="empty">${tr('noValid')}</div>`;
+
+    return;
+  }
+
+  const x=
+    c.valid.map(
+      r=>r.N
+    );
+
+  const specs=[
+    {
+      key:'p0',
+      label:'P0',
+      values:c.valid.map(
+        r=>r.P0
+      ),
+      color:el('p0Color').value
+    },
+    {
+      key:'p1',
+      label:'P1',
+      values:c.valid.map(
+        r=>r.P1
+      ),
+      color:el('p1Color').value
+    },
+    {
+      key:'diff',
+      label:'P0 - P1',
+      values:c.valid.map(
+        r=>r.Diff
+      ),
+      color:el('diffColor').value
+    }
+  ];
+
+  for(const spec of specs){
     const card=
       document.createElement(
         'div'
@@ -1288,14 +1503,71 @@ async function renderPlots(){
     card.className=
       'plot-card';
 
+    const rangeState=
+      state.plotView
+      .yRanges[name][spec.key];
+
     card.innerHTML=
       `<div class="plot-title">`+
-      `<span>${name}</span>`+
+      `<span class="plot-title-name">${spec.label}</span>`+
+      `<div class="y-controls">`+
+      `<div class="y-control">`+
+      `<label>${tr('yMin')}</label>`+
+      `<input class="y-min-input" type="number" step="any" value="${rangeState.min}">`+
+      `</div>`+
+      `<div class="y-control">`+
+      `<label>${tr('yMax')}</label>`+
+      `<input class="y-max-input" type="number" step="any" value="${rangeState.max}">`+
+      `</div>`+
+      `<button class="auto-scale-btn" type="button">${tr('autoScale')}</button>`+
+      `</div>`+
       `</div>`+
       `<div class="plot"></div>`;
 
     el('plots')
       .appendChild(card);
+
+    const minInput=
+      card.querySelector(
+        '.y-min-input'
+      );
+
+    const maxInput=
+      card.querySelector(
+        '.y-max-input'
+      );
+
+    const autoBtn=
+      card.querySelector(
+        '.auto-scale-btn'
+      );
+
+    minInput.addEventListener(
+      'change',
+      ()=>{
+        rangeState.min=
+          minInput.value.trim();
+        renderPlots();
+      }
+    );
+
+    maxInput.addEventListener(
+      'change',
+      ()=>{
+        rangeState.max=
+          maxInput.value.trim();
+        renderPlots();
+      }
+    );
+
+    autoBtn.addEventListener(
+      'click',
+      ()=>{
+        rangeState.min='';
+        rangeState.max='';
+        renderPlots();
+      }
+    );
 
     const div=
       card.querySelector(
@@ -1306,90 +1578,54 @@ async function renderPlots(){
       div
     );
 
-    if(!c.valid.length){
-      div.innerHTML=
-        `<div class="empty" style="min-height:430px">`+
-        `${tr('noValid')}`+
-        `</div>`;
-
-      continue;
-    }
-
-    const x=
-      c.valid.map(
-        r=>r.N
+    const trace=
+      buildPlotTrace(
+        x,
+        spec.values,
+        spec.label,
+        spec.color,
+        name
       );
-
-    const traces=[
-      {
-        type:'bar',
-        x,
-        y:c.valid.map(
-          r=>r.P0
-        ),
-        xaxis:'x',
-        yaxis:'y',
-
-        marker:{
-          color:
-            el('p0Color').value
-        },
-
-        hovertemplate:
-          `${tr('sampleAxis')}=%{x}<br>`+
-          `P0=%{y:.6f}`+
-          `<extra>${name}</extra>`
-      },
-
-      {
-        type:'bar',
-        x,
-        y:c.valid.map(
-          r=>r.P1
-        ),
-        xaxis:'x2',
-        yaxis:'y2',
-
-        marker:{
-          color:
-            el('p1Color').value
-        },
-
-        hovertemplate:
-          `${tr('sampleAxis')}=%{x}<br>`+
-          `P1=%{y:.6f}`+
-          `<extra>${name}</extra>`
-      },
-
-      {
-        type:'bar',
-        x,
-        y:c.valid.map(
-          r=>r.Diff
-        ),
-        xaxis:'x3',
-        yaxis:'y3',
-
-        marker:{
-          color:
-            el('diffColor').value
-        },
-
-        hovertemplate:
-          `${tr('sampleAxis')}=%{x}<br>`+
-          `P0 - P1=%{y:.6f}`+
-          `<extra>${name}</extra>`
-      }
-    ];
 
     await Plotly.newPlot(
       div,
-      traces,
-      subplotLayout(name),
+      [trace],
+      singlePlotLayout(
+        spec.label,
+        spec.values,
+        x.length,
+        rangeState
+      ),
       plotConfig
     );
   }
 }
+
+el('channelSelect')
+.addEventListener(
+  'change',
+  ()=>{
+    state.plotView.channel=
+      el('channelSelect').value;
+
+    if(state.dataset){
+      renderPlots();
+    }
+  }
+);
+
+el('plotTypeSelect')
+.addEventListener(
+  'change',
+  ()=>{
+    state.plotView.type=
+      el('plotTypeSelect').value;
+
+    if(state.dataset){
+      renderPlots();
+    }
+  }
+);
 
 [
   'p0Color',
