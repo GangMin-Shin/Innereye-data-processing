@@ -192,9 +192,8 @@ button{cursor:pointer}
 <div class="dock-label" data-i18n="analysis">Analysis</div>
 <button class="analysis-btn" data-mode="raw" data-i18n="rawBtn">Raw data plot</button>
 <button class="analysis-btn" data-mode="sg" data-i18n="sgBtn">SG smoothing plot</button>
-<button class="analysis-btn" data-mode="interval" data-i18n="intervalBtn">Interval analysis (Max & Max)</button>
+<button class="analysis-btn" data-mode="interval" data-i18n="intervalBtn">Interval analysis</button>
 <button class="analysis-btn" data-mode="intervalMean" data-i18n="intervalMeanBtn">Min / Before / Notch regions Interval analysis</button>
-<button class="analysis-btn" data-mode="intervalAucV1" data-i18n="intervalAucV1Btn">Interval analysis (Min & Max)</button>
 </aside>
 <header class="topbar">
 <div class="title-wrap">
@@ -362,9 +361,8 @@ home:'🏠 Home',
 analysis:'Analysis',
 rawBtn:'Raw data plot',
 sgBtn:'SG smoothing plot',
-intervalBtn:'Interval analysis (Max & Max)',
+intervalBtn:'Interval analysis',
 intervalMeanBtn:'Min / Before / Notch regions Interval analysis',
-intervalAucV1Btn:'Interval analysis (Min & Max)',
 inputSetup:'Input & output setup',
 excelFile:'Excel workbook',
 savePath:'Save path',
@@ -423,14 +421,12 @@ noLines:'No valid scan-line header was found. The first header must be L1.',
 noValid:'No valid non-zero numeric data were found.',
 rawTitle:'Raw data',
 sgTitle:'SG smoothing',
-intervalTitle:'Interval analysis (Max & Max)',
+intervalTitle:'Interval analysis',
 intervalMeanTitle:'Min / Before / Notch regions Interval analysis',
-intervalAucV1Title:'Interval analysis (Min & Max)',
 rawSub:'Select a sample and one or more detected lines.',
 sgSub:'Third-order Savitzky–Golay smoothing using the SG window size entered above.',
 intervalSub:'Enter Range start/end to set the analysis interval. Plot zooming is independent of the analysis range.',
 intervalMeanSub:'',
-intervalAucV1Sub:'',
 samplingRate:'Estimated sampling rate',
 duration:'Scan duration',
 minLength:'Common valid length',
@@ -458,13 +454,10 @@ saveFailed:'Save failed',
 hintRaw:'Use the sample selector and dynamically detected line buttons to control the overlay.',
 hintSG:'SG polynomial order = 3. The entered window size is interpreted in seconds and converted to the nearest valid odd sample count based on the estimated sampling rate.',
 hintInterval:'',
-hintIntervalAucV1:'',
 extremaDone:'Dominant local extrema were detected from the SG-smoothed signal using sign-change candidates and topographic prominence.',
-aucDone:'Within the entered search range, the two most prominent local maxima were selected. Upper AUC was calculated from the signal relative to the straight baseline connecting the maxima, and Lower AUC was calculated from the signal relative to the horizontal baseline at the minimum between the maxima. Both AUC values are reported as absolute integrated magnitudes.',
-aucV1Done:'AUC calculation completed.',
+aucDone:'Within the entered search range, two dominant local maxima (P1 and P2) and the minimum between them were selected. AUC (P1 & P2) uses the previous Lower_AUC method. AUC (P1 & MIN) and AUC (P2 & MIN) use the bounded Min & Max AUC method. Delta X, Delta Y, slopes, Notch, First Slope, and the P1/P2/MIN signal values were also calculated.',
 noExtrema:'No valid local maximum/minimum pair was found in the selected interval.',
 noTwoMaxima:'Fewer than two valid local maxima were found in the selected search range.',
-aucV1Partial:'AUC could not be calculated for one or more selected lines. Check the result table.',
 rangeInvalid:'The analysis range is invalid.',
 lineRequired:'At least one line must remain selected.',
 regionsReset:'Calculated regions were reset.',
@@ -476,9 +469,8 @@ noTwoMinima:'Fewer than two valid local minima satisfying the minimum spacing we
 meanWindowOut:'A requested calculation window extends outside the scan range.',
 modeRaw:'Raw data',
 modeSG:'SG smoothing',
-modeInterval:'Interval analysis (Max & Max)',
+modeInterval:'Interval analysis',
 modeIntervalMean:'Min / Before / Notch regions Interval analysis',
-modeIntervalAucV1:'Interval analysis (Min & Max)',
 globalResetTitle:'Reset all',
 tabResetTitle:'Reset current analysis',
 fullResetDone:'All inputs and analysis states were reset.',
@@ -496,9 +488,8 @@ home:'🏠 Home',
 analysis:'분석',
 rawBtn:'Rawdata 플롯',
 sgBtn:'SG 스무딩 플롯',
-intervalBtn:'Interval analysis (Max & Max)',
+intervalBtn:'Interval analysis',
 intervalMeanBtn:'Min / Before / Notch regions Interval analysis',
-intervalAucV1Btn:'Interval analysis (Min & Max)',
 inputSetup:'입력 및 저장 설정',
 excelFile:'입력 Excel 파일',
 savePath:'저장 경로',
@@ -557,14 +548,12 @@ noLines:'유효한 스캔 라인 헤더가 없습니다. 첫 번째 헤더는 L1
 noValid:'0이 아닌 유효 숫자 데이터를 찾지 못했습니다.',
 rawTitle:'Rawdata',
 sgTitle:'SG 스무딩',
-intervalTitle:'Interval analysis (Max & Max)',
+intervalTitle:'Interval analysis',
 intervalMeanTitle:'Min / Before / Notch regions Interval analysis',
-intervalAucV1Title:'Interval analysis (Min & Max)',
 rawSub:'샘플과 검출된 스캔 라인을 선택해 오버레이를 확인합니다.',
 sgSub:'상단에서 입력한 SG 윈도우 크기를 사용하는 3차 Savitzky–Golay 스무딩입니다.',
 intervalSub:'Range start/end로 분석 구간을 설정합니다. 그래프 확대·축소는 분석 구간과 독립적으로 사용할 수 있습니다.',
 intervalMeanSub:'',
-intervalAucV1Sub:'',
 samplingRate:'추정 샘플링 레이트',
 duration:'스캔 시간',
 minLength:'공통 유효 길이',
@@ -592,13 +581,10 @@ saveFailed:'저장 실패',
 hintRaw:'샘플 선택과 동적으로 검출된 라인 버튼으로 오버레이 라인을 선택할 수 있습니다.',
 hintSG:'SG 다항식 차수는 3차로 고정하며, 상단에 입력한 윈도우 크기(s)를 추정 샘플링 레이트에 따라 가장 가까운 유효 홀수 샘플 수로 변환합니다.',
 hintInterval:'',
-hintIntervalAucV1:'',
 extremaDone:'SG 스무딩 신호의 미분 부호 변화 후보와 topographic prominence를 이용해 대표 극대·극소점을 검출했습니다.',
-aucDone:'입력한 검색 구간 안에서 prominence가 큰 대표 극댓값 2개를 선택했습니다. Upper AUC는 두 극댓값을 잇는 직선 baseline 기준으로, Lower AUC는 두 극댓값 사이의 극솟값을 지나는 수평 baseline 기준으로 사다리꼴 적분했으며 두 값 모두 적분 결과의 절대값으로 표시합니다.',
-aucV1Done:'AUC 계산을 완료했습니다.',
+aucDone:'입력한 검색 구간 안에서 대표 극댓값 2개(P1, P2)와 그 사이의 극솟점(MIN)을 선택했습니다. AUC (P1 & P2)는 기존 Lower_AUC 계산 방식을 그대로 사용하고, AUC (P1 & MIN)과 AUC (P2 & MIN)은 기존 Min & Max 탭의 bounded AUC 방식을 사용합니다. Delta X, Delta Y, 각 기울기, Notch, First Slope, P1/P2/MIN 신호값도 함께 계산합니다.',
 noExtrema:'선택 구간에서 유효한 극대점·극소점 쌍을 찾지 못했습니다.',
 noTwoMaxima:'선택한 검색 구간에서 유효한 극댓값을 2개 이상 찾지 못했습니다.',
-aucV1Partial:'선택된 라인 중 하나 이상에서 AUC를 계산하지 못했습니다. 결과 테이블을 확인해주세요.',
 rangeInvalid:'분석 구간이 올바르지 않습니다.',
 lineRequired:'최소 한 개의 라인은 선택되어 있어야 합니다.',
 regionsReset:'계산된 구간을 초기화했습니다.',
@@ -610,9 +596,8 @@ noTwoMinima:'선택한 검색 구간에서 최소 간격 조건을 만족하는 
 meanWindowOut:'계산 구간이 전체 스캔 범위를 벗어납니다.',
 modeRaw:'Rawdata',
 modeSG:'SG 스무딩',
-modeInterval:'Interval analysis (Max & Max)',
+modeInterval:'Interval analysis',
 modeIntervalMean:'Min / Before / Notch regions Interval analysis',
-modeIntervalAucV1:'Interval analysis (Min & Max)',
 globalResetTitle:'전체 리셋',
 tabResetTitle:'현재 분석 탭 리셋',
 fullResetDone:'입력과 분석 상태를 모두 초기화했습니다.',
@@ -634,15 +619,12 @@ selectedLines:new Set(),
 lineColors:{},
 ranges:{},
 rangeApplyAll:{
-interval:false,
-intervalAucV1:false
+interval:false
 },
 meanSettings:{},
 results:{
 extrema:{},
 auc:{},
-extremaV1:{},
-aucV1:{},
 mean:{},
 notchSlope:{}
 },
@@ -820,15 +802,12 @@ state.currentMode=null;
 state.selectedSample=null;
 state.ranges={};
 state.rangeApplyAll={
-interval:false,
-intervalAucV1:false
+interval:false
 };
 state.meanSettings={};
 state.results={
 extrema:{},
 auc:{},
-extremaV1:{},
-aucV1:{},
 mean:{},
 notchSlope:{}
 };
@@ -966,21 +945,13 @@ resetSelectedLines();
 state.exportAll=false;
 el('exportAllToggle').classList.remove('on');
 el('resultTableWrap').innerHTML='';
-if(mode==='interval'||mode==='intervalAucV1'){
-state.rangeApplyAll[mode]=false;
+if(mode==='interval'){
+state.rangeApplyAll.interval=false;
 syncRangeApplyAllToggle();
 }
 if(mode==='interval'){
 state.results.extrema={};
 state.results.auc={};
-state.ranges={};
-state.dataset.samples.forEach(s=>{
-state.ranges[s]=[0,state.dataset.params.scanLength];
-});
-}
-if(mode==='intervalAucV1'){
-state.results.extremaV1={};
-state.results.aucV1={};
 state.ranges={};
 state.dataset.samples.forEach(s=>{
 state.ranges[s]=[0,state.dataset.params.scanLength];
@@ -1484,15 +1455,12 @@ state.selectedSample=state.dataset.samples[0];
 state.selectedLines=new Set(state.dataset.lines);
 state.ranges={};
 state.rangeApplyAll={
-interval:false,
-intervalAucV1:false
+interval:false
 };
 state.meanSettings={};
 state.results={
 extrema:{},
 auc:{},
-extremaV1:{},
-aucV1:{},
 mean:{},
 notchSlope:{}
 };
@@ -1584,11 +1552,6 @@ intervalMean:{
 title:'modeIntervalMean',
 sub:'intervalMeanSub',
 folder:'Interval Mean Cal'
-},
-intervalAucV1:{
-title:'modeIntervalAucV1',
-sub:'intervalAucV1Sub',
-folder:'Interval analysis (Min & Max)'
 }
 };
 document.querySelectorAll('.analysis-btn').forEach(btn=>{
@@ -1622,16 +1585,14 @@ el('analysisControls').classList.add('visible');
 el('resultTitle').textContent=tr(modeInfo[mode].title);
 el('resultSub').textContent=tr(modeInfo[mode].sub);
 const interval=mode==='interval';
-const intervalAucV1=mode==='intervalAucV1';
 const mean=mode==='intervalMean';
-const intervalLike=interval||intervalAucV1;
-const needsRange=intervalLike||mean;
+const needsRange=interval||mean;
 el('rangeControls').style.display=
 needsRange?'flex':'none';
 el('meanSetup').style.display=
 mean?'flex':'none';
 el('intervalActions').style.display=
-intervalLike?'flex':'none';
+interval?'flex':'none';
 syncRangeApplyAllToggle();
 el('meanActions').style.display=
 mean?'flex':'none';
@@ -1647,13 +1608,9 @@ mean
 interval
 ?'hintInterval'
 :(
-intervalAucV1
-?'hintIntervalAucV1'
-:(
 mode==='sg'
 ?'hintSG'
 :'hintRaw'
-)
 )
 );
 el('controlHint').textContent=hintText;
@@ -1674,8 +1631,8 @@ renderMeanResultTable(state.selectedSample);
 }
 function rangeApplyAllEnabled(mode=state.currentMode){
 return(
-(mode==='interval'||mode==='intervalAucV1')&&
-!!state.rangeApplyAll?.[mode]
+mode==='interval'&&
+!!state.rangeApplyAll?.interval
 );
 }
 function syncRangeApplyAllToggle(){
@@ -1702,23 +1659,20 @@ range[1]
 }
 }
 el('intervalApplyAllToggle').onclick=async()=>{
-if(
-state.currentMode!=='interval'&&
-state.currentMode!=='intervalAucV1'
-){
+if(state.currentMode!=='interval'){
 return;
 }
-const mode=state.currentMode;
-state.rangeApplyAll[mode]=!state.rangeApplyAll[mode];
+const mode='interval';
+state.rangeApplyAll.interval=!state.rangeApplyAll.interval;
 syncRangeApplyAllToggle();
-if(state.rangeApplyAll[mode]){
+if(state.rangeApplyAll.interval){
 try{
 const range=readRangeInputs();
 applyRangeToAllSamples(range);
 setStatus(tr('rangeApplyAllOn'),'good');
 await renderCurrentMode();
 }catch(e){
-state.rangeApplyAll[mode]=false;
+state.rangeApplyAll.interval=false;
 syncRangeApplyAllToggle();
 setStatus(e.message||String(e),'bad');
 }
@@ -1771,7 +1725,6 @@ invalidateMeanSample(state.selectedSample);
 }
 if(
 state.currentMode==='interval'||
-state.currentMode==='intervalAucV1'||
 state.currentMode==='intervalMean'
 ){
 await renderCurrentMode();
@@ -1874,7 +1827,6 @@ color:'#000000'
 };
 if(
 mode==='interval'||
-mode==='intervalAucV1'||
 mode==='intervalMean'
 ){
 const r=
@@ -2003,12 +1955,12 @@ line+
 function aucSegmentData(sample,line,au){
 if(
 !au||
-!Number.isFinite(au.x0)||
-!Number.isFinite(au.x1)||
-!Number.isFinite(au.y0)||
-!Number.isFinite(au.y1)||
+!Number.isFinite(au.peak1X)||
+!Number.isFinite(au.peak2X)||
+!Number.isFinite(au.peak1Y)||
+!Number.isFinite(au.peak2Y)||
 !Number.isFinite(au.valleyY)||
-!(au.x1>au.x0)
+!(au.peak2X>au.peak1X)
 ){
 return null;
 }
@@ -2018,12 +1970,12 @@ if(!Array.isArray(yAll)){
 return null;
 }
 const i0=clamp(
-Math.round(au.x0/d.dx),
+Math.round(au.peak1X/d.dx),
 0,
 d.minLength-1
 );
 const i1=clamp(
-Math.round(au.x1/d.dx),
+Math.round(au.peak2X/d.dx),
 0,
 d.minLength-1
 );
@@ -2032,42 +1984,13 @@ return null;
 }
 const x=d.distance.slice(i0,i1+1);
 const y=yAll.slice(i0,i1+1);
-const upperBaseline=x.map(
-xi=>
-au.y0+
-(au.y1-au.y0)*
-(xi-au.x0)/
-(au.x1-au.x0)
-);
 const lowerBaseline=x.map(
 ()=>au.valleyY
 );
 return{
 x,
 y,
-upperBaseline,
 lowerBaseline
-};
-}
-function upperAucAreaTrace(sample,line,au){
-const seg=aucSegmentData(sample,line,au);
-if(!seg){
-return null;
-}
-return{
-x:seg.x.concat(seg.x.slice().reverse()),
-y:seg.y.concat(seg.upperBaseline.slice().reverse()),
-type:'scatter',
-mode:'lines',
-name:`${line} Upper AUC area`,
-line:{
-width:0,
-color:'rgba(0,0,0,0)'
-},
-fill:'toself',
-fillcolor:lightLineFill(line,.20,.78),
-showlegend:false,
-hoverinfo:'skip'
 };
 }
 function lowerAucAreaTrace(sample,line,au){
@@ -2080,7 +2003,7 @@ x:seg.x.concat(seg.x.slice().reverse()),
 y:seg.y.concat(seg.lowerBaseline.slice().reverse()),
 type:'scatter',
 mode:'lines',
-name:`${line} Lower AUC area`,
+name:`${line} AUC (P1 & P2) area`,
 line:{
 width:0,
 color:'rgba(0,0,0,0)'
@@ -2102,29 +2025,10 @@ return;
 traces.push(
 {
 x:seg.x,
-y:seg.upperBaseline,
-type:'scatter',
-mode:'lines',
-name:`${line} Upper AUC baseline`,
-line:{
-width:1.4,
-dash:'dot',
-color:lineColor(line)
-},
-opacity:.75,
-hovertemplate:
-'x=%{x:.4f} mm<br>upper baseline=%{y:.6f}<extra>'+
-line+
-'</extra>'
-}
-);
-traces.push(
-{
-x:seg.x,
 y:seg.lowerBaseline,
 type:'scatter',
 mode:'lines',
-name:`${line} Lower AUC baseline`,
+name:`${line} AUC (P1 & P2) baseline`,
 line:{
 width:1.4,
 dash:'dash',
@@ -2132,24 +2036,32 @@ color:lineColor(line)
 },
 opacity:.75,
 hovertemplate:
-'x=%{x:.4f} mm<br>lower baseline=%{y:.6f}<extra>'+
-line+
-'</extra>'
+'x=%{x:.4f} mm<br>MIN baseline=%{y:.6f}<extra>'+line+'</extra>'
 }
 );
 traces.push(
 {
-x:[
-au.peak1X,
-au.peak2X
-],
-y:[
-au.peak1Y,
-au.peak2Y
-],
+x:[au.peak1X,au.valleyX,au.peak2X],
+y:[au.peak1Y,au.valleyY,au.peak2Y],
+type:'scatter',
+mode:'lines',
+name:`${line} P1-MIN-P2 slopes`,
+showlegend:false,
+line:{
+width:1.3,
+dash:'dot',
+color:lineColor(line)
+},
+hoverinfo:'skip'
+}
+);
+traces.push(
+{
+x:[au.peak1X,au.peak2X],
+y:[au.peak1Y,au.peak2Y],
 type:'scatter',
 mode:'markers',
-name:`${line} AUC maxima`,
+name:`${line} P1 / P2`,
 marker:{
 size:10,
 symbol:'circle-open',
@@ -2167,7 +2079,7 @@ x:[au.valleyX],
 y:[au.valleyY],
 type:'scatter',
 mode:'markers',
-name:`${line} AUC minimum`,
+name:`${line} MIN`,
 marker:{
 size:10,
 symbol:'triangle-down',
@@ -2179,158 +2091,47 @@ width:1.1
 }
 }
 );
-}
-function aucV1AreaTrace(sample,line,segment,name,alpha=.24,clipToCap=true){
 if(
-!segment||
-!Number.isInteger(segment.startIndex)||
-!Number.isInteger(segment.endIndex)||
-!Number.isFinite(segment.baselineY)||
-segment.endIndex<=segment.startIndex
+Number.isFinite(au.firstSlopeRefX)&&
+Number.isFinite(au.firstSlopeRefY)
 ){
-return null;
-}
-const d=state.dataset;
-const yAll=d.smoothed?.[sample]?.[line];
-if(!Array.isArray(yAll)){
-return null;
-}
-const startIndex=clamp(
-segment.startIndex,
-0,
-d.minLength-1
-);
-const endIndex=clamp(
-segment.endIndex,
-0,
-d.minLength-1
-);
-if(endIndex-startIndex<1){
-return null;
-}
-const x=d.distance.slice(
-startIndex,
-endIndex+1
-);
-const yRaw=yAll.slice(
-startIndex,
-endIndex+1
-);
-const lo=segment.baselineY;
-const hi=
-Number.isFinite(segment.capY)
-?Math.max(lo,segment.capY)
-:Infinity;
-const yArea=yRaw.map(v=>{
-if(!clipToCap){
-return v;
-}
-return Math.min(
-hi,
-Math.max(lo,v)
-);
-});
-const baseline=x.map(()=>lo);
-return{
-x:x.concat(x.slice().reverse()),
-y:yArea.concat(baseline.slice().reverse()),
-type:'scatter',
-mode:'lines',
-name,
-line:{
-width:0,
-color:'rgba(0,0,0,0)'
-},
-fill:'toself',
-fillcolor:lightLineFill(line,alpha,.78),
-showlegend:false,
-hoverinfo:'skip'
-};
-}
-function appendAucV1AreaTraces(traces,sample,line,au){
-if(!au||!au.auc){
-return;
-}
-const area=aucV1AreaTrace(
-sample,
-line,
-au.auc,
-`${line} AUC area`,
-.30,
-true
-);
-if(area){
-traces.push(area);
-}
-}
-function appendAucV1OverlayTraces(traces,sample,line,au){
-if(!au){
-return;
-}
-if(au.auc){
 traces.push(
 {
-x:[
-state.dataset.distance[au.auc.startIndex],
-state.dataset.distance[au.auc.endIndex]
-],
-y:[
-au.auc.baselineY,
-au.auc.baselineY
-],
+x:[au.firstSlopeRefX,au.peak1X],
+y:[au.firstSlopeRefY,au.peak1Y],
 type:'scatter',
 mode:'lines',
-name:`${line} AUC baseline`,
+name:`${line} First Slope`,
 showlegend:false,
 line:{
 width:1.4,
 dash:'dot',
 color:lineColor(line)
 },
-opacity:.78,
+hoverinfo:'skip'
+}
+);
+traces.push(
+{
+x:[au.firstSlopeRefX],
+y:[au.firstSlopeRefY],
+type:'scatter',
+mode:'markers',
+name:`${line} Notch - 1 mm`,
+marker:{
+size:10,
+symbol:'square',
+color:lineColor(line),
+line:{
+color:'#111827',
+width:1.2
+}
+},
 hovertemplate:
-'x=%{x:.4f} mm<br>AUC baseline=%{y:.6f}<extra>'+
-line+
-'</extra>'
+'x=%{x:.4f} mm<br>y=%{y:.6f}<extra>'+line+' · Notch - 1 mm</extra>'
 }
 );
 }
-traces.push(
-{
-x:[au.localMinX],
-y:[au.localMinY],
-type:'scatter',
-mode:'markers',
-name:`${line} min`,
-marker:{
-size:11,
-symbol:'triangle-down',
-color:lineColor(line),
-line:{
-color:'#111827',
-width:1.1
-}
-}
-}
-);
-traces.push(
-{
-x:[au.localMaxX],
-y:[au.localMaxY],
-type:'scatter',
-mode:'markers',
-name:`${line} max`,
-marker:{
-size:11,
-symbol:'triangle-up',
-color:lineColor(line),
-line:{
-color:'#111827',
-width:1.1
-}
-}
-}
-);
 }
 function makeTraces(sample,mode){
 const d=state.dataset;
@@ -2342,24 +2143,9 @@ const au=
 state.results.auc?.[sample]?.[line];
 const lowerArea=
 lowerAucAreaTrace(sample,line,au);
-const upperArea=
-upperAucAreaTrace(sample,line,au);
 if(lowerArea){
 traces.push(lowerArea);
 }
-if(upperArea){
-traces.push(upperArea);
-}
-}
-}
-if(mode==='intervalAucV1'){
-for(const line of selectedLineList(sample)){
-appendAucV1AreaTraces(
-traces,
-sample,
-line,
-state.results.aucV1?.[sample]?.[line]
-);
 }
 }
 for(const line of displayLineList(sample)){
@@ -2375,7 +2161,7 @@ mode==='raw'
 ?tr('rawLegend')
 :tr('sgLegend')
 }`,
-showlegend:mode==='intervalAucV1'?false:true,
+showlegend:true,
 line:{
 width:mode==='raw'?1.5:2.2,
 color:lineColor(line)
@@ -2389,46 +2175,6 @@ line+
 }
 if(mode==='interval'){
 for(const line of selectedLineList(sample)){
-const ex=
-state.results.extrema?.[sample]?.[line];
-if(ex){
-traces.push(
-{
-x:[ex.xMax],
-y:[ex.yMax],
-type:'scatter',
-mode:'markers',
-name:`${line} local max`,
-marker:{
-size:11,
-symbol:'triangle-up',
-color:lineColor(line),
-line:{
-color:'#111827',
-width:1
-}
-}
-}
-);
-traces.push(
-{
-x:[ex.xMin],
-y:[ex.yMin],
-type:'scatter',
-mode:'markers',
-name:`${line} local min`,
-marker:{
-size:11,
-symbol:'triangle-down',
-color:lineColor(line),
-line:{
-color:'#111827',
-width:1
-}
-}
-}
-);
-}
 appendAucOverlayTraces(
 traces,
 sample,
@@ -2439,16 +2185,6 @@ appendNotchPointTrace(
 traces,
 sample,
 line
-);
-}
-}
-if(mode==='intervalAucV1'){
-for(const line of selectedLineList(sample)){
-appendAucV1OverlayTraces(
-traces,
-sample,
-line,
-state.results.aucV1?.[sample]?.[line]
 );
 }
 }
@@ -2596,85 +2332,6 @@ return Math.max(
 peak-contour
 );
 }
-function dominantExtrema(x,y){
-if(y.length<5){
-return null;
-}
-const yr=
-Math.max(...y)-
-Math.min(...y);
-const threshold=Math.max(
-1e-12,
-yr*0.01
-);
-const maxima=[];
-const minima=[];
-for(let i=1;i<y.length-1;i++){
-const d1=y[i]-y[i-1];
-const d2=y[i+1]-y[i];
-if(d1>0&&d2<=0){
-const prom=peakProminence(
-y,
-i,
-true
-);
-if(prom>=threshold){
-maxima.push({
-i,
-prom
-});
-}
-}
-if(d1<0&&d2>=0){
-const prom=peakProminence(
-y,
-i,
-false
-);
-if(prom>=threshold){
-minima.push({
-i,
-prom
-});
-}
-}
-}
-if(!maxima.length||!minima.length){
-return null;
-}
-maxima.sort(
-(a,b)=>b.prom-a.prom
-);
-minima.sort(
-(a,b)=>b.prom-a.prom
-);
-const ma=maxima[0];
-const mi=minima[0];
-const xMax=x[ma.i];
-const yMax=y[ma.i];
-const xMin=x[mi.i];
-const yMin=y[mi.i];
-const dxSigned=xMax-xMin;
-const dySigned=yMax-yMin;
-return{
-xMax,
-yMax,
-xMin,
-yMin,
-maxIndex:ma.i,
-minIndex:mi.i,
-deltaX:Math.abs(dxSigned),
-deltaY:Math.abs(dySigned),
-slope:
-Math.abs(dxSigned)>1e-15
-?dySigned/dxSigned
-:NaN,
-maxProminence:ma.prom,
-minProminence:mi.prom,
-maxCandidates:maxima.length,
-minCandidates:minima.length
-};
-}
 function dominantTwoMaxima(x,y){
 if(y.length<5){
 return null;
@@ -2774,40 +2431,6 @@ minCandidates:minima.length,
 prominenceThreshold:NaN
 };
 }
-function correctedAUC(x,y){
-const x0=x[0];
-const x1=x[x.length-1];
-const y0=y[0];
-const y1=y[y.length-1];
-let signed=0;
-for(let i=0;i<x.length-1;i++){
-const b0=
-y0+
-(y1-y0)*
-(x[i]-x0)/
-(x1-x0);
-const b1=
-y0+
-(y1-y0)*
-(x[i+1]-x0)/
-(x1-x0);
-const c0=y[i]-b0;
-const c1=y[i+1]-b1;
-const dx=x[i+1]-x[i];
-signed+=
-(c0+c1)*
-0.5*
-dx;
-}
-return{
-x0,
-x1,
-y0,
-y1,
-signedAUC:signed,
-upperAUC:Math.abs(signed)
-};
-}
 function lowerAUCFromMinimum(x,y){
 if(
 x.length<3||
@@ -2900,92 +2523,41 @@ capY,
 auc:Math.abs(area)
 };
 }
-function calculateIntervalAucV1ForSample(sample,range,rows){
-const [i0,i1]=rangeIndices(range);
-state.results.aucV1[sample]=
-state.results.aucV1[sample]||{};
-state.results.extremaV1[sample]=
-state.results.extremaV1[sample]||{};
-for(const line of selectedLineList(sample)){
-const xSearch=
-state.dataset.distance.slice(
-i0,
-i1+1
-);
-const ySearch=
-state.dataset.smoothed[sample][line]
-.slice(
-i0,
-i1+1
-);
-const ex=dominantExtrema(
-xSearch,
-ySearch
-);
-if(!ex){
-delete state.results.aucV1[sample][line];
-delete state.results.extremaV1[sample][line];
-rows.push({
+function slopeBetweenPoints(x1,y1,x2,y2){
+if(
+!Number.isFinite(x1)||
+!Number.isFinite(y1)||
+!Number.isFinite(x2)||
+!Number.isFinite(y2)
+){
+return NaN;
+}
+const dx=x2-x1;
+return Math.abs(dx)>1e-15
+?(y2-y1)/dx
+:NaN;
+}
+function emptyUnifiedIntervalRow(sample,line,notchY=NaN){
+return{
 Sample:sample,
 Line:line,
-Search_Range_Start_mm:range[0],
-Search_Range_End_mm:range[1],
-Slope_Y_per_mm:NaN,
-AUC:NaN
-});
-continue;
-}
-state.results.extremaV1[sample][line]={
-...ex,
-rangeStart:range[0],
-rangeEnd:range[1]
+'Delta X (P1 & MIN)':NaN,
+'Delta X (P2 & MIN)':NaN,
+'Delta Y (P1 & MIN)':NaN,
+'Delta Y (P2 & MIN)':NaN,
+'AUC (P1 & P2)':NaN,
+'AUC (P1 & MIN)':NaN,
+'AUC (P2 & MIN)':NaN,
+Notch:notchY,
+'First Slope':NaN,
+'Slope (P1 & MIN)':NaN,
+'Slope (P2 & MIN)':NaN,
+'Peak 1 값':NaN,
+'Peak 2 값':NaN,
+'Min 값':NaN
 };
-const xAll=state.dataset.distance;
-const yAll=state.dataset.smoothed[sample][line];
-const minGlobalIndex=
-i0+ex.minIndex;
-const maxGlobalIndex=
-i0+ex.maxIndex;
-const auc=
-boundedAUCByIndices(
-xAll,
-yAll,
-minGlobalIndex,
-maxGlobalIndex,
-ex.yMin,
-ex.yMax
-);
-state.results.aucV1[sample][line]={
-searchRangeStart:range[0],
-searchRangeEnd:range[1],
-localMinIndex:minGlobalIndex,
-localMinX:ex.xMin,
-localMinY:ex.yMin,
-localMaxIndex:maxGlobalIndex,
-localMaxX:ex.xMax,
-localMaxY:ex.yMax,
-slopeYPerMm:ex.slope,
-auc,
-maxProminence:ex.maxProminence,
-minProminence:ex.minProminence,
-maxCandidates:ex.maxCandidates,
-minCandidates:ex.minCandidates
-};
-rows.push({
-Sample:sample,
-Line:line,
-Search_Range_Start_mm:range[0],
-Search_Range_End_mm:range[1],
-Local_Min_X_mm:ex.xMin,
-Local_Min_Y:ex.yMin,
-Local_Max_X_mm:ex.xMax,
-Local_Max_Y:ex.yMax,
-Slope_Y_per_mm:ex.slope,
-AUC:auc?.auc??NaN
-});
 }
-}
-function calculateIntervalMaxMaxForSample(sample,range,rows){
+function calculateIntervalForSample(sample,range,rows){
 const [i0,i1]=rangeIndices(range);
 state.results.auc[sample]=
 state.results.auc[sample]||{};
@@ -3008,43 +2580,16 @@ notchValueForLine(
 sample,
 line
 );
-const ex=dominantExtrema(
-xSearch,
-ySearch
-);
-if(ex){
-state.results.extrema[sample][line]={
-...ex,
-rangeStart:range[0],
-rangeEnd:range[1],
-notchX:state.dataset.params.notchPosition,
-notchY
-};
-}else{
-delete state.results.extrema[sample][line];
-}
 const peaks=dominantTwoMaxima(
 xSearch,
 ySearch
 );
 if(!peaks){
 delete state.results.auc[sample][line];
-rows.push({
-Sample:sample,
-Line:line,
-Search_Range_Start_mm:range[0],
-Search_Range_End_mm:range[1],
-...(ex?{
-Local_Max_X_mm:ex.xMax,
-Local_Max_Y:ex.yMax,
-Local_Min_X_mm:ex.xMin,
-Local_Min_Y:ex.yMin,
-Delta_X_mm:ex.deltaX,
-Delta_Y:ex.deltaY,
-Slope_Y_per_mm:ex.slope
-}:{}),
-Notch:notchY
-});
+delete state.results.extrema[sample][line];
+rows.push(
+emptyUnifiedIntervalRow(sample,line,notchY)
+);
 continue;
 }
 const p1=peaks.first;
@@ -3059,74 +2604,129 @@ ySearch.slice(
 p1.i,
 p2.i+1
 );
-const upper=correctedAUC(
-xAuc,
-yAuc
-);
 const lower=lowerAUCFromMinimum(
 xAuc,
 yAuc
 );
 if(!lower){
 delete state.results.auc[sample][line];
-rows.push({
-Sample:sample,
-Line:line,
-Search_Range_Start_mm:range[0],
-Search_Range_End_mm:range[1],
-...(ex?{
-Local_Max_X_mm:ex.xMax,
-Local_Max_Y:ex.yMax,
-Local_Min_X_mm:ex.xMin,
-Local_Min_Y:ex.yMin,
-Delta_X_mm:ex.deltaX,
-Delta_Y:ex.deltaY,
-Slope_Y_per_mm:ex.slope
-}:{}),
-Notch:notchY
-});
+delete state.results.extrema[sample][line];
+rows.push(
+emptyUnifiedIntervalRow(sample,line,notchY)
+);
 continue;
 }
-state.results.auc[sample][line]={
-...upper,
-...lower,
-searchRangeStart:range[0],
-searchRangeEnd:range[1],
-notchX:state.dataset.params.notchPosition,
-notchY,
+const p1GlobalIndex=i0+p1.i;
+const p2GlobalIndex=i0+p2.i;
+const minGlobalIndex=
+p1GlobalIndex+lower.valleyIndex;
+const xAll=state.dataset.distance;
+const yAll=state.dataset.smoothed[sample][line];
+const aucP1Min=boundedAUCByIndices(
+xAll,
+yAll,
+p1GlobalIndex,
+minGlobalIndex,
+lower.valleyY,
+p1.y
+);
+const aucP2Min=boundedAUCByIndices(
+xAll,
+yAll,
+minGlobalIndex,
+p2GlobalIndex,
+lower.valleyY,
+p2.y
+);
+const deltaXP1Min=Math.abs(p1.x-lower.valleyX);
+const deltaXP2Min=Math.abs(p2.x-lower.valleyX);
+const deltaYP1Min=Math.abs(p1.y-lower.valleyY);
+const deltaYP2Min=Math.abs(p2.y-lower.valleyY);
+const slopeP1Min=slopeBetweenPoints(
+p1.x,
+p1.y,
+lower.valleyX,
+lower.valleyY
+);
+const slopeP2Min=slopeBetweenPoints(
+p2.x,
+p2.y,
+lower.valleyX,
+lower.valleyY
+);
+const firstSlopeRefX=
+state.dataset.params.notchPosition-1;
+const firstSlopeRefY=interpolatedYAtX(
+state.dataset.distance,
+yAll,
+firstSlopeRefX
+);
+const firstSlope=slopeBetweenPoints(
+firstSlopeRefX,
+firstSlopeRefY,
+p1.x,
+p1.y
+);
+state.results.extrema[sample][line]={
+rangeStart:range[0],
+rangeEnd:range[1],
 peak1X:p1.x,
 peak1Y:p1.y,
 peak2X:p2.x,
 peak2Y:p2.y,
+minX:lower.valleyX,
+minY:lower.valleyY,
+notchX:state.dataset.params.notchPosition,
+notchY
+};
+state.results.auc[sample][line]={
+searchRangeStart:range[0],
+searchRangeEnd:range[1],
+notchX:state.dataset.params.notchPosition,
+notchY,
+peak1Index:p1GlobalIndex,
+peak1X:p1.x,
+peak1Y:p1.y,
+peak2Index:p2GlobalIndex,
+peak2X:p2.x,
+peak2Y:p2.y,
+valleyIndex:minGlobalIndex,
+valleyX:lower.valleyX,
+valleyY:lower.valleyY,
+aucP1P2:lower.lowerAUC,
+aucP1Min,
+aucP2Min,
+deltaXP1Min,
+deltaXP2Min,
+deltaYP1Min,
+deltaYP2Min,
+slopeP1Min,
+slopeP2Min,
+firstSlopeRefX,
+firstSlopeRefY,
+firstSlope,
 peak1Prominence:p1.prom,
 peak2Prominence:p2.prom,
 maxCandidates:peaks.maxCandidates,
-prominenceThreshold:
-peaks.prominenceThreshold
+prominenceThreshold:peaks.prominenceThreshold
 };
 rows.push({
 Sample:sample,
 Line:line,
-Search_Range_Start_mm:range[0],
-Search_Range_End_mm:range[1],
-...(ex?{
-Local_Max_X_mm:ex.xMax,
-Local_Max_Y:ex.yMax,
-Local_Min_X_mm:ex.xMin,
-Local_Min_Y:ex.yMin,
-Delta_X_mm:ex.deltaX,
-Delta_Y:ex.deltaY,
-Slope_Y_per_mm:ex.slope
-}:{}),
+'Delta X (P1 & MIN)':deltaXP1Min,
+'Delta X (P2 & MIN)':deltaXP2Min,
+'Delta Y (P1 & MIN)':deltaYP1Min,
+'Delta Y (P2 & MIN)':deltaYP2Min,
+'AUC (P1 & P2)':lower.lowerAUC,
+'AUC (P1 & MIN)':aucP1Min?.auc??NaN,
+'AUC (P2 & MIN)':aucP2Min?.auc??NaN,
 Notch:notchY,
-Peak1_X_mm:p1.x,
-Peak1_Y:p1.y,
-Minimum_X_mm:lower.valleyX,
-Minimum_Y:lower.valleyY,
-Peak2_X_mm:p2.x,
-Peak2_Y:p2.y,
-Upper_AUC:upper.upperAUC,
-Lower_AUC:lower.lowerAUC
+'First Slope':firstSlope,
+'Slope (P1 & MIN)':slopeP1Min,
+'Slope (P2 & MIN)':slopeP2Min,
+'Peak 1 값':p1.y,
+'Peak 2 값':p2.y,
+'Min 값':lower.valleyY
 });
 }
 }
@@ -3142,13 +2742,12 @@ applyAll
 ?state.dataset.samples.slice()
 :[state.selectedSample];
 const rows=[];
-if(state.currentMode==='intervalAucV1'){
 for(let i=0;i<samples.length;i++){
 const sample=samples[i];
 const range=
 state.ranges[sample]||
 currentRange;
-calculateIntervalAucV1ForSample(
+calculateIntervalForSample(
 sample,
 range,
 rows
@@ -3158,53 +2757,12 @@ await new Promise(requestAnimationFrame);
 }
 }
 renderResultTable(
-'aucV1',
-rows
-);
-const successCount=rows.filter(
-r=>Number.isFinite(r.AUC)
-).length;
-setStatus(
-successCount===rows.length&&rows.length>0
-?tr('aucV1Done')
-:(
-successCount>0
-?tr('aucV1Partial')
-:tr('noExtrema')
-),
-successCount===rows.length&&rows.length>0
-?'good'
-:(
-successCount>0
-?'warn'
-:'bad'
-)
-);
-await renderCurrentMode();
-return;
-}
-for(let i=0;i<samples.length;i++){
-const sample=samples[i];
-const range=
-state.ranges[sample]||
-currentRange;
-calculateIntervalMaxMaxForSample(
-sample,
-range,
-rows
-);
-if(samples.length>20&&i%10===9){
-await new Promise(requestAnimationFrame);
-}
-}
-renderResultTable(
-'auc',
+'interval',
 rows
 );
 const hasSuccess=rows.some(
 r=>
-Number.isFinite(r.Upper_AUC)&&
-Number.isFinite(r.Lower_AUC)
+Number.isFinite(r['AUC (P1 & P2)'])
 );
 setStatus(
 hasSuccess
@@ -4116,41 +3674,6 @@ line=>source[sample][line][i]
 }
 return aoa;
 }
-function allExtremaRows(){
-const rows=[];
-for(const s of state.dataset.samples){
-for(
-const line of(
-state.dataset.sampleLines?.[s]||
-state.dataset.lines
-)
-){
-const r=
-state.results.extrema?.[s]?.[line];
-if(r){
-rows.push({
-Sample:s,
-Line:line,
-Range_Start_mm:r.rangeStart,
-Range_End_mm:r.rangeEnd,
-Local_Max_X_mm:r.xMax,
-Local_Max_Y:r.yMax,
-Local_Min_X_mm:r.xMin,
-Local_Min_Y:r.yMin,
-Delta_X_mm:r.deltaX,
-Delta_Y:r.deltaY,
-Slope_Y_per_mm:r.slope,
-Notch:Number.isFinite(r.notchY)?r.notchY:notchValueForLine(s,line),
-Max_Prominence:r.maxProminence,
-Min_Prominence:r.minProminence,
-Max_Candidates:r.maxCandidates,
-Min_Candidates:r.minCandidates
-});
-}
-}
-}
-return rows;
-}
 function allAucRows(){
 const rows=[];
 for(const s of state.dataset.samples){
@@ -4166,80 +3689,20 @@ if(r){
 rows.push({
 Sample:s,
 Line:line,
-Search_Range_Start_mm:r.searchRangeStart,
-Search_Range_End_mm:r.searchRangeEnd,
+'Delta X (P1 & MIN)':r.deltaXP1Min,
+'Delta X (P2 & MIN)':r.deltaXP2Min,
+'Delta Y (P1 & MIN)':r.deltaYP1Min,
+'Delta Y (P2 & MIN)':r.deltaYP2Min,
+'AUC (P1 & P2)':r.aucP1P2,
+'AUC (P1 & MIN)':r.aucP1Min?.auc??'',
+'AUC (P2 & MIN)':r.aucP2Min?.auc??'',
 Notch:Number.isFinite(r.notchY)?r.notchY:notchValueForLine(s,line),
-Peak1_X_mm:r.peak1X,
-Peak1_Y:r.peak1Y,
-Minimum_X_mm:r.valleyX,
-Minimum_Y:r.valleyY,
-Peak2_X_mm:r.peak2X,
-Peak2_Y:r.peak2Y,
-Upper_AUC:r.upperAUC,
-Lower_AUC:r.lowerAUC
-});
-}
-}
-}
-return rows;
-}
-function allExtremaV1Rows(){
-const rows=[];
-for(const s of state.dataset.samples){
-for(
-const line of(
-state.dataset.sampleLines?.[s]||
-state.dataset.lines
-)
-){
-const r=
-state.results.extremaV1?.[s]?.[line];
-if(r){
-rows.push({
-Sample:s,
-Line:line,
-Range_Start_mm:r.rangeStart,
-Range_End_mm:r.rangeEnd,
-Local_Max_X_mm:r.xMax,
-Local_Max_Y:r.yMax,
-Local_Min_X_mm:r.xMin,
-Local_Min_Y:r.yMin,
-Delta_X_mm:r.deltaX,
-Delta_Y:r.deltaY,
-Slope_Y_per_mm:r.slope,
-Max_Prominence:r.maxProminence,
-Min_Prominence:r.minProminence,
-Max_Candidates:r.maxCandidates,
-Min_Candidates:r.minCandidates
-});
-}
-}
-}
-return rows;
-}
-function allAucV1Rows(){
-const rows=[];
-for(const s of state.dataset.samples){
-for(
-const line of(
-state.dataset.sampleLines?.[s]||
-state.dataset.lines
-)
-){
-const r=
-state.results.aucV1?.[s]?.[line];
-if(r){
-rows.push({
-Sample:s,
-Line:line,
-Search_Range_Start_mm:r.searchRangeStart,
-Search_Range_End_mm:r.searchRangeEnd,
-Local_Min_X_mm:r.localMinX,
-Local_Min_Y:r.localMinY,
-Local_Max_X_mm:r.localMaxX,
-Local_Max_Y:r.localMaxY,
-Slope_Y_per_mm:r.slopeYPerMm,
-AUC:r.auc?.auc??''
+'First Slope':r.firstSlope,
+'Slope (P1 & MIN)':r.slopeP1Min,
+'Slope (P2 & MIN)':r.slopeP2Min,
+'Peak 1 값':r.peak1Y,
+'Peak 2 값':r.peak2Y,
+'Min 값':r.valleyY
 });
 }
 }
@@ -4360,12 +3823,7 @@ rangeRows()
 );
 appendJsonSheet(
 wb,
-'Extrema_Results',
-allExtremaRows()
-);
-appendJsonSheet(
-wb,
-'AUC_Results',
+'Interval_Results',
 allAucRows()
 );
 for(const s of d.samples){
@@ -4378,18 +3836,6 @@ d.smoothed
 )
 );
 }
-}
-if(mode==='intervalAucV1'){
-appendJsonSheet(
-wb,
-'Extrema_Results',
-allExtremaV1Rows()
-);
-appendJsonSheet(
-wb,
-'AUC_Results',
-allAucV1Rows()
-);
 }
 if(mode==='intervalMean'){
 appendJsonSheet(
@@ -4476,28 +3922,9 @@ sample,
 line,
 au
 );
-const upperArea=
-upperAucAreaTrace(
-sample,
-line,
-au
-);
 if(lowerArea){
 traces.push(lowerArea);
 }
-if(upperArea){
-traces.push(upperArea);
-}
-}
-}
-if(mode==='intervalAucV1'){
-for(const line of exportLines){
-appendAucV1AreaTraces(
-traces,
-sample,
-line,
-state.results.aucV1?.[sample]?.[line]
-);
 }
 }
 for(const line of exportLines){
@@ -4507,7 +3934,7 @@ y:source[sample][line],
 type:'scatter',
 mode:'lines',
 name:line,
-showlegend:mode==='intervalAucV1'?false:true,
+showlegend:true,
 line:{
 width:mode==='raw'?1.5:2.2,
 color:lineColor(line)
@@ -4516,34 +3943,6 @@ color:lineColor(line)
 }
 if(mode==='interval'){
 for(const line of exportLines){
-const ex=
-state.results.extrema?.[sample]?.[line];
-if(ex){
-traces.push({
-x:[ex.xMax],
-y:[ex.yMax],
-type:'scatter',
-mode:'markers',
-name:`${line} max`,
-marker:{
-size:11,
-symbol:'triangle-up',
-color:lineColor(line)
-}
-});
-traces.push({
-x:[ex.xMin],
-y:[ex.yMin],
-type:'scatter',
-mode:'markers',
-name:`${line} min`,
-marker:{
-size:11,
-symbol:'triangle-down',
-color:lineColor(line)
-}
-});
-}
 appendAucOverlayTraces(
 traces,
 sample,
@@ -4554,16 +3953,6 @@ appendNotchPointTrace(
 traces,
 sample,
 line
-);
-}
-}
-if(mode==='intervalAucV1'){
-for(const line of exportLines){
-appendAucV1OverlayTraces(
-traces,
-sample,
-line,
-state.results.aucV1?.[sample]?.[line]
 );
 }
 }
