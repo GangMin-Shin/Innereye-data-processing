@@ -65,6 +65,8 @@ button{cursor:pointer}
 .colors[hidden]{display:none!important}
 .color-opt{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;color:#475467}
 .color-opt input{width:30px;height:30px;padding:0;border:0;background:none}
+.color-default-btn{height:36px;padding:0 14px;font-size:12px}
+.sigma-control input{width:92px}
 .result-header{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:28px 0 14px}
 .result-header h2{margin:0;font-size:21px;font-weight:800;letter-spacing:-.03em}
 .result-header .sub{font-size:12px;color:var(--muted);font-weight:600;margin-top:5px}
@@ -128,6 +130,7 @@ button{cursor:pointer}
 </style>
 </head>
 <body>
+
 <aside class="dock">
   <div class="dock-head">
     <strong data-i18n="module">ZR rawdata analysis</strong>
@@ -190,6 +193,7 @@ button{cursor:pointer}
       <label class="color-opt"><input id="p0Color" type="color" value="#2563eb"><span>P0</span></label>
       <label class="color-opt"><input id="p1Color" type="color" value="#d97706"><span>P1</span></label>
       <label class="color-opt"><input id="diffColor" type="color" value="#059669"><span>P0 - P1</span></label>
+      <button id="defaultColorsBtn" type="button" class="secondary color-default-btn" data-i18n="defaultColors">Default</button>
     </div>
   </section>
 
@@ -298,8 +302,16 @@ const I18N={
     linePlot:'Line plot',
     yMin:'Y min',
     yMax:'Y max',
-    autoScale:'Auto'
+    autoScale:'Auto',
+    sigma:'σ',
+    goodCount:'Good',
+    badCount:'Bad',
+    defaultColors:'Default',
+    sigmaSummary:'Sigma summary',
+    lowerLimit:'Lower limit',
+    upperLimit:'Upper limit'
   },
+
   ko:{
     module:'ZR rawdata 분석',
     dockHint:'분석 기능을 선택하세요.',
@@ -359,7 +371,14 @@ const I18N={
     linePlot:'꺾은선 그래프',
     yMin:'Y축 최소',
     yMax:'Y축 최대',
-    autoScale:'Auto'
+    autoScale:'Auto',
+    sigma:'σ',
+    goodCount:'양품',
+    badCount:'불량',
+    defaultColors:'디폴트',
+    sigmaSummary:'시그마 요약',
+    lowerLimit:'하한',
+    upperLimit:'상한'
   }
 };
 
@@ -371,19 +390,36 @@ const state={
   saveHandle:null,
   dataset:null,
   plotDivs:[],
+
   plotView:{
     channel:'Ch1',
     type:'bar',
+
     yRanges:{
       Ch1:{
         p0:{min:'',max:''},
         p1:{min:'',max:''},
         diff:{min:'',max:''}
       },
+
       Ch2:{
         p0:{min:'',max:''},
         p1:{min:'',max:''},
         diff:{min:'',max:''}
+      }
+    },
+
+    sigmas:{
+      Ch1:{
+        p0:1.0,
+        p1:1.0,
+        diff:1.0
+      },
+
+      Ch2:{
+        p0:1.0,
+        p1:1.0,
+        diff:1.0
       }
     }
   }
@@ -458,6 +494,91 @@ function meanAndSampleSD(values){
     sd:Math.sqrt(
       ss/(n-1)
     )
+  };
+}
+
+function normalizeSigma(value){
+  const n=
+    Number(value);
+
+  if(!Number.isFinite(n)){
+    return 1.0;
+  }
+
+  return Math.max(
+    0,
+    Math.round(n*10)/10
+  );
+}
+
+function lightenHexToRgba(
+  hex,
+  lighten=.45,
+  alpha=.50
+){
+  const raw=
+    String(hex||'')
+    .trim()
+    .replace('#','');
+
+  if(!/^[0-9a-fA-F]{6}$/.test(raw)){
+    return `rgba(148,163,184,${alpha})`;
+  }
+
+  const r=parseInt(raw.slice(0,2),16);
+  const g=parseInt(raw.slice(2,4),16);
+  const b=parseInt(raw.slice(4,6),16);
+
+  const mix=v=>
+    Math.round(
+      v+(255-v)*lighten
+    );
+
+  return `rgba(${mix(r)},${mix(g)},${mix(b)},${alpha})`;
+}
+
+function sigmaAssessment(
+  values,
+  stats,
+  sigma
+){
+  const s=
+    normalizeSigma(
+      sigma
+    );
+
+  const mean=
+    stats.mean;
+
+  const sd=
+    stats.sd;
+
+  const lower=
+    mean-s*sd;
+
+  const upper=
+    mean+s*sd;
+
+  let good=0;
+
+  for(const value of values){
+    if(
+      value>=lower&&
+      value<=upper
+    ){
+      good++;
+    }
+  }
+
+  return{
+    sigma:s,
+    mean,
+    sd,
+    lower,
+    upper,
+    good,
+    bad:values.length-good,
+    total:values.length
   };
 }
 
@@ -623,6 +744,7 @@ el('folderBtn').onclick=async()=>{
       tr('folderSelected'),
       'good'
     );
+
   }catch(e){
     if(e.name!=='AbortError'){
       setStatus(
@@ -642,16 +764,32 @@ function resetPlotColors(){
 function resetPlotView(){
   state.plotView.channel='Ch1';
   state.plotView.type='bar';
+
   state.plotView.yRanges={
     Ch1:{
       p0:{min:'',max:''},
       p1:{min:'',max:''},
       diff:{min:'',max:''}
     },
+
     Ch2:{
       p0:{min:'',max:''},
       p1:{min:'',max:''},
       diff:{min:'',max:''}
+    }
+  };
+
+  state.plotView.sigmas={
+    Ch1:{
+      p0:1.0,
+      p1:1.0,
+      diff:1.0
+    },
+
+    Ch2:{
+      p0:1.0,
+      p1:1.0,
+      diff:1.0
     }
   };
 
@@ -664,6 +802,7 @@ function resetAll(){
   state.saveHandle=null;
 
   el('excelInput').value='';
+
   el('filename').textContent=
     tr('noFile');
 
@@ -702,6 +841,14 @@ el('globalResetBtn').onclick=
 
 el('tabResetBtn').onclick=
   resetCurrentAnalysis;
+
+el('defaultColorsBtn').onclick=()=>{
+  resetPlotColors();
+
+  if(state.dataset){
+    renderPlots();
+  }
+};
 
 function buildTemplateWorkbook(){
   const wb=
@@ -763,6 +910,7 @@ el('downloadTemplateBtn').onclick=()=>{
       tr('templateDownloadStarted'),
       'good'
     );
+
   }catch(e){
     setStatus(
       e.message||String(e),
@@ -1017,6 +1165,7 @@ el('readBtn').onclick=async()=>{
       tr('readDone'),
       'good'
     );
+
   }catch(e){
     console.error(e);
 
@@ -1234,6 +1383,7 @@ function autoDataRange(values){
 
     min-=pad;
     max+=pad;
+
   }else{
     const pad=
       (max-min)*.06;
@@ -1301,7 +1451,9 @@ function singlePlotLayout(
   metricLabel,
   values,
   sampleCount,
-  rangeState
+  rangeState,
+  assessment,
+  color
 ){
   const yRange=
     resolveYRange(
@@ -1313,6 +1465,77 @@ function singlePlotLayout(
     niceSampleTickStep(
       sampleCount
     );
+
+  const shapes=[
+    {
+      type:'rect',
+      xref:'x',
+      yref:'y',
+      x0:.5,
+      x1:sampleCount+.5,
+      y0:assessment.lower,
+      y1:assessment.upper,
+
+      fillcolor:lightenHexToRgba(
+        color,
+        .45,
+        .50
+      ),
+
+      line:{
+        width:0
+      },
+
+      layer:'below'
+    },
+
+    {
+      type:'line',
+      xref:'x',
+      yref:'y',
+      x0:.5,
+      x1:sampleCount+.5,
+      y0:assessment.mean,
+      y1:assessment.mean,
+
+      line:{
+        color:'#000000',
+        width:3,
+        dash:'dash'
+      },
+
+      layer:'above'
+    }
+  ];
+
+  const annotations=[
+    {
+      xref:'paper',
+      yref:'paper',
+      x:.01,
+      y:.99,
+      xanchor:'left',
+      yanchor:'top',
+      align:'left',
+      showarrow:false,
+
+      text:
+        `<b>σ = ${assessment.sigma.toFixed(1)}</b><br>`+
+        `${tr('goodCount')}: ${assessment.good}<br>`+
+        `${tr('badCount')}: ${assessment.bad}`,
+
+      font:{
+        family:'Inter, sans-serif',
+        size:12,
+        color:'#111827'
+      },
+
+      bgcolor:'rgba(255,255,255,.86)',
+      bordercolor:'rgba(17,24,39,.18)',
+      borderwidth:1,
+      borderpad:7
+    }
+  ];
 
   return{
     height:460,
@@ -1335,13 +1558,18 @@ function singlePlotLayout(
     showlegend:false,
     bargap:.18,
 
+    shapes,
+    annotations,
+
     xaxis:{
       title:{
         text:tr('sampleAxis'),
+
         font:{
           size:12
         }
       },
+
       showgrid:false,
       zeroline:false,
       linecolor:'#9aa1ad',
@@ -1349,20 +1577,24 @@ function singlePlotLayout(
       tickmode:'linear',
       tick0:1,
       dtick:tickStep,
+
       range:[
         .5,
         sampleCount+.5
       ],
+
       fixedrange:false
     },
 
     yaxis:{
       title:{
         text:metricLabel,
+
         font:{
           size:12
         }
       },
+
       showgrid:false,
       zeroline:false,
       linecolor:'#9aa1ad',
@@ -1404,14 +1636,17 @@ function buildPlotTrace(
       mode:'lines+markers',
       x,
       y,
+
       line:{
         color,
         width:2
       },
+
       marker:{
         color,
         size:5
       },
+
       hovertemplate:
         `${tr('sampleAxis')}=%{x}<br>`+
         `${metricLabel}=%{y:.6f}`+
@@ -1423,9 +1658,11 @@ function buildPlotTrace(
     type:'bar',
     x,
     y,
+
     marker:{
       color
     },
+
     hovertemplate:
       `${tr('sampleAxis')}=%{x}<br>`+
       `${metricLabel}=%{y:.6f}`+
@@ -1441,8 +1678,10 @@ async function renderPlots(){
   purgePlots();
 
   el('plotControls').hidden=false;
+
   el('channelSelect').value=
     state.plotView.channel;
+
   el('plotTypeSelect').value=
     state.plotView.type;
 
@@ -1471,25 +1710,36 @@ async function renderPlots(){
     {
       key:'p0',
       label:'P0',
+
       values:c.valid.map(
         r=>r.P0
       ),
+
+      stats:c.stats.p0,
       color:el('p0Color').value
     },
+
     {
       key:'p1',
       label:'P1',
+
       values:c.valid.map(
         r=>r.P1
       ),
+
+      stats:c.stats.p1,
       color:el('p1Color').value
     },
+
     {
       key:'diff',
       label:'P0 - P1',
+
       values:c.valid.map(
         r=>r.Diff
       ),
+
+      stats:c.stats.diff,
       color:el('diffColor').value
     }
   ];
@@ -1507,18 +1757,43 @@ async function renderPlots(){
       state.plotView
       .yRanges[name][spec.key];
 
+    const sigma=
+      normalizeSigma(
+        state.plotView
+        .sigmas[name][spec.key]
+      );
+
+    state.plotView
+      .sigmas[name][spec.key]=
+      sigma;
+
+    const assessment=
+      sigmaAssessment(
+        spec.values,
+        spec.stats,
+        sigma
+      );
+
     card.innerHTML=
       `<div class="plot-title">`+
       `<span class="plot-title-name">${spec.label}</span>`+
       `<div class="y-controls">`+
+
+      `<div class="y-control sigma-control">`+
+      `<label>${tr('sigma')}</label>`+
+      `<input class="sigma-input" type="number" min="0" step="0.1" value="${sigma.toFixed(1)}">`+
+      `</div>`+
+
       `<div class="y-control">`+
       `<label>${tr('yMin')}</label>`+
       `<input class="y-min-input" type="number" step="any" value="${rangeState.min}">`+
       `</div>`+
+
       `<div class="y-control">`+
       `<label>${tr('yMax')}</label>`+
       `<input class="y-max-input" type="number" step="any" value="${rangeState.max}">`+
       `</div>`+
+
       `<button class="auto-scale-btn" type="button">${tr('autoScale')}</button>`+
       `</div>`+
       `</div>`+
@@ -1526,6 +1801,11 @@ async function renderPlots(){
 
     el('plots')
       .appendChild(card);
+
+    const sigmaInput=
+      card.querySelector(
+        '.sigma-input'
+      );
 
     const minInput=
       card.querySelector(
@@ -1542,11 +1822,28 @@ async function renderPlots(){
         '.auto-scale-btn'
       );
 
+    sigmaInput.addEventListener(
+      'change',
+      ()=>{
+        const next=
+          normalizeSigma(
+            sigmaInput.value
+          );
+
+        state.plotView
+          .sigmas[name][spec.key]=
+          next;
+
+        renderPlots();
+      }
+    );
+
     minInput.addEventListener(
       'change',
       ()=>{
         rangeState.min=
           minInput.value.trim();
+
         renderPlots();
       }
     );
@@ -1556,6 +1853,7 @@ async function renderPlots(){
       ()=>{
         rangeState.max=
           maxInput.value.trim();
+
         renderPlots();
       }
     );
@@ -1565,6 +1863,7 @@ async function renderPlots(){
       ()=>{
         rangeState.min='';
         rangeState.max='';
+
         renderPlots();
       }
     );
@@ -1590,12 +1889,16 @@ async function renderPlots(){
     await Plotly.newPlot(
       div,
       [trace],
+
       singlePlotLayout(
         spec.label,
         spec.values,
         x.length,
-        rangeState
+        rangeState,
+        assessment,
+        spec.color
       ),
+
       plotConfig
     );
   }
@@ -1697,6 +2000,106 @@ function buildOutputWorkbook(){
       );
   }
 
+  const sigmaRows=[
+    [
+      'Channel',
+      'Metric',
+      'Sigma',
+      'Mean',
+      'SD',
+      'Lower limit',
+      'Upper limit',
+      'Good Count',
+      'Bad Count',
+      'Valid Samples'
+    ]
+  ];
+
+  const metricSpecs=[
+    {
+      key:'p0',
+      label:'P0',
+      valueKey:'P0'
+    },
+
+    {
+      key:'p1',
+      label:'P1',
+      valueKey:'P1'
+    },
+
+    {
+      key:'diff',
+      label:'P0 - P1',
+      valueKey:'Diff'
+    }
+  ];
+
+  for(
+    const name of [
+      'Ch1',
+      'Ch2'
+    ]
+  ){
+    const channel=
+      state.dataset
+      .channels[name];
+
+    for(const metric of metricSpecs){
+      const values=
+        channel.valid.map(
+          r=>r[metric.valueKey]
+        );
+
+      const assessment=
+        sigmaAssessment(
+          values,
+          channel.stats[metric.key],
+          state.plotView
+          .sigmas[name][metric.key]
+        );
+
+      sigmaRows.push([
+        name,
+        metric.label,
+        assessment.sigma,
+        assessment.mean,
+        assessment.sd,
+        assessment.lower,
+        assessment.upper,
+        assessment.good,
+        assessment.bad,
+        assessment.total
+      ]);
+    }
+  }
+
+  const sigmaWs=
+    XLSX.utils
+    .aoa_to_sheet(
+      sigmaRows
+    );
+
+  sigmaWs['!cols']=[
+    {wch:12},
+    {wch:14},
+    {wch:10},
+    {wch:18},
+    {wch:18},
+    {wch:18},
+    {wch:18},
+    {wch:14},
+    {wch:14},
+    {wch:16}
+  ];
+
+  XLSX.utils
+    .book_append_sheet(
+      wb,
+      sigmaWs,
+      'Sigma Summary'
+    );
+
   return wb;
 }
 
@@ -1784,6 +2187,7 @@ el('saveBtn').onclick=async()=>{
       tr('saved'),
       'good'
     );
+
   }catch(e){
     console.error(e);
 
@@ -1791,6 +2195,7 @@ el('saveBtn').onclick=async()=>{
       `${tr('saveFailed')}: ${e.message||e}`,
       'bad'
     );
+
   }finally{
     el('saveBtn').disabled=
       false;
