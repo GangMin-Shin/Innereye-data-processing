@@ -590,6 +590,75 @@ button{
     min-width:150px
 }
 
+.grouping-toggle-line{
+    height:38px;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:0 10px;
+    border:1px solid #cfd4dc;
+    border-radius:10px;
+    background:#fff;
+    color:#111827;
+    font-size:12px;
+    font-weight:800
+}
+
+.grouping-toggle-line input{
+    width:17px;
+    height:17px;
+    margin:0;
+    accent-color:#111827
+}
+
+.grouping-options{
+    display:flex;
+    align-items:end;
+    gap:12px;
+    flex-wrap:wrap
+}
+
+.grouping-options[hidden]{
+    display:none!important
+}
+
+.grouping-threshold-input{
+    height:38px;
+    border:1px solid #cfd4dc;
+    border-radius:10px;
+    background:#fff;
+    color:#111827;
+    padding:0 10px;
+    font-size:12px;
+    font-weight:700;
+    outline:none;
+    width:150px
+}
+
+.grouping-threshold-input:focus{
+    border-color:#98a2b3;
+    box-shadow:0 0 0 3px rgba(17,24,39,.05)
+}
+
+.grouping-counts{
+    min-height:38px;
+    display:flex;
+    align-items:center;
+    padding:0 12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#f8f9fb;
+    color:#475467;
+    font-size:11px;
+    font-weight:800;
+    white-space:nowrap
+}
+
+.group-row td:first-child,
+.group-metric-row td:nth-child(2){
+    font-weight:800
+}
+
 .plot-control-group label,
 .y-control label{
     font-size:11px;
@@ -1404,6 +1473,50 @@ Histogram
 
 </div>
 
+<div class="plot-control-group">
+
+<label data-i18n="grouping">
+Group split
+</label>
+
+<label class="grouping-toggle-line">
+<input id="groupingToggle" type="checkbox">
+<span data-i18n="groupingEnable">Enable split</span>
+</label>
+
+</div>
+
+<div
+    id="groupingOptions"
+    class="grouping-options"
+    hidden
+>
+
+<div class="plot-control-group">
+<label for="groupingMetricSelect" data-i18n="groupingSignal">Split signal</label>
+<select id="groupingMetricSelect">
+<option value="p0">P0</option>
+<option value="p1">P1</option>
+</select>
+</div>
+
+<div class="plot-control-group">
+<label for="groupingOperatorSelect" data-i18n="groupingOperator">Group (1) condition</label>
+<select id="groupingOperatorSelect">
+<option value="gte" data-i18n="groupingGte">≥ threshold</option>
+<option value="lte" data-i18n="groupingLte">≤ threshold</option>
+</select>
+</div>
+
+<div class="plot-control-group">
+<label for="groupingThreshold" data-i18n="groupingThreshold">Threshold</label>
+<input id="groupingThreshold" class="grouping-threshold-input" type="number" step="any" inputmode="decimal">
+</div>
+
+<div id="groupingCounts" class="grouping-counts"></div>
+
+</div>
+
 </div>
 
 <div
@@ -1492,6 +1605,15 @@ const I18N={
         plotType:'Plot type',
         linePlot:'Line plot',
         histogramPlot:'Histogram',
+        grouping:'Group split',
+        groupingEnable:'Enable split',
+        groupingSignal:'Split signal',
+        groupingOperator:'Group (1) condition',
+        groupingThreshold:'Threshold',
+        groupingGte:'≥ threshold',
+        groupingLte:'≤ threshold',
+        groupingNeedThreshold:'Enter a finite threshold.',
+        groupingCounts:'Group counts',
         xMin:'X min',
         xMax:'X max',
         yMin:'Y min',
@@ -1569,6 +1691,15 @@ const I18N={
         plotType:'플롯 선택',
         linePlot:'꺾은선 그래프',
         histogramPlot:'히스토그램',
+        grouping:'그룹 분리',
+        groupingEnable:'그룹 분리 사용',
+        groupingSignal:'분리 기준 신호',
+        groupingOperator:'그룹 (1) 조건',
+        groupingThreshold:'기준값',
+        groupingGte:'기준값 이상 (≥)',
+        groupingLte:'기준값 이하 (≤)',
+        groupingNeedThreshold:'유효한 기준값을 입력하세요.',
+        groupingCounts:'그룹 수',
         xMin:'X축 최소',
         xMax:'X축 최대',
         yMin:'Y축 최소',
@@ -1649,6 +1780,28 @@ const state={
     plotView:{
         channel:'Ch1',
         type:'line',
+        renderToken:0,
+
+        grouping:{
+            Ch1:{
+                enabled:false,
+                metric:'p0',
+                operator:'gte',
+                threshold:''
+            },
+
+            Ch2:{
+                enabled:false,
+                metric:'p0',
+                operator:'gte',
+                threshold:''
+            }
+        },
+
+        groupingCache:{
+            Ch1:null,
+            Ch2:null
+        },
 
         yRanges:{
             Ch1:{
@@ -2111,6 +2264,42 @@ function computeVariability(values){
     };
 }
 
+const DESCRIPTION_METRICS=[
+    {
+        key:'p0',
+        label:'P0',
+        valueKey:'P0',
+        colorId:'p0Color',
+        fileLabel:'P0'
+    },
+
+    {
+        key:'p1',
+        label:'P1',
+        valueKey:'P1',
+        colorId:'p1Color',
+        fileLabel:'P1'
+    },
+
+    {
+        key:'diff',
+        label:'P0 - P1',
+        valueKey:'Diff',
+        colorId:'diffColor',
+        fileLabel:'P0_minus_P1'
+    }
+];
+
+function getDescriptionMetric(metricKey){
+
+    return(
+        DESCRIPTION_METRICS.find(
+            metric=>metric.key===metricKey
+        )||
+        DESCRIPTION_METRICS[0]
+    );
+}
+
 function getMetricValues(
     channelName,
     metricKey
@@ -2123,19 +2312,228 @@ function getMetricValues(
     const channel=
         state.dataset.channels[channelName];
 
-    const keyMap={
-        p0:'P0',
-        p1:'P1',
-        diff:'Diff'
+    return(
+        channel.series?.[metricKey]||
+        []
+    );
+}
+
+function invalidateGroupingCache(channelName){
+
+    if(
+        state.plotView.groupingCache&&
+        Object.prototype.hasOwnProperty.call(
+            state.plotView.groupingCache,
+            channelName
+        )
+    ){
+        state.plotView.groupingCache[channelName]=null;
+    }
+}
+
+function buildGroupedSubset(rows,index,criterion){
+
+    const series={
+        p0:[],
+        p1:[],
+        diff:[]
     };
 
-    const valueKey=
-        keyMap[metricKey]||
-        'P0';
+    for(const row of rows){
+        series.p0.push(row.P0);
+        series.p1.push(row.P1);
+        series.diff.push(row.Diff);
+    }
 
-    return channel.valid.map(
-        r=>r[valueKey]
-    );
+    const stats={
+        p0:meanAndSampleSD(series.p0),
+        p1:meanAndSampleSD(series.p1),
+        diff:meanAndSampleSD(series.diff)
+    };
+
+    const variability={
+        p0:computeVariability(series.p0),
+        p1:computeVariability(series.p1),
+        diff:computeVariability(series.diff)
+    };
+
+    return{
+        index,
+        label:`(${index})`,
+        criterion,
+        rows,
+        validCount:rows.length,
+        series,
+        stats,
+        variability
+    };
+}
+
+function getGroupingResult(channelName){
+
+    if(!state.dataset){
+        return null;
+    }
+
+    const config=
+        state.plotView.grouping[channelName];
+
+    if(!config||!config.enabled){
+        return null;
+    }
+
+    const threshold=
+        Number(config.threshold);
+
+    if(
+        String(config.threshold).trim()===''||
+        !Number.isFinite(threshold)
+    ){
+        return null;
+    }
+
+    const metric=
+        getDescriptionMetric(
+            config.metric
+        );
+
+    const operator=
+        config.operator==='lte'
+            ?'lte'
+            :'gte';
+
+    const cacheKey=
+        `${metric.key}|${operator}|${threshold}`;
+
+    const cached=
+        state.plotView.groupingCache[channelName];
+
+    if(
+        cached&&
+        cached.key===cacheKey
+    ){
+        return cached.result;
+    }
+
+    const channel=
+        state.dataset.channels[channelName];
+
+    const group1Rows=[];
+    const group2Rows=[];
+
+    for(const row of channel.valid){
+
+        const value=
+            row[metric.valueKey];
+
+        const inGroup1=
+            operator==='lte'
+                ?value<=threshold
+                :value>=threshold;
+
+        (
+            inGroup1
+                ?group1Rows
+                :group2Rows
+        ).push(row);
+    }
+
+    const symbol1=
+        operator==='lte'
+            ?'≤'
+            :'≥';
+
+    const symbol2=
+        operator==='lte'
+            ?'>'
+            :'<';
+
+    const result={
+        channel:channelName,
+        metricKey:metric.key,
+        metricLabel:metric.label,
+        operator,
+        threshold,
+        group1:
+            buildGroupedSubset(
+                group1Rows,
+                1,
+                `${metric.label} ${symbol1} ${threshold}`
+            ),
+        group2:
+            buildGroupedSubset(
+                group2Rows,
+                2,
+                `${metric.label} ${symbol2} ${threshold}`
+            )
+    };
+
+    state.plotView.groupingCache[channelName]={
+        key:cacheKey,
+        result
+    };
+
+    return result;
+}
+
+function renderGroupingControls(){
+
+    const channelName=
+        state.plotView.channel;
+
+    const config=
+        state.plotView.grouping[channelName];
+
+    el('groupingToggle').checked=
+        !!config.enabled;
+
+    el('groupingOptions').hidden=
+        !config.enabled;
+
+    el('groupingMetricSelect').value=
+        config.metric;
+
+    el('groupingOperatorSelect').value=
+        config.operator;
+
+    el('groupingThreshold').value=
+        config.threshold;
+
+    const countsEl=
+        el('groupingCounts');
+
+    if(!config.enabled){
+        countsEl.textContent='';
+        return;
+    }
+
+    const grouping=
+        getGroupingResult(
+            channelName
+        );
+
+    if(!grouping){
+        countsEl.textContent=
+            tr('groupingNeedThreshold');
+        return;
+    }
+
+    countsEl.textContent=
+        `(1) N=${grouping.group1.validCount} · (2) N=${grouping.group2.validCount}`;
+}
+
+function refreshDescriptionResults(){
+
+    if(
+        !state.dataset||
+        state.activeMode!=='description'
+    ){
+        return;
+    }
+
+    renderSummaryTable();
+    renderVariabilityTable();
+    renderPlots();
 }
 
 function renderVariabilityTable(){
@@ -2156,30 +2554,13 @@ function renderVariabilityTable(){
         ['Ch1','Ch2']
     ){
 
-        const specs=[
-            {
-                key:'p0',
-                label:'P0'
-            },
-            {
-                key:'p1',
-                label:'P1'
-            },
-            {
-                key:'diff',
-                label:'P0 - P1'
-            }
-        ];
+        const channel=
+            state.dataset.channels[channelName];
 
-        for(const spec of specs){
+        for(const spec of DESCRIPTION_METRICS){
 
             const metrics=
-                computeVariability(
-                    getMetricValues(
-                        channelName,
-                        spec.key
-                    )
-                );
+                channel.variability[spec.key];
 
             rows.push(
                 `<tr>`+
@@ -2194,6 +2575,40 @@ function renderVariabilityTable(){
                 `<td>${fmt(metrics.minmax)}</td>`+
                 `</tr>`
             );
+        }
+
+        const grouping=
+            getGroupingResult(
+                channelName
+            );
+
+        if(grouping){
+
+            for(const spec of DESCRIPTION_METRICS){
+
+                for(
+                    const group of
+                    [grouping.group1,grouping.group2]
+                ){
+
+                    const metrics=
+                        group.variability[spec.key];
+
+                    rows.push(
+                        `<tr class="group-metric-row">`+
+                        `<td>${channelName}</td>`+
+                        `<td>${spec.label} - ${group.label}</td>`+
+                        `<td>${fmt(metrics.cv)}</td>`+
+                        `<td>${fmt(metrics.iqr)}</td>`+
+                        `<td>${fmt(metrics.mad)}</td>`+
+                        `<td>${fmt(metrics.p95p5)}</td>`+
+                        `<td>${fmt(metrics.p99p1)}</td>`+
+                        `<td>${fmt(metrics.qn)}</td>`+
+                        `<td>${fmt(metrics.minmax)}</td>`+
+                        `</tr>`
+                    );
+                }
+            }
         }
     }
 
@@ -2361,6 +2776,7 @@ function setActiveMode(mode){
 
     }else{
 
+        state.plotView.renderToken++;
         purgePlots();
 
         el(
@@ -5694,6 +6110,7 @@ function clearDescription(
     }={}
 ){
 
+    state.plotView.renderToken++;
     purgePlots();
     purgeLotPlot();
 
@@ -6113,6 +6530,29 @@ function resetPlotView(){
     state.plotView.type=
         'line';
 
+    state.plotView.renderToken++;
+
+    state.plotView.grouping={
+        Ch1:{
+            enabled:false,
+            metric:'p0',
+            operator:'gte',
+            threshold:''
+        },
+
+        Ch2:{
+            enabled:false,
+            metric:'p0',
+            operator:'gte',
+            threshold:''
+        }
+    };
+
+    state.plotView.groupingCache={
+        Ch1:null,
+        Ch2:null
+    };
+
     state.plotView.yRanges={
         Ch1:{
             p0:{min:'',max:''},
@@ -6480,26 +6920,29 @@ function parseChannelSheet(
         });
     }
 
-    const p0Stats=
-        meanAndSampleSD(
-            valid.map(
-                r=>r.P0
-            )
-        );
+    const series={
+        p0:[],
+        p1:[],
+        diff:[]
+    };
 
-    const p1Stats=
-        meanAndSampleSD(
-            valid.map(
-                r=>r.P1
-            )
-        );
+    for(const row of valid){
+        series.p0.push(row.P0);
+        series.p1.push(row.P1);
+        series.diff.push(row.Diff);
+    }
 
-    const diffStats=
-        meanAndSampleSD(
-            valid.map(
-                r=>r.Diff
-            )
-        );
+    const stats={
+        p0:meanAndSampleSD(series.p0),
+        p1:meanAndSampleSD(series.p1),
+        diff:meanAndSampleSD(series.diff)
+    };
+
+    const variability={
+        p0:computeVariability(series.p0),
+        p1:computeVariability(series.p1),
+        diff:computeVariability(series.diff)
+    };
 
     return{
         name,
@@ -6510,12 +6953,9 @@ function parseChannelSheet(
             valid.length,
 
         valid,
-
-        stats:{
-            p0:p0Stats,
-            p1:p1Stats,
-            diff:diffStats
-        }
+        series,
+        stats,
+        variability
     };
 }
 
@@ -6588,6 +7028,11 @@ el(
 
             state.dataset={
                 channels
+            };
+
+            state.plotView.groupingCache={
+                Ch1:null,
+                Ch2:null
             };
 
             state.activeMode=
@@ -6794,31 +7239,56 @@ function renderSummaryTable(){
         tr('note')
     ];
 
-    const body=
+    const body=[];
+
+    for(
+        const name of
         ['Ch1','Ch2']
-            .map(
-                name=>{
+    ){
 
-                    const c=
-                        state.dataset
-                            .channels[name];
+        const channel=
+            state.dataset.channels[name];
 
-                    return(
-                        `<tr>`+
-                        `<td>${name}</td>`+
-                        `<td>${c.validCount}</td>`+
-                        `<td>${fmt(c.stats.p0.mean)}</td>`+
-                        `<td>${fmt(c.stats.p0.sd)}</td>`+
-                        `<td>${fmt(c.stats.p1.mean)}</td>`+
-                        `<td>${fmt(c.stats.p1.sd)}</td>`+
-                        `<td>${fmt(c.stats.diff.mean)}</td>`+
-                        `<td>${fmt(c.stats.diff.sd)}</td>`+
-                        `<td>${tr('invalidNote')}: ${c.invalidCount}</td>`+
-                        `</tr>`
-                    );
-                }
-            )
-            .join('');
+        body.push(
+            `<tr>`+
+            `<td>${name}</td>`+
+            `<td>${channel.validCount}</td>`+
+            `<td>${fmt(channel.stats.p0.mean)}</td>`+
+            `<td>${fmt(channel.stats.p0.sd)}</td>`+
+            `<td>${fmt(channel.stats.p1.mean)}</td>`+
+            `<td>${fmt(channel.stats.p1.sd)}</td>`+
+            `<td>${fmt(channel.stats.diff.mean)}</td>`+
+            `<td>${fmt(channel.stats.diff.sd)}</td>`+
+            `<td>${tr('invalidNote')}: ${channel.invalidCount}</td>`+
+            `</tr>`
+        );
+
+        const grouping=
+            getGroupingResult(name);
+
+        if(grouping){
+
+            for(
+                const group of
+                [grouping.group1,grouping.group2]
+            ){
+
+                body.push(
+                    `<tr class="group-row">`+
+                    `<td>${name} - ${group.label}</td>`+
+                    `<td>${group.validCount}</td>`+
+                    `<td>${fmt(group.stats.p0.mean)}</td>`+
+                    `<td>${fmt(group.stats.p0.sd)}</td>`+
+                    `<td>${fmt(group.stats.p1.mean)}</td>`+
+                    `<td>${fmt(group.stats.p1.sd)}</td>`+
+                    `<td>${fmt(group.stats.diff.mean)}</td>`+
+                    `<td>${fmt(group.stats.diff.sd)}</td>`+
+                    `<td>${group.criterion}</td>`+
+                    `</tr>`
+                );
+            }
+        }
+    }
 
     el(
         'resultTableWrap'
@@ -6837,7 +7307,7 @@ function renderSummaryTable(){
 
         `</tr>`+
         `</thead>`+
-        `<tbody>${body}</tbody>`+
+        `<tbody>${body.join('')}</tbody>`+
         `</table>`+
         `</div>`;
 }
@@ -7478,6 +7948,9 @@ async function renderPlots(){
         return;
     }
 
+    const token=
+        ++state.plotView.renderToken;
+
     purgePlots();
 
     el(
@@ -7494,6 +7967,8 @@ async function renderPlots(){
     ).value=
         state.plotView.type;
 
+    renderGroupingControls();
+
     el(
         'plots'
     ).innerHTML='';
@@ -7501,12 +7976,11 @@ async function renderPlots(){
     const name=
         state.plotView.channel;
 
-    const c=
-        state.dataset
-            .channels[name];
+    const channel=
+        state.dataset.channels[name];
 
     if(
-        !c.valid.length
+        !channel.valid.length
     ){
 
         el(
@@ -7517,68 +7991,58 @@ async function renderPlots(){
         return;
     }
 
-    const x=
-        c.valid.map(
+    const grouping=
+        getGroupingResult(name);
+
+    const baseX=
+        channel.valid.map(
             r=>r.N
         );
 
-    const specs=[
-        {
-            key:'p0',
-            label:'P0',
+    const plotItems=[];
 
-            values:
-                c.valid.map(
-                    r=>r.P0
-                ),
+    for(const spec of DESCRIPTION_METRICS){
 
-            stats:
-                c.stats.p0,
+        plotItems.push({
+            spec,
+            label:spec.label,
+            values:channel.series[spec.key],
+            x:baseX,
+            stats:channel.stats[spec.key],
+            group:null
+        });
 
-            color:
-                el(
-                    'p0Color'
-                ).value
-        },
+        if(grouping){
 
-        {
-            key:'p1',
-            label:'P1',
+            for(
+                const group of
+                [grouping.group1,grouping.group2]
+            ){
 
-            values:
-                c.valid.map(
-                    r=>r.P1
-                ),
-
-            stats:
-                c.stats.p1,
-
-            color:
-                el(
-                    'p1Color'
-                ).value
-        },
-
-        {
-            key:'diff',
-            label:'P0 - P1',
-
-            values:
-                c.valid.map(
-                    r=>r.Diff
-                ),
-
-            stats:
-                c.stats.diff,
-
-            color:
-                el(
-                    'diffColor'
-                ).value
+                plotItems.push({
+                    spec,
+                    label:`${spec.label} - ${group.label}`,
+                    values:group.series[spec.key],
+                    x:group.rows.map(
+                        row=>row.N
+                    ),
+                    stats:group.stats[spec.key],
+                    group
+                });
+            }
         }
-    ];
+    }
 
-    for(const spec of specs){
+    for(const item of plotItems){
+
+        if(
+            token!==
+            state.plotView.renderToken
+        ){
+            return;
+        }
+
+        const spec=item.spec;
 
         const card=
             document.createElement(
@@ -7604,8 +8068,8 @@ async function renderPlots(){
 
         const assessment=
             sigmaAssessment(
-                spec.values,
-                spec.stats,
+                item.values,
+                item.stats,
                 sigma
             );
 
@@ -7619,9 +8083,17 @@ async function renderPlots(){
                 ?tr('xMax')
                 :tr('yMax');
 
+        const groupNote=
+            item.group
+                ?`<span style="font-size:11px;color:#667085;font-weight:700">${item.group.criterion} · N=${item.group.validCount}</span>`
+                :'';
+
         card.innerHTML=
             `<div class="plot-title">`+
-            `<span class="plot-title-name">${spec.label}</span>`+
+            `<div style="display:flex;flex-direction:column;gap:4px">`+
+            `<span class="plot-title-name">${item.label}</span>`+
+            groupNote+
+            `</div>`+
             `<div class="y-controls">`+
 
             `<div class="y-control sigma-control">`+
@@ -7729,13 +8201,23 @@ async function renderPlots(){
             div
         );
 
+        if(!item.values.length){
+
+            div.innerHTML=
+                `<div class="empty" style="min-height:430px">${tr('noValid')}</div>`;
+
+            continue;
+        }
+
         const trace=
             buildPlotTrace(
-                x,
-                spec.values,
-                spec.label,
-                spec.color,
-                name
+                item.x,
+                item.values,
+                item.label,
+                el(spec.colorId).value,
+                item.group
+                    ?`${name} ${item.group.label}`
+                    :name
             );
 
         await Plotly.newPlot(
@@ -7743,16 +8225,23 @@ async function renderPlots(){
             [trace],
 
             singlePlotLayout(
-                spec.label,
-                spec.values,
-                x.length,
+                item.label,
+                item.values,
+                channel.validCount,
                 rangeState,
                 assessment,
-                spec.color
+                el(spec.colorId).value
             ),
 
             plotConfig
         );
+
+        if(
+            token!==
+            state.plotView.renderToken
+        ){
+            return;
+        }
     }
 }
 
@@ -7793,6 +8282,89 @@ el(
         ){
             renderPlots();
         }
+    }
+);
+
+let groupingRenderTimer=null;
+
+function updateActiveGroupingConfig(
+    key,
+    value,
+    debounce=false
+){
+
+    const channelName=
+        state.plotView.channel;
+
+    state.plotView
+        .grouping[channelName][key]=
+        value;
+
+    invalidateGroupingCache(
+        channelName
+    );
+
+    if(!debounce){
+        clearTimeout(groupingRenderTimer);
+        refreshDescriptionResults();
+        return;
+    }
+
+    clearTimeout(groupingRenderTimer);
+
+    groupingRenderTimer=
+        setTimeout(
+            refreshDescriptionResults,
+            220
+        );
+}
+
+el(
+    'groupingToggle'
+).addEventListener(
+    'change',
+    ()=>{
+        updateActiveGroupingConfig(
+            'enabled',
+            el('groupingToggle').checked
+        );
+    }
+);
+
+el(
+    'groupingMetricSelect'
+).addEventListener(
+    'change',
+    ()=>{
+        updateActiveGroupingConfig(
+            'metric',
+            el('groupingMetricSelect').value
+        );
+    }
+);
+
+el(
+    'groupingOperatorSelect'
+).addEventListener(
+    'change',
+    ()=>{
+        updateActiveGroupingConfig(
+            'operator',
+            el('groupingOperatorSelect').value
+        );
+    }
+);
+
+el(
+    'groupingThreshold'
+).addEventListener(
+    'input',
+    ()=>{
+        updateActiveGroupingConfig(
+            'threshold',
+            el('groupingThreshold').value.trim(),
+            true
+        );
     }
 );
 
@@ -7881,6 +8453,79 @@ function buildValidDataWorkbook(){
             'Valid Data'
         );
 
+    const groupedRows=[
+        [
+            'Channel',
+            'Group',
+            'Criterion',
+            'N',
+            'Original N',
+            'P0',
+            'P1',
+            'P0 - P1'
+        ]
+    ];
+
+    for(
+        const name of
+        ['Ch1','Ch2']
+    ){
+
+        const grouping=
+            getGroupingResult(name);
+
+        if(!grouping){
+            continue;
+        }
+
+        for(
+            const group of
+            [grouping.group1,grouping.group2]
+        ){
+
+            for(const r of group.rows){
+
+                groupedRows.push([
+                    name,
+                    group.label,
+                    group.criterion,
+                    r.N,
+                    r.Original_N,
+                    r.P0,
+                    r.P1,
+                    r.Diff
+                ]);
+            }
+        }
+    }
+
+    if(groupedRows.length>1){
+
+        const groupedWs=
+            XLSX.utils
+                .aoa_to_sheet(
+                    groupedRows
+                );
+
+        groupedWs['!cols']=[
+            {wch:12},
+            {wch:12},
+            {wch:26},
+            {wch:10},
+            {wch:16},
+            {wch:18},
+            {wch:18},
+            {wch:18}
+        ];
+
+        XLSX.utils
+            .book_append_sheet(
+                wb,
+                groupedWs,
+                'Grouped Data'
+            );
+    }
+
     return wb;
 }
 
@@ -7905,7 +8550,8 @@ function buildResultsWorkbook(){
             'P0 - P1 Mean',
             'P0 - P1 SD',
             'Invalid Samples',
-            'Input Rows'
+            'Input Rows',
+            'Group Criterion'
         ]
     ];
 
@@ -7915,8 +8561,7 @@ function buildResultsWorkbook(){
     ){
 
         const channel=
-            state.dataset
-                .channels[name];
+            state.dataset.channels[name];
 
         rows.push([
             name,
@@ -7928,12 +8573,38 @@ function buildResultsWorkbook(){
             channel.stats.diff.mean,
             channel.stats.diff.sd,
             channel.invalidCount,
-            channel.inputRows
+            channel.inputRows,
+            ''
         ]);
+
+        const grouping=
+            getGroupingResult(name);
+
+        if(grouping){
+
+            for(
+                const group of
+                [grouping.group1,grouping.group2]
+            ){
+
+                rows.push([
+                    `${name} - ${group.label}`,
+                    group.validCount,
+                    group.stats.p0.mean,
+                    group.stats.p0.sd,
+                    group.stats.p1.mean,
+                    group.stats.p1.sd,
+                    group.stats.diff.mean,
+                    group.stats.diff.sd,
+                    '',
+                    '',
+                    group.criterion
+                ]);
+            }
+        }
     }
 
     rows.push([]);
-
     rows.push([
         'Sigma Summary'
     ]);
@@ -7951,52 +8622,20 @@ function buildResultsWorkbook(){
         'Valid Samples'
     ]);
 
-    const metricSpecs=[
-        {
-            key:'p0',
-            label:'P0',
-            valueKey:'P0'
-        },
-
-        {
-            key:'p1',
-            label:'P1',
-            valueKey:'P1'
-        },
-
-        {
-            key:'diff',
-            label:'P0 - P1',
-            valueKey:'Diff'
-        }
-    ];
-
     for(
         const name of
         ['Ch1','Ch2']
     ){
 
         const channel=
-            state.dataset
-                .channels[name];
+            state.dataset.channels[name];
 
-        for(const metric of metricSpecs){
-
-            const values=
-                channel.valid.map(
-                    r=>
-                        r[
-                            metric.valueKey
-                        ]
-                );
+        for(const metric of DESCRIPTION_METRICS){
 
             const assessment=
                 sigmaAssessment(
-                    values,
-                    channel.stats[
-                        metric.key
-                    ],
-
+                    channel.series[metric.key],
+                    channel.stats[metric.key],
                     state.plotView
                         .sigmas[name][metric.key]
                 );
@@ -8014,6 +8653,78 @@ function buildResultsWorkbook(){
                 assessment.total
             ]);
         }
+
+        const grouping=
+            getGroupingResult(name);
+
+        if(grouping){
+
+            for(const metric of DESCRIPTION_METRICS){
+
+                for(
+                    const group of
+                    [grouping.group1,grouping.group2]
+                ){
+
+                    const assessment=
+                        sigmaAssessment(
+                            group.series[metric.key],
+                            group.stats[metric.key],
+                            state.plotView
+                                .sigmas[name][metric.key]
+                        );
+
+                    rows.push([
+                        name,
+                        `${metric.label} - ${group.label}`,
+                        assessment.sigma,
+                        assessment.mean,
+                        assessment.sd,
+                        assessment.lower,
+                        assessment.upper,
+                        assessment.good,
+                        assessment.bad,
+                        assessment.total
+                    ]);
+                }
+            }
+        }
+    }
+
+    rows.push([]);
+    rows.push([
+        'Grouping Settings'
+    ]);
+    rows.push([
+        'Channel',
+        'Enabled',
+        'Split Signal',
+        'Group (1) Operator',
+        'Threshold',
+        'Group (1) N',
+        'Group (2) N'
+    ]);
+
+    for(
+        const name of
+        ['Ch1','Ch2']
+    ){
+
+        const config=
+            state.plotView.grouping[name];
+
+        const grouping=
+            getGroupingResult(name);
+
+        rows.push([
+            name,
+            config.enabled?'Yes':'No',
+            getDescriptionMetric(config.metric).label,
+            config.operator==='lte'?'≤':'≥',
+            config.threshold,
+            grouping?grouping.group1.validCount:'',
+            grouping?grouping.group2.validCount:''
+        ]);
     }
 
     const ws=
@@ -8023,8 +8734,8 @@ function buildResultsWorkbook(){
             );
 
     ws['!cols']=[
-        {wch:18},
-        {wch:18},
+        {wch:20},
+        {wch:22},
         {wch:18},
         {wch:18},
         {wch:18},
@@ -8032,7 +8743,8 @@ function buildResultsWorkbook(){
         {wch:18},
         {wch:16},
         {wch:16},
-        {wch:16}
+        {wch:16},
+        {wch:30}
     ];
 
     XLSX.utils
@@ -8056,40 +8768,18 @@ function buildResultsWorkbook(){
         ]
     ];
 
-    const variabilitySpecs=[
-        {
-            key:'p0',
-            label:'P0'
-        },
-
-        {
-            key:'p1',
-            label:'P1'
-        },
-
-        {
-            key:'diff',
-            label:'P0 - P1'
-        }
-    ];
-
     for(
         const channelName of
         ['Ch1','Ch2']
     ){
 
-        for(
-            const spec of
-            variabilitySpecs
-        ){
+        const channel=
+            state.dataset.channels[channelName];
+
+        for(const spec of DESCRIPTION_METRICS){
 
             const metrics=
-                computeVariability(
-                    getMetricValues(
-                        channelName,
-                        spec.key
-                    )
-                );
+                channel.variability[spec.key];
 
             variabilityRows.push([
                 channelName,
@@ -8103,6 +8793,36 @@ function buildResultsWorkbook(){
                 metrics.minmax
             ]);
         }
+
+        const grouping=
+            getGroupingResult(channelName);
+
+        if(grouping){
+
+            for(const spec of DESCRIPTION_METRICS){
+
+                for(
+                    const group of
+                    [grouping.group1,grouping.group2]
+                ){
+
+                    const metrics=
+                        group.variability[spec.key];
+
+                    variabilityRows.push([
+                        channelName,
+                        `${spec.label} - ${group.label}`,
+                        metrics.cv,
+                        metrics.iqr,
+                        metrics.mad,
+                        metrics.p95p5,
+                        metrics.p99p1,
+                        metrics.qn,
+                        metrics.minmax
+                    ]);
+                }
+            }
+        }
     }
 
     const variabilityWs=
@@ -8113,7 +8833,7 @@ function buildResultsWorkbook(){
 
     variabilityWs['!cols']=[
         {wch:14},
-        {wch:18},
+        {wch:22},
         {wch:18},
         {wch:18},
         {wch:28},
@@ -8222,32 +8942,6 @@ async function saveDescriptionPlotImages(){
             exportHost
         );
 
-    const metricSpecs=[
-        {
-            key:'p0',
-            label:'P0',
-            valueKey:'P0',
-            colorId:'p0Color',
-            fileLabel:'P0'
-        },
-
-        {
-            key:'p1',
-            label:'P1',
-            valueKey:'P1',
-            colorId:'p1Color',
-            fileLabel:'P1'
-        },
-
-        {
-            key:'diff',
-            label:'P0 - P1',
-            valueKey:'Diff',
-            colorId:'diffColor',
-            fileLabel:'P0_minus_P1'
-        }
-    ];
-
     try{
 
         for(
@@ -8256,8 +8950,7 @@ async function saveDescriptionPlotImages(){
         ){
 
             const channel=
-                state.dataset
-                    .channels[name];
+                state.dataset.channels[name];
 
             if(
                 !channel.valid.length
@@ -8265,23 +8958,59 @@ async function saveDescriptionPlotImages(){
                 continue;
             }
 
-            const x=
+            const grouping=
+                getGroupingResult(name);
+
+            const baseX=
                 channel.valid.map(
                     r=>r.N
                 );
 
-            for(
-                const metric of
-                metricSpecs
-            ){
+            const exportItems=[];
 
-                const values=
-                    channel.valid.map(
-                        r=>
-                            r[
-                                metric.valueKey
-                            ]
-                    );
+            for(const metric of DESCRIPTION_METRICS){
+
+                exportItems.push({
+                    metric,
+                    label:metric.label,
+                    fileLabel:metric.fileLabel,
+                    values:channel.series[metric.key],
+                    x:baseX,
+                    stats:channel.stats[metric.key],
+                    group:null
+                });
+
+                if(grouping){
+
+                    for(
+                        const group of
+                        [grouping.group1,grouping.group2]
+                    ){
+
+                        exportItems.push({
+                            metric,
+                            label:`${metric.label} - ${group.label}`,
+                            fileLabel:
+                                `${metric.fileLabel}_Group_${group.index}`,
+                            values:group.series[metric.key],
+                            x:group.rows.map(
+                                row=>row.N
+                            ),
+                            stats:group.stats[metric.key],
+                            group
+                        });
+                    }
+                }
+            }
+
+            for(const item of exportItems){
+
+                if(!item.values.length){
+                    continue;
+                }
+
+                const metric=
+                    item.metric;
 
                 const color=
                     el(
@@ -8300,27 +9029,27 @@ async function saveDescriptionPlotImages(){
 
                 const assessment=
                     sigmaAssessment(
-                        values,
-                        channel.stats[
-                            metric.key
-                        ],
+                        item.values,
+                        item.stats,
                         sigma
                     );
 
                 const trace=
                     buildPlotTrace(
-                        x,
-                        values,
-                        metric.label,
+                        item.x,
+                        item.values,
+                        item.label,
                         color,
-                        name
+                        item.group
+                            ?`${name} ${item.group.label}`
+                            :name
                     );
 
                 const layout=
                     singlePlotLayout(
-                        metric.label,
-                        values,
-                        x.length,
+                        item.label,
+                        item.values,
+                        channel.validCount,
                         rangeState,
                         assessment,
                         color
@@ -8344,7 +9073,9 @@ async function saveDescriptionPlotImages(){
 
                 layout.title={
                     text:
-                        `${name} - ${metric.label}`,
+                        item.group
+                            ?`${name} - ${item.label} (${item.group.criterion})`
+                            :`${name} - ${item.label}`,
 
                     x:.5,
                     xanchor:'center',
@@ -8385,7 +9116,7 @@ async function saveDescriptionPlotImages(){
                     );
 
                 await writeBlobToSelectedFolder(
-                    `ZR_rawdata_Description_${name}_${metric.fileLabel}.png`,
+                    `ZR_rawdata_Description_${name}_${item.fileLabel}.png`,
                     blob
                 );
 
