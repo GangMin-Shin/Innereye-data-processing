@@ -566,6 +566,32 @@ button{cursor:pointer}
   border-color:#111827
 }
 
+
+#meanActions{
+  align-items:flex-end;
+  gap:8px;
+}
+#meanActions .region-button-pair{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:none;
+  gap:8px;
+}
+#meanActions button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  line-height:1.2;
+  vertical-align:middle;
+  min-height:42px;
+}
+#meanActions .region-button-pair button{
+  flex:none;
+  white-space:nowrap;
+}
+
 .hint{
   font-size:11px;
   line-height:1.55;
@@ -1129,8 +1155,10 @@ button{cursor:pointer}
       <label for="regionTargetLine" data-i18n="regionTargetLine">Target line</label>
       <select id="regionTargetLine" style="width:100%;height:42px;border:1px solid #d9dde4;border-radius:11px;padding:0 10px;background:#fff"></select>
     </div>
-    <button id="regionExploreBtn" class="primary-mini" type="button" data-i18n="regionExplore">Range Search</button>
-    <button id="regionAddBtn" type="button" data-i18n="regionAdd">Add</button>
+    <div id="regionIndividualActions" class="region-button-pair">
+      <button id="regionExploreBtn" class="primary-mini" type="button" data-i18n="regionExplore">Range Search</button>
+      <button id="regionAddBtn" type="button" data-i18n="regionAdd">Add</button>
+    </div>
     <button id="regionAnalysisBtn" class="primary-mini" type="button" style="display:none" data-i18n="regionAnalysis">Analysis</button>
     <button id="calcMeanBtn" type="button" style="display:none">Calculate</button>
 </div>
@@ -7435,8 +7463,7 @@ function syncRegionModes(){
   btn.classList.toggle('on',on);
   btn.setAttribute('aria-pressed',on?'true':'false');
  }
- el('regionExploreBtn').style.display=enabled&&!total?'inline-flex':'none';
- el('regionAddBtn').style.display=enabled&&!total?'inline-flex':'none';
+ el('regionIndividualActions').style.display=enabled&&!total?'inline-flex':'none';
  el('regionAnalysisBtn').style.display=enabled&&total?'inline-flex':'none';
  el('regionTargetField').style.display=enabled&&!total?'block':'none';
  if(enabled&&!total)syncRegionTarget();
@@ -7474,7 +7501,15 @@ function regionRows(sample,mode=regionState.mode){
   const regions=mode==='total'?regionTotalLine(sample,line):regionIndividualLine(sample,line);
   for(const r of regions){
    const valid=Number.isFinite(r.start)&&Number.isFinite(r.end);
-   const stats=valid?regionStat(sample,line,r.start,r.end):{N:0,Mean:NaN,SD:NaN,Max:NaN,Min:NaN};
+   let stats={N:0,Mean:NaN,SD:NaN,Max:NaN,Min:NaN};
+   if(valid){
+    if(!r.cachedStats||r.cachedStart!==r.start||r.cachedEnd!==r.end){
+     r.cachedStats=regionStat(sample,line,r.start,r.end);
+     r.cachedStart=r.start;
+     r.cachedEnd=r.end;
+    }
+    stats=r.cachedStats;
+   }
    rows.push({Sample:sample,Line:line,Region:mode==='total'?`Region ${r.id}`:`Range ${r.id}`,
     Range_Start_mm:valid?r.start:NaN,Range_End_mm:valid?r.end:NaN,
     Length_mm:valid?r.end-r.start:NaN,...stats,
@@ -7530,19 +7565,95 @@ function appendRegionTraces(traces,sample){
     name:`${total?'Region':'Range'} ${r.id} · ${line}`,
     line:{color,width:6},hovertemplate:`x=%{x:.4f} mm<br>y=%{y:.6f}<extra>${line} · ${total?'Region':'Range'} ${r.id}</extra>`});
   });
+  if(total&&regions.length&&Number.isFinite(regions[0].min1X)&&Number.isFinite(regions[0].min2X)){
+   const markers=[regions[0].min1X,regions[0].min2X];
+   const x=state.dataset.distance,y=state.dataset.smoothed[sample][line];
+   traces.push({type:'scatter',mode:'markers',x:markers,
+    y:markers.map(position=>interpolatedYAtX(x,y,position)),
+    name:`${line} detected minima`,showlegend:false,
+    marker:{symbol:'triangle-down',size:11,color:'#b00000',line:{color:'#111827',width:1}},
+    hovertemplate:'x=%{x:.4f} mm<br>Minimum=%{y:.6f}<extra>'+line+'</extra>'});
+  }
  }
 }
 
-function deepestTwoMinima(y,first,last){
- let a=-1,b=-1,count=0;
- for(let i=first+1;i<last;i++){
-  if(!(y[i]<y[i-1]&&y[i]<=y[i+1]))continue;
-  count++;
-  if(a<0||y[i]<y[a]){b=a;a=i;}
-  else if(b<0||y[i]<y[b])b=i;
+function deepestTwoMinima(y,first,last,minWidth,dx){
+ const n=last-first+1;
+ if(n<3)return null;
+ let ymin=Infinity,ymax=-Infinity;
+ for(let i=first;i<=last;i++){
+  if(y[i]<ymin)ymin=y[i];
+  if(y[i]>ymax)ymax=y[i];
  }
- if(a<0||b<0)return null;
- return {left:Math.min(a,b),right:Math.max(a,b),count};
+ const threshold=Math.max(1e-12,(ymax-ymin)*0.007);
+ const candidates=[];
+ for(let i=first+1;i<last;i++){
+  if(!(y[i]<y[i-1]))continue;
+  let end=i;
+  while(end<last-1&&y[end+1]===y[i])end++;
+  if(y[end]<y[end+1])candidates.push({i:Math.floor((i+end)/2),prom:0});
+  i=end;
+ }
+ if(candidates.length<2)return null;
+ const lowerLeft=new Int32Array(n),lowerRight=new Int32Array(n),stack=[];
+ for(let j=0;j<n;j++){
+  const value=y[first+j];
+  while(stack.length&&y[first+stack[stack.length-1]]>=value)stack.pop();
+  lowerLeft[j]=stack.length?stack[stack.length-1]:-1;
+  stack.push(j);
+ }
+ stack.length=0;
+ for(let j=n-1;j>=0;j--){
+  const value=y[first+j];
+  while(stack.length&&y[first+stack[stack.length-1]]>=value)stack.pop();
+  lowerRight[j]=stack.length?stack[stack.length-1]:n;
+  stack.push(j);
+ }
+ let size=1;
+ while(size<n)size*=2;
+ const tree=new Float64Array(size*2);
+ tree.fill(-Infinity);
+ for(let j=0;j<n;j++)tree[size+j]=y[first+j];
+ for(let j=size-1;j>0;j--)tree[j]=Math.max(tree[2*j],tree[2*j+1]);
+ const maximum=(begin,end)=>{
+  let l=begin+size,r=end+size+1,best=-Infinity;
+  while(l<r){
+   if(l&1)best=Math.max(best,tree[l++]);
+   if(r&1)best=Math.max(best,tree[--r]);
+   l>>=1;r>>=1;
+  }
+  return best;
+ };
+ const eligible=[];
+ for(const c of candidates){
+  const j=c.i-first;
+  const leftRise=maximum(lowerLeft[j]+1,j)-y[c.i];
+  const rightRise=maximum(j,lowerRight[j]-1)-y[c.i];
+  c.prom=Math.max(0,Math.min(leftRise,rightRise));
+  if(c.prom>=threshold)eligible.push(c);
+ }
+ if(eligible.length<2)return null;
+ let cursor=0,bestLeft=null,bestPair=null,bestScore=-Infinity;
+ const required=Math.max(minWidth,dx);
+ for(let right=1;right<eligible.length;right++){
+  const current=eligible[right];
+  while(cursor<right&&(current.i-eligible[cursor].i)*dx>=required-1e-10){
+   if(!bestLeft||eligible[cursor].prom>bestLeft.prom)bestLeft=eligible[cursor];
+   cursor++;
+  }
+  if(!bestLeft)continue;
+  const score=bestLeft.prom+current.prom+0.25*Math.min(bestLeft.prom,current.prom);
+  if(score>bestScore){
+   bestScore=score;
+   bestPair=[bestLeft,current];
+  }
+ }
+ if(!bestPair){
+  const ranked=eligible.slice().sort((a,b)=>b.prom-a.prom);
+  bestPair=[ranked[0],ranked[1]].sort((a,b)=>a.i-b.i);
+ }
+ return {left:bestPair[0].i,right:bestPair[1].i,count:candidates.length,
+  prominence1:bestPair[0].prom,prominence2:bestPair[1].prom};
 }
 function regionFitPrefixes(y,first,last){
  const length=last-first+1,sy=new Float64Array(length+1),sy2=new Float64Array(length+1),siy=new Float64Array(length+1);
@@ -7554,7 +7665,7 @@ function regionFitPrefixes(y,first,last){
 }
 function fitWindow(pre,a,b,dx){
  const s=a-pre.first,e=b-pre.first+1,n=e-s;
- if(n<3)return null;
+ if(n<2)return null;
  const sum=pre.sy[e]-pre.sy[s],sum2=pre.sy2[e]-pre.sy2[s],si=pre.siy[e]-pre.siy[s];
  const avgI=(s+e-1)/2,sxx=n*(n*n-1)/12,sxy=si-avgI*sum;
  const rmse=Math.sqrt(Math.max(0,(sum2-sum*sum/n-sxy*sxy/sxx)/n));
@@ -7565,52 +7676,72 @@ function detectTotalRegions(sample,line,range,width){
  const lo=lowerBoundIndex(x,range[0]),hi=lowerBoundIndex(x,range[1]+1e-12)-1;
  const result=[{id:1,error:''},{id:2,error:''}];
  if(hi-lo<4){result.forEach(r=>r.error=tr('rangeInvalid'));return result;}
- const minima=deepestTwoMinima(y,lo,hi);
+ const k=Math.floor(width/dx+1e-9)+1;
+ if(k<2){result.forEach(r=>r.error=tr('regionInsufficient'));return result;}
+ const minima=deepestTwoMinima(y,lo,hi,width,dx);
  if(!minima){result.forEach(r=>r.error=tr('noTwoMinima'));return result;}
  const {left,right}=minima,min1X=x[left],min2X=x[right];
  result.forEach(r=>{r.min1X=min1X;r.min2X=min2X;});
- const k=Math.max(3,Math.floor(width/dx)+1),pre=regionFitPrefixes(y,lo,hi);
- if(width>x[right]-x[left]+1e-10){result[0].error=tr('regionBetweenTooShort');}
- else{
+ const pre=regionFitPrefixes(y,lo,hi);
+ const gap=x[right]-x[left];
+ if(width>gap+1e-10){
+  result[0].error=tr('regionBetweenTooShort');
+ }else{
   let ampMin=Infinity,ampMax=-Infinity;
-  for(let i=left;i<=right;i++){if(y[i]<ampMin)ampMin=y[i];if(y[i]>ampMax)ampMax=y[i];}
-  const scale=Math.max(ampMax-ampMin,1e-12),middle=(x[left]+x[right])/2,span=Math.max(x[right]-x[left],dx);
+  for(let i=left;i<=right;i++){
+   if(y[i]<ampMin)ampMin=y[i];
+   if(y[i]>ampMax)ampMax=y[i];
+  }
+  const scale=Math.max(ampMax-ampMin,1e-12),middle=(x[left]+x[right])/2;
+  const span=Math.max(gap,dx);
   let best=null;
-  for(let i=left+1;i+k-1<right;i++){
+  for(let i=left;i+k-1<=right;i++){
    const start=x[i],end=start+width;
    if(end>x[right]+1e-10)break;
-   const fit=fitWindow(pre,i,i+k-1,dx);if(!fit)continue;
+   const fit=fitWindow(pre,i,i+k-1,dx);
+   if(!fit)continue;
    const center=start+width/2;
    const score=0.9*Math.abs(fit.slope)*width/scale+2*fit.rmse/scale+0.18*Math.abs(center-middle)/span;
    if(!best||score<best.score)best={score,start,end};
   }
+  if(!best){
+   const start=clamp(middle-width/2,x[left],x[right]-width);
+   const first=lowerBoundIndex(x,start),last=lowerBoundIndex(x,start+width+1e-10)-1;
+   if(last-first>=1)best={start,end:start+width};
+  }
   if(best){result[0].start=best.start;result[0].end=best.end;}
-  else result[0].error=tr('regionBetweenTooShort');
+  else result[0].error=tr('regionInsufficient');
  }
+ const latestStart=hi-k+1;
+ if(latestStart<=right){result[1].error=tr('regionNoPostPeak');return result;}
  let maxIdx=right+1;
- if(maxIdx>hi){result[1].error=tr('regionNoPostPeak');return result;}
- for(let i=maxIdx+1;i<=hi;i++)if(y[i]>y[maxIdx])maxIdx=i;
+ for(let i=maxIdx+1;i<=latestStart;i++)if(y[i]>y[maxIdx])maxIdx=i;
  result[1].maxX=x[maxIdx];
- if(x[maxIdx]+width>range[1]+1e-10){result[1].error=tr('regionNoPostPeak');return result;}
+ let bestScore=Infinity;
  const candidates=[];
+ const half=Math.floor(k/2);
  let vMin=Infinity,vMax=-Infinity;
- for(let i=maxIdx;i<=hi;i++){if(y[i]<vMin)vMin=y[i];if(y[i]>vMax)vMax=y[i];}
- const scale=Math.max(vMax-vMin,1e-12),half=Math.floor(k/2);
- for(let i=maxIdx+1;i+k-1<=hi;i++){
+ for(let i=right;i<=hi;i++){
+  if(y[i]<vMin)vMin=y[i];
+  if(y[i]>vMax)vMax=y[i];
+ }
+ const scale=Math.max(vMax-vMin,1e-12);
+ const begin=maxIdx<latestStart?maxIdx+1:maxIdx;
+ for(let i=begin;i<=latestStart;i++){
   const start=x[i],end=start+width;
   if(end>range[1]+1e-10)break;
   const fit=fitWindow(pre,i,i+k-1,dx);
-  const leftFit=fitWindow(pre,i,i+half,dx),rightFit=fitWindow(pre,i+half,i+k-1,dx);
-  if(!fit||!leftFit||!rightFit)continue;
-  const curvature=Math.abs(leftFit.slope-rightFit.slope)*width/scale;
+  if(!fit)continue;
+  const leftFit=fitWindow(pre,i,i+half,dx);
+  const rightFit=fitWindow(pre,i+half,i+k-1,dx);
+  const curvature=leftFit&&rightFit?Math.abs(leftFit.slope-rightFit.slope)*width/scale:0;
   const score=fit.rmse/scale+0.22*curvature;
+  if(score<bestScore)bestScore=score;
   candidates.push({start,end,score});
  }
  if(!candidates.length){result[1].error=tr('regionNoPostPeak');return result;}
- let bestScore=Infinity;
- for(const candidate of candidates)if(candidate.score<bestScore)bestScore=candidate.score;
  const tolerance=bestScore*1.7+0.008;
- const chosen=candidates.find(c=>c.score<=tolerance)||candidates.reduce((a,b)=>a.score<b.score?a:b);
+ const chosen=candidates.find(c=>c.score<=tolerance)||candidates[0];
  result[1].start=chosen.start;result[1].end=chosen.end;
  return result;
 }
@@ -7780,8 +7911,9 @@ buildWorkbook=function(mode){
  if(state.cidType!=='2170'||mode!=='intervalMean')return originalBuildWorkbook(mode);
  const wb=XLSX.utils.book_new(),samples=state.dataset.samples,selectedMode=regionState.mode;
  appendJsonSheet(wb,'Parameters',parameterRows());appendJsonSheet(wb,'Line_Colors',lineColorRows());
- appendJsonSheet(wb,'Region_Results',samples.flatMap(s=>regionRows(s,selectedMode)));
- appendJsonSheet(wb,'Region_Selections',samples.flatMap(s=>regionRows(s,selectedMode).map(r=>({Mode:selectedMode,Sample:s,Line:r.Line,Region:r.Region,Range_Start_mm:r.Range_Start_mm,Range_End_mm:r.Range_End_mm,Status:r.Status}))));
+ const regionResults=samples.flatMap(s=>regionRows(s,selectedMode));
+ appendJsonSheet(wb,'Region_Results',regionResults);
+ appendJsonSheet(wb,'Region_Selections',regionResults.map(r=>({Mode:selectedMode,Sample:r.Sample,Line:r.Line,Region:r.Region,Range_Start_mm:r.Range_Start_mm,Range_End_mm:r.Range_End_mm,Status:r.Status})));
  for(const s of samples)appendAoASheet(wb,`${s}_SG`,datasetSheet(s,state.dataset.smoothed));
  return new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 };
