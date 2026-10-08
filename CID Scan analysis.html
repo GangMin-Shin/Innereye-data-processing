@@ -7579,81 +7579,72 @@ function appendRegionTraces(traces,sample){
 
 function deepestTwoMinima(y,first,last,minWidth,dx){
  const n=last-first+1;
- if(n<3)return null;
+ if(n<3||!(dx>0))return null;
  let ymin=Infinity,ymax=-Infinity;
  for(let i=first;i<=last;i++){
-  if(y[i]<ymin)ymin=y[i];
-  if(y[i]>ymax)ymax=y[i];
+  const v=y[i];
+  if(!Number.isFinite(v))return null;
+  if(v<ymin)ymin=v;
+  if(v>ymax)ymax=v;
  }
- const threshold=Math.max(1e-12,(ymax-ymin)*0.007);
- const candidates=[];
+ const amplitude=ymax-ymin;
+ const floor=Math.max(amplitude*0.0005,1e-12);
+ const minSamples=Math.max(1,Math.ceil((minWidth-1e-10)/dx));
+ const candidates=new Map();
+ const addCandidate=(index,relief=0)=>{
+  if(index<=first||index>=last)return;
+  const previous=candidates.get(index);
+  if(!previous||relief>previous.relief){
+   candidates.set(index,{i:index,y:y[index],relief});
+  }
+ };
+
  for(let i=first+1;i<last;i++){
-  if(!(y[i]<y[i-1]))continue;
+  if(y[i]>y[i-1])continue;
   let end=i;
   while(end<last-1&&y[end+1]===y[i])end++;
-  if(y[end]<y[end+1])candidates.push({i:Math.floor((i+end)/2),prom:0});
+  if(y[end]<y[end+1]&&(y[i]<y[i-1]||end>i)){
+   const index=Math.floor((i+end)/2);
+   addCandidate(index,Math.min(y[i-1]-y[i],y[end+1]-y[end]));
+  }
   i=end;
  }
- if(candidates.length<2)return null;
- const lowerLeft=new Int32Array(n),lowerRight=new Int32Array(n),stack=[];
- for(let j=0;j<n;j++){
-  const value=y[first+j];
-  while(stack.length&&y[first+stack[stack.length-1]]>=value)stack.pop();
-  lowerLeft[j]=stack.length?stack[stack.length-1]:-1;
-  stack.push(j);
- }
- stack.length=0;
- for(let j=n-1;j>=0;j--){
-  const value=y[first+j];
-  while(stack.length&&y[first+stack[stack.length-1]]>=value)stack.pop();
-  lowerRight[j]=stack.length?stack[stack.length-1]:n;
-  stack.push(j);
- }
- let size=1;
- while(size<n)size*=2;
- const tree=new Float64Array(size*2);
- tree.fill(-Infinity);
- for(let j=0;j<n;j++)tree[size+j]=y[first+j];
- for(let j=size-1;j>0;j--)tree[j]=Math.max(tree[2*j],tree[2*j+1]);
- const maximum=(begin,end)=>{
-  let l=begin+size,r=end+size+1,best=-Infinity;
-  while(l<r){
-   if(l&1)best=Math.max(best,tree[l++]);
-   if(r&1)best=Math.max(best,tree[--r]);
-   l>>=1;r>>=1;
+
+ const radius=Math.max(2,Math.min(128,Math.floor(minSamples/6),Math.floor(n/12)));
+ const radii=[radius];
+ const wider=Math.min(Math.max(radius+1,radius*3),Math.floor(n/6),384);
+ if(wider>radius)radii.push(wider);
+
+ for(const r of radii){
+  let best=-1,bestValue=Infinity,bestRelief=0;
+  for(let i=first+r;i<=last-r+1;i++){
+   let qualifies=false,relief=0;
+   if(i<=last-r){
+    const leftDrop=y[i-r]-y[i];
+    const rightChange=y[i+r]-y[i];
+    qualifies=leftDrop>floor&&rightChange>=-Math.max(floor,leftDrop*0.35);
+    relief=leftDrop+Math.max(0,rightChange);
+   }
+   if(qualifies){
+    if(y[i]<bestValue||(y[i]===bestValue&&relief>bestRelief)){
+     best=i;bestValue=y[i];bestRelief=relief;
+    }
+   }else if(best>=0){
+    addCandidate(best,bestRelief);
+    best=-1;bestValue=Infinity;bestRelief=0;
+   }
   }
-  return best;
- };
- const eligible=[];
- for(const c of candidates){
-  const j=c.i-first;
-  const leftRise=maximum(lowerLeft[j]+1,j)-y[c.i];
-  const rightRise=maximum(j,lowerRight[j]-1)-y[c.i];
-  c.prom=Math.max(0,Math.min(leftRise,rightRise));
-  if(c.prom>=threshold)eligible.push(c);
+  if(best>=0)addCandidate(best,bestRelief);
  }
- if(eligible.length<2)return null;
- let cursor=0,bestLeft=null,bestPair=null,bestScore=-Infinity;
- const required=Math.max(minWidth,dx);
- for(let right=1;right<eligible.length;right++){
-  const current=eligible[right];
-  while(cursor<right&&(current.i-eligible[cursor].i)*dx>=required-1e-10){
-   if(!bestLeft||eligible[cursor].prom>bestLeft.prom)bestLeft=eligible[cursor];
-   cursor++;
-  }
-  if(!bestLeft)continue;
-  const score=bestLeft.prom+current.prom+0.25*Math.min(bestLeft.prom,current.prom);
-  if(score>bestScore){
-   bestScore=score;
-   bestPair=[bestLeft,current];
-  }
- }
- if(!bestPair){
-  const ranked=eligible.slice().sort((a,b)=>b.prom-a.prom);
-  bestPair=[ranked[0],ranked[1]].sort((a,b)=>a.i-b.i);
- }
- return {left:bestPair[0].i,right:bestPair[1].i,count:candidates.length,
-  prominence1:bestPair[0].prom,prominence2:bestPair[1].prom};
+
+ if(candidates.size<2)return null;
+ const ranked=[...candidates.values()].sort((a,b)=>a.y-b.y||b.relief-a.relief||a.i-b.i);
+ const deepest=ranked[0];
+ const second=ranked.find(c=>Math.abs(c.i-deepest.i)>=minSamples);
+ if(!second)return null;
+ const pair=[deepest,second].sort((a,b)=>a.i-b.i);
+ return {left:pair[0].i,right:pair[1].i,count:candidates.size,
+  prominence1:pair[0].relief,prominence2:pair[1].relief};
 }
 function regionFitPrefixes(y,first,last){
  const length=last-first+1,sy=new Float64Array(length+1),sy2=new Float64Array(length+1),siy=new Float64Array(length+1);
