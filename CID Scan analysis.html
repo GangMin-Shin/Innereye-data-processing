@@ -465,8 +465,11 @@ button{cursor:pointer}
   display:flex;
   align-items:center;
   justify-content:flex-end;
+  gap:10px;
   margin-bottom:10px
 }
+.region-mode-buttons{display:flex;align-items:center;gap:8px}
+#regionExploreBtn.active{background:#b00000;color:#fff;border-color:#b00000}
 
 .tab-reset-btn{
   width:38px;
@@ -1057,6 +1060,10 @@ button{cursor:pointer}
 <div id="analysisControls" class="analysis-card">
 
 <div class="analysis-card-head">
+  <div id="regionModeButtons" class="region-mode-buttons" style="display:none">
+    <button id="regionIndividualToggle" class="toggle on" type="button" aria-pressed="true"><span class="lamp"></span><span>Individual</span></button>
+    <button id="regionTotalToggle" class="toggle" type="button" aria-pressed="false"><span class="lamp"></span><span>Total</span></button>
+  </div>
   <button id="tabResetBtn" class="tab-reset-btn" type="button" title="Reset current analysis" aria-label="Reset current analysis">↻</button>
 </div>
 
@@ -1118,8 +1125,13 @@ button{cursor:pointer}
 </div>
 
 <div id="meanActions" class="analysis-actions" style="display:none">
-      <button id="regionExploreBtn" class="primary-mini" type="button" data-i18n="regionExplore">Range 탐색</button>
+    <div id="regionTargetField" class="range-field" style="min-width:112px;max-width:140px">
+      <label for="regionTargetLine" data-i18n="regionTargetLine">Target line</label>
+      <select id="regionTargetLine" style="width:100%;height:42px;border:1px solid #d9dde4;border-radius:11px;padding:0 10px;background:#fff"></select>
+    </div>
+    <button id="regionExploreBtn" class="primary-mini" type="button" data-i18n="regionExplore">Range Search</button>
     <button id="regionAddBtn" type="button" data-i18n="regionAdd">Add</button>
+    <button id="regionAnalysisBtn" class="primary-mini" type="button" style="display:none" data-i18n="regionAnalysis">Analysis</button>
     <button id="calcMeanBtn" type="button" style="display:none">Calculate</button>
 </div>
 
@@ -1202,7 +1214,7 @@ meanLine:'Analysis line',
 meanWindowLength:'Calculation window length (mm)',
 beforeOffset:'Before offset from first minimum (mm)',
 minMinimaSpacing:'Minimum spacing (mm)',
-regionLength:'Region length (mm)',regionExplore:'Range 탐색',regionAdd:'Add',
+regionLength:'Region length (mm)',regionExplore:'Range Search',regionAdd:'Add',regionAnalysis:'Analysis',regionTargetLine:'Target line',regionClickHint:'Move over the plot and click to select a range.',invalidRegionLength:'Invalid Region length (mm).',regionTooLong:'Region length exceeds the search range.',regionBetweenTooShort:'The selected minima do not contain a region of the specified length.',regionNoPostPeak:'No full-length post-maximum linear region is available.',regionInsufficient:'Insufficient data in region.',regionAnalysisDone:'Total region analysis completed (valid regions):',
 rangeStart:'Range start (mm)',
 rangeEnd:'Range end (mm)',
 findExtrema:'Find local extrema',
@@ -1333,7 +1345,7 @@ meanLine:'분석 라인',
 meanWindowLength:'계산 구간 길이 (mm)',
 beforeOffset:'첫 번째 극솟점 기준 앞쪽 거리 (mm)',
 minMinimaSpacing:'최소 간격 (mm)',
-regionLength:'구간 간격 (mm)',regionExplore:'Range 탐색',regionAdd:'Add',
+regionLength:'구간 간격 (mm)',regionExplore:'Range Search',regionAdd:'Add',regionAnalysis:'Analysis',regionTargetLine:'분석 대상 라인',regionClickHint:'그래프 위로 포인터를 이동하고 클릭해 구간을 선택하세요.',invalidRegionLength:'Region length (mm)가 올바르지 않습니다.',regionTooLong:'선택한 구간 길이가 검색 범위를 초과합니다.',regionBetweenTooShort:'선택한 두 극솟점 사이에 지정 길이의 구간이 없습니다.',regionNoPostPeak:'최댓값 오른쪽에 지정 길이의 직선 구간이 없습니다.',regionInsufficient:'분석 구간의 유효 데이터가 부족합니다.',regionAnalysisDone:'전체 라인 자동 분석 완료 (유효 구간):',
 rangeStart:'구간 시작 (mm)',
 rangeEnd:'구간 끝 (mm)',
 findExtrema:'극대·극소점 찾기',
@@ -7378,66 +7390,342 @@ el('saveBtn').onclick=async()=>{
 };
 
 
-const REGION_RED=['#b00000','#d33434','#e35b5b','#ec8585','#f0aaaa','#f5c1c1'];
-const regionState={bySample:{},armed:false,preview:null,serial:0,overlay:null};
-function regionMode(){return state.cidType==='2170'&&state.currentMode==='intervalMean';}
-function regionListFor(sample){return regionState.bySample[sample]||(regionState.bySample[sample]=[]);}
-function regionColor(i){return REGION_RED[Math.min(i,REGION_RED.length-1)];}
-function regionWidth(){
- const v=Number(el('regionLength').value);
- if(!Number.isFinite(v)||v<=0||v>state.dataset.params.scanLength)throw Error('Invalid region length (mm).');
- return v;
+const REGION_INDIVIDUAL_COLORS=['#b00000','#d33434','#e35b5b','#ec8585','#f0aaaa','#f5c1c1'];
+const REGION_TOTAL_COLORS=['#a77c0b','#d4aa46'];
+const regionState={individual:{},total:{},mode:'individual',targetLine:null,armed:false,preview:null,overlay:null,frame:0};
+
+function regionMode(){
+ return state.cidType==='2170'&&state.currentMode==='intervalMean';
 }
-function regionBoundsAt(x){
- const r=state.ranges[state.selectedSample],w=regionWidth();
- if(w>r[1]-r[0]+1e-10)throw Error('Region length exceeds the displayed search range.');
- let a=clamp(x-w/2,r[0],r[1]-w);
- return [a,a+w];
+function regionWidth(){
+ const width=Number(el('regionLength').value);
+ if(!state.dataset||!Number.isFinite(width)||width<=0||width>state.dataset.params.scanLength)throw Error(tr('invalidRegionLength'));
+ return width;
+}
+function regionIndividualLine(sample,line){
+ const byLine=regionState.individual[sample]||(regionState.individual[sample]={});
+ return byLine[line]||(byLine[line]=[]);
+}
+function regionTotalLine(sample,line){
+ return regionState.total[sample]?.[line]||[];
+}
+function activeRegionEntries(sample,line){
+ return regionState.mode==='total'?regionTotalLine(sample,line):regionIndividualLine(sample,line);
+}
+function regionSelectedLines(sample){
+ return state.dataset.sampleLines?.[sample]||state.dataset.lines;
+}
+function regionTargetOptions(){
+ if(!state.dataset)return [];
+ return selectedLineList(state.selectedSample);
+}
+function syncRegionTarget(){
+ if(!regionMode())return;
+ const lines=regionTargetOptions(),sel=el('regionTargetLine');
+ if(!lines.includes(regionState.targetLine))regionState.targetLine=lines[0]||null;
+ const next=lines.map(line=>`<option value="${line}">${line}</option>`).join('');
+ if(sel.innerHTML!==next)sel.innerHTML=next;
+ sel.value=regionState.targetLine||'';
+}
+function syncRegionModes(){
+ const enabled=regionMode(),total=regionState.mode==='total';
+ el('regionModeButtons').style.display=enabled?'flex':'none';
+ for(const [name,id] of [['individual','regionIndividualToggle'],['total','regionTotalToggle']]){
+  const btn=el(id),on=enabled&&regionState.mode===name;
+  btn.classList.toggle('on',on);
+  btn.setAttribute('aria-pressed',on?'true':'false');
+ }
+ el('regionExploreBtn').style.display=enabled&&!total?'inline-flex':'none';
+ el('regionAddBtn').style.display=enabled&&!total?'inline-flex':'none';
+ el('regionAnalysisBtn').style.display=enabled&&total?'inline-flex':'none';
+ el('regionTargetField').style.display=enabled&&!total?'block':'none';
+ if(enabled&&!total)syncRegionTarget();
+}
+function regionSearchRange(sample){
+ const scan=state.dataset.params.scanLength;
+ const range=state.ranges[sample]||[0,scan];
+ return [range[0],Math.min(range[1],state.dataset.distance.at(-1))];
+}
+function regionBoundsAt(pointerX){
+ const range=regionSearchRange(state.selectedSample),width=regionWidth();
+ if(width>range[1]-range[0]+1e-12)throw Error(tr('regionTooLong'));
+ const start=clamp(pointerX-width/2,range[0],range[1]-width);
+ return [start,start+width];
 }
 function regionStat(sample,line,start,end){
  const d=state.dataset,values=d.smoothed[sample][line],x=d.distance;
  const first=lowerBoundIndex(x,start),last=lowerBoundIndex(x,end+1e-12);
  let n=0,mean=0,m2=0,min=Infinity,max=-Infinity;
  for(let i=first;i<last&&i<values.length;i++){
-  const v=values[i];if(!Number.isFinite(v))continue;
-  n++;const delta=v-mean;mean+=delta/n;m2+=delta*(v-mean);
-  min=Math.min(min,v);max=Math.max(max,v);
+  const v=values[i];
+  if(!Number.isFinite(v))continue;
+  n++;
+  const delta=v-mean;
+  mean+=delta/n;
+  m2+=delta*(v-mean);
+  if(v<min)min=v;
+  if(v>max)max=v;
  }
- return {N:n,Mean:n?mean:NaN,SD:n>1?Math.sqrt(m2/(n-1)):0,Max:n?max:NaN,Min:n?min:NaN};
+ return {N:n,Mean:n?mean:NaN,SD:n>1?Math.sqrt(m2/(n-1)):NaN,Max:n?max:NaN,Min:n?min:NaN};
 }
-function regionRows(sample){
+function regionRows(sample,mode=regionState.mode){
  const rows=[];
- for(const r of regionListFor(sample))for(const line of state.dataset.sampleLines[sample]){
-  rows.push({Sample:sample,Line:line,Region:`Range ${r.id}`,Range_Start_mm:r.start,Range_End_mm:r.end,Length_mm:r.end-r.start,...regionStat(sample,line,r.start,r.end)});
+ for(const line of regionSelectedLines(sample)){
+  const regions=mode==='total'?regionTotalLine(sample,line):regionIndividualLine(sample,line);
+  for(const r of regions){
+   const valid=Number.isFinite(r.start)&&Number.isFinite(r.end);
+   const stats=valid?regionStat(sample,line,r.start,r.end):{N:0,Mean:NaN,SD:NaN,Max:NaN,Min:NaN};
+   rows.push({Sample:sample,Line:line,Region:mode==='total'?`Region ${r.id}`:`Range ${r.id}`,
+    Range_Start_mm:valid?r.start:NaN,Range_End_mm:valid?r.end:NaN,
+    Length_mm:valid?r.end-r.start:NaN,...stats,
+    Status:r.error||(stats.N>=2?'Calculated':tr('regionInsufficient')),
+    ...(mode==='total'?{Min1_X_mm:r.min1X??NaN,Min2_X_mm:r.min2X??NaN,Post_Min_Max_X_mm:r.maxX??NaN}:{})
+   });
+  }
  }
  return rows;
 }
 function redrawRegionPanel(){
  if(!regionMode())return;
- const sample=state.selectedSample,rs=regionListFor(sample);
- el('regionManager').classList.add('visible');
- el('regionList').innerHTML=rs.length?rs.map((r,i)=>`<span class="region-chip"><span style="width:11px;height:11px;border-radius:50%;background:${regionColor(i)}"></span>Range ${r.id}: ${fmt(r.start,4)}–${fmt(r.end,4)} mm <button type="button" data-region-delete="${r.id}" aria-label="Delete Range ${r.id}" style="background:none;border:0;cursor:pointer">×</button></span>`).join(''):`<span class="region-empty">${tr('noRegions')}</span>`;
- el('regionList').querySelectorAll('[data-region-delete]').forEach(btn=>btn.onclick=async()=>{
-  regionState.bySample[sample]=regionListFor(sample).filter(r=>r.id!==Number(btn.dataset.regionDelete));
+ syncRegionModes();
+ const sample=state.selectedSample,all=[];
+ for(const line of regionSelectedLines(sample)){
+  const regions=activeRegionEntries(sample,line);
+  for(let i=0;i<regions.length;i++)all.push({line,region:regions[i],index:i});
+ }
+ const container=el('regionList');
+ container.innerHTML=all.length?all.map(({line,region:r,index})=>{
+  const total=regionState.mode==='total',color=total?REGION_TOTAL_COLORS[index]:REGION_INDIVIDUAL_COLORS[Math.min(index,REGION_INDIVIDUAL_COLORS.length-1)];
+  const detail=Number.isFinite(r.start)?`${fmt(r.start,4)}–${fmt(r.end,4)} mm`:r.error||tr('regionInsufficient');
+  return `<span class="region-chip"><span style="width:11px;height:11px;flex:none;border-radius:50%;background:${color}"></span>${line} · ${total?'Region':'Range'} ${r.id}: ${detail}${total?'':` <button type="button" data-region-line="${line}" data-region-delete="${r.id}" aria-label="Delete ${line} Range ${r.id}" style="background:none;border:0;cursor:pointer">×</button>`}</span>`;
+ }).join(''):`<span class="region-empty">${tr('noRegions')}</span>`;
+ container.querySelectorAll('[data-region-delete]').forEach(btn=>btn.onclick=async()=>{
+  const line=btn.dataset.regionLine;
+  regionState.individual[sample][line]=regionIndividualLine(sample,line).filter(r=>r.id!==Number(btn.dataset.regionDelete));
   redrawRegionPanel();await renderCurrentMode();
  });
- const rows=regionRows(sample);
- renderResultTable(rows);
+ renderResultTable(regionRows(sample));
 }
-function segmentCoords(sample,line,a,b){
- const d=state.dataset,x=d.distance,y=d.smoothed[sample][line];
- const i0=lowerBoundIndex(x,a),i1=lowerBoundIndex(x,b+1e-12);
- return {x:x.slice(i0,i1),y:y.slice(i0,i1)};
+function segmentCoords(sample,line,start,end){
+ const d=state.dataset,x=d.distance,y=d.smoothed[sample][line],right=x[x.length-1];
+ if(!Number.isFinite(start)||!Number.isFinite(end)||start<0||end>right+1e-9||end<=start)return {x:[],y:[]};
+ const begin=lowerBoundIndex(x,start),finish=lowerBoundIndex(x,end);
+ const sx=[start],sy=[interpolatedYAtX(x,y,start)];
+ for(let i=begin;i<finish;i++){
+  if(x[i]>start+1e-12){sx.push(x[i]);sy.push(y[i]);}
+ }
+ sx.push(end);sy.push(interpolatedYAtX(x,y,end));
+ return {x:sx,y:sy};
 }
 function appendRegionTraces(traces,sample){
- regionListFor(sample).forEach((r,i)=>{
-  const col=regionColor(i);
-  for(const line of selectedLineList(sample)){
+ const total=regionState.mode==='total';
+ for(const line of selectedLineList(sample)){
+  const regions=activeRegionEntries(sample,line);
+  regions.forEach((r,i)=>{
+   if(!Number.isFinite(r.start)||!Number.isFinite(r.end))return;
    const seg=segmentCoords(sample,line,r.start,r.end);
-   if(seg.x.length)traces.push({type:'scatter',mode:'lines',x:seg.x,y:seg.y,name:`Range ${r.id} · ${line}`,line:{color:col,width:5},hovertemplate:'x=%{x:.4f} mm<br>y=%{y:.6f}<extra>Range '+r.id+' · '+line+'</extra>'});
-  }
- });
+   if(seg.x.length<2)return;
+   const color=total?REGION_TOTAL_COLORS[i]:REGION_INDIVIDUAL_COLORS[Math.min(i,REGION_INDIVIDUAL_COLORS.length-1)];
+   traces.push({type:'scatter',mode:'lines',x:seg.x,y:seg.y,
+    name:`${total?'Region':'Range'} ${r.id} · ${line}`,
+    line:{color,width:6},hovertemplate:`x=%{x:.4f} mm<br>y=%{y:.6f}<extra>${line} · ${total?'Region':'Range'} ${r.id}</extra>`});
+  });
+ }
 }
+
+function deepestTwoMinima(y,first,last){
+ let a=-1,b=-1,count=0;
+ for(let i=first+1;i<last;i++){
+  if(!(y[i]<y[i-1]&&y[i]<=y[i+1]))continue;
+  count++;
+  if(a<0||y[i]<y[a]){b=a;a=i;}
+  else if(b<0||y[i]<y[b])b=i;
+ }
+ if(a<0||b<0)return null;
+ return {left:Math.min(a,b),right:Math.max(a,b),count};
+}
+function regionFitPrefixes(y,first,last){
+ const length=last-first+1,sy=new Float64Array(length+1),sy2=new Float64Array(length+1),siy=new Float64Array(length+1);
+ for(let k=0;k<length;k++){
+  const value=y[first+k],v=Number.isFinite(value)?value:0;
+  sy[k+1]=sy[k]+v;sy2[k+1]=sy2[k]+v*v;siy[k+1]=siy[k]+k*v;
+ }
+ return {first,sy,sy2,siy};
+}
+function fitWindow(pre,a,b,dx){
+ const s=a-pre.first,e=b-pre.first+1,n=e-s;
+ if(n<3)return null;
+ const sum=pre.sy[e]-pre.sy[s],sum2=pre.sy2[e]-pre.sy2[s],si=pre.siy[e]-pre.siy[s];
+ const avgI=(s+e-1)/2,sxx=n*(n*n-1)/12,sxy=si-avgI*sum;
+ const rmse=Math.sqrt(Math.max(0,(sum2-sum*sum/n-sxy*sxy/sxx)/n));
+ return {rmse,slope:sxy/sxx/dx};
+}
+function detectTotalRegions(sample,line,range,width){
+ const d=state.dataset,x=d.distance,y=d.smoothed[sample][line],dx=d.dx;
+ const lo=lowerBoundIndex(x,range[0]),hi=lowerBoundIndex(x,range[1]+1e-12)-1;
+ const result=[{id:1,error:''},{id:2,error:''}];
+ if(hi-lo<4){result.forEach(r=>r.error=tr('rangeInvalid'));return result;}
+ const minima=deepestTwoMinima(y,lo,hi);
+ if(!minima){result.forEach(r=>r.error=tr('noTwoMinima'));return result;}
+ const {left,right}=minima,min1X=x[left],min2X=x[right];
+ result.forEach(r=>{r.min1X=min1X;r.min2X=min2X;});
+ const k=Math.max(3,Math.floor(width/dx)+1),pre=regionFitPrefixes(y,lo,hi);
+ if(width>x[right]-x[left]+1e-10){result[0].error=tr('regionBetweenTooShort');}
+ else{
+  let ampMin=Infinity,ampMax=-Infinity;
+  for(let i=left;i<=right;i++){if(y[i]<ampMin)ampMin=y[i];if(y[i]>ampMax)ampMax=y[i];}
+  const scale=Math.max(ampMax-ampMin,1e-12),middle=(x[left]+x[right])/2,span=Math.max(x[right]-x[left],dx);
+  let best=null;
+  for(let i=left+1;i+k-1<right;i++){
+   const start=x[i],end=start+width;
+   if(end>x[right]+1e-10)break;
+   const fit=fitWindow(pre,i,i+k-1,dx);if(!fit)continue;
+   const center=start+width/2;
+   const score=0.9*Math.abs(fit.slope)*width/scale+2*fit.rmse/scale+0.18*Math.abs(center-middle)/span;
+   if(!best||score<best.score)best={score,start,end};
+  }
+  if(best){result[0].start=best.start;result[0].end=best.end;}
+  else result[0].error=tr('regionBetweenTooShort');
+ }
+ let maxIdx=right+1;
+ if(maxIdx>hi){result[1].error=tr('regionNoPostPeak');return result;}
+ for(let i=maxIdx+1;i<=hi;i++)if(y[i]>y[maxIdx])maxIdx=i;
+ result[1].maxX=x[maxIdx];
+ if(x[maxIdx]+width>range[1]+1e-10){result[1].error=tr('regionNoPostPeak');return result;}
+ const candidates=[];
+ let vMin=Infinity,vMax=-Infinity;
+ for(let i=maxIdx;i<=hi;i++){if(y[i]<vMin)vMin=y[i];if(y[i]>vMax)vMax=y[i];}
+ const scale=Math.max(vMax-vMin,1e-12),half=Math.floor(k/2);
+ for(let i=maxIdx+1;i+k-1<=hi;i++){
+  const start=x[i],end=start+width;
+  if(end>range[1]+1e-10)break;
+  const fit=fitWindow(pre,i,i+k-1,dx);
+  const leftFit=fitWindow(pre,i,i+half,dx),rightFit=fitWindow(pre,i+half,i+k-1,dx);
+  if(!fit||!leftFit||!rightFit)continue;
+  const curvature=Math.abs(leftFit.slope-rightFit.slope)*width/scale;
+  const score=fit.rmse/scale+0.22*curvature;
+  candidates.push({start,end,score});
+ }
+ if(!candidates.length){result[1].error=tr('regionNoPostPeak');return result;}
+ let bestScore=Infinity;
+ for(const candidate of candidates)if(candidate.score<bestScore)bestScore=candidate.score;
+ const tolerance=bestScore*1.7+0.008;
+ const chosen=candidates.find(c=>c.score<=tolerance)||candidates.reduce((a,b)=>a.score<b.score?a:b);
+ result[1].start=chosen.start;result[1].end=chosen.end;
+ return result;
+}
+function analyzeAllRegionLines(){
+ if(!regionMode()||regionState.mode!=='total')return;
+ try{
+  const sample=state.selectedSample,range=readRangeInputs(),width=regionWidth();
+  if(width>range[1]-range[0])throw Error(tr('regionTooLong'));
+  const computed={};
+  for(const line of regionSelectedLines(sample))computed[line]=detectTotalRegions(sample,line,regionSearchRange(sample),width);
+  regionState.total[sample]=computed;
+  redrawRegionPanel();void renderCurrentMode();
+  const rows=regionRows(sample,'total'),success=rows.filter(r=>r.N>=2).length;
+  setStatus(`${tr('regionAnalysisDone')} ${success}/${rows.length}`,success===rows.length?'good':'warn');
+ }catch(e){setStatus(e.message||String(e),'bad');}
+}
+
+function hideRegionOverlay(){
+ if(regionState.frame){cancelAnimationFrame(regionState.frame);regionState.frame=0;}
+ if(regionState.overlay){regionState.overlay.remove();regionState.overlay=null;}
+}
+function drawRegionOverlay(){
+ regionState.frame=0;
+ const div=state.currentPlot,preview=regionState.preview;
+ if(!div||!preview||!regionMode()||regionState.mode!=='individual')return hideRegionOverlay();
+ const line=regionState.targetLine,ax=div._fullLayout?.xaxis,ay=div._fullLayout?.yaxis;
+ if(!ax||!ay||!line)return;
+ if(!regionState.overlay){
+  regionState.overlay=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  regionState.overlay.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:9';
+  div.style.position='relative';div.appendChild(regionState.overlay);
+ }
+ const svg=regionState.overlay;svg.replaceChildren();
+ const ns='http://www.w3.org/2000/svg',px=x=>ax._offset+ax.d2p(x),py=y=>ay._offset+ay.d2p(y);
+ const rect=document.createElementNS(ns,'rect');
+ rect.setAttribute('x',px(preview[0]));rect.setAttribute('y',ay._offset);
+ rect.setAttribute('width',Math.max(0,px(preview[1])-px(preview[0])));rect.setAttribute('height',ay._length);
+ rect.setAttribute('fill','rgba(176,0,0,.08)');rect.setAttribute('stroke','#b00000');rect.setAttribute('stroke-dasharray','5,4');svg.appendChild(rect);
+ const seg=segmentCoords(state.selectedSample,line,...preview);
+ if(seg.x.length){
+  const path=document.createElementNS(ns,'path');
+  let points='';for(let i=0;i<seg.x.length;i++)points+=`${i?' L':'M'}${px(seg.x[i])},${py(seg.y[i])}`;
+  path.setAttribute('d',points);path.setAttribute('fill','none');path.setAttribute('stroke','#b00000');path.setAttribute('stroke-width','6');svg.appendChild(path);
+ }
+}
+function disarmRegion(){
+ regionState.armed=false;regionState.preview=null;hideRegionOverlay();el('regionExploreBtn').classList.remove('active');
+}
+function armRegion(){
+ if(!regionMode()||regionState.mode!=='individual')return;
+ try{
+  syncRegionTarget();regionWidth();regionBoundsAt(regionSearchRange(state.selectedSample)[0]);
+  if(!regionState.targetLine)throw Error(tr('lineRequired'));
+  regionState.armed=true;regionState.preview=null;hideRegionOverlay();
+  el('regionExploreBtn').classList.add('active');
+  setStatus(`${regionState.targetLine}: ${tr('regionClickHint')}`,'good');
+ }catch(e){disarmRegion();setStatus(e.message||String(e),'bad');}
+}
+function bindRegionPointer(){
+ const div=state.currentPlot;if(!div)return;
+ if(div._regionMove)div.removeEventListener('mousemove',div._regionMove);
+ if(div._regionClick)div.removeEventListener('click',div._regionClick,true);
+ div._regionMove=ev=>{
+  if(!regionState.armed||regionState.mode!=='individual')return;
+  const ax=div._fullLayout?.xaxis;if(!ax)return;
+  const px=ev.clientX-div.getBoundingClientRect().left-ax._offset;
+  if(px<0||px>ax._length){regionState.preview=null;hideRegionOverlay();return;}
+  try{
+   regionState.preview=regionBoundsAt(ax.p2d(px));
+   if(!regionState.frame)regionState.frame=requestAnimationFrame(drawRegionOverlay);
+  }catch(e){disarmRegion();setStatus(e.message||String(e),'bad');}
+ };
+ div._regionClick=async ev=>{
+  if(!regionState.armed||!regionState.preview||regionState.mode!=='individual')return;
+  const ax=div._fullLayout?.xaxis;if(!ax)return;
+  const px=ev.clientX-div.getBoundingClientRect().left-ax._offset;
+  if(px<0||px>ax._length)return;
+  ev.preventDefault();ev.stopPropagation();
+  const line=regionState.targetLine,sample=state.selectedSample;
+  if(!regionTargetOptions().includes(line))return disarmRegion();
+  const ranges=regionIndividualLine(sample,line);
+  let id=1;for(const r of ranges)if(r.id>=id)id=r.id+1;
+  ranges.push({id,start:regionState.preview[0],end:regionState.preview[1]});
+  disarmRegion();redrawRegionPanel();await renderCurrentMode();
+ };
+ div.addEventListener('mousemove',div._regionMove);
+ div.addEventListener('click',div._regionClick,true);
+}
+async function chooseRegionMode(mode){
+ if(!regionMode()||!['individual','total'].includes(mode)||regionState.mode===mode)return;
+ disarmRegion();regionState.mode=mode;syncRegionModes();redrawRegionPanel();await renderCurrentMode();
+}
+el('regionIndividualToggle').onclick=()=>chooseRegionMode('individual');
+el('regionTotalToggle').onclick=()=>chooseRegionMode('total');
+el('regionExploreBtn').onclick=armRegion;
+el('regionAddBtn').onclick=armRegion;
+el('regionAnalysisBtn').onclick=analyzeAllRegionLines;
+el('regionTargetLine').addEventListener('change',()=>{
+ regionState.targetLine=el('regionTargetLine').value;disarmRegion();
+});
+el('regionLength').addEventListener('change',()=>{
+ if(!regionMode())return;
+ try{
+  regionWidth();disarmRegion();
+  if(regionState.mode==='total'){
+   delete regionState.total[state.selectedSample];redrawRegionPanel();void renderCurrentMode();
+  }
+ }catch(e){setStatus(e.message||String(e),'bad');}
+});
+for(const id of ['rangeStart','rangeEnd'])el(id).addEventListener('change',()=>{
+ if(!regionMode())return;
+ disarmRegion();delete regionState.total[state.selectedSample];
+ redrawRegionPanel();
+});
+
 const originalMakeTraces=makeTraces;
 makeTraces=function(sample,mode){
  if(state.cidType!=='2170'||mode!=='intervalMean')return originalMakeTraces(sample,mode);
@@ -7445,15 +7733,15 @@ makeTraces=function(sample,mode){
 };
 const originalBaseLayout=baseLayout;
 baseLayout=function(title,mode,sample){
- const l=originalBaseLayout(title,mode,sample);
+ const layout=originalBaseLayout(title,mode,sample);
  if(state.cidType==='2170'&&mode==='intervalMean'){
   const range=state.ranges[sample]||[0,state.dataset.params.scanLength];
-  l.xaxis.range=range.slice();l.uirevision=`region-${sample}-${range.join('-')}`;
+  layout.xaxis.range=range.slice();layout.uirevision=`region-${sample}-${range.join('-')}`;
  }
- return l;
+ return layout;
 };
 const originalSyncMeanControls=syncMeanControls;
-syncMeanControls=function(){if(regionMode())return;originalSyncMeanControls();};
+syncMeanControls=function(){if(regionMode())return;return originalSyncMeanControls();};
 const originalEnsureMeanSetting=ensureMeanSetting;
 ensureMeanSetting=function(sample){if(state.cidType==='2170')return {};return originalEnsureMeanSetting(sample);};
 const originalInvalidateMeanSample=invalidateMeanSample;
@@ -7462,86 +7750,47 @@ const originalRenderRegionManager=renderRegionManager;
 renderRegionManager=function(){if(regionMode()){redrawRegionPanel();return;}return originalRenderRegionManager();};
 const originalRenderMeanResultTable=renderMeanResultTable;
 renderMeanResultTable=function(){if(regionMode()){redrawRegionPanel();return;}return originalRenderMeanResultTable();};
-function hideRegionOverlay(){if(regionState.overlay){regionState.overlay.remove();regionState.overlay=null;}}
-function drawRegionOverlay(){
- const div=state.currentPlot,preview=regionState.preview;if(!div||!preview||!regionMode())return hideRegionOverlay();
- const ax=div._fullLayout?.xaxis,ay=div._fullLayout?.yaxis;
- if(!ax||!ay)return;
- if(!regionState.overlay){
-  regionState.overlay=document.createElementNS('http://www.w3.org/2000/svg','svg');
-  regionState.overlay.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:9';
-  div.style.position='relative';div.appendChild(regionState.overlay);
- }
- const svg=regionState.overlay;svg.replaceChildren();
- const ns='http://www.w3.org/2000/svg',coordX=x=>ax._offset+ax.d2p(x),coordY=y=>ay._offset+ay.d2p(y);
- const box=document.createElementNS(ns,'rect');box.setAttribute('x',coordX(preview[0]));box.setAttribute('y',ay._offset);box.setAttribute('width',Math.max(0,coordX(preview[1])-coordX(preview[0])));box.setAttribute('height',ay._length);box.setAttribute('fill','rgba(176,0,0,.08)');box.setAttribute('stroke','#b00000');box.setAttribute('stroke-dasharray','5,4');svg.appendChild(box);
- for(const line of selectedLineList(state.selectedSample)){
-  const seg=segmentCoords(state.selectedSample,line,...preview);if(!seg.x.length)continue;
-  const path=document.createElementNS(ns,'path');let points='';
-  for(let i=0;i<seg.x.length;i++)points+=`${i?' L':'M'}${coordX(seg.x[i])},${coordY(seg.y[i])}`;
-  path.setAttribute('d',points);path.setAttribute('fill','none');path.setAttribute('stroke','#b00000');path.setAttribute('stroke-width','5');svg.appendChild(path);
- }
-}
-function disarmRegion(){regionState.armed=false;regionState.preview=null;hideRegionOverlay();el('regionExploreBtn').classList.remove('active');}
-function armRegion(){
- if(!regionMode())return;
- try{regionWidth();regionState.armed=true;regionState.preview=null;el('regionExploreBtn').classList.add('active');setStatus('Move the pointer over the graph and click to select the range.','good');}
- catch(e){setStatus(e.message,'bad');}
-}
-el('regionExploreBtn').onclick=armRegion;
-el('regionAddBtn').onclick=armRegion;
-el('regionLength').addEventListener('change',()=>{
- if(!regionMode())return;
- try{regionWidth();regionState.preview=null;hideRegionOverlay();}catch(e){setStatus(e.message,'bad');}
-});
 const originalRenderCurrentMode=renderCurrentMode;
 renderCurrentMode=async function(){
  if(!regionMode()){disarmRegion();return originalRenderCurrentMode();}
  hideRegionOverlay();
  await originalRenderCurrentMode();
- const div=state.currentPlot;if(!div)return;
- if(div._regionMove)div.removeEventListener('mousemove',div._regionMove);
- if(div._regionClick)div.removeEventListener('click',div._regionClick);
- div._regionMove=ev=>{
-  if(!regionState.armed)return;
-  const ax=div._fullLayout?.xaxis;if(!ax)return;
-  const px=ev.clientX-div.getBoundingClientRect().left-ax._offset;
-  if(px<0||px>ax._length){regionState.preview=null;hideRegionOverlay();return;}
-  try{regionState.preview=regionBoundsAt(ax.p2d(px));requestAnimationFrame(drawRegionOverlay);}catch(e){disarmRegion();setStatus(e.message,'bad');}
- };
- div._regionClick=async ev=>{
-  if(!regionState.armed||!regionState.preview)return;
-  ev.preventDefault();ev.stopPropagation();
-  const [start,end]=regionState.preview;const ranges=regionListFor(state.selectedSample);
-  const id=ranges.length?Math.max(...ranges.map(r=>r.id))+1:1;
-  ranges.push({id,start,end});disarmRegion();redrawRegionPanel();await renderCurrentMode();
- };
- div.addEventListener('mousemove',div._regionMove);div.addEventListener('click',div._regionClick,true);
+ syncRegionTarget();bindRegionPointer();
+};
+const originalActivateMode=activateMode;
+activateMode=async function(mode,updateButtons=true){
+ if(mode!=='intervalMean')disarmRegion();
+ await originalActivateMode(mode,updateButtons);
+ syncRegionModes();
 };
 const originalResetCurrentAnalysis=resetCurrentAnalysis;
 resetCurrentAnalysis=async function(){
  if(!regionMode())return originalResetCurrentAnalysis();
- regionState.bySample={};disarmRegion();el('regionLength').value='0.1';
- await originalResetCurrentAnalysis();redrawRegionPanel();
+ disarmRegion();regionState.individual={};regionState.total={};regionState.mode='individual';regionState.targetLine=null;
+ el('regionLength').value='0.1';await originalResetCurrentAnalysis();syncRegionModes();redrawRegionPanel();
 };
 el('tabResetBtn').onclick=()=>resetCurrentAnalysis();
 const originalClearAnalysisUi=clearAnalysisUi;
-clearAnalysisUi=function(){regionState.bySample={};disarmRegion();return originalClearAnalysisUi();};
+clearAnalysisUi=function(){
+ disarmRegion();regionState.individual={};regionState.total={};regionState.mode='individual';regionState.targetLine=null;
+ syncRegionModes();return originalClearAnalysisUi();
+};
 const originalBuildWorkbook=buildWorkbook;
 buildWorkbook=function(mode){
  if(state.cidType!=='2170'||mode!=='intervalMean')return originalBuildWorkbook(mode);
- const wb=XLSX.utils.book_new();
+ const wb=XLSX.utils.book_new(),samples=state.dataset.samples,selectedMode=regionState.mode;
  appendJsonSheet(wb,'Parameters',parameterRows());appendJsonSheet(wb,'Line_Colors',lineColorRows());
- appendJsonSheet(wb,'Region_Results',state.dataset.samples.flatMap(regionRows));
- appendJsonSheet(wb,'Region_Selections',state.dataset.samples.flatMap(s=>regionListFor(s).map(r=>({Sample:s,Region:`Range ${r.id}`,Range_Start_mm:r.start,Range_End_mm:r.end}))));
- for(const s of state.dataset.samples)appendAoASheet(wb,`${s}_SG`,datasetSheet(s,state.dataset.smoothed));
+ appendJsonSheet(wb,'Region_Results',samples.flatMap(s=>regionRows(s,selectedMode)));
+ appendJsonSheet(wb,'Region_Selections',samples.flatMap(s=>regionRows(s,selectedMode).map(r=>({Mode:selectedMode,Sample:s,Line:r.Line,Region:r.Region,Range_Start_mm:r.Range_Start_mm,Range_End_mm:r.Range_End_mm,Status:r.Status}))));
+ for(const s of samples)appendAoASheet(wb,`${s}_SG`,datasetSheet(s,state.dataset.smoothed));
  return new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 };
 const originalSaveClick=el('saveBtn').onclick;
 el('saveBtn').onclick=async()=>{
  if(!regionMode())return originalSaveClick();
  if(!state.saveHandle){setStatus(tr('needFolder'),'bad');return;}
- const btn=el('saveBtn'),folder=modeInfo.intervalMean.folder;btn.disabled=true;el('progress').classList.add('visible');
+ const btn=el('saveBtn'),folder=modeInfo.intervalMean.folder;
+ btn.disabled=true;el('progress').classList.add('visible');
  try{
   const samples=state.exportAll?state.dataset.samples:[state.selectedSample];
   let done=0;
