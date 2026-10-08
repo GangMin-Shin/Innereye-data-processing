@@ -927,7 +927,7 @@ button{cursor:pointer}
   <button class="analysis-btn" data-mode="raw" data-i18n="rawBtn">Raw data plot</button>
   <button class="analysis-btn" data-mode="sg" data-i18n="sgBtn">SG smoothing plot</button>
   <button class="analysis-btn" data-mode="interval" data-i18n="intervalBtn">Interval analysis</button>
-  <button class="analysis-btn" data-mode="intervalMean" data-i18n="intervalMeanBtn">Min / Before / Notch regions Interval analysis</button>
+  <button class="analysis-btn" data-mode="intervalMean" data-i18n="intervalMeanBtn">Regions analysis</button>
 </aside>
 
 <header class="topbar">
@@ -1084,7 +1084,9 @@ button{cursor:pointer}
   </div>
 </div>
 
-<div id="meanSetup" class="range-row" style="display:none">
+  <div id="meanSetup" class="range-row" style="display:none">
+<div class="range-field"><label data-i18n="regionLength">Region length (mm)</label><input id="regionLength" type="number" min="0.000001" step="0.001" value="0.1"></div>
+<div style="display:none">
 
 <div class="range-field">
   <label data-i18n="meanWindowLength">Calculation window length (mm)</label>
@@ -1103,7 +1105,8 @@ button{cursor:pointer}
 
 </div>
 
-<div id="intervalActions" class="analysis-actions" style="display:none">
+  </div>
+  <div id="intervalActions" class="analysis-actions" style="display:none">
 
 <button id="intervalApplyAllToggle" class="toggle" type="button" aria-pressed="false">
   <span class="lamp"></span>
@@ -1115,7 +1118,9 @@ button{cursor:pointer}
 </div>
 
 <div id="meanActions" class="analysis-actions" style="display:none">
-  <button id="calcMeanBtn" class="primary-mini" data-i18n="calcMean">Calculate</button>
+      <button id="regionExploreBtn" class="primary-mini" type="button" data-i18n="regionExplore">Range 탐색</button>
+    <button id="regionAddBtn" type="button" data-i18n="regionAdd">Add</button>
+    <button id="calcMeanBtn" type="button" style="display:none">Calculate</button>
 </div>
 
 </div>
@@ -1163,7 +1168,7 @@ analysis:'Analysis',
 rawBtn:'Raw data plot',
 sgBtn:'SG smoothing plot',
 intervalBtn:'Interval analysis',
-intervalMeanBtn:'Min / Before / Notch regions Interval analysis',
+intervalMeanBtn:'Regions analysis',
 inputSetup:'Input & output setup',
 excelFile:'Excel workbook',
 savePath:'Save path',
@@ -1197,6 +1202,7 @@ meanLine:'Analysis line',
 meanWindowLength:'Calculation window length (mm)',
 beforeOffset:'Before offset from first minimum (mm)',
 minMinimaSpacing:'Minimum spacing (mm)',
+regionLength:'Region length (mm)',regionExplore:'Range 탐색',regionAdd:'Add',
 rangeStart:'Range start (mm)',
 rangeEnd:'Range end (mm)',
 findExtrema:'Find local extrema',
@@ -1205,7 +1211,7 @@ calcMean:'Calculate',
 applyAll:'Apply to all',
 rangeApplyAllOn:'Apply-to-all is ON. The current range is applied to every sample, and Calculate will process all samples.',
 rangeApplyAllOff:'Apply-to-all is OFF. Calculate will process only the selected sample.',
-selectedRegions:'Calculated Min / Before / Notch regions',
+selectedRegions:'Selected ranges',
 notchTangentSlope:'Notch tangent slope (Y/mm)',
 notchTangentRegion:'Notch Tangent',
 empty:'No plot yet.\nRead a valid workbook and start analysis.',
@@ -1225,7 +1231,7 @@ noValid:'No valid non-zero numeric data were found.',
 rawTitle:'Raw data',
 sgTitle:'SG smoothing',
 intervalTitle:'Interval analysis',
-intervalMeanTitle:'Min / Before / Notch regions Interval analysis',
+intervalMeanTitle:'Regions analysis',
 rawSub:'Select a sample and one or more detected lines.',
 sgSub:'Third-order Savitzky–Golay smoothing using the SG window size entered above.',
 intervalSub:'Enter Range start/end to set the analysis interval. Plot zooming is independent of the analysis range.',
@@ -1273,7 +1279,7 @@ meanWindowOut:'A requested calculation window extends outside the scan range.',
 modeRaw:'Raw data',
 modeSG:'SG smoothing',
 modeInterval:'Interval analysis',
-modeIntervalMean:'Min / Before / Notch regions Interval analysis',
+modeIntervalMean:'Regions analysis',
 globalResetTitle:'Reset all',
 tabResetTitle:'Reset current analysis',
 fullResetDone:'All inputs and analysis states were reset.',
@@ -1293,7 +1299,7 @@ analysis:'분석',
 rawBtn:'Rawdata 플롯',
 sgBtn:'SG 스무딩 플롯',
 intervalBtn:'Interval analysis',
-intervalMeanBtn:'Min / Before / Notch regions Interval analysis',
+intervalMeanBtn:'Regions analysis',
 inputSetup:'입력 및 저장 설정',
 excelFile:'입력 Excel 파일',
 savePath:'저장 경로',
@@ -1327,6 +1333,7 @@ meanLine:'분석 라인',
 meanWindowLength:'계산 구간 길이 (mm)',
 beforeOffset:'첫 번째 극솟점 기준 앞쪽 거리 (mm)',
 minMinimaSpacing:'최소 간격 (mm)',
+regionLength:'구간 간격 (mm)',regionExplore:'Range 탐색',regionAdd:'Add',
 rangeStart:'구간 시작 (mm)',
 rangeEnd:'구간 끝 (mm)',
 findExtrema:'극대·극소점 찾기',
@@ -1335,7 +1342,7 @@ calcMean:'Calculate',
 applyAll:'모두 적용',
 rangeApplyAllOn:'모두 적용이 ON되었습니다. 현재 구간이 모든 샘플에 적용되며 Calculate 실행 시 전체 샘플을 일괄 계산합니다.',
 rangeApplyAllOff:'모두 적용이 OFF되었습니다. Calculate 실행 시 현재 선택된 샘플만 계산합니다.',
-selectedRegions:'계산된 Min / Before / Notch 구간',
+selectedRegions:'선택한 구간',
 notchTangentSlope:'Notch 접선 기울기 (Y/mm)',
 notchTangentRegion:'Notch 접선',
 empty:'아직 플롯이 없습니다.\n유효한 Excel을 읽고 분석을 시작하세요.',
@@ -1355,7 +1362,7 @@ noValid:'0이 아닌 유효 숫자 데이터를 찾지 못했습니다.',
 rawTitle:'Rawdata',
 sgTitle:'SG 스무딩',
 intervalTitle:'Interval analysis',
-intervalMeanTitle:'Min / Before / Notch regions Interval analysis',
+intervalMeanTitle:'Regions analysis',
 rawSub:'샘플과 검출된 스캔 라인을 선택해 오버레이를 확인합니다.',
 sgSub:'상단에서 입력한 SG 윈도우 크기를 사용하는 3차 Savitzky–Golay 스무딩입니다.',
 intervalSub:'Range start/end로 분석 구간을 설정합니다. 그래프 확대·축소는 분석 구간과 독립적으로 사용할 수 있습니다.',
@@ -1403,7 +1410,7 @@ meanWindowOut:'계산 구간이 전체 스캔 범위를 벗어납니다.',
 modeRaw:'Rawdata',
 modeSG:'SG 스무딩',
 modeInterval:'Interval analysis',
-modeIntervalMean:'Min / Before / Notch regions Interval analysis',
+modeIntervalMean:'Regions analysis',
 globalResetTitle:'전체 리셋',
 tabResetTitle:'현재 분석 탭 리셋',
 fullResetDone:'입력과 분석 상태를 모두 초기화했습니다.',
@@ -3237,7 +3244,7 @@ interval:{
 intervalMean:{
   title:'modeIntervalMean',
   sub:'intervalMeanSub',
-  folder:'Interval Mean Cal'
+  folder:'Regions analysis'
 }
 
 };
@@ -7369,6 +7376,188 @@ el('saveBtn').onclick=async()=>{
     progress.classList.remove('visible');
   }
 };
+
+
+const REGION_RED=['#b00000','#d33434','#e35b5b','#ec8585','#f0aaaa','#f5c1c1'];
+const regionState={bySample:{},armed:false,preview:null,serial:0,overlay:null};
+function regionMode(){return state.cidType==='2170'&&state.currentMode==='intervalMean';}
+function regionListFor(sample){return regionState.bySample[sample]||(regionState.bySample[sample]=[]);}
+function regionColor(i){return REGION_RED[Math.min(i,REGION_RED.length-1)];}
+function regionWidth(){
+ const v=Number(el('regionLength').value);
+ if(!Number.isFinite(v)||v<=0||v>state.dataset.params.scanLength)throw Error('Invalid region length (mm).');
+ return v;
+}
+function regionBoundsAt(x){
+ const r=state.ranges[state.selectedSample],w=regionWidth();
+ if(w>r[1]-r[0]+1e-10)throw Error('Region length exceeds the displayed search range.');
+ let a=clamp(x-w/2,r[0],r[1]-w);
+ return [a,a+w];
+}
+function regionStat(sample,line,start,end){
+ const d=state.dataset,values=d.smoothed[sample][line],x=d.distance;
+ const first=lowerBoundIndex(x,start),last=lowerBoundIndex(x,end+1e-12);
+ let n=0,mean=0,m2=0,min=Infinity,max=-Infinity;
+ for(let i=first;i<last&&i<values.length;i++){
+  const v=values[i];if(!Number.isFinite(v))continue;
+  n++;const delta=v-mean;mean+=delta/n;m2+=delta*(v-mean);
+  min=Math.min(min,v);max=Math.max(max,v);
+ }
+ return {N:n,Mean:n?mean:NaN,SD:n>1?Math.sqrt(m2/(n-1)):0,Max:n?max:NaN,Min:n?min:NaN};
+}
+function regionRows(sample){
+ const rows=[];
+ for(const r of regionListFor(sample))for(const line of state.dataset.sampleLines[sample]){
+  rows.push({Sample:sample,Line:line,Region:`Range ${r.id}`,Range_Start_mm:r.start,Range_End_mm:r.end,Length_mm:r.end-r.start,...regionStat(sample,line,r.start,r.end)});
+ }
+ return rows;
+}
+function redrawRegionPanel(){
+ if(!regionMode())return;
+ const sample=state.selectedSample,rs=regionListFor(sample);
+ el('regionManager').classList.add('visible');
+ el('regionList').innerHTML=rs.length?rs.map((r,i)=>`<span class="region-chip"><span style="width:11px;height:11px;border-radius:50%;background:${regionColor(i)}"></span>Range ${r.id}: ${fmt(r.start,4)}–${fmt(r.end,4)} mm <button type="button" data-region-delete="${r.id}" aria-label="Delete Range ${r.id}" style="background:none;border:0;cursor:pointer">×</button></span>`).join(''):`<span class="region-empty">${tr('noRegions')}</span>`;
+ el('regionList').querySelectorAll('[data-region-delete]').forEach(btn=>btn.onclick=async()=>{
+  regionState.bySample[sample]=regionListFor(sample).filter(r=>r.id!==Number(btn.dataset.regionDelete));
+  redrawRegionPanel();await renderCurrentMode();
+ });
+ const rows=regionRows(sample);
+ renderResultTable(rows);
+}
+function segmentCoords(sample,line,a,b){
+ const d=state.dataset,x=d.distance,y=d.smoothed[sample][line];
+ const i0=lowerBoundIndex(x,a),i1=lowerBoundIndex(x,b+1e-12);
+ return {x:x.slice(i0,i1),y:y.slice(i0,i1)};
+}
+function appendRegionTraces(traces,sample){
+ regionListFor(sample).forEach((r,i)=>{
+  const col=regionColor(i);
+  for(const line of selectedLineList(sample)){
+   const seg=segmentCoords(sample,line,r.start,r.end);
+   if(seg.x.length)traces.push({type:'scatter',mode:'lines',x:seg.x,y:seg.y,name:`Range ${r.id} · ${line}`,line:{color:col,width:5},hovertemplate:'x=%{x:.4f} mm<br>y=%{y:.6f}<extra>Range '+r.id+' · '+line+'</extra>'});
+  }
+ });
+}
+const originalMakeTraces=makeTraces;
+makeTraces=function(sample,mode){
+ if(state.cidType!=='2170'||mode!=='intervalMean')return originalMakeTraces(sample,mode);
+ const traces=originalMakeTraces(sample,'sg');appendRegionTraces(traces,sample);return traces;
+};
+const originalBaseLayout=baseLayout;
+baseLayout=function(title,mode,sample){
+ const l=originalBaseLayout(title,mode,sample);
+ if(state.cidType==='2170'&&mode==='intervalMean'){
+  const range=state.ranges[sample]||[0,state.dataset.params.scanLength];
+  l.xaxis.range=range.slice();l.uirevision=`region-${sample}-${range.join('-')}`;
+ }
+ return l;
+};
+const originalSyncMeanControls=syncMeanControls;
+syncMeanControls=function(){if(regionMode())return;originalSyncMeanControls();};
+const originalEnsureMeanSetting=ensureMeanSetting;
+ensureMeanSetting=function(sample){if(state.cidType==='2170')return {};return originalEnsureMeanSetting(sample);};
+const originalInvalidateMeanSample=invalidateMeanSample;
+invalidateMeanSample=function(sample,showStatus=true){if(state.cidType==='2170')return;return originalInvalidateMeanSample(sample,showStatus);};
+const originalRenderRegionManager=renderRegionManager;
+renderRegionManager=function(){if(regionMode()){redrawRegionPanel();return;}return originalRenderRegionManager();};
+const originalRenderMeanResultTable=renderMeanResultTable;
+renderMeanResultTable=function(){if(regionMode()){redrawRegionPanel();return;}return originalRenderMeanResultTable();};
+function hideRegionOverlay(){if(regionState.overlay){regionState.overlay.remove();regionState.overlay=null;}}
+function drawRegionOverlay(){
+ const div=state.currentPlot,preview=regionState.preview;if(!div||!preview||!regionMode())return hideRegionOverlay();
+ const ax=div._fullLayout?.xaxis,ay=div._fullLayout?.yaxis;
+ if(!ax||!ay)return;
+ if(!regionState.overlay){
+  regionState.overlay=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  regionState.overlay.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:9';
+  div.style.position='relative';div.appendChild(regionState.overlay);
+ }
+ const svg=regionState.overlay;svg.replaceChildren();
+ const ns='http://www.w3.org/2000/svg',coordX=x=>ax._offset+ax.d2p(x),coordY=y=>ay._offset+ay.d2p(y);
+ const box=document.createElementNS(ns,'rect');box.setAttribute('x',coordX(preview[0]));box.setAttribute('y',ay._offset);box.setAttribute('width',Math.max(0,coordX(preview[1])-coordX(preview[0])));box.setAttribute('height',ay._length);box.setAttribute('fill','rgba(176,0,0,.08)');box.setAttribute('stroke','#b00000');box.setAttribute('stroke-dasharray','5,4');svg.appendChild(box);
+ for(const line of selectedLineList(state.selectedSample)){
+  const seg=segmentCoords(state.selectedSample,line,...preview);if(!seg.x.length)continue;
+  const path=document.createElementNS(ns,'path');let points='';
+  for(let i=0;i<seg.x.length;i++)points+=`${i?' L':'M'}${coordX(seg.x[i])},${coordY(seg.y[i])}`;
+  path.setAttribute('d',points);path.setAttribute('fill','none');path.setAttribute('stroke','#b00000');path.setAttribute('stroke-width','5');svg.appendChild(path);
+ }
+}
+function disarmRegion(){regionState.armed=false;regionState.preview=null;hideRegionOverlay();el('regionExploreBtn').classList.remove('active');}
+function armRegion(){
+ if(!regionMode())return;
+ try{regionWidth();regionState.armed=true;regionState.preview=null;el('regionExploreBtn').classList.add('active');setStatus('Move the pointer over the graph and click to select the range.','good');}
+ catch(e){setStatus(e.message,'bad');}
+}
+el('regionExploreBtn').onclick=armRegion;
+el('regionAddBtn').onclick=armRegion;
+el('regionLength').addEventListener('change',()=>{
+ if(!regionMode())return;
+ try{regionWidth();regionState.preview=null;hideRegionOverlay();}catch(e){setStatus(e.message,'bad');}
+});
+const originalRenderCurrentMode=renderCurrentMode;
+renderCurrentMode=async function(){
+ if(!regionMode()){disarmRegion();return originalRenderCurrentMode();}
+ hideRegionOverlay();
+ await originalRenderCurrentMode();
+ const div=state.currentPlot;if(!div)return;
+ if(div._regionMove)div.removeEventListener('mousemove',div._regionMove);
+ if(div._regionClick)div.removeEventListener('click',div._regionClick);
+ div._regionMove=ev=>{
+  if(!regionState.armed)return;
+  const ax=div._fullLayout?.xaxis;if(!ax)return;
+  const px=ev.clientX-div.getBoundingClientRect().left-ax._offset;
+  if(px<0||px>ax._length){regionState.preview=null;hideRegionOverlay();return;}
+  try{regionState.preview=regionBoundsAt(ax.p2d(px));requestAnimationFrame(drawRegionOverlay);}catch(e){disarmRegion();setStatus(e.message,'bad');}
+ };
+ div._regionClick=async ev=>{
+  if(!regionState.armed||!regionState.preview)return;
+  ev.preventDefault();ev.stopPropagation();
+  const [start,end]=regionState.preview;const ranges=regionListFor(state.selectedSample);
+  const id=ranges.length?Math.max(...ranges.map(r=>r.id))+1:1;
+  ranges.push({id,start,end});disarmRegion();redrawRegionPanel();await renderCurrentMode();
+ };
+ div.addEventListener('mousemove',div._regionMove);div.addEventListener('click',div._regionClick,true);
+};
+const originalResetCurrentAnalysis=resetCurrentAnalysis;
+resetCurrentAnalysis=async function(){
+ if(!regionMode())return originalResetCurrentAnalysis();
+ regionState.bySample={};disarmRegion();el('regionLength').value='0.1';
+ await originalResetCurrentAnalysis();redrawRegionPanel();
+};
+el('tabResetBtn').onclick=()=>resetCurrentAnalysis();
+const originalClearAnalysisUi=clearAnalysisUi;
+clearAnalysisUi=function(){regionState.bySample={};disarmRegion();return originalClearAnalysisUi();};
+const originalBuildWorkbook=buildWorkbook;
+buildWorkbook=function(mode){
+ if(state.cidType!=='2170'||mode!=='intervalMean')return originalBuildWorkbook(mode);
+ const wb=XLSX.utils.book_new();
+ appendJsonSheet(wb,'Parameters',parameterRows());appendJsonSheet(wb,'Line_Colors',lineColorRows());
+ appendJsonSheet(wb,'Region_Results',state.dataset.samples.flatMap(regionRows));
+ appendJsonSheet(wb,'Region_Selections',state.dataset.samples.flatMap(s=>regionListFor(s).map(r=>({Sample:s,Region:`Range ${r.id}`,Range_Start_mm:r.start,Range_End_mm:r.end}))));
+ for(const s of state.dataset.samples)appendAoASheet(wb,`${s}_SG`,datasetSheet(s,state.dataset.smoothed));
+ return new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+};
+const originalSaveClick=el('saveBtn').onclick;
+el('saveBtn').onclick=async()=>{
+ if(!regionMode())return originalSaveClick();
+ if(!state.saveHandle){setStatus(tr('needFolder'),'bad');return;}
+ const btn=el('saveBtn'),folder=modeInfo.intervalMean.folder;btn.disabled=true;el('progress').classList.add('visible');
+ try{
+  const samples=state.exportAll?state.dataset.samples:[state.selectedSample];
+  let done=0;
+  for(const sample of samples){
+   el('progress').textContent=`${tr('saving')} ${++done}/${samples.length}`;
+   const traces=makeTracesForSampleExport(sample,'sg');appendRegionTraces(traces,sample);
+   const layout=baseLayout(tr('intervalMeanTitle'),'intervalMean',sample);
+   await writeBlob(state.saveHandle,`${folder}/${sample}_regions_full.png`,await imageFromSpec(traces,{...layout,xaxis:{...layout.xaxis,range:[0,state.dataset.params.scanLength]}}));
+   await writeBlob(state.saveHandle,`${folder}/${sample}_regions_zoom.png`,await imageFromSpec(traces,layout));
+  }
+  await writeBlob(state.saveHandle,`${folder}/CID_Scan_Regions_Results.xlsx`,buildWorkbook('intervalMean'));
+  setStatus(tr('saved'),'good');
+ }catch(e){console.error(e);setStatus(`${tr('saveFailed')}: ${e.message||e}`,'bad');}
+ finally{btn.disabled=false;el('progress').classList.remove('visible');}
+};
+
 </script>
 
 </body>
