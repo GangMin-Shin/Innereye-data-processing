@@ -345,6 +345,7 @@ Read a valid workbook to generate the Description results.
 <select id="plotTypeSelect">
 <option value="line" data-i18n="linePlot">Line plot</option>
 <option value="histogram" data-i18n="histogramPlot">Histogram</option>
+<option value="normal" data-i18n="normalPlot">Normal distribution</option>
 </select>
 </div>
 </div>
@@ -361,7 +362,7 @@ Read a valid workbook to start analysis.
 </main>
 
 <script>
-const I18N={en:{module:'ZR rawdata analysis',dockHint:'Select an analysis function.',back:'← Back',home:'🏠 Home',analysis:'Analysis',descriptionBtn:'Description',lotMixtureBtn:'Lot mixture detection',inputSetup:'Input & output setup',excelFile:'Excel workbook',savePath:'Save path',browse:'Browse',noFile:'No file selected',notSelected:'No folder selected',readExcel:'Read Excel',downloadTemplate:'Download template',ready:'Ready',invalidLowerThreshold:'Invalid if P0 or P1 is less than or equal to',invalidUpperThreshold:'Invalid if P0 or P1 is greater than or equal to',thresholdBlankHint:'Blank disables this limit.',upperThresholdDefaultHint:'Default: 160. Blank disables this limit.',invalidThresholdSetting:'The lower invalid threshold must be smaller than the upper invalid threshold.',originalSample:'Original N',dateLabel:'Date',timeLabel:'Time',selectedPoint:'Selected sample',plotColors:'Plot colors',result:'Processing result',chooseAnalysis:'Read a valid workbook to generate the Description results.',save:'Save',descriptionSummary:'Description summary',variabilitySummary:'Variability metrics',lotMixtureTitle:'Lot mixture detection',empty:'No plot yet.\nRead a valid workbook to start analysis.',needFile:'Please select an Excel workbook.',needFolder:'Please select a save folder.',folderSelected:'Save folder selected.',folderUnsupported:'This browser does not support folder selection. Use a browser with the File System Access API.',reading:'Reading Ch1 / Ch2 and validating Date, Time, P1 and P0 - P1…',readDone:'Description analysis completed.',templateDownloadStarted:'Template download started.',sheetMissing:'The workbook must contain both Ch1 and Ch2 sheets.',headerMismatch:'Each channel sheet must have A1=N, B1=Date, C1=Time, D1=P1, E1=P0 - P1.',saving:'Saving workbook and plot images…',saved:'Save completed.',saveFailed:'Save failed',globalResetTitle:'Reset all',tabResetTitle:'Reset current analysis',fullResetDone:'All inputs and analysis states were reset.',tabResetDone:'The Description analysis was reset.',channel:'Channel',validSamples:'Valid samples',p0Mean:'P0 Mean',p0SD:'P0 SD',p1Mean:'P1 Mean',p1SD:'P1 SD',diffMean:'P0 - P1 Mean',diffSD:'P0 - P1 SD',note:'Note',invalidNote:'Invalid samples',rawSamples:'Input rows',valid:'Valid',invalid:'Invalid',sampleAxis:'Sample',noValid:'No valid samples',channelSelect:'Channel',plotType:'Plot type',linePlot:'Line plot',histogramPlot:'Histogram',xMin:'X min',xMax:'X max',yMin:'Y min',yMax:'Y max',count:'Count',autoScale:'Auto',sigma:'σ',goodCount:'Good',badCount:'Bad',defaultColors:'Default',defaultColorsSaved:'Current plot colors were saved as the default.',defaultColorsSaveFailed:'Failed to save the plot color defaults.',sigmaSummary:'Sigma summary',lowerLimit:'Lower limit',upperLimit:'Upper limit',invalidNaN:'NaN / Missing / Non-numeric',invalidNonFinite:'Other non-finite',invalidLower:'Invalid ≤ lower threshold',invalidUpper:'Invalid ≥ upper threshold',invalidOverlap:'Invalid at both thresholds',invalidThresholdTotal:'Invalid by threshold',lowerGoodCount:'Lower Good Count',upperGoodCount:'Upper Good Count',lowerBadRate:'Lower Bad Rate (%)',upperBadRate:'Upper Bad Rate (%)'},ko:{module:'ZR rawdata 분석',dockHint:'분석 기능을 선택하세요.',back:'← 뒤로가기',home:'🏠 Home',analysis:'분석',descriptionBtn:'Description',lotMixtureBtn:'Lot mixture detection',inputSetup:'입력 및 저장 설정',excelFile:'입력 Excel 파일',savePath:'저장 경로',browse:'Browse',noFile:'선택된 파일 없음',notSelected:'선택된 폴더 없음',readExcel:'Excel 읽기',downloadTemplate:'양식 다운로드',ready:'준비 완료',invalidLowerThreshold:'P0 또는 P1이 다음 값 이하이면 제외',invalidUpperThreshold:'P0 또는 P1이 다음 값 이상이면 제외',thresholdBlankHint:'빈칸이면 해당 기준을 사용하지 않습니다.',upperThresholdDefaultHint:'기본값은 160이며, 빈칸이면 해당 기준을 사용하지 않습니다.',invalidThresholdSetting:'하한 제외 기준은 상한 제외 기준보다 작아야 합니다.',originalSample:'원본 N',dateLabel:'측정 날짜',timeLabel:'측정 시간',selectedPoint:'선택 샘플',plotColors:'그래프 색상',result:'처리 결과',chooseAnalysis:'유효한 Excel을 읽으면 Description 결과를 생성합니다.',save:'세이브',descriptionSummary:'Description 요약',variabilitySummary:'변동성 지표',lotMixtureTitle:'Lot mixture detection',empty:'아직 플롯이 없습니다.\n유효한 Excel을 읽어 분석을 시작하세요.',needFile:'입력 Excel 파일을 선택해주세요.',needFolder:'저장 폴더를 선택해주세요.',folderSelected:'저장 폴더 선택 완료.',folderUnsupported:'이 브라우저는 저장 폴더 선택을 지원하지 않습니다. File System Access API 지원 브라우저를 사용해주세요.',reading:'Ch1 / Ch2의 Date, Time, P1 및 P0 - P1 유효성을 확인하는 중…',readDone:'Description 분석이 완료되었습니다.',templateDownloadStarted:'Excel 양식 다운로드를 시작했습니다.',sheetMissing:'Excel에는 Ch1과 Ch2 시트가 모두 있어야 합니다.',headerMismatch:'각 채널 시트의 A1=N, B1=Date, C1=Time, D1=P1, E1=P0 - P1이어야 합니다.',saving:'Excel 파일과 그래프 이미지를 저장 중…',saved:'저장이 완료되었습니다.',saveFailed:'저장 실패',globalResetTitle:'전체 리셋',tabResetTitle:'현재 분석 탭 리셋',fullResetDone:'입력과 분석 상태를 모두 초기화했습니다.',tabResetDone:'Description 분석 탭을 초기화했습니다.',channel:'채널',validSamples:'유효 샘플 수',p0Mean:'P0 평균',p0SD:'P0 표준편차',p1Mean:'P1 평균',p1SD:'P1 표준편차',diffMean:'P0 - P1 평균',diffSD:'P0 - P1 표준편차',note:'비고',invalidNote:'유효하지 않은 샘플',rawSamples:'입력 행 수',valid:'유효',invalid:'무효',sampleAxis:'샘플',noValid:'유효 샘플 없음',channelSelect:'Ch 선택',plotType:'플롯 선택',linePlot:'꺾은선 그래프',histogramPlot:'히스토그램',xMin:'X축 최소',xMax:'X축 최대',yMin:'Y축 최소',yMax:'Y축 최대',count:'빈도',autoScale:'Auto',sigma:'σ',goodCount:'양품',badCount:'불량',defaultColors:'디폴트',defaultColorsSaved:'현재 그래프 색상을 디폴트로 저장했습니다.',defaultColorsSaveFailed:'그래프 색상 디폴트 저장에 실패했습니다.',sigmaSummary:'시그마 요약',lowerLimit:'하한',upperLimit:'상한',invalidNaN:'NaN / 누락 / 비숫자',invalidNonFinite:'기타 비유한값',invalidLower:'하한 이하 Invalid',invalidUpper:'상한 이상 Invalid',invalidOverlap:'상·하한 동시 해당',invalidThresholdTotal:'임계값 Invalid 합계',lowerGoodCount:'Lower Good 수',upperGoodCount:'Upper Good 수',lowerBadRate:'Lower Bad Rate (%)',upperBadRate:'Upper Bad Rate (%)'}};
+const I18N={en:{module:'ZR rawdata analysis',dockHint:'Select an analysis function.',back:'← Back',home:'🏠 Home',analysis:'Analysis',descriptionBtn:'Description',lotMixtureBtn:'Lot mixture detection',inputSetup:'Input & output setup',excelFile:'Excel workbook',savePath:'Save path',browse:'Browse',noFile:'No file selected',notSelected:'No folder selected',readExcel:'Read Excel',downloadTemplate:'Download template',ready:'Ready',invalidLowerThreshold:'Invalid if P0 or P1 is less than or equal to',invalidUpperThreshold:'Invalid if P0 or P1 is greater than or equal to',thresholdBlankHint:'Blank disables this limit.',upperThresholdDefaultHint:'Default: 160. Blank disables this limit.',invalidThresholdSetting:'The lower invalid threshold must be smaller than the upper invalid threshold.',originalSample:'Original N',dateLabel:'Date',timeLabel:'Time',selectedPoint:'Selected sample',plotColors:'Plot colors',result:'Processing result',chooseAnalysis:'Read a valid workbook to generate the Description results.',save:'Save',descriptionSummary:'Description summary',variabilitySummary:'Variability metrics',lotMixtureTitle:'Lot mixture detection',empty:'No plot yet.\nRead a valid workbook to start analysis.',needFile:'Please select an Excel workbook.',needFolder:'Please select a save folder.',folderSelected:'Save folder selected.',folderUnsupported:'This browser does not support folder selection. Use a browser with the File System Access API.',reading:'Reading Ch1 / Ch2 and validating Date, Time, P1 and P0 - P1…',readDone:'Description analysis completed.',templateDownloadStarted:'Template download started.',sheetMissing:'The workbook must contain both Ch1 and Ch2 sheets.',headerMismatch:'Each channel sheet must have A1=N, B1=Date, C1=Time, D1=P1, E1=P0 - P1.',saving:'Saving workbook and plot images…',saved:'Save completed.',saveFailed:'Save failed',globalResetTitle:'Reset all',tabResetTitle:'Reset current analysis',fullResetDone:'All inputs and analysis states were reset.',tabResetDone:'The Description analysis was reset.',channel:'Channel',validSamples:'Valid samples',p0Mean:'P0 Mean',p0SD:'P0 SD',p1Mean:'P1 Mean',p1SD:'P1 SD',diffMean:'P0 - P1 Mean',diffSD:'P0 - P1 SD',note:'Note',invalidNote:'Invalid samples',rawSamples:'Input rows',valid:'Valid',invalid:'Invalid',sampleAxis:'Sample',noValid:'No valid samples',channelSelect:'Channel',plotType:'Plot type',linePlot:'Line plot',histogramPlot:'Histogram',normalPlot:'Normal distribution',normalUnavailable:'Normal distribution is undefined when SD = 0.',density:'Probability density',xMin:'X min',xMax:'X max',yMin:'Y min',yMax:'Y max',count:'Count',autoScale:'Auto',sigma:'σ',goodCount:'Good',badCount:'Bad',defaultColors:'Default',defaultColorsSaved:'Current plot colors were saved as the default.',defaultColorsSaveFailed:'Failed to save the plot color defaults.',sigmaSummary:'Sigma summary',lowerLimit:'Lower limit',upperLimit:'Upper limit',invalidNaN:'NaN / Missing / Non-numeric',invalidNonFinite:'Other non-finite',invalidLower:'Invalid ≤ lower threshold',invalidUpper:'Invalid ≥ upper threshold',invalidOverlap:'Invalid at both thresholds',invalidThresholdTotal:'Invalid by threshold',lowerGoodCount:'Lower Good Count',upperGoodCount:'Upper Good Count',lowerBadRate:'Lower Bad Rate (%)',upperBadRate:'Upper Bad Rate (%)'},ko:{module:'ZR rawdata 분석',dockHint:'분석 기능을 선택하세요.',back:'← 뒤로가기',home:'🏠 Home',analysis:'분석',descriptionBtn:'Description',lotMixtureBtn:'Lot mixture detection',inputSetup:'입력 및 저장 설정',excelFile:'입력 Excel 파일',savePath:'저장 경로',browse:'Browse',noFile:'선택된 파일 없음',notSelected:'선택된 폴더 없음',readExcel:'Excel 읽기',downloadTemplate:'양식 다운로드',ready:'준비 완료',invalidLowerThreshold:'P0 또는 P1이 다음 값 이하이면 제외',invalidUpperThreshold:'P0 또는 P1이 다음 값 이상이면 제외',thresholdBlankHint:'빈칸이면 해당 기준을 사용하지 않습니다.',upperThresholdDefaultHint:'기본값은 160이며, 빈칸이면 해당 기준을 사용하지 않습니다.',invalidThresholdSetting:'하한 제외 기준은 상한 제외 기준보다 작아야 합니다.',originalSample:'원본 N',dateLabel:'측정 날짜',timeLabel:'측정 시간',selectedPoint:'선택 샘플',plotColors:'그래프 색상',result:'처리 결과',chooseAnalysis:'유효한 Excel을 읽으면 Description 결과를 생성합니다.',save:'세이브',descriptionSummary:'Description 요약',variabilitySummary:'변동성 지표',lotMixtureTitle:'Lot mixture detection',empty:'아직 플롯이 없습니다.\n유효한 Excel을 읽어 분석을 시작하세요.',needFile:'입력 Excel 파일을 선택해주세요.',needFolder:'저장 폴더를 선택해주세요.',folderSelected:'저장 폴더 선택 완료.',folderUnsupported:'이 브라우저는 저장 폴더 선택을 지원하지 않습니다. File System Access API 지원 브라우저를 사용해주세요.',reading:'Ch1 / Ch2의 Date, Time, P1 및 P0 - P1 유효성을 확인하는 중…',readDone:'Description 분석이 완료되었습니다.',templateDownloadStarted:'Excel 양식 다운로드를 시작했습니다.',sheetMissing:'Excel에는 Ch1과 Ch2 시트가 모두 있어야 합니다.',headerMismatch:'각 채널 시트의 A1=N, B1=Date, C1=Time, D1=P1, E1=P0 - P1이어야 합니다.',saving:'Excel 파일과 그래프 이미지를 저장 중…',saved:'저장이 완료되었습니다.',saveFailed:'저장 실패',globalResetTitle:'전체 리셋',tabResetTitle:'현재 분석 탭 리셋',fullResetDone:'입력과 분석 상태를 모두 초기화했습니다.',tabResetDone:'Description 분석 탭을 초기화했습니다.',channel:'채널',validSamples:'유효 샘플 수',p0Mean:'P0 평균',p0SD:'P0 표준편차',p1Mean:'P1 평균',p1SD:'P1 표준편차',diffMean:'P0 - P1 평균',diffSD:'P0 - P1 표준편차',note:'비고',invalidNote:'유효하지 않은 샘플',rawSamples:'입력 행 수',valid:'유효',invalid:'무효',sampleAxis:'샘플',noValid:'유효 샘플 없음',channelSelect:'Ch 선택',plotType:'플롯 선택',linePlot:'꺾은선 그래프',histogramPlot:'히스토그램',normalPlot:'정규분포',normalUnavailable:'표준편차가 0이면 정규분포를 정의할 수 없습니다.',density:'확률밀도',xMin:'X축 최소',xMax:'X축 최대',yMin:'Y축 최소',yMax:'Y축 최대',count:'빈도',autoScale:'Auto',sigma:'σ',goodCount:'양품',badCount:'불량',defaultColors:'디폴트',defaultColorsSaved:'현재 그래프 색상을 디폴트로 저장했습니다.',defaultColorsSaveFailed:'그래프 색상 디폴트 저장에 실패했습니다.',sigmaSummary:'시그마 요약',lowerLimit:'하한',upperLimit:'상한',invalidNaN:'NaN / 누락 / 비숫자',invalidNonFinite:'기타 비유한값',invalidLower:'하한 이하 Invalid',invalidUpper:'상한 이상 Invalid',invalidOverlap:'상·하한 동시 해당',invalidThresholdTotal:'임계값 Invalid 합계',lowerGoodCount:'Lower Good 수',upperGoodCount:'Upper Good 수',lowerBadRate:'Lower Bad Rate (%)',upperBadRate:'Upper Bad Rate (%)'}};
 let lang=localStorage.getItem('innereye_lang')||'en';
 if(!I18N[lang]){lang='en';
 }const state={file:null,saveHandle:null,dataset:null,plotDivs:[],lotPlotDiv:null,activeMode:'description',lotView:{method:'kde',channel:'Ch1',metric:'p0',params:{kde:{bandwidth:''},dip:{bootstrap:200,alpha:0.05},gmm:{mode:'auto',k:2,maxK:4,maxIter:200,tol:0.000001},pelt:{penalty:10,minSegment:20},slidingMean:{window:100,step:10},slidingMad:{window:100,step:10}},lastResult:null,renderToken:0},plotView:{channel:'Ch1',type:'line',renderToken:0,yRanges:{Ch1:{p0:{min:'',max:''},p1:{min:'',max:''},diff:{min:'',max:''}},Ch2:{p0:{min:'',max:''},p1:{min:'',max:''},diff:{min:'',max:''}}},sigmas:{Ch1:{p0:1.0,p1:1.0,diff:1.0},Ch2:{p0:1.0,p1:1.0,diff:1.0}}}};
@@ -1294,14 +1295,43 @@ let hi=hasMax?max:auto[1];
 if(lo>=hi){return null;
 }return[lo,hi];
 }function assessmentAnnotation(assessment){return{xref:'paper',yref:'paper',x:.01,y:.99,xanchor:'left',yanchor:'top',align:'left',showarrow:false,text:`<b>σ = ${assessment.sigma.toFixed(1)}</b><br>`+`${tr('goodCount')}: ${assessment.good}<br>`+`${tr('badCount')}: ${assessment.bad}`,font:{family:'Inter, sans-serif',size:12,color:'#111827'},bgcolor:'rgba(255,255,255,.86)',bordercolor:'rgba(17,24,39,.18)',borderwidth:1,borderpad:7};
-}function singlePlotLayout(metricLabel,values,sampleCount,rangeState,assessment,color,plotType=state.plotView.type){const signalRange=resolveYRange(values,rangeState);
+}function singlePlotLayout(metricLabel,values,sampleCount,rangeState,assessment,color,plotType=state.plotView.type,normalCurve=null){
+const signalRange=resolveYRange(plotType==='normal'&&normalCurve&&!normalCurve.degenerate?normalCurve.x:values,rangeState);
 const common={height:460,margin:{l:82,r:34,t:24,b:70},paper_bgcolor:'#fff',plot_bgcolor:'#fff',font:{family:'Inter, sans-serif',color:'#111827'},showlegend:false,hovermode:'closest',clickmode:'event+select',annotations:[assessmentAnnotation(assessment)]};
-if(plotType==='histogram'){return{...common,bargap:.05,shapes:[{type:'rect',xref:'x',yref:'paper',x0:assessment.lower,x1:assessment.upper,y0:0,y1:1,fillcolor:lightenHexToRgba(color,.45,.50),line:{width:0},layer:'below'},{type:'line',xref:'x',yref:'paper',x0:assessment.mean,x1:assessment.mean,y0:0,y1:1,line:{color:'#000000',width:3,dash:'dash'},layer:'above'}],xaxis:{title:{text:metricLabel,font:{size:12}},showgrid:false,zeroline:false,linecolor:'#9aa1ad',linewidth:1.1,autorange:!signalRange,...(signalRange?{range:signalRange}:{}),fixedrange:false},yaxis:{title:{text:tr('count'),font:{size:12}},showgrid:false,zeroline:false,linecolor:'#9aa1ad',linewidth:1.1,fixedrange:false}};
+if(plotType==='histogram'||plotType==='normal'){
+if(plotType==='normal'&&normalCurve?.degenerate){common.annotations.push({xref:'paper',yref:'paper',x:.5,y:.5,showarrow:false,text:tr('normalUnavailable'),font:{size:14,color:'#b42318'},bgcolor:'rgba(255,255,255,.85)'});}
+return{...common,bargap:.05,shapes:[{type:'rect',xref:'x',yref:'paper',x0:assessment.lower,x1:assessment.upper,y0:0,y1:1,fillcolor:lightenHexToRgba(color,.45,.50),line:{width:0},layer:'below'},{type:'line',xref:'x',yref:'paper',x0:assessment.mean,x1:assessment.mean,y0:0,y1:1,line:{color:'#000000',width:3,dash:'dash'},layer:'above'}],xaxis:{title:{text:metricLabel,font:{size:12}},showgrid:false,zeroline:false,linecolor:'#9aa1ad',linewidth:1.1,autorange:!signalRange,...(signalRange?{range:signalRange}:{}),fixedrange:false},yaxis:{title:{text:plotType==='normal'?tr('density'):tr('count'),font:{size:12}},showgrid:false,zeroline:false,linecolor:'#9aa1ad',linewidth:1.1,fixedrange:false,...(plotType==='normal'?{rangemode:'tozero'}:{})}};
 }const tickStep=niceSampleTickStep(sampleCount);
 return{...common,bargap:.18,shapes:[{type:'rect',xref:'x',yref:'y',x0:.5,x1:sampleCount+.5,y0:assessment.lower,y1:assessment.upper,fillcolor:lightenHexToRgba(color,.45,.50),line:{width:0},layer:'below'},{type:'line',xref:'x',yref:'y',x0:.5,x1:sampleCount+.5,y0:assessment.mean,y1:assessment.mean,line:{color:'#000000',width:3,dash:'dash'},layer:'above'}],xaxis:{title:{text:tr('sampleAxis'),font:{size:12}},showgrid:false,zeroline:false,linecolor:'#9aa1ad',linewidth:1.1,tickmode:'linear',tick0:1,dtick:tickStep,range:[.5,sampleCount+.5],fixedrange:false},yaxis:{title:{text:metricLabel,font:{size:12}},showgrid:false,zeroline:false,linecolor:'#9aa1ad',linewidth:1.1,autorange:!signalRange,...(signalRange?{range:signalRange}:{})}};
 }const plotConfig={responsive:true,displaylogo:false,modeBarButtonsToRemove:['select2d','lasso2d'],toImageButtonOptions:{format:'png',filename:'ZR_rawdata_plot',height:900,width:1600,scale:2}};
-function buildPlotTrace(x,y,metricLabel,color,channel,customData=[],plotType=state.plotView.type){if(plotType==='line'){return{type:'scatter',mode:'lines+markers',x,y,customdata:customData,line:{color,width:2},marker:{color,size:5},hovertemplate:`${tr('sampleAxis')}=%{x}<br>`+`${tr('originalSample')}=%{customdata[0]}<br>`+`${tr('dateLabel')}=%{customdata[1]}<br>`+`${tr('timeLabel')}=%{customdata[2]}<br>`+`${metricLabel}=%{y:.6f}`+`<extra>${channel}</extra>`};
+function buildPlotTrace(x,y,metricLabel,color,channel,customData=[],plotType=state.plotView.type,normalCurve=null){if(plotType==='line'){return{type:'scatter',mode:'lines+markers',x,y,customdata:customData,line:{color,width:2},marker:{color,size:5},hovertemplate:`${tr('sampleAxis')}=%{x}<br>`+`${tr('originalSample')}=%{customdata[0]}<br>`+`${tr('dateLabel')}=%{customdata[1]}<br>`+`${tr('timeLabel')}=%{customdata[2]}<br>`+`${metricLabel}=%{y:.6f}`+`<extra>${channel}</extra>`};
+}if(plotType==='normal'){
+return{type:'scatter',mode:normalCurve.degenerate?'markers':'lines',x:normalCurve.x,y:normalCurve.y,name:'Normal PDF',line:{color,width:3.5},marker:{color,size:9},hovertemplate:`${metricLabel}=%{x:.6f}<br>`+`${tr('density')}=%{y:.6f}`+`<extra>${channel}</extra>`};
 }return{type:'histogram',x:y,nbinsx:Math.max(10,Math.min(80,Math.round(Math.sqrt(y.length)))),marker:{color,line:{color:'#111827',width:1}},hovertemplate:`${metricLabel}=%{x:.6f}<br>`+`${tr('count')}=%{y}`+`<extra>${channel}</extra>`};
+}function normalCurveFor(channelName,metricKey,sigma){const channel=state.dataset.channels[channelName];
+if(!channel.normalCurveCache)channel.normalCurveCache={};
+const cached=channel.normalCurveCache[metricKey];
+if(cached&&cached.sigma===sigma)return cached.curve;
+const stats=channel.stats[metricKey];
+const mu=stats.mean,sd=stats.sd;
+let curve;
+if(!Number.isFinite(mu)||!(sd>0)){
+curve={x:Number.isFinite(mu)?[mu]:[],y:Number.isFinite(mu)?[0]:[],degenerate:true};
+}else{
+const extent=Math.max(4,sigma+0.5);
+const pointCount=501;
+const x=new Array(pointCount),y=new Array(pointCount);
+const start=mu-extent*sd,step=2*extent*sd/(pointCount-1);
+const factor=1/(sd*Math.sqrt(2*Math.PI));
+for(let i=0;i<pointCount;i++){
+const z=-extent+2*extent*i/(pointCount-1);
+x[i]=start+i*step;
+y[i]=factor*Math.exp(-0.5*z*z);
+}
+curve={x,y,degenerate:false};
+}
+channel.normalCurveCache[metricKey]={sigma,curve};
+return curve;
 }function bindPointInfo(plotDiv,infoEl,metricLabel){if(!plotDiv||!infoEl||typeof plotDiv.on!=='function'){return;
 }plotDiv.on('plotly_click',event=>{const point=event?.points?.[0];
 const data=point?.customdata;
@@ -1321,44 +1351,46 @@ const name=state.plotView.channel;
 const channel=state.dataset.channels[name];
 if(!channel.valid.length){el('plots').innerHTML=`<div class="empty">${tr('noValid')}</div>`;
 return;
-}const x=channel.valid.map(row=>row.N);
-const customData=channel.valid.map(row=>[row.Original_N,row.Date,row.Time]);
+}const isLine=state.plotView.type==='line';
+const x=isLine?channel.valid.map(row=>row.N):[];
+const customData=isLine?channel.valid.map(row=>[row.Original_N,row.Date,row.Time]):[];
 for(const spec of DESCRIPTION_METRICS){if(token!==state.plotView.renderToken){return;
 }const values=channel.series[spec.key];
-const stats=channel.stats[spec.key];
 const card=document.createElement('div');
 card.className='plot-card';
 const rangeState=state.plotView.yRanges[name][spec.key];
 const sigma=normalizeSigma(state.plotView.sigmas[name][spec.key]);
 state.plotView.sigmas[name][spec.key]=sigma;
-const assessment=getSigmaAssessment(name,spec.key);
-const minLabel=state.plotView.type==='histogram'?tr('xMin'):tr('yMin');
-const maxLabel=state.plotView.type==='histogram'?tr('xMax'):tr('yMax');
+const valueOnXAxis=state.plotView.type!=='line';
+const minLabel=valueOnXAxis?tr('xMin'):tr('yMin');
+const maxLabel=valueOnXAxis?tr('xMax'):tr('yMax');
 card.innerHTML=`<div class="plot-title">`+`<span class="plot-title-name">${spec.label}</span>`+`<div class="y-controls">`+`<div class="y-control sigma-control">`+`<label>${tr('sigma')}</label>`+`<input class="sigma-input" type="number" min="0" step="0.1" value="${sigma.toFixed(1)}">`+`</div>`+`<div class="y-control">`+`<label>${minLabel}</label>`+`<input class="y-min-input" type="number" step="any" value="${rangeState.min}">`+`</div>`+`<div class="y-control">`+`<label>${maxLabel}</label>`+`<input class="y-max-input" type="number" step="any" value="${rangeState.max}">`+`</div>`+`<button class="auto-scale-btn" type="button">${tr('autoScale')}</button>`+`</div>`+`</div>`+`<div class="plot"></div>`+`<div class="point-info"></div>`;
 el('plots').appendChild(card);
 const sigmaInput=card.querySelector('.sigma-input');
 const minInput=card.querySelector('.y-min-input');
 const maxInput=card.querySelector('.y-max-input');
 const autoBtn=card.querySelector('.auto-scale-btn');
-sigmaInput.addEventListener('change',()=>{state.plotView.sigmas[name][spec.key]=normalizeSigma(sigmaInput.value);
-renderSigmaTable();
-renderPlots();
-});
-minInput.addEventListener('change',()=>{rangeState.min=minInput.value.trim();
-renderPlots();
-});
-maxInput.addEventListener('change',()=>{rangeState.max=maxInput.value.trim();
-renderPlots();
-});
-autoBtn.addEventListener('click',()=>{rangeState.min='';
-rangeState.max='';
-renderPlots();
-});
 const div=card.querySelector('.plot');
 const pointInfo=card.querySelector('.point-info');
 state.plotDivs.push(div);
-const trace=buildPlotTrace(x,values,spec.label,el(spec.colorId).value,name,customData);
-await Plotly.newPlot(div,[trace],singlePlotLayout(spec.label,values,channel.validCount,rangeState,assessment,el(spec.colorId).value),plotConfig);
+function plotArguments(){
+const currentAssessment=getSigmaAssessment(name,spec.key);
+const curve=state.plotView.type==='normal'?normalCurveFor(name,spec.key,currentAssessment.sigma):null;
+const color=el(spec.colorId).value;
+return{trace:buildPlotTrace(x,values,spec.label,color,name,customData,state.plotView.type,curve),layout:singlePlotLayout(spec.label,values,channel.validCount,rangeState,currentAssessment,color,state.plotView.type,curve)};
+}
+function updateThisPlot(){const args=plotArguments();return Plotly.react(div,[args.trace],args.layout,plotConfig);}
+sigmaInput.addEventListener('change',()=>{const updated=normalizeSigma(sigmaInput.value);
+state.plotView.sigmas[name][spec.key]=updated;
+sigmaInput.value=updated.toFixed(1);
+renderSigmaTable();
+updateThisPlot();
+});
+minInput.addEventListener('change',()=>{rangeState.min=minInput.value.trim();updateThisPlot();});
+maxInput.addEventListener('change',()=>{rangeState.max=maxInput.value.trim();updateThisPlot();});
+autoBtn.addEventListener('click',()=>{rangeState.min='';rangeState.max='';minInput.value='';maxInput.value='';updateThisPlot();});
+const args=plotArguments();
+await Plotly.newPlot(div,[args.trace],args.layout,plotConfig);
 if(state.plotView.type==='line'){bindPointInfo(div,pointInfo,spec.label);
 }if(token!==state.plotView.renderToken){return;
 }}}el('channelSelect').addEventListener('change',()=>{state.plotView.channel=el('channelSelect').value;
@@ -1423,7 +1455,7 @@ Object.assign(exportHost.style,{position:'fixed',left:'-20000px',top:'0',width:'
 document.body.appendChild(exportHost);
 const exportConfig={responsive:false,displaylogo:false,displayModeBar:false};
 const imageOptions={format:'png',width:1600,height:900,scale:2};
-const plotTypes=[{key:'line',fileLabel:'Line'},{key:'histogram',fileLabel:'Histogram'}];
+const plotTypes=[{key:'line',fileLabel:'Line'},{key:'histogram',fileLabel:'Histogram'},{key:'normal',fileLabel:'Normal_Distribution'}];
 try{for(const name of['Ch1','Ch2']){const channel=state.dataset.channels[name];
 if(!channel.valid.length){continue;
 }const x=channel.valid.map(row=>row.N);
@@ -1432,20 +1464,20 @@ for(const metric of DESCRIPTION_METRICS){const values=channel.series[metric.key]
 if(!values.length){continue;
 }const color=el(metric.colorId).value;
 const rangeState=state.plotView.yRanges[name][metric.key];
-const sigma=normalizeSigma(state.plotView.sigmas[name][metric.key]);
 const assessment=getSigmaAssessment(name,metric.key);
-for(const plotType of plotTypes){const trace=buildPlotTrace(x,values,metric.label,color,name,customData,plotType.key);
-const layout=singlePlotLayout(metric.label,values,channel.validCount,rangeState,assessment,color,plotType.key);
+for(const plotType of plotTypes){
+const curve=plotType.key==='normal'?normalCurveFor(name,metric.key,assessment.sigma):null;
+const trace=buildPlotTrace(x,values,metric.label,color,name,plotType.key==='line'?customData:[],plotType.key,curve);
+const layout=singlePlotLayout(metric.label,values,channel.validCount,rangeState,assessment,color,plotType.key,curve);
 layout.width=1600;
 layout.height=900;
 layout.autosize=false;
 layout.margin={l:110,r:60,t:95,b:95};
 layout.title={text:`${name} - ${metric.label} - ${plotType.fileLabel}`,x:.5,xanchor:'center',font:{family:'Inter, sans-serif',size:24,color:'#111827'}};
-await Plotly.newPlot(exportHost,[trace],layout,exportConfig);
+await Plotly.react(exportHost,[trace],layout,exportConfig);
 const dataUrl=await Plotly.toImage(exportHost,imageOptions);
 const blob=await dataUrlToBlob(dataUrl);
 await writeBlobToSelectedFolder(`ZR_rawdata_Description_${name}_${metric.fileLabel}_${plotType.fileLabel}.png`,blob);
-Plotly.purge(exportHost);
 }}}}finally{try{Plotly.purge(exportHost);
 }catch(_){}exportHost.remove();
 }}el('saveBtn').onclick=async()=>{if(!state.dataset){setStatus(tr('chooseAnalysis'),'bad');
