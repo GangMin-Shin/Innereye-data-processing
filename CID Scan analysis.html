@@ -1263,7 +1263,7 @@ reading:'Reading workbook, validating dynamic scan lines, and preprocessing…',
 readyToAnalyze:'Workbook validation completed. Set the plot colors for the detected lines, then press Analyze.',
 analysisStarted:'Analysis is ready.',
 invalidParams:'Check the input parameters. Speed, length, frequency, SG window size and sample count must be valid positive values.',
-sheetMismatch:'Sample sheets must be exactly S1 through the entered sample count.',
+sheetMismatch:'The number of detected S-number sample sheets must match Measured samples.',
 headerMismatch:'Each sample sheet must contain contiguous scan-line headers starting at A1 as L1, L2, ... with no gaps.',
 lineSetMismatch:'All sample sheets must use the same contiguous scan-line headers.',
 noLines:'No valid scan-line header was found. The first header must be L1.',
@@ -1394,7 +1394,7 @@ reading:'Excel 구조와 동적 스캔 라인을 확인하고 전처리 중…',
 readyToAnalyze:'Excel 검증이 완료되었습니다. 검출된 라인별 그래프 색상을 설정한 뒤 분석 시작을 눌러주세요.',
 analysisStarted:'분석 준비가 완료되었습니다.',
 invalidParams:'입력 파라미터를 확인해주세요. 속도, 길이, 주파수, SG 윈도우 크기, 샘플 수는 유효한 양수여야 합니다.',
-sheetMismatch:'샘플 시트는 입력한 개수에 맞춰 S1부터 연속적으로 존재해야 합니다.',
+sheetMismatch:'S숫자 형식의 샘플 시트 수가 측정 샘플 수와 일치해야 합니다.',
 headerMismatch:'각 샘플 시트는 A1부터 L1, L2, ... 형식으로 빈 열 없이 연속된 스캔 라인 헤더를 가져야 합니다.',
 lineSetMismatch:'모든 샘플 시트의 스캔 라인 헤더 구성은 동일해야 합니다.',
 noLines:'유효한 스캔 라인 헤더가 없습니다. 첫 번째 헤더는 L1이어야 합니다.',
@@ -2849,14 +2849,6 @@ el('readBtn').onclick=async()=>{
         {type:'array'}
       );
 
-    const expected=
-      Array.from(
-        {
-          length:p.expectedSamples
-        },
-        (_,i)=>`S${i+1}`
-      );
-
     const sampleSheets=
       wb.SheetNames
         .filter(
@@ -2868,16 +2860,9 @@ el('readBtn').onclick=async()=>{
             naturalNum(b)
         );
 
-    if(
-      sampleSheets.length!==expected.length ||
-      expected.some(
-        (s,i)=>
-          sampleSheets[i]!==s
-      )
-    ){
-
+    if(sampleSheets.length!==p.expectedSamples){
       throw new Error(
-        `${tr('sheetMismatch')} [${sampleSheets.join(', ')}]`
+        `${tr('sheetMismatch')} (${sampleSheets.length}/${p.expectedSamples}) [${sampleSheets.join(', ')}]`
       );
     }
 
@@ -2887,7 +2872,7 @@ el('readBtn').onclick=async()=>{
     const allLineSet=
       new Set();
 
-    for(const s of expected){
+    for(const s of sampleSheets){
 
       const aoa=
         XLSX.utils.sheet_to_json(
@@ -2993,7 +2978,7 @@ el('readBtn').onclick=async()=>{
     const cleaned={};
     const smoothed={};
 
-    for(const s of expected){
+    for(const s of sampleSheets){
 
       cleaned[s]={};
       smoothed[s]={};
@@ -3026,7 +3011,7 @@ el('readBtn').onclick=async()=>{
     state.readCache={
       workbook:wb,
       params:p,
-      samples:expected,
+      samples:sampleSheets,
       lines,
       sampleLines,
       raw:cleaned,
