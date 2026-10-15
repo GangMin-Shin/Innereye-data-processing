@@ -673,6 +673,7 @@
 
       <div class="read-row">
         <button type="button" id="readBtn" class="primary" data-i18n="readExcel">Read Excel</button>
+        <button type="button" id="inputDefaultBtn" class="secondary" data-i18n="defaultBtn">Default</button>
         <span id="status" class="status" data-i18n="ready">Ready</span>
       </div>
 
@@ -771,6 +772,9 @@ const I18N={
     defaultBtn:'Default',
     defaultSaved:'Current plot colors have been saved as the default.',
     defaultFailed:'Could not save the default plot colors.',
+    inputDefaultSaved:'Sample and point counts saved as the default.',
+    inputDefaultFailed:'Could not save the default sample and point counts.',
+    inputDefaultInvalid:'Enter valid integers for Measured samples (≥1) and Points per sample (≥3).',
     rawBefore:'Raw before alignment',
     alignedRaw:'Aligned raw',
     harmonic:'1st harmonic',
@@ -860,6 +864,9 @@ const I18N={
     defaultBtn:'디폴트',
     defaultSaved:'현재 그래프 색상을 기본값으로 저장했습니다.',
     defaultFailed:'그래프 색상 기본값을 저장하지 못했습니다.',
+    inputDefaultSaved:'현재 측정 샘플 수와 샘플당 포인트 수를 기본값으로 저장했습니다.',
+    inputDefaultFailed:'샘플 수와 포인트 수의 기본값을 저장하지 못했습니다.',
+    inputDefaultInvalid:'측정 샘플 수는 1 이상, 샘플당 포인트 수는 3 이상의 정수로 입력해주세요.',
     rawBefore:'정렬 전 rawdata',
     alignedRaw:'정렬 후 rawdata',
     harmonic:'1차 하모닉',
@@ -927,6 +934,7 @@ const I18N={
 };
 
 const PLOT_COLOR_STORAGE_KEY='innereye_cid_preprocessing_plot_colors';
+const INPUT_DEFAULT_STORAGE_KEY='innereye_cid_preprocessing_input_defaults';
 
 const FACTORY_PLOT_COLORS=Object.freeze({
   colorRaw:'#111827',
@@ -1000,6 +1008,59 @@ function saveDefaultPlotColors(){
       `${tr('defaultFailed')} ${err.message||err}`,
       'bad'
     );
+  }
+}
+
+function getStoredInputDefaults(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(INPUT_DEFAULT_STORAGE_KEY)||'null');
+
+    if(
+      saved&&
+      Number.isSafeInteger(saved.expectedSamples)&&saved.expectedSamples>=1&&
+      Number.isSafeInteger(saved.expectedPoints)&&saved.expectedPoints>=3
+    ){
+      return saved;
+    }
+  }catch(_){}
+
+  return null;
+}
+
+function restoreDefaultInputValues(){
+  const saved=getStoredInputDefaults();
+  el('expectedSamples').value=saved?saved.expectedSamples:'';
+  el('expectedPoints').value=saved?saved.expectedPoints:'';
+}
+
+function saveDefaultInputValues(){
+  const sampleInput=el('expectedSamples');
+  const pointInput=el('expectedPoints');
+  const expectedSamples=Number(sampleInput.value);
+  const expectedPoints=Number(pointInput.value);
+
+  if(
+    !sampleInput.value.trim()||!pointInput.value.trim()||
+    !Number.isSafeInteger(expectedSamples)||expectedSamples<1||
+    !Number.isSafeInteger(expectedPoints)||expectedPoints<3
+  ){
+    setStatus(tr('inputDefaultInvalid'),'bad');
+    return;
+  }
+
+  try{
+    localStorage.setItem(
+      INPUT_DEFAULT_STORAGE_KEY,
+      JSON.stringify({expectedSamples,expectedPoints})
+    );
+
+    if(state.dataset){
+      renderDetected(expectedSamples,expectedPoints);
+    }
+
+    setStatus(tr('inputDefaultSaved'),'good');
+  }catch(err){
+    setStatus(`${tr('inputDefaultFailed')} ${err.message||err}`,'bad');
   }
 }
 
@@ -1104,9 +1165,7 @@ function resetAll(){
   el('filename').textContent=tr('noFile');
   el('folderName').textContent=tr('notSelected');
 
-  el('expectedSamples').value='';
-  el('expectedPoints').value='';
-
+  restoreDefaultInputValues();
   restoreDefaultPlotColors();
 
   el('detected').innerHTML='';
@@ -1273,6 +1332,24 @@ function alignByH1(y,h=firstHarmonic(y)){
   };
 }
 
+function shiftedHarmonic(h,shift,n){
+  if(!shift)return h;
+
+  const {cos,sin}=harmonicBasis(n);
+  const a=h.a*cos[shift]+h.b*sin[shift];
+  const b=h.b*cos[shift]-h.a*sin[shift];
+
+  return{
+    mean:h.mean,
+    a,
+    b,
+    amp:h.amp,
+    peak:((h.peak-shift*(360/n))%360+360)%360,
+    r2:h.r2,
+    fit:rotateLeft(h.fit,shift)
+  };
+}
+
 function processDataset(ds){
   const aligned={};
   const rawFit={};
@@ -1288,7 +1365,7 @@ function processDataset(ds){
 
     const rawH=firstHarmonic(y);
     const al=alignByH1(y,rawH);
-    const alH=firstHarmonic(al.aligned);
+    const alH=shiftedHarmonic(rawH,al.shift,y.length);
 
     rawHarmonics[s]=rawH;
     alignedHarmonics[s]=alH;
@@ -1776,39 +1853,19 @@ async function renderMainPlot(mode){
 
   if(mode==='alignedH1'){
     const div=addPlotCard('plot-main',tr('alignH1Title'));
-    const traces=[];
     const x=pointLabels();
-
-    d.samples.forEach((s,i)=>{
-      const c=d.sampleColors[i];
-
-      traces.push({
-        x,
-        y:p.aligned[s],
-        type:'scatter',
-        mode:'lines',
-        name:`${s} raw`,
-        showlegend:false,
-        line:{
-          width:1,
-          color:c
-        },
-        opacity:.25
-      });
-
-      traces.push({
-        x,
-        y:p.alignedFit[s],
-        type:'scatter',
-        mode:'lines',
-        name:s,
-        line:{
-          width:1.8,
-          color:c
-        },
-        opacity:.9
-      });
-    });
+    const traces=d.samples.map((s,i)=>({
+      x,
+      y:p.alignedFit[s],
+      type:'scatter',
+      mode:'lines',
+      name:s,
+      line:{
+        width:1.8,
+        color:d.sampleColors[i]
+      },
+      opacity:.9
+    }));
 
     await Plotly.newPlot(
       div,
@@ -2032,15 +2089,13 @@ async function saveEntries(folder,entries){
     throw new Error(tr('needFolder'));
   }
 
+  const outputDir=await ensureDirPath(state.saveHandle,folder);
+
   for(let i=0;i<entries.length;i++){
     el('progress').textContent=
       `${tr('saving')} ${i+1}/${entries.length}`;
 
-    await writeBlob(
-      state.saveHandle,
-      `${folder}/${entries[i].path}`,
-      entries[i].blob
-    );
+    await writeBlob(outputDir,entries[i].path,entries[i].blob);
   }
 }
 
@@ -2212,6 +2267,7 @@ el('langBtn').onclick=()=>{
 el('globalResetBtn').onclick=resetAll;
 el('tabResetBtn').onclick=resetCurrentAnalysis;
 el('colorDefaultBtn').onclick=saveDefaultPlotColors;
+el('inputDefaultBtn').onclick=saveDefaultInputValues;
 
 el('excelBrowseBtn').onclick=()=>{
   el('excelInput').click();
@@ -2311,9 +2367,12 @@ el('readBtn').onclick=async()=>{
       throw new Error(tr('noSamples'));
     }
 
-    const sampleCols=Object.fromEntries(
-      samples.map(s=>[s,headers.indexOf(s)])
-    );
+    const sampleCols={};
+    headers.forEach((name,index)=>{
+      if(/^S\d+$/i.test(name)&&!(name in sampleCols)){
+        sampleCols[name]=index;
+      }
+    });
 
     const rowMap={};
 
@@ -2436,7 +2495,7 @@ el('individualToggle').onclick=()=>{
 
 COLOR_IDS.forEach(id=>{
   el(id).addEventListener('change',()=>{
-    if(state.currentMode){
+    if(state.currentMode==='ecc'&&(id==='colorAligned'||id==='colorCorrected')){
       runAnalysis(state.currentMode,false);
     }
   });
@@ -2563,6 +2622,7 @@ el('saveBtn').onclick=async()=>{
 };
 
 applyLanguage();
+restoreDefaultInputValues();
 restoreDefaultPlotColors();
 </script>
 
