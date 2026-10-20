@@ -1199,6 +1199,198 @@ button{cursor:pointer}
 
 </div>
 
+<script id="cid-processing-worker" type="text/plain">
+'use strict';
+importScripts('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js');
+const allowedExcelType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+let exportBook=null;
+function report(stage,index,total){self.postMessage({kind:'progress',stage,index,total});}
+function fail(error){self.postMessage({kind:'error',error:error&&error.message?error.message:String(error)});}
+function validHeader(ws,count,sample){
+ const row=ws[0]||[];
+ for(let c=0;c<count;c++){
+  const got=String(row[c]?.v??'').trim().toUpperCase();
+  if(got!==`L${c+1}`)throw Error(`Invalid headers in ${sample}: column ${c+1}, expected L${c+1}.`);
+ }
+ for(let c=count;c<row.length;c++){
+  if(String(row[c]?.v??'').trim()!=='')throw Error(`Unexpected header in ${sample}: column ${c+1}.`);
+ }
+}
+function sgWindow(fs,n,seconds){
+ let w=Math.round(fs*seconds);
+ if(w%2===0)w++;
+ w=Math.max(5,w);
+ if(w>n)w=n%2===1?n:n-1;
+ if(w<5)throw Error('The common data length is too short for a 3rd-order SG filter.');
+ return w;
+}
+function reflectIndex(i,n){
+ while(i<0||i>=n){if(i<0)i=-i-1;if(i>=n)i=2*n-i-1;}
+ return i;
+}
+const sgCache=new Map();
+function sgCoefficients(w){
+ if(sgCache.has(w))return sgCache.get(w);
+ const m=(w-1)/2;
+ const s2=m*(m+1)*(2*m+1)/3;
+ const s4=m*(m+1)*(2*m+1)*(3*m*m+3*m-1)/15;
+ const den=w*s4-s2*s2;
+ if(!(den>0))throw Error('Invalid SG filter coefficients.');
+ const out=new Float64Array(w);
+ for(let j=0;j<w;j++){const k=j-m;out[j]=(s4-s2*k*k)/den;}
+ sgCache.set(w,out);
+ return out;
+}
+function savgol(data,w){
+ const n=data.length,half=(w-1)/2;
+ const pad=new Float64Array(n+w-1),out=new Float64Array(n);
+ for(let i=0;i<pad.length;i++)pad[i]=data[reflectIndex(i-half,n)];
+ if(w<=31){
+  const c=sgCoefficients(w);
+  for(let i=0;i<n;i++){
+   let sum=0;for(let j=0;j<w;j++)sum+=c[j]*pad[i+j];
+   out[i]=sum;
+  }
+  return out;
+ }
+ const m=half,s2=m*(m+1)*(2*m+1)/3;
+ const s4=m*(m+1)*(2*m+1)*(3*m*m+3*m-1)/15;
+ const den=w*s4-s2*s2;
+ let sum0=0,sum1=0,sum2=0;
+ for(let i=0;i<n;i++){
+  if(i%128===0){
+   sum0=0;sum1=0;sum2=0;
+   for(let j=0;j<w;j++){
+    const k=j-m,v=pad[i+j];
+    sum0+=v;sum1+=k*v;sum2+=k*k*v;
+   }
+  }
+  out[i]=(s4*sum0-s2*sum2)/den;
+  if(i+1<n){
+   const old=pad[i],next=pad[i+w];
+   const t2=sum2-2*sum1+sum0-(m+1)*(m+1)*old+m*m*next;
+   const t1=sum1-sum0+(m+1)*old+m*next;
+   sum0+=next-old;sum1=t1;sum2=t2;
+  }
+ }
+ return out;
+}
+function decodeFile(buffer,params,filename){
+ const book=XLSX.read(buffer,{type:'array',dense:true,cellNF:false,cellStyles:false,cellDates:false,bookVBA:false});
+ const sampleSheets=book.SheetNames.filter(n=>/^S\d+$/i.test(n)).sort((a,b)=>Number(a.slice(1))-Number(b.slice(1)));
+ if(sampleSheets.length!==params.expectedSamples){throw Error(`The number of S-number sample sheets must match Measured samples (${sampleSheets.length}/${params.expectedSamples}). [${sampleSheets.join(', ')}]`);}
+ const lines=Array.from({length:params.expectedLines},(_,i)=>`L${i+1}`);
+ const raw={},smoothed={},lengths=[];
+ const sampleLines={};
+ let minLength=Infinity;
+ for(let si=0;si<sampleSheets.length;si++){
+  const s=sampleSheets[si],sheet=book.Sheets[s];
+  validHeader(sheet,params.expectedLines,s);
+  const columns=lines.map(()=>[]);
+  for(let r=1;r<sheet.length;r++){
+   const row=sheet[r];if(!row)continue;
+   for(let c=0;c<columns.length;c++){
+    const v=row[c]?.v;
+    if(v===null||v===undefined||(typeof v==='string'&&v.trim()===''))continue;
+    const number=Number(v);
+    if(Number.isFinite(number)&&number!==0)columns[c].push(number);
+   }
+  }
+  raw[s]={};sampleLines[s]=lines;
+  for(let j=0;j<lines.length;j++){
+   raw[s][lines[j]]=columns[j];
+   const validLength=columns[j].length;
+   lengths.push({Sample:s,Line:lines[j],Valid_Length:validLength});
+   if(validLength<minLength)minLength=validLength;
+  }
+  report('read',si+1,sampleSheets.length);
+  delete book.Sheets[s];
+ }
+ if(!Number.isFinite(minLength)||minLength<5)throw Error('No valid non-zero numeric data were found, or fewer than five common samples remain.');
+ const duration=params.scanLength/params.scanSpeed;
+ const fs=minLength/duration,dx=params.scanSpeed/fs,window=sgWindow(fs,minLength,params.sgWindowSec);
+ const distance=new Float64Array(minLength);
+ for(let i=0;i<minLength;i++)distance[i]=i*dx;
+ const transfers=[distance.buffer];
+ for(let si=0;si<sampleSheets.length;si++){
+  const s=sampleSheets[si];smoothed[s]={};
+  for(const line of lines){
+   const values=Float64Array.from(raw[s][line].slice(0,minLength));
+   raw[s][line]=values;
+   smoothed[s][line]=savgol(values,window);
+   transfers.push(values.buffer,smoothed[s][line].buffer);
+  }
+  report('smooth',si+1,sampleSheets.length);
+ }
+ const freqMatch=String(filename).match(/(\d+(?:\.\d+)?)\s*kHz/i);
+ const signalMatch=String(filename).match(/\b(Phase|EMF)\b/i);
+ const filenameMeta={frequency:freqMatch?Number(freqMatch[1]):NaN,
+  signal:signalMatch?(signalMatch[1].toLowerCase()==='phase'?'Phase':'EMF'):null};
+ const data={params,samples:sampleSheets,lines,sampleLines,raw,smoothed,distance,minLength,duration,fs,dx,
+  sgWindow:window,sgWindowRequestedSec:params.sgWindowSec,sgWindowSec:window/fs,sgWindowMm:window*dx,lengths,filenameMeta};
+ self.postMessage({kind:'complete',data},transfers);
+}
+function jsonSheet(name,rows){
+ if(rows&&rows.length)XLSX.utils.book_append_sheet(exportBook,XLSX.utils.json_to_sheet(rows),name.slice(0,31));
+}
+function beginExport(payload){
+ exportBook=XLSX.utils.book_new();
+ jsonSheet('Parameters',payload.parameters);
+ jsonSheet('Line_Colors',payload.lineColors);
+ if(payload.specialRegions){
+  jsonSheet('Region_Results',payload.regions);
+  jsonSheet('Region_Selections',payload.regionSelections);
+ }else{
+  jsonSheet('Length_Audit',payload.lengths);
+  if(payload.mode==='interval'){
+   jsonSheet('Analysis_Ranges',payload.ranges);
+   jsonSheet('Interval_Results',payload.auc);
+  }
+  if(payload.mode==='intervalMean'){
+   jsonSheet('Region_Selections',payload.regionSelections);
+   jsonSheet('Interval_Mean_Results',payload.mean);
+   jsonSheet('Notch_Tangent_Slope',payload.notchSlope);
+  }
+ }
+ self.postMessage({kind:'ready'});
+}
+function exportSample(msg){
+ if(!exportBook)throw Error('Export workbook was not initialized.');
+ const {sample,tag,lines,values,dx}=msg;
+ const n=values.length?values[0].length:0;
+ if(n>1048575)throw Error(`${sample} exceeds the 1,048,576-row Excel worksheet limit.`);
+ const ws=XLSX.utils.aoa_to_sheet([['Distance_mm',...lines]]);
+ const CHUNK=1024;
+ for(let start=0;start<n;start+=CHUNK){
+  const end=Math.min(start+CHUNK,n),block=new Array(end-start);
+  for(let i=start;i<end;i++){
+   const row=new Array(lines.length+1);row[0]=i*dx;
+   for(let j=0;j<lines.length;j++)row[j+1]=values[j][i];
+   block[i-start]=row;
+  }
+  XLSX.utils.sheet_add_aoa(ws,block,{origin:-1});
+ }
+ XLSX.utils.book_append_sheet(exportBook,ws,`${sample}_${tag}`.slice(0,31));
+ self.postMessage({kind:'ready'});
+}
+function finishExport(){
+ if(!exportBook)throw Error('Export workbook was not initialized.');
+ const bytes=XLSX.write(exportBook,{bookType:'xlsx',type:'array',compression:true});
+ exportBook=null;
+ self.postMessage({kind:'exported',buffer:bytes},[bytes]);
+}
+self.onmessage=function(event){
+ try{
+  const msg=event.data;
+  if(msg.kind==='decode')decodeFile(msg.buffer,msg.params,msg.filename);
+  else if(msg.kind==='export-init')beginExport(msg);
+  else if(msg.kind==='export-sample')exportSample(msg);
+  else if(msg.kind==='export-finish')finishExport();
+  else throw Error(`Unknown worker command: ${msg.kind}`);
+ }catch(err){fail(err);}
+};
+</script>
+
 <script>
 const I18N={
 en:{
@@ -1494,7 +1686,9 @@ const state={
     notchSlope:{}
   },
 
-  currentPlot:null
+  currentPlot:null,
+  plotViewRanges:{},
+  plotResolutionFrame:0
 };
 
 const domCache=new Map();
@@ -1806,7 +2000,10 @@ el('langBtn').onclick=()=>{
 applyLanguage();
 
 function purgeCurrentPlot(){
-
+  if(state.currentPlot?._resolutionRelayout){
+    state.currentPlot.removeListener('plotly_relayout',state.currentPlot._resolutionRelayout);
+    state.currentPlot._resolutionRelayout=null;
+  }
   if(state.currentPlot){
     try{
       Plotly.purge(
@@ -1826,6 +2023,8 @@ function clearAnalysisUi(){
   state.currentMode=null;
   state.selectedSample=null;
   state.ranges={};
+  state.plotViewRanges={};
+  if(state.plotResolutionFrame)cancelAnimationFrame(state.plotResolutionFrame);
 
   state.rangeApplyAll={
     interval:false
@@ -1881,7 +2080,7 @@ function clearAnalysisUi(){
 }
 
 function resetDataset(){
-
+  cancelActiveRead();
   clearAnalysisUi();
 
   state.readCache=null;
@@ -2107,6 +2306,7 @@ async function resetCurrentAnalysis(){
 
   const mode=
     state.currentMode;
+  state.plotViewRanges={};
 
   purgeCurrentPlot();
 
@@ -2779,7 +2979,120 @@ function renderLineToggles(){
     });
 }
 
+const workerScriptUrl=URL.createObjectURL(new Blob([
+  document.getElementById('cid-processing-worker').textContent
+],{type:'text/javascript'}));
+let activeReadWorker=null;
+let readGeneration=0;
+const XLSX_MIME='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+function createCidWorker(){
+  if(typeof Worker==='undefined')throw Error('Web Workers are required to process large Excel files.');
+  return new Worker(workerScriptUrl);
+}
+function cancelActiveRead(){
+  readGeneration++;
+  if(activeReadWorker){activeReadWorker.terminate();activeReadWorker=null;}
+}
+function localizedWorkerError(message){
+  if(message.startsWith('Invalid headers in ')||message.startsWith('Unexpected header in '))
+    return `${tr('headerMismatch')} (${message})`;
+  if(message.startsWith('The number of S-number sample sheets must match '))
+    return `${tr('sheetMismatch')} (${message})`;
+  if(message.startsWith('No valid non-zero numeric data were found'))
+    return tr('noValid');
+  return message;
+}
+function workerExchange(worker,message,transfer=[]){
+  return new Promise((resolve,reject)=>{
+    const accept=event=>{
+      const result=event.data;
+      if(result.kind==='progress'){
+        const label=result.stage==='read'?'Reading':'SG smoothing';
+        setStatus(`${tr('reading')} ${label} ${result.index}/${result.total}`);
+        return;
+      }
+      worker.removeEventListener('message',accept);
+      worker.removeEventListener('error',error);
+      if(result.kind==='error')reject(Error(localizedWorkerError(result.error)));
+      else resolve(result);
+    };
+    const error=event=>{
+      worker.removeEventListener('message',accept);
+      worker.removeEventListener('error',error);
+      reject(Error(event.message||'Worker failed. Check browser permissions and CDN access.'));
+    };
+    worker.addEventListener('message',accept);
+    worker.addEventListener('error',error);
+    try{worker.postMessage(message,transfer);}catch(err){
+      worker.removeEventListener('message',accept);
+      worker.removeEventListener('error',error);
+      reject(err);
+    }
+  });
+}
+async function decodeWorkbookOnWorker(file,params){
+  const gen=readGeneration;
+  const buffer=await file.arrayBuffer();
+  if(gen!==readGeneration)return null;
+  const worker=createCidWorker();
+  activeReadWorker=worker;
+  try{
+    const result=await workerExchange(worker,{
+      kind:'decode',buffer,params,filename:file.name
+    },[buffer]);
+    if(gen!==readGeneration)return null;
+    return result.data;
+  }finally{
+    worker.terminate();
+    if(activeReadWorker===worker)activeReadWorker=null;
+  }
+}
+function getExportMetadata(mode){
+  const specialRegions=state.cidType==='2170'&&mode==='intervalMean';
+  const metadata={kind:'export-init',mode,specialRegions,
+    parameters:parameterRows(),lineColors:lineColorRows()};
+  if(specialRegions){
+    const selectedMode=regionState.mode;
+    const rows=state.dataset.samples.flatMap(s=>regionRows(s,selectedMode));
+    metadata.regions=rows;
+    metadata.regionSelections=rows.map(r=>({Mode:selectedMode,Sample:r.Sample,
+      Line:r.Line,Region:r.Region,Range_Start_mm:r.Range_Start_mm,
+      Range_End_mm:r.Range_End_mm,Status:r.Status}));
+  }else{
+    metadata.lengths=state.dataset.lengths;
+    if(mode==='interval'){
+      metadata.ranges=rangeRows();metadata.auc=allAucRows();
+    }
+    if(mode==='intervalMean'){
+      metadata.regionSelections=regionSelectionRows();
+      metadata.mean=allMeanRows();metadata.notchSlope=allNotchSlopeRows();
+    }
+  }
+  return metadata;
+}
+async function buildWorkbookAsync(mode){
+  const d=state.dataset;
+  const worker=createCidWorker();
+  try{
+    await workerExchange(worker,getExportMetadata(mode));
+    const source=mode==='raw'?d.raw:d.smoothed;
+    const tag=mode==='raw'?'Raw':'SG';
+    for(let i=0;i<d.samples.length;i++){
+      const sample=d.samples[i];
+      const lines=d.sampleLines?.[sample]||d.lines;
+      const values=lines.map(line=>source[sample][line]);
+      el('progress').textContent=`${tr('saving')} Excel ${i+1}/${d.samples.length}`;
+      await workerExchange(worker,{kind:'export-sample',sample,tag,lines,values,dx:d.dx});
+    }
+    el('progress').textContent=`${tr('saving')} Excel packaging`;
+    const result=await workerExchange(worker,{kind:'export-finish'});
+    return new Blob([result.buffer],{type:XLSX_MIME});
+  }finally{worker.terminate();}
+}
+
 el('readBtn').onclick=async()=>{
+  cancelActiveRead();
+  const requestGeneration=readGeneration;
 
   if(!state.file){
 
@@ -2809,135 +3122,16 @@ el('readBtn').onclick=async()=>{
     const p=
       getParams();
 
-    const buf=
-      await state.file.arrayBuffer();
-
-    const wb=
-      XLSX.read(
-        buf,
-        {type:'array'}
-      );
-
-    const sampleSheets=
-      wb.SheetNames
-        .filter(
-          n=>/^S\d+$/i.test(n)
-        )
-        .sort(
-          (a,b)=>
-            naturalNum(a)-
-            naturalNum(b)
-        );
-
-    if(sampleSheets.length!==p.expectedSamples){
-      throw new Error(
-        `${tr('sheetMismatch')} (${sampleSheets.length}/${p.expectedSamples}) [${sampleSheets.join(', ')}]`
-      );
-    }
-
-    const raw={};
-    const lengths=[];
-    const sampleLines={};
-    const lines=Array.from({length:p.expectedLines},(_,i)=>`L${i+1}`);
-    let minLength=Infinity;
-
-    for(const s of sampleSheets){
-      const aoa=XLSX.utils.sheet_to_json(wb.Sheets[s],{
-        header:1,
-        defval:null,
-        raw:true
-      });
-
-      try{
-        detectLineHeaders(aoa[0],p.expectedLines);
-      }catch(e){
-        throw new Error(`${e.message} (${s})`);
-      }
-
-      // All sheets have the same enforced line schema.
-      sampleLines[s]=lines;
-      const values=extractLineValues(aoa,lines);
-      raw[s]=values;
-      for(const line of lines){
-        const validLength=values[line].length;
-        lengths.push({Sample:s,Line:line,Valid_Length:validLength});
-        if(validLength<minLength)minLength=validLength;
-      }
-    }
-
-    if(!Number.isFinite(minLength)||minLength<5){
-      throw new Error(tr('noValid'));
-    }
-
-    const duration=
-      p.scanLength/
-      p.scanSpeed;
-
-    const fs=
-      minLength/
-      duration;
-
-    const dx=
-      p.scanSpeed/
-      fs;
-
-    const distance=
-      Array.from(
-        {length:minLength},
-        (_,i)=>i*dx
-      );
-
-    const window=
-      validSgWindow(
-        fs,
-        minLength,
-        p.sgWindowSec
-      );
-
-    const smoothed={};
-    for(const s of sampleSheets){
-      smoothed[s]={};
-      for(const line of lines){
-        // In-place truncation avoids a second full-sized raw-signal copy.
-        raw[s][line].length=minLength;
-        smoothed[s][line]=savgol(raw[s][line],window,3);
-      }
-    }
-
-    const meta=
-      parseFilenameMeta(
-        state.file.name
-      );
-
-    state.readCache={
-      params:p,
-      samples:sampleSheets,
-      lines,
-      sampleLines,
-      raw,
-      smoothed,
-      distance,
-      minLength,
-      duration,
-      fs,
-      dx,
-      sgWindow:window,
-      sgWindowRequestedSec:
-        p.sgWindowSec,
-      sgWindowSec:
-        window/fs,
-      sgWindowMm:
-        window*dx,
-      lengths,
-      filenameMeta:meta
-    };
+    const cache=await decodeWorkbookOnWorker(state.file,p);
+    if(!cache||requestGeneration!==readGeneration)return;
+    state.readCache=cache;
 
     initializeLineColors(
-      lines
+      cache.lines
     );
 
     state.selectedLines=
-      new Set(lines);
+      new Set(cache.lines);
 
     renderDetected(
       state.readCache
@@ -2953,7 +3147,7 @@ el('readBtn').onclick=async()=>{
     );
 
   }catch(err){
-
+    if(requestGeneration!==readGeneration)return;
     console.error(err);
 
     state.readCache=null;
@@ -3749,8 +3943,8 @@ function lowerBoundIndex(x,target,n=x.length){
 
 function interpolatedYAtX(x,y,targetX){
   const n=Math.min(
-    Array.isArray(x)?x.length:0,
-    Array.isArray(y)?y.length:0
+    (Array.isArray(x)||ArrayBuffer.isView(x))?x.length:0,
+    (Array.isArray(y)||ArrayBuffer.isView(y))?y.length:0
   );
 
   if(
@@ -3864,7 +4058,7 @@ function aucSegmentData(
       line
     ];
 
-  if(!Array.isArray(yAll)){
+  if(!yAll||!(Array.isArray(yAll)||ArrayBuffer.isView(yAll))){
     return null;
   }
 
@@ -3892,17 +4086,11 @@ function aucSegmentData(
     return null;
   }
 
-  const x=
-    d.distance.slice(
-      i0,
-      i1+1
-    );
-
-  const y=
-    yAll.slice(
-      i0,
-      i1+1
-    );
+  const segmentX=d.distance.subarray(i0,i1+1);
+  const segmentY=yAll.subarray(i0,i1+1);
+  const reduced=plotReduction(segmentX,segmentY,[segmentX[0],segmentX[segmentX.length-1]],6000);
+  const x=Array.from(reduced.x);
+  const y=Array.from(reduced.y);
 
   const lowerBaseline=
     x.map(
@@ -4165,6 +4353,78 @@ function appendAucOverlayTraces(
   }
 }
 
+const PLOT_TARGET=7000;
+const plotSeriesCache=new WeakMap();
+function plotReduction(x,y,range,target=PLOT_TARGET){
+  const n=Math.min(x.length,y.length);
+  if(!n)return{x:[],y:[]};
+  let start=lowerBoundIndex(x,range[0],n);
+  let end=Math.min(n,lowerBoundIndex(x,range[1],n)+1);
+  start=Math.max(0,Math.min(n-1,start-1));
+  end=Math.min(n,Math.max(start+1,end+1));
+  if(end-start<=target)return{x:x.slice(start,end),y:y.slice(start,end)};
+  const buckets=Math.max(1,Math.floor((target-2)/2));
+  const step=(end-start-2)/buckets;
+  const picked=[start];
+  for(let b=0;b<buckets;b++){
+    const a=start+1+Math.floor(b*step);
+    const z=b===buckets-1?end-1:Math.min(end-1,start+1+Math.floor((b+1)*step));
+    if(a>=z)continue;
+    let min=a,max=a;
+    for(let j=a+1;j<z;j++){
+      if(y[j]<y[min])min=j;
+      if(y[j]>y[max])max=j;
+    }
+    if(min<max){picked.push(min,max);}else if(max<min){picked.push(max,min);}else picked.push(min);
+  }
+  picked.push(end-1);
+  const rx=new Float64Array(picked.length),ry=new Float64Array(picked.length);
+  for(let i=0;i<picked.length;i++){rx[i]=x[picked[i]];ry[i]=y[picked[i]];}
+  return{x:rx,y:ry};
+}
+function plottedSeries(sample,line,mode,source,range){
+  const d=state.dataset;
+  const y=source[sample][line];
+  const full=!range||range[0]<=0&&range[1]>=d.distance[d.minLength-1];
+  if(full){
+    const cached=plotSeriesCache.get(y);
+    if(cached)return cached;
+    const value=plotReduction(d.distance,y,[0,d.distance[d.minLength-1]]);
+    plotSeriesCache.set(y,value);
+    return value;
+  }
+  return plotReduction(d.distance,y,range);
+}
+function plotKey(mode,sample){return `${mode}:${sample}`;}
+function plotVisibleRange(mode,sample){
+  return state.plotViewRanges?.[plotKey(mode,sample)]||
+    [0,state.dataset.distance[state.dataset.minLength-1]];
+}
+function bindPlotDynamicResolution(div,mode,sample){
+  if(div._resolutionRelayout)div.removeListener('plotly_relayout',div._resolutionRelayout);
+  div._resolutionRelayout=event=>{
+    if(!state.dataset||state.currentMode!==mode||state.selectedSample!==sample)return;
+    const full=state.dataset.params.scanLength;
+    let a,b;
+    if(event['xaxis.autorange']){a=0;b=full;}
+    else if(Number.isFinite(Number(event['xaxis.range[0]']))&&Number.isFinite(Number(event['xaxis.range[1]']))){
+      a=Number(event['xaxis.range[0]']);b=Number(event['xaxis.range[1]']);
+    }else if(Array.isArray(event['xaxis.range'])){
+      [a,b]=event['xaxis.range'];
+    }else return;
+    if(!Number.isFinite(a)||!Number.isFinite(b)||b<=a)return;
+    const key=plotKey(mode,sample),old=state.plotViewRanges[key];
+    if(old&&Math.abs(old[0]-a)<1e-9&&Math.abs(old[1]-b)<1e-9)return;
+    state.plotViewRanges[key]=[a,b];
+    if(state.plotResolutionFrame)cancelAnimationFrame(state.plotResolutionFrame);
+    state.plotResolutionFrame=requestAnimationFrame(()=>{
+      state.plotResolutionFrame=0;
+      if(state.currentMode===mode&&state.selectedSample===sample)void renderCurrentMode();
+    });
+  };
+  div.on('plotly_relayout',div._resolutionRelayout);
+}
+
 function makeTraces(
   sample,
   mode
@@ -4215,9 +4475,10 @@ function makeTraces(
     of visibleLines
   ){
 
+    const series=plottedSeries(sample,line,mode,source,plotVisibleRange(mode,sample));
     traces.push({
-      x:d.distance,
-      y:source[sample][line],
+      x:series.x,
+      y:series.y,
       type:'scatter',
       mode:'lines',
 
@@ -4384,9 +4645,12 @@ async function renderCurrentMode(){
 
   const traces=makeTraces(sample,mode);
   const layout=baseLayout(title,mode,sample);
+  const viewport=state.plotViewRanges[plotKey(mode,sample)];
+  if(viewport)layout.xaxis.range=viewport.slice();
 
   await Plotly.react(div,traces,layout,plotConfig);
   state.currentPlot=div;
+  bindPlotDynamicResolution(div,mode,sample);
 }
 
 function rangeIndices(range){
@@ -4433,72 +4697,46 @@ function rangeIndices(range){
   ];
 }
 
-function peakProminence(
-  y,
-  idx,
-  isMax
-){
-
-  const sign=
-    isMax
-    ?1
-    :-1;
-
-  const peak=
-    sign*
-    y[idx];
-
-  let leftMin=peak;
-  let rightMin=peak;
-
-  for(
-    let k=idx-1;
-    k>=0;
-    k--
-  ){
-
-    const v=
-      sign*
-      y[k];
-
-    if(v>peak){
-      break;
-    }
-
-    if(v<leftMin){
-      leftMin=v;
-    }
+function peakProminence(y,idx,isMax){
+  const sign=isMax?1:-1,peak=sign*y[idx];
+  let leftMin=peak,rightMin=peak;
+  for(let k=idx-1;k>=0;k--){const v=sign*y[k];if(v>peak)break;if(v<leftMin)leftMin=v;}
+  for(let k=idx+1;k<y.length;k++){const v=sign*y[k];if(v>peak)break;if(v<rightMin)rightMin=v;}
+  return Math.max(0,peak-Math.max(leftMin,rightMin));
+}
+function allPeakProminences(y,isMax){
+  const n=y.length,sign=isMax?1:-1,values=new Float64Array(n);
+  for(let i=0;i<n;i++)values[i]=sign*y[i];
+  const left=new Int32Array(n),right=new Int32Array(n),stack=new Int32Array(n);
+  let top=0;
+  for(let i=0;i<n;i++){
+    while(top&&values[stack[top-1]]<=values[i])top--;
+    left[i]=top?stack[top-1]:-1;
+    stack[top++]=i;
   }
-
-  for(
-    let k=idx+1;
-    k<y.length;
-    k++
-  ){
-
-    const v=
-      sign*
-      y[k];
-
-    if(v>peak){
-      break;
-    }
-
-    if(v<rightMin){
-      rightMin=v;
-    }
+  top=0;
+  for(let i=n-1;i>=0;i--){
+    while(top&&values[stack[top-1]]<=values[i])top--;
+    right[i]=top?stack[top-1]:n;
+    stack[top++]=i;
   }
-
-  const contour=
-    Math.max(
-      leftMin,
-      rightMin
-    );
-
-  return Math.max(
-    0,
-    peak-contour
-  );
+  let size=1;while(size<n)size*=2;
+  const tree=new Float64Array(size*2);tree.fill(Infinity);
+  for(let i=0;i<n;i++)tree[size+i]=values[i];
+  for(let i=size-1;i>0;i--)tree[i]=Math.min(tree[i*2],tree[i*2+1]);
+  const rangeMin=(a,b)=>{
+    let out=Infinity;
+    for(a+=size,b+=size;a<=b;a>>=1,b>>=1){
+      if(a&1)out=Math.min(out,tree[a++]);
+      if(!(b&1))out=Math.min(out,tree[b--]);
+    }
+    return out;
+  };
+  return idx=>{
+    const p=values[idx];
+    const l=rangeMin(left[idx]+1,idx),r=rangeMin(idx,right[idx]-1);
+    return Math.max(0,p-Math.max(l,r));
+  };
 }
 
 function dominantTwoMaxima(x,y){
@@ -4522,6 +4760,7 @@ function dominantTwoMaxima(x,y){
     );
 
   const maxima=[];
+  const prominenceAt=allPeakProminences(y,true);
 
   for(
     let i=1;
@@ -4541,11 +4780,7 @@ function dominantTwoMaxima(x,y){
     ){
 
       const prom=
-        peakProminence(
-          y,
-          i,
-          true
-        );
+        prominenceAt(i);
 
       if(prom>=threshold){
 
@@ -4595,6 +4830,7 @@ function dominantTwoMinima(
   }
 
   const minima=[];
+  const prominenceAt=allPeakProminences(y,false);
 
   for(
     let i=1;
@@ -4614,11 +4850,7 @@ function dominantTwoMinima(
     ){
 
       const prom=
-        peakProminence(
-          y,
-          i,
-          false
-        );
+        prominenceAt(i);
 
       minima.push({
         i,
@@ -4935,7 +5167,7 @@ function calculateIntervalForSample(
     state.results.extrema[sample]||
     {};
 
-  const xSearch=state.dataset.distance.slice(i0,i1+1);
+  const xSearch=state.dataset.distance.subarray(i0,i1+1);
 
   for(
     const line
@@ -5243,8 +5475,8 @@ async()=>{
       );
 
       if(
-        samples.length>20 &&
-        i%10===9
+        samples.length>1 &&
+        i%2===1
       ){
         await new Promise(
           requestAnimationFrame
@@ -7151,9 +7383,10 @@ function makeTracesForSampleExport(
     of exportLines
   ){
 
+    const series=plottedSeries(sample,line,mode,source,[0,d.distance[d.minLength-1]]);
     traces.push({
-      x:d.distance,
-      y:source[sample][line],
+      x:series.x,
+      y:series.y,
       type:'scatter',
       mode:'lines',
       name:line,
@@ -7291,7 +7524,7 @@ el('saveBtn').onclick=async()=>{
       await writeBlob(
         state.saveHandle,
         `${folder}/CID_Scan_${mode}_Results.xlsx`,
-        buildWorkbook(mode)
+        await buildWorkbookAsync(mode)
       );
     }
 
@@ -7450,7 +7683,9 @@ function appendRegionTraces(traces,sample){
   const regions=activeRegionEntries(sample,line);
   regions.forEach((r,i)=>{
    if(!Number.isFinite(r.start)||!Number.isFinite(r.end))return;
-   const seg=segmentCoords(sample,line,r.start,r.end);
+   const rawSeg=segmentCoords(sample,line,r.start,r.end);
+   const seg=rawSeg.x.length>PLOT_TARGET
+    ?plotReduction(rawSeg.x,rawSeg.y,[r.start,r.end]):rawSeg;
    if(seg.x.length<2)return;
    const color=total?REGION_TOTAL_COLORS[i]:REGION_INDIVIDUAL_COLORS[Math.min(i,REGION_INDIVIDUAL_COLORS.length-1)];
    traces.push({type:'scatter',mode:'lines',x:seg.x,y:seg.y,
@@ -7663,7 +7898,9 @@ function drawRegionOverlay(){
  rect.setAttribute('x',px(preview[0]));rect.setAttribute('y',ay._offset);
  rect.setAttribute('width',Math.max(0,px(preview[1])-px(preview[0])));rect.setAttribute('height',ay._length);
  rect.setAttribute('fill','rgba(176,0,0,.08)');rect.setAttribute('stroke','#b00000');rect.setAttribute('stroke-dasharray','5,4');svg.appendChild(rect);
- const seg=segmentCoords(state.selectedSample,line,...preview);
+ const originalSeg=segmentCoords(state.selectedSample,line,...preview);
+ const seg=originalSeg.x.length>PLOT_TARGET
+  ?plotReduction(originalSeg.x,originalSeg.y,preview):originalSeg;
  if(seg.x.length){
   const path=document.createElementNS(ns,'path');
   let points='';for(let i=0;i<seg.x.length;i++)points+=`${i?' L':'M'}${px(seg.x[i])},${py(seg.y[i])}`;
@@ -7736,6 +7973,7 @@ el('regionLength').addEventListener('change',()=>{
 });
 for(const id of ['rangeStart','rangeEnd'])el(id).addEventListener('change',()=>{
  if(!regionMode())return;
+ delete state.plotViewRanges[plotKey('intervalMean',state.selectedSample)];
  disarmRegion();delete regionState.total[state.selectedSample];
  redrawRegionPanel();
 });
@@ -7816,7 +8054,7 @@ el('saveBtn').onclick=async()=>{
    await writeBlob(state.saveHandle,`${folder}/${sample}_regions_full.png`,await imageFromSpec(traces,{...layout,xaxis:{...layout.xaxis,range:[0,state.dataset.params.scanLength]}}));
    await writeBlob(state.saveHandle,`${folder}/${sample}_regions_zoom.png`,await imageFromSpec(traces,layout));
   }
-  await writeBlob(state.saveHandle,`${folder}/CID_Scan_Regions_Results.xlsx`,buildWorkbook('intervalMean'));
+  await writeBlob(state.saveHandle,`${folder}/CID_Scan_Regions_Results.xlsx`,await buildWorkbookAsync('intervalMean'));
   setStatus(tr('saved'),'good');
  }catch(e){console.error(e);setStatus(`${tr('saveFailed')}: ${e.message||e}`,'bad');}
  finally{btn.disabled=false;el('progress').classList.remove('visible');}
