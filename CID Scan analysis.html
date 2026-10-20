@@ -1033,6 +1033,11 @@ button{cursor:pointer}
   <input id="expectedSamples" type="number" min="1" step="1" value="6">
 </div>
 
+<div class="field">
+  <label data-i18n="expectedLines">Measured lines</label>
+  <input id="expectedLines" type="number" min="1" max="16384" step="1" value="1">
+</div>
+
 </div>
 
 <div class="read-row">
@@ -1222,6 +1227,7 @@ scanSpeed:'Scan speed (mm/s)',
 scanLength:'Scan length (mm)',
 notchPosition:'Estimated notch position from start (mm)',
 expectedSamples:'Measured samples',
+expectedLines:'Measured lines',
 readOnly:'Read Excel',
 downloadTemplate:'Download template',
 setDefault:'Default',
@@ -1262,9 +1268,9 @@ folderUnsupported:'This browser does not support folder selection. Use a browser
 reading:'Reading workbook, validating dynamic scan lines, and preprocessing…',
 readyToAnalyze:'Workbook validation completed. Set the plot colors for the detected lines, then press Analyze.',
 analysisStarted:'Analysis is ready.',
-invalidParams:'Check the input parameters. Speed, length, frequency, SG window size and sample count must be valid positive values.',
+invalidParams:'Check the input parameters. Speed, length, frequency, SG window size, sample count and line count must be valid positive values. Line count must be an integer from 1 to 16384.',
 sheetMismatch:'The number of detected S-number sample sheets must match Measured samples.',
-headerMismatch:'Each sample sheet must contain contiguous scan-line headers starting at A1 as L1, L2, ... with no gaps.',
+headerMismatch:'Each sample sheet must contain exactly Measured lines columns, headed L1 through the specified L number from A1 without gaps or additional headers.',
 lineSetMismatch:'All sample sheets must use the same contiguous scan-line headers.',
 noLines:'No valid scan-line header was found. The first header must be L1.',
 noValid:'No valid non-zero numeric data were found.',
@@ -1353,6 +1359,7 @@ scanSpeed:'스캔 속도 (mm/s)',
 scanLength:'스캔 길이 (mm)',
 notchPosition:'시작점 기준 노치 추정 위치 (mm)',
 expectedSamples:'측정 샘플 수',
+expectedLines:'측정 라인 수',
 readOnly:'Excel 읽기',
 downloadTemplate:'양식 다운로드',
 setDefault:'Default',
@@ -1393,9 +1400,9 @@ folderUnsupported:'이 브라우저는 저장 폴더 선택을 지원하지 않�
 reading:'Excel 구조와 동적 스캔 라인을 확인하고 전처리 중…',
 readyToAnalyze:'Excel 검증이 완료되었습니다. 검출된 라인별 그래프 색상을 설정한 뒤 분석 시작을 눌러주세요.',
 analysisStarted:'분석 준비가 완료되었습니다.',
-invalidParams:'입력 파라미터를 확인해주세요. 속도, 길이, 주파수, SG 윈도우 크기, 샘플 수는 유효한 양수여야 합니다.',
+invalidParams:'입력 파라미터를 확인해주세요. 속도, 길이, 주파수, SG 윈도우 크기, 샘플 수 및 라인 수는 유효한 양수여야 합니다. 라인 수는 1~16384 사이의 정수여야 합니다.',
 sheetMismatch:'S숫자 형식의 샘플 시트 수가 측정 샘플 수와 일치해야 합니다.',
-headerMismatch:'각 샘플 시트는 A1부터 L1, L2, ... 형식으로 빈 열 없이 연속된 스캔 라인 헤더를 가져야 합니다.',
+headerMismatch:'각 샘플 시트의 1행은 A1부터 Measured lines에 입력한 개수만큼 L1, L2, ... 헤더가 누락·추가 없이 연속되어야 합니다.',
 lineSetMismatch:'모든 샘플 시트의 스캔 라인 헤더 구성은 동일해야 합니다.',
 noLines:'유효한 스캔 라인 헤더가 없습니다. 첫 번째 헤더는 L1이어야 합니다.',
 noValid:'0이 아닌 유효 숫자 데이터를 찾지 못했습니다.',
@@ -1592,7 +1599,8 @@ const BASE_DEFAULTS={
   scanSpeed:1,
   scanLength:6,
   notchPosition:2,
-  expectedSamples:6
+  expectedSamples:6,
+  expectedLines:1
 };
 
 function defaultStorageKey(type=state.cidType){
@@ -1638,6 +1646,7 @@ function applyInputSettings(v){
   el('scanLength').value=x.scanLength;
   el('notchPosition').value=x.notchPosition;
   el('expectedSamples').value=x.expectedSamples;
+  el('expectedLines').value=x.expectedLines;
 }
 
 function loadStoredDefaults(type=state.cidType){
@@ -1909,35 +1918,21 @@ const TEMPLATE_DOWNLOAD_NAME=
   'CID Scan data 분석용 양식.xlsx';
 
 function buildTemplateWorkbook(){
-
-  const sampleCount=Math.max(
-    1,
-    Math.trunc(
-      Number(el('expectedSamples').value)||
-      BASE_DEFAULTS.expectedSamples
-    )
-  );
-
+  // Use exactly the same validated sample/line counts as Excel reading.
+  const expectedSamples=Math.max(1,Math.trunc(Number(el('expectedSamples').value)||BASE_DEFAULTS.expectedSamples));
+  const expectedLines=Number(el('expectedLines').value);
+  if(!Number.isInteger(expectedLines)||expectedLines<1||expectedLines>16384){
+    throw new Error(tr('invalidParams'));
+  }
+  const headers=Array.from({length:expectedLines},(_,i)=>`L${i+1}`);
+  const columns=Array.from({length:expectedLines},()=>({wch:18}));
   const wb=XLSX.utils.book_new();
 
-  for(let i=1;i<=sampleCount;i++){
-
-    const ws=
-      XLSX.utils.aoa_to_sheet([
-        ['L1']
-      ]);
-
-    ws['!cols']=[
-      {wch:18}
-    ];
-
-    XLSX.utils.book_append_sheet(
-      wb,
-      ws,
-      `S${i}`
-    );
+  for(let i=1;i<=expectedSamples;i++){
+    const ws=XLSX.utils.aoa_to_sheet([headers]);
+    ws['!cols']=columns;
+    XLSX.utils.book_append_sheet(wb,ws,`S${i}`);
   }
-
   return wb;
 }
 
@@ -2063,7 +2058,8 @@ el('folderBtn').onclick=async()=>{
   'scanSpeed',
   'scanLength',
   'notchPosition',
-  'expectedSamples'
+  'expectedSamples',
+  'expectedLines'
 ].forEach(id=>{
 
   el(id).addEventListener(
@@ -2176,7 +2172,8 @@ function getParams(){
     scanSpeed:Number(el('scanSpeed').value),
     scanLength:Number(el('scanLength').value),
     notchPosition:Number(el('notchPosition').value),
-    expectedSamples:Number(el('expectedSamples').value)
+    expectedSamples:Number(el('expectedSamples').value),
+    expectedLines:Number(el('expectedLines').value)
   };
 
   if(
@@ -2187,6 +2184,9 @@ function getParams(){
       p.scanLength>0 &&
       Number.isInteger(p.expectedSamples) &&
       p.expectedSamples>0 &&
+      Number.isInteger(p.expectedLines) &&
+      p.expectedLines>0 &&
+      p.expectedLines<=16384 &&
       Number.isFinite(p.notchPosition)
     )
   ){
@@ -2228,70 +2228,39 @@ function parseFilenameMeta(name){
 }
 
 function extractLineValues(aoa,headers){
-  const values=Object.fromEntries(
-    headers.map(line=>[line,[]])
-  );
-
+  // Process rows once and avoid repeated object lookups in the inner loop.
+  const columns=headers.map(()=>[]);
+  const count=headers.length;
   for(let r=1;r<aoa.length;r++){
-    const row=aoa[r]||[];
-    for(let c=0;c<headers.length;c++){
+    const row=aoa[r];
+    if(!row)continue;
+    for(let c=0;c<count;c++){
       const raw=row[c];
-      if(
-        raw===null ||
-        raw===undefined ||
-        String(raw).trim()===''
-      ){
-        continue;
-      }
-      const v=Number(raw);
-      if(Number.isFinite(v)&&v!==0){
-        values[headers[c]].push(v);
-      }
+      if(raw===null||raw===undefined||
+         (typeof raw==='string'&&raw.trim()===''))continue;
+      const value=Number(raw);
+      if(Number.isFinite(value)&&value!==0)columns[c].push(value);
     }
   }
-
-  return values;
+  return Object.fromEntries(headers.map((header,i)=>[header,columns[i]]));
 }
 
-function detectLineHeaders(row){
-
-  const vals=
-    (row||[]).map(
-      v=>String(v??'').trim()
-    );
-
-  let last=-1;
-
-  for(let i=0;i<vals.length;i++){
-    if(vals[i]!==''){
-      last=i;
+function detectLineHeaders(row,expectedLines){
+  const values=Array.isArray(row)?row:[];
+  for(let c=0;c<expectedLines;c++){
+    const expected=`L${c+1}`;
+    if(String(values[c]??'').trim().toUpperCase()!==expected){
+      throw new Error(`${tr('headerMismatch')} (expected L1–L${expectedLines}; column ${c+1}: ${expected})`);
     }
   }
 
-  if(last<0){
-    throw new Error(
-      tr('noLines')
-    );
-  }
-
-  const headers=
-    vals
-      .slice(0,last+1)
-      .map(
-        v=>v.toUpperCase()
-      );
-
-  for(let i=0;i<headers.length;i++){
-
-    if(headers[i]!==`L${i+1}`){
-
-      throw new Error(
-        tr('headerMismatch')
-      );
+  // Trailing blank Excel cells are allowed; an additional actual header is not.
+  for(let c=expectedLines;c<values.length;c++){
+    if(String(values[c]??'').trim()!==''){
+      throw new Error(`${tr('headerMismatch')} (expected L1–L${expectedLines}; unexpected column ${c+1})`);
     }
   }
-
-  return headers;
+  return expectedLines;
 }
 
 function invertMatrix(A){
@@ -2869,85 +2838,35 @@ el('readBtn').onclick=async()=>{
     const raw={};
     const lengths=[];
     const sampleLines={};
-    const allLineSet=
-      new Set();
+    const lines=Array.from({length:p.expectedLines},(_,i)=>`L${i+1}`);
+    let minLength=Infinity;
 
     for(const s of sampleSheets){
-
-      const aoa=
-        XLSX.utils.sheet_to_json(
-          wb.Sheets[s],
-          {
-            header:1,
-            defval:null,
-            raw:true
-          }
-        );
-
-      let headers;
+      const aoa=XLSX.utils.sheet_to_json(wb.Sheets[s],{
+        header:1,
+        defval:null,
+        raw:true
+      });
 
       try{
-
-        headers=
-          detectLineHeaders(
-            aoa[0]
-          );
-
+        detectLineHeaders(aoa[0],p.expectedLines);
       }catch(e){
-
-        throw new Error(
-          `${e.message} (${s})`
-        );
+        throw new Error(`${e.message} (${s})`);
       }
 
-      sampleLines[s]=headers;
-
-      headers.forEach(
-        line=>
-          allLineSet.add(line)
-      );
-
-      raw[s]=extractLineValues(aoa,headers);
-
-      for(const line of headers){
-        lengths.push({
-          Sample:s,
-          Line:line,
-          Valid_Length:raw[s][line].length
-        });
+      // All sheets have the same enforced line schema.
+      sampleLines[s]=lines;
+      const values=extractLineValues(aoa,lines);
+      raw[s]=values;
+      for(const line of lines){
+        const validLength=values[line].length;
+        lengths.push({Sample:s,Line:line,Valid_Length:validLength});
+        if(validLength<minLength)minLength=validLength;
       }
     }
 
-    const lines=
-      [...allLineSet]
-        .sort(
-          (a,b)=>
-            naturalNum(a)-
-            naturalNum(b)
-        );
-
-    if(!lines.length){
-
-      throw new Error(
-        tr('noLines')
-      );
-    }
-
-    const minLength=
-      Math.min(
-        ...lengths.map(
-          x=>x.Valid_Length
-        )
-      );
-
-    if(
-      !Number.isFinite(minLength) ||
-      minLength<5
-    ){
-
-      throw new Error(
-        tr('noValid')
-      );
+    if(!Number.isFinite(minLength)||minLength<5){
+      throw new Error(tr('noValid'));
     }
 
     const duration=
@@ -2975,31 +2894,13 @@ el('readBtn').onclick=async()=>{
         p.sgWindowSec
       );
 
-    const cleaned={};
     const smoothed={};
-
     for(const s of sampleSheets){
-
-      cleaned[s]={};
       smoothed[s]={};
-
-      for(
-        const line
-        of sampleLines[s]
-      ){
-
-        cleaned[s][line]=
-          raw[s][line].slice(
-            0,
-            minLength
-          );
-
-        smoothed[s][line]=
-          savgol(
-            cleaned[s][line],
-            window,
-            3
-          );
+      for(const line of lines){
+        // In-place truncation avoids a second full-sized raw-signal copy.
+        raw[s][line].length=minLength;
+        smoothed[s][line]=savgol(raw[s][line],window,3);
       }
     }
 
@@ -3009,12 +2910,11 @@ el('readBtn').onclick=async()=>{
       );
 
     state.readCache={
-      workbook:wb,
       params:p,
       samples:sampleSheets,
       lines,
       sampleLines,
-      raw:cleaned,
+      raw,
       smoothed,
       distance,
       minLength,
@@ -4279,12 +4179,13 @@ function makeTraces(
     :d.smoothed;
 
   const traces=[];
+  const visibleLines=selectedLineList(sample);
 
   if(mode==='interval'){
 
     for(
       const line
-      of selectedLineList(sample)
+      of visibleLines
     ){
 
       const au=
@@ -4311,7 +4212,7 @@ function makeTraces(
 
   for(
     const line
-    of selectedLineList(sample)
+    of visibleLines
   ){
 
     traces.push({
@@ -4350,7 +4251,7 @@ function makeTraces(
 
     for(
       const line
-      of selectedLineList(sample)
+      of visibleLines
     ){
 
       appendAucOverlayTraces(
@@ -4376,7 +4277,7 @@ function makeTraces(
 
     for(
       const line
-      of selectedLineList(sample)
+      of visibleLines
     ){
 
       const rows=
@@ -4606,9 +4507,13 @@ function dominantTwoMaxima(x,y){
     return null;
   }
 
-  const yr=
-    Math.max(...y)-
-    Math.min(...y);
+  let ymin=Infinity;
+  let ymax=-Infinity;
+  for(const value of y){
+    if(value<ymin)ymin=value;
+    if(value>ymax)ymax=value;
+  }
+  const yr=ymax-ymin;
 
   const threshold=
     Math.max(
@@ -5030,16 +4935,12 @@ function calculateIntervalForSample(
     state.results.extrema[sample]||
     {};
 
+  const xSearch=state.dataset.distance.slice(i0,i1+1);
+
   for(
     const line
     of selectedLineList(sample)
   ){
-
-    const xSearch=
-      state.dataset.distance.slice(
-        i0,
-        i1+1
-      );
 
     const ySearch=
       state.dataset.smoothed[sample][line]
@@ -6698,6 +6599,12 @@ function parameterRows(){
       Parameter:'Measured samples',
       Value:
         d.params.expectedSamples
+    },
+
+    {
+      Parameter:'Measured lines',
+      Value:
+        d.params.expectedLines
     },
 
     {
