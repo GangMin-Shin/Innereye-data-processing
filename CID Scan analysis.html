@@ -3075,14 +3075,16 @@ async function buildWorkbookAsync(mode){
   const worker=createCidWorker();
   try{
     await workerExchange(worker,getExportMetadata(mode));
-    const source=mode==='raw'?d.raw:d.smoothed;
-    const tag=mode==='raw'?'Raw':'SG';
-    for(let i=0;i<d.samples.length;i++){
-      const sample=d.samples[i];
-      const lines=d.sampleLines?.[sample]||d.lines;
-      const values=lines.map(line=>source[sample][line]);
-      el('progress').textContent=`${tr('saving')} Excel ${i+1}/${d.samples.length}`;
-      await workerExchange(worker,{kind:'export-sample',sample,tag,lines,values,dx:d.dx});
+    if(mode!=='interval'){
+      const source=mode==='raw'?d.raw:d.smoothed;
+      const tag=mode==='raw'?'Raw':'SG';
+      for(let i=0;i<d.samples.length;i++){
+        const sample=d.samples[i];
+        const lines=d.sampleLines?.[sample]||d.lines;
+        const values=lines.map(line=>source[sample][line]);
+        el('progress').textContent=`${tr('saving')} Excel ${i+1}/${d.samples.length}`;
+        await workerExchange(worker,{kind:'export-sample',sample,tag,lines,values,dx:d.dx});
+      }
     }
     el('progress').textContent=`${tr('saving')} Excel packaging`;
     const result=await workerExchange(worker,{kind:'export-finish'});
@@ -5176,7 +5178,7 @@ function calculateIntervalForSample(
 
     const ySearch=
       state.dataset.smoothed[sample][line]
-        .slice(
+        .subarray(
           i0,
           i1+1
         );
@@ -5216,13 +5218,13 @@ function calculateIntervalForSample(
       peaks.second;
 
     const xAuc=
-      xSearch.slice(
+      xSearch.subarray(
         p1.i,
         p2.i+1
       );
 
     const yAuc=
-      ySearch.slice(
+      ySearch.subarray(
         p1.i,
         p2.i+1
       );
@@ -7241,20 +7243,6 @@ function buildWorkbook(mode){
       allAucRows()
     );
 
-    for(
-      const s
-      of d.samples
-    ){
-
-      appendAoASheet(
-        wb,
-        `${s}_SG`,
-        datasetSheet(
-          s,
-          d.smoothed
-        )
-      );
-    }
   }
 
   if(mode==='intervalMean'){
