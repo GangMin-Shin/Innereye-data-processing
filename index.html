@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -280,6 +281,10 @@
       background:#0f766e;
     }
 
+    .tab.temperature .dot{
+      background:#ea580c;
+    }
+
     .homepage-credit{
       position:fixed;
       right:32px;
@@ -504,6 +509,11 @@
             <span data-i18n="quality">Quality Control</span>
           </a>
 
+          <a class="tab temperature" href="./Temperature%20Compensation.html">
+            <span class="dot" aria-hidden="true"></span>
+            <span data-i18n="temperature">Temperature Compensation</span>
+          </a>
+
         </div>
       </div>
 
@@ -532,7 +542,8 @@
         decomposition: "CID Scan Data Decomposition",
         zr: "ZR rawdata analysis",
         normalization: "Normalization assessment",
-        quality: "Quality Control"
+        quality: "Quality Control",
+        temperature: "Temperature Compensation"
       },
 
       ko: {
@@ -549,7 +560,8 @@
         decomposition: "CID 스캔 데이터 분해",
         zr: "ZR rawdata 분석",
         normalization: "정규분포 평가",
-        quality: "품질 관리"
+        quality: "품질 관리",
+        temperature: "온도 보정"
       }
     };
 
