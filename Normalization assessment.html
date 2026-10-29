@@ -479,6 +479,18 @@
     .sorting-blank{height:490px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;font-weight:700;text-align:center;padding:20px}
     .sort-table{min-width:640px}
     .sort-table th,.sort-table td{min-width:85px}
+    .axis-controls{display:flex;gap:9px;flex-wrap:wrap;align-items:end;justify-content:flex-end;margin:0 0 8px}
+    .axis-controls .axis-entry{display:flex;flex-direction:column;gap:4px}
+    .axis-controls label{font-size:10px;font-weight:800;color:#475467}
+    .axis-controls input{width:108px;height:35px;padding:0 8px;border:1px solid #d9dde4;border-radius:9px;background:#fff;font-size:11px}
+    .axis-controls button{height:35px;padding:0 11px;border:1px solid var(--line);border-radius:9px;background:#fff;font-weight:800;font-size:11px}
+    .axis-controls button:hover{background:#f8f9fb}
+    .axis-controls .axis-apply{background:#111827;color:#fff;border-color:#111827}
+    .axis-controls .axis-apply:hover{background:#303946}
+    .axis-controls .axis-zoom{min-width:38px;font-size:15px}
+    .axis-caption{font-weight:800;font-size:11px;color:#475467;align-self:center;margin-right:auto}
+    @media(max-width:650px){.axis-controls{justify-content:flex-start}.axis-controls input{width:88px}}
+
 
     .normal-grid{
       display:grid;
@@ -647,7 +659,7 @@
         </div>
 
         <div class="field">
-          <label for="expectedConditions" data-i18n="conditionCount">Groups / conditions</label>
+          <label for="expectedConditions" data-i18n="conditionCount">Groups</label>
           <input id="expectedConditions" type="number" min="1" step="1" value="3" />
         </div>
 
@@ -676,7 +688,7 @@
 
       <div class="detected">
         <span class="badge"><span data-i18n="detectedSamples">Detected samples</span>: <span id="summarySamples">—</span></span>
-        <span class="badge"><span data-i18n="detectedConditions">Detected conditions</span>: <span id="summaryConditions">—</span></span>
+        <span class="badge"><span data-i18n="detectedConditions">Detected groups</span>: <span id="summaryConditions">—</span></span>
         <span class="badge"><span data-i18n="activeSheet">Active sheet</span>: <span id="summarySheet">—</span></span>
         <span class="badge"><span data-i18n="numericValues">Numeric values</span>: <span id="summaryValues">—</span></span>
       </div>
@@ -714,7 +726,7 @@
           <div class="control-strip">
             <div class="control-left">
               <div>
-                <div class="section-title" data-i18n="basicTitle">Value summary by group / condition</div>
+                <div class="section-title" data-i18n="basicTitle">Value summary by group</div>
                 <div class="section-desc" data-i18n="basicDesc">Bars show the group mean and error bars show ±1 SD.</div>
               </div>
             </div>
@@ -727,12 +739,28 @@
                     <option value="samples" data-i18n="basicSamples">Samples by group</option>
                   </select>
                 </div>
+                <div class="inline-field" style="min-width:150px">
+                  <label for="basicPlotTypeSelect" data-i18n="plotTypeLabel">Plot type</label>
+                  <select id="basicPlotTypeSelect">
+                    <option value="bar" data-i18n="plotBar">Bar plot</option>
+                    <option value="line" data-i18n="plotLine">Line plot</option>
+                  </select>
+                </div>
               </div>
               <button id="resetColorsBtn" class="mini-btn" data-i18n="resetColors">Reset colors</button>
             </div>
           </div>
 
           <div class="plot-card">
+            <div class="axis-controls" data-chart="basicChart">
+              <span class="axis-caption" data-i18n="axisScale">Y-axis scale</span>
+              <div class="axis-entry"><label data-i18n="axisMin">Y min</label><input class="axis-min" type="number" step="any" aria-label="Y min"></div>
+              <div class="axis-entry"><label data-i18n="axisMax">Y max</label><input class="axis-max" type="number" step="any" aria-label="Y max"></div>
+              <button type="button" class="axis-apply" data-i18n="axisApply">Apply</button>
+              <button type="button" class="axis-zoom" data-factor="0.75" title="Zoom in Y" aria-label="Zoom in Y">+</button>
+              <button type="button" class="axis-zoom" data-factor="1.333333333333" title="Zoom out Y" aria-label="Zoom out Y">−</button>
+              <button type="button" class="axis-auto" data-i18n="axisAuto">Auto</button>
+            </div>
             <div id="basicChart" class="chart"></div>
           </div>
 
@@ -747,7 +775,7 @@
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th data-i18n="thCondition">Condition</th>
+                    <th data-i18n="thCondition">Group</th>
                     <th>n</th>
                     <th>Mean</th>
                     <th>SD</th>
@@ -815,6 +843,15 @@
               </div>
 
               <div class="plot-card">
+                <div class="axis-controls" data-chart="normalChart">
+              <span class="axis-caption" data-i18n="axisScale">Y-axis scale</span>
+              <div class="axis-entry"><label data-i18n="axisMin">Y min</label><input class="axis-min" type="number" step="any" aria-label="Y min"></div>
+              <div class="axis-entry"><label data-i18n="axisMax">Y max</label><input class="axis-max" type="number" step="any" aria-label="Y max"></div>
+              <button type="button" class="axis-apply" data-i18n="axisApply">Apply</button>
+              <button type="button" class="axis-zoom" data-factor="0.75" title="Zoom in Y" aria-label="Zoom in Y">+</button>
+              <button type="button" class="axis-zoom" data-factor="1.333333333333" title="Zoom out Y" aria-label="Zoom out Y">−</button>
+              <button type="button" class="axis-auto" data-i18n="axisAuto">Auto</button>
+            </div>
                 <div id="normalChart" class="chart"></div>
               </div>
 
@@ -828,7 +865,7 @@
                   <table class="data-table">
                     <thead>
                       <tr>
-                        <th data-i18n="thCondition">Condition</th>
+                        <th data-i18n="thCondition">Group</th>
                         <th>n</th>
                         <th>Mean</th>
                         <th>SD</th>
@@ -857,9 +894,25 @@
                     <option value="desc" data-i18n="sortDesc">Descending</option>
                   </select>
                 </div>
+                <div class="inline-field">
+                  <label for="sortPlotTypeSelect" data-i18n="plotTypeLabel">Plot type</label>
+                  <select id="sortPlotTypeSelect">
+                    <option value="bar" data-i18n="plotBar">Bar plot</option>
+                    <option value="line" data-i18n="plotLine">Line plot</option>
+                  </select>
+                </div>
                 <button id="sortPlotBtn" class="primary" type="button" data-i18n="plotBtn">Plot</button>
               </div>
               <div class="plot-card">
+                <div class="axis-controls" data-chart="sortingChart">
+              <span class="axis-caption" data-i18n="axisScale">Y-axis scale</span>
+              <div class="axis-entry"><label data-i18n="axisMin">Y min</label><input class="axis-min" type="number" step="any" aria-label="Y min"></div>
+              <div class="axis-entry"><label data-i18n="axisMax">Y max</label><input class="axis-max" type="number" step="any" aria-label="Y max"></div>
+              <button type="button" class="axis-apply" data-i18n="axisApply">Apply</button>
+              <button type="button" class="axis-zoom" data-factor="0.75" title="Zoom in Y" aria-label="Zoom in Y">+</button>
+              <button type="button" class="axis-zoom" data-factor="1.333333333333" title="Zoom out Y" aria-label="Zoom out Y">−</button>
+              <button type="button" class="axis-auto" data-i18n="axisAuto">Auto</button>
+            </div>
                 <div id="sortingBlank" class="sorting-blank" data-i18n="sortBlank">Select a sheet and group, then click Plot.</div>
                 <div id="sortingChart" class="chart" style="display:none"></div>
               </div>
@@ -871,14 +924,13 @@
                     <tbody id="sortingTableBody"></tbody>
                   </table>
                 </div>
-                <div class="sort-table-caption" data-i18n="sigmaStatsNote">Sigma limits are computed from the sample standard deviation (n − 1).</div>
               </div>
             </div>
             <aside class="selection-card">
               <h3 data-i18n="sortControls">Sorting controls</h3>
               <div class="control-group-title" data-i18n="sortSheet">Sheet</div>
               <div id="sortingSheetList" class="condition-list"></div>
-              <div class="control-group-title" data-i18n="sortGroup">Group / condition</div>
+              <div class="control-group-title" data-i18n="sortGroup">Group</div>
               <div id="sortingGroupList" class="condition-list sort-group-list"></div>
               <div class="control-group-title" data-i18n="sortLines">Horizontal reference lines</div>
               <div class="condition-list">
@@ -921,14 +973,14 @@
         title: "Normalization assessment",
         desc: "Validate any number of data sheets, read each sheet’s group headers dynamically, and assess their distributions using a selected ±Nσ reference range.",
         loadTitle: "1. Load workbook",
-        loadDesc: "The summary sheet is ignored. Every other sheet is treated as a data sheet. Column A contains Sample IDs; columns B onward contain user-defined groups or conditions.",
+        loadDesc: "The summary sheet is ignored. Every other sheet is treated as a data sheet. Column A contains Sample IDs; columns B onward contain user-defined groups.",
         dropTitle: "Choose an Excel workbook",
         dropSub: ".xlsx or .xls · processed locally in your browser",
         noFile: "No file selected.",
         validateTitle: "2. Validate structure",
-        validateDesc: "Enter the expected number of samples and groups/conditions, then validate every detected data sheet.",
+        validateDesc: "Enter the expected number of samples and groups, then validate every detected data sheet.",
         sampleCount: "Samples",
-        conditionCount: "Groups / conditions",
+        conditionCount: "Groups",
         validateBtn: "Validate workbook",
         downloadTemplate: "Download template",
         statusNoDataSheets: "No analyzable data sheet was found. Add at least one sheet other than summary.",
@@ -936,7 +988,7 @@
         statusIdle: "Load a workbook to begin validation.",
         sheetTitle: "3. Active sheet",
         detectedSamples: "Detected samples",
-        detectedConditions: "Detected conditions",
+        detectedConditions: "Detected groups",
         activeSheet: "Active sheet",
         numericValues: "Numeric values",
         exportBtn: "Save",
@@ -946,6 +998,15 @@
         basicViewLabel: "View mode",
         basicSummary: "Group summary",
         basicSamples: "Samples by group",
+        plotTypeLabel: "Plot type",
+        plotBar: "Bar plot",
+        plotLine: "Line plot",
+        axisScale: "Y-axis scale",
+        axisMin: "Y min",
+        axisMax: "Y max",
+        axisApply: "Apply",
+        axisAuto: "Auto",
+        axisInvalid: "Y min must be smaller than Y max.",
         sortModeLabel: "Sort order",
         sortBasic: "Basic (S1 → Sn)",
         sortAsc: "Ascending",
@@ -953,10 +1014,9 @@
         plotBtn: "Plot",
         sortBlank: "Select a sheet and group, then click Plot.",
         sortStatistics: "Sorting statistics",
-        sigmaStatsNote: "Sigma limits use the sample standard deviation (n − 1).",
         sortControls: "Sorting controls",
         sortSheet: "Sheet",
-        sortGroup: "Group / condition",
+        sortGroup: "Group",
         sortLines: "Horizontal reference lines",
         lineMean: "Mean",
         sortSigma: "Sigma levels (±Nσ)",
@@ -968,13 +1028,13 @@
         statusNeedValidation: "Validate the workbook first.",
         emptyTitle: "Workbook validation is required.",
         emptyDesc: "Load the Excel file, enter the expected structure, and run validation. Analysis controls will appear after all detected data sheets pass.",
-        basicTitle: "Value summary by group / condition",
-        basicDesc: "Bars show the group mean and error bars show ±1 SD.",
-        basicSamplesDesc: "Bars show each group's measured values by sample ID.",
+        basicTitle: "Value summary by group",
+        basicDesc: "The group means are shown with ±1 SD error bars.",
+        basicSamplesDesc: "Each group's measured values are shown by sample ID.",
         resetColors: "Reset colors",
         descriptiveTitle: "Descriptive statistics",
         descriptiveDesc: "Summary of valid numeric values in the selected sheet.",
-        thCondition: "Group / condition",
+        thCondition: "Group",
         normalControls: "Distribution controls",
         sigmaLabel: "Reference range (±Nσ)",
         referenceGroup: "Reference group",
@@ -998,13 +1058,13 @@
         statusNoWorkbook: "Load an Excel workbook first.",
         statusMissingSheets: "No analyzable data sheet was found.",
         statusSampleMismatch: "Sample count does not match the expected value.",
-        statusConditionMismatch: "Group / condition count does not match the expected value.",
-        statusHeaderMismatch: "Group / condition headers are invalid.",
+        statusConditionMismatch: "Group count does not match the expected value.",
+        statusHeaderMismatch: "Group headers are invalid.",
         statusSampleIdMismatch: "Sample IDs are invalid.",
         statusDuplicateSample: "Duplicate Sample IDs were detected.",
-        statusDuplicateCondition: "Duplicate group / condition headers were detected.",
+        statusDuplicateCondition: "Duplicate group headers were detected.",
         statusSampleHeader: "Cell A1 must be exactly \"Sample\" in every data sheet.",
-        statusInsufficientGroup: "Each group / condition needs at least two valid numeric values in its data sheet.",
+        statusInsufficientGroup: "Each group needs at least two valid numeric values in its data sheet.",
         statusInvalidExpected: "Expected sample and group counts must be positive integers.",
         statusParseError: "Could not parse the workbook structure.",
         meanInside: "Inside",
@@ -1039,14 +1099,14 @@
         title: "정규분포 평가",
         desc: "summary를 제외한 모든 데이터 시트를 검증하고 각 시트의 그룹 헤더를 자동으로 읽어, 선택한 기준군의 ±Nσ 범위로 분포를 평가합니다.",
         loadTitle: "1. 엑셀 불러오기",
-        loadDesc: "summary 시트는 분석에서 제외됩니다. 나머지 모든 시트는 데이터 시트로 처리되며, A열은 Sample ID, B열 이후는 사용자가 지정한 그룹/조건입니다.",
+        loadDesc: "summary 시트는 분석에서 제외됩니다. 나머지 모든 시트는 데이터 시트로 처리되며, A열은 Sample ID, B열 이후는 사용자가 지정한 그룹입니다.",
         dropTitle: "엑셀 파일 선택",
         dropSub: ".xlsx 또는 .xls · 브라우저 내부에서만 처리",
         noFile: "선택된 파일이 없습니다.",
         validateTitle: "2. 구조 검증",
-        validateDesc: "예상 샘플 수와 그룹/조건 수를 입력하고 검출된 모든 데이터 시트의 구조를 검증합니다.",
+        validateDesc: "예상 샘플 수와 그룹 수를 입력하고 검출된 모든 데이터 시트의 구조를 검증합니다.",
         sampleCount: "샘플 수",
-        conditionCount: "그룹 / 조건 수",
+        conditionCount: "그룹 수",
         validateBtn: "엑셀 구조 검증",
         downloadTemplate: "입력 양식 다운로드",
         statusNoDataSheets: "분석할 데이터 시트가 없습니다. summary 이외의 시트를 1개 이상 추가해주세요.",
@@ -1054,7 +1114,7 @@
         statusIdle: "엑셀 파일을 불러오면 검증을 시작할 수 있습니다.",
         sheetTitle: "3. 분석 시트",
         detectedSamples: "검출 샘플 수",
-        detectedConditions: "검출 조건 수",
+        detectedConditions: "검출 그룹 수",
         activeSheet: "현재 시트",
         numericValues: "숫자 데이터 수",
         exportBtn: "Save",
@@ -1063,7 +1123,16 @@
         sortingTab: "Sorting analysis",
         basicViewLabel: "보기 옵션",
         basicSummary: "그룹별 평균",
-        basicSamples: "그룹 내부 샘플 바 플롯",
+        basicSamples: "그룹별 샘플",
+        plotTypeLabel: "그래프 유형",
+        plotBar: "막대그래프",
+        plotLine: "꺾은선그래프",
+        axisScale: "Y축 배율",
+        axisMin: "Y 최소",
+        axisMax: "Y 최대",
+        axisApply: "적용",
+        axisAuto: "자동",
+        axisInvalid: "Y 최소는 Y 최대보다 작아야 합니다.",
         sortModeLabel: "정렬 방식",
         sortBasic: "베이직 (S1 → Sn)",
         sortAsc: "오름차순",
@@ -1071,10 +1140,9 @@
         plotBtn: "Plot",
         sortBlank: "시트와 그룹을 선택하고 Plot을 누르세요.",
         sortStatistics: "정렬 분석 통계",
-        sigmaStatsNote: "시그마 범위는 표본표준편차(n − 1)로 계산합니다.",
         sortControls: "정렬 분석 설정",
         sortSheet: "시트",
-        sortGroup: "그룹 / 조건",
+        sortGroup: "그룹",
         sortLines: "수평 기준선",
         lineMean: "평균",
         sortSigma: "시그마 기준선 (±Nσ)",
@@ -1086,13 +1154,13 @@
         statusNeedValidation: "먼저 엑셀 구조를 검증하세요.",
         emptyTitle: "엑셀 구조 검증이 필요합니다.",
         emptyDesc: "엑셀 파일을 불러오고 예상 구조를 입력한 뒤 검증을 실행하세요. 검출된 모든 데이터 시트가 통과하면 분석 기능이 활성화됩니다.",
-        basicTitle: "그룹 / 조건별 측정값 요약",
-        basicDesc: "막대는 그룹 평균, 오차막대는 ±1 SD(표준편차)를 표시합니다.",
-        basicSamplesDesc: "각 그룹의 샘플별 실측값을 막대그래프로 표시합니다.",
+        basicTitle: "그룹별 측정값 요약",
+        basicDesc: "그룹 평균과 ±1 SD(표준편차)를 표시합니다.",
+        basicSamplesDesc: "각 그룹의 샘플별 실측값을 표시합니다.",
         resetColors: "색상 초기화",
         descriptiveTitle: "기술통계",
         descriptiveDesc: "현재 시트의 유효한 숫자 측정값에 대한 요약입니다.",
-        thCondition: "그룹 / 조건",
+        thCondition: "그룹",
         normalControls: "분포 설정",
         sigmaLabel: "기준 범위 (±Nσ)",
         referenceGroup: "기준 그룹",
@@ -1116,13 +1184,13 @@
         statusNoWorkbook: "먼저 엑셀 파일을 불러오세요.",
         statusMissingSheets: "분석할 데이터 시트가 없습니다.",
         statusSampleMismatch: "실제 샘플 수가 입력한 예상값과 일치하지 않습니다.",
-        statusConditionMismatch: "실제 그룹/조건 수가 입력한 예상값과 일치하지 않습니다.",
-        statusHeaderMismatch: "그룹/조건 헤더가 올바르지 않습니다.",
+        statusConditionMismatch: "실제 그룹 수가 입력한 예상값과 일치하지 않습니다.",
+        statusHeaderMismatch: "그룹 헤더가 올바르지 않습니다.",
         statusSampleIdMismatch: "Sample ID 구성이 올바르지 않습니다.",
         statusDuplicateSample: "중복된 Sample ID가 검출되었습니다.",
-        statusDuplicateCondition: "중복된 그룹/조건 헤더가 검출되었습니다.",
+        statusDuplicateCondition: "중복된 그룹 헤더가 검출되었습니다.",
         statusSampleHeader: "모든 데이터 시트의 A1 셀 열 라벨은 정확히 \"Sample\"이어야 합니다.",
-        statusInsufficientGroup: "각 그룹/조건에는 해당 데이터 시트에서 최소 2개의 유효한 숫자값이 필요합니다.",
+        statusInsufficientGroup: "각 그룹에는 해당 데이터 시트에서 최소 2개의 유효한 숫자값이 필요합니다.",
         statusInvalidExpected: "예상 샘플 수와 그룹 수는 1 이상의 정수여야 합니다.",
         statusParseError: "엑셀 구조를 해석하지 못했습니다.",
         meanInside: "범위 내부",
@@ -1156,6 +1224,8 @@
     let showMeasuredBars = true;
     let saveHandle = null;
     let basicView = "summary";
+    let basicPlotType = "bar";
+    let yAxisRanges = { basicChart: null, normalChart: null, sortingChart: null };
     let sortingStates = {};
     let nextSigmaId = 0;
 
@@ -1188,6 +1258,8 @@
       globalResetBtn: document.getElementById("globalResetBtn"),
       tabResetBtn: document.getElementById("tabResetBtn"),
       basicViewSelect: document.getElementById("basicViewSelect"),
+      basicPlotTypeSelect: document.getElementById("basicPlotTypeSelect"),
+      sortPlotTypeSelect: document.getElementById("sortPlotTypeSelect"),
       sortMode: document.getElementById("sortMode"),
       sortPlotBtn: document.getElementById("sortPlotBtn"),
       sortingBlank: document.getElementById("sortingBlank"),
@@ -1299,6 +1371,8 @@
       showMeasuredBars = true;
       saveHandle = null;
       basicView = "summary";
+      basicPlotType = "bar";
+      yAxisRanges = { basicChart: null, normalChart: null, sortingChart: null };
       sortingStates = {};
       nextSigmaId = 0;
 
@@ -1309,7 +1383,9 @@
       els.expectedConditions.value = "3";
       els.sigmaInput.value = "3";
       els.basicViewSelect.value = "summary";
+      els.basicPlotTypeSelect.value = "bar";
       els.sortMode.value = "basic";
+      els.sortPlotTypeSelect.value = "bar";
       els.validateBtn.disabled = true;
 
       setActiveTab("basic");
@@ -1327,11 +1403,15 @@
       if (!d) return;
       if (activeTab === "basic") {
         basicView = "summary";
+        basicPlotType = "bar";
+        yAxisRanges.basicChart = null;
         els.basicViewSelect.value = "summary";
+        els.basicPlotTypeSelect.value = "bar";
         renderBasicChart();
         renderBasicTable();
       } else if (activeTab === "normal") {
         els.sigmaInput.value = "3";
+        yAxisRanges.normalChart = null;
         referenceCondition = d.conditions[0] || null;
         visibleConditions = new Set(d.conditions);
         showMeasuredBars = true;
@@ -1340,6 +1420,7 @@
         persistCurrentSheetState();
       } else {
         sortingStates[activeSheet] = createSortingState(d);
+        yAxisRanges.sortingChart = null;
         renderSortingControls();
         renderSortingResult();
       }
@@ -1413,13 +1494,17 @@
         }
       }
 
+      const sampleVectors = Object.create(null);
+      for (const col of conditionColumns) {
+        const values = Array(sampleIds.length).fill(null);
+        for (const pair of groupPairs[col.label]) values[pair.index] = pair.value;
+        sampleVectors[col.label] = values;
+      }
       return {
-        sheetName,
-        sampleHeader,
+        sheetName, sampleHeader,
         conditions: conditionColumns.map(d => d.label),
-        sampleIds,
-        groups,
-        groupPairs,
+        sampleIds, groups, groupPairs, sampleVectors,
+        sortedCache: new Map(),
         stats: Object.fromEntries(conditionColumns.map(col => [col.label, descriptive(groups[col.label])]))
       };
     }
@@ -1452,8 +1537,12 @@
       conditionColors = {};
       showMeasuredBars = true;
       basicView = "summary";
+      basicPlotType = "bar";
+      yAxisRanges = { basicChart: null, normalChart: null, sortingChart: null };
       sortingStates = {};
       els.basicViewSelect.value = "summary";
+      els.basicPlotTypeSelect.value = "bar";
+      els.sortPlotTypeSelect.value = "bar";
       els.sigmaInput.value = "3";
       setActiveTab("basic");
       clearRenderedAssessmentContent();
@@ -1548,6 +1637,7 @@
       conditionColors = {};
       showMeasuredBars = true;
       sortingStates = {};
+      yAxisRanges = { basicChart: null, normalChart: null, sortingChart: null };
       clearRenderedAssessmentContent();
       resetAnalysisUI();
       setStatus("error", message);
@@ -1778,7 +1868,10 @@
 
     function switchSheet(sheetName) {
       if (!validated || !parsed?.[sheetName]) return;
-      if (activeSheet && activeSheet !== sheetName) persistCurrentSheetState();
+      if (activeSheet && activeSheet !== sheetName) {
+        persistCurrentSheetState();
+        yAxisRanges = { basicChart: null, normalChart: null, sortingChart: null };
+      }
       activeSheet = sheetName;
       loadSheetState(sheetName);
       renderSheetButtons();
@@ -1867,7 +1960,9 @@
         input.addEventListener("input", () => {
           conditionColors[condition] = input.value;
           persistCurrentSheetState();
-          renderActiveTab();
+          if (activeTab === "basic") renderBasicChart();
+          else if (activeTab === "normal") { renderNormalControls(); renderNormalAssessment(); }
+          else renderSortingResult();
         });
 
         const text = document.createElement("span");
@@ -1890,6 +1985,92 @@
       persistCurrentSheetState();
       renderActiveTab();
     });
+
+    function roundAxisValue(value) {
+      return Number.isFinite(value) ? Number(value.toPrecision(10)).toString() : "";
+    }
+
+    function syncAxisInputs(chartId) {
+      const panel = document.querySelector(`.axis-controls[data-chart="${chartId}"]`);
+      const chart = document.getElementById(chartId);
+      if (!panel || !chart?._fullLayout?.yaxis) return;
+      const range = yAxisRanges[chartId] || chart._fullLayout.yaxis.range;
+      if (!Array.isArray(range) || !range.every(Number.isFinite)) return;
+      panel.querySelector(".axis-min").value = roundAxisValue(range[0]);
+      panel.querySelector(".axis-max").value = roundAxisValue(range[1]);
+    }
+
+    function setYRange(chartId, low, high) {
+      if (!Number.isFinite(low) || !Number.isFinite(high) || !(high > low)) {
+        setStatus("error", tr("axisInvalid"));
+        return;
+      }
+      yAxisRanges[chartId] = [low, high];
+      const chart = document.getElementById(chartId);
+      if (chart?._fullLayout) {
+        Plotly.relayout(chart, {"yaxis.range": [low, high], "yaxis.autorange": false});
+      }
+      syncAxisInputs(chartId);
+    }
+
+    function setupAxisControls() {
+      document.querySelectorAll(".axis-controls").forEach(panel => {
+        const chartId = panel.dataset.chart;
+        const minInput = panel.querySelector(".axis-min");
+        const maxInput = panel.querySelector(".axis-max");
+        panel.querySelector(".axis-apply").addEventListener("click", () => {
+          if (!minInput.value.trim() || !maxInput.value.trim()) {
+            setStatus("error", tr("axisInvalid"));return;
+          }
+          setYRange(chartId, Number(minInput.value), Number(maxInput.value));
+        });
+        for (const input of [minInput, maxInput]) {
+          input.addEventListener("keydown", e => {
+            if (e.key === "Enter") panel.querySelector(".axis-apply").click();
+          });
+        }
+        panel.querySelectorAll(".axis-zoom").forEach(button => {
+          button.addEventListener("click", () => {
+            const chart = document.getElementById(chartId);
+            const range = yAxisRanges[chartId] || chart?._fullLayout?.yaxis?.range;
+            if (!range || !range.every(Number.isFinite)) return;
+            const center = (range[0] + range[1]) / 2;
+            const span = (range[1] - range[0]) * Number(button.dataset.factor);
+            if (span > 0) setYRange(chartId, center - span / 2, center + span / 2);
+          });
+        });
+        panel.querySelector(".axis-auto").addEventListener("click", () => {
+          yAxisRanges[chartId] = null;
+          const chart = document.getElementById(chartId);
+          if (chart?._fullLayout) {
+            Plotly.relayout(chart, {"yaxis.autorange": true}).then(() => syncAxisInputs(chartId));
+          }
+        });
+      });
+    }
+
+    function plotWithAxis(chartId, traces, layout) {
+      const range = yAxisRanges[chartId];
+      if (range) layout.yaxis = { ...layout.yaxis, range: [...range], autorange: false };
+      const chart = document.getElementById(chartId);
+      return Plotly.react(chart, traces, layout, plotConfig()).then(() => {
+        if (!chart.__axisTracked) {
+          chart.__axisTracked = true;
+          chart.on("plotly_relayout", update => {
+            if (update["yaxis.autorange"] === true) {
+              yAxisRanges[chartId] = null;
+            } else if (update["yaxis.range"] || update["yaxis.range[0]"] !== undefined || update["yaxis.range[1]"] !== undefined) {
+              const rangeNow = chart?._fullLayout?.yaxis?.range;
+              if (rangeNow?.length === 2 && rangeNow.every(Number.isFinite)) {
+                yAxisRanges[chartId] = [...rangeNow];
+              }
+            }
+            syncAxisInputs(chartId);
+          });
+        }
+        syncAxisInputs(chartId);
+      });
+    }
 
     function graphLayout(xTitle, yTitle, extra = {}) {
       const axis = {
@@ -1921,59 +2102,71 @@
       };
     }
 
-    function renderBasicChart() {
+    function buildBasicPlotSpec(view = basicView, plotType = basicPlotType) {
       const d = getCurrentData();
-      if (!d) return;
-      const sampleView = basicView === "samples";
-      document.querySelector("#basicPage [data-i18n='basicDesc']").textContent =
-        tr(sampleView ? "basicSamplesDesc" : "basicDesc");
+      if (!d) return null;
+      const sampleView = view === "samples";
+      const isLine = plotType === "line";
+      const yTitle = lang === "ko" ? "측정값" : "Measured value";
+      const xTitle = sampleView ? (lang === "ko" ? "샘플" : "Sample") : "Groups";
       let traces;
       let layout;
+
       if (sampleView) {
-        traces = d.conditions.map(condition => ({
-          type: "bar", name: condition, x: d.sampleIds,
-          y: (() => {
-            const values = Array(d.sampleIds.length).fill(null);
-            for (const pair of d.groupPairs[condition]) values[pair.index] = pair.value;
-            return values;
-          })(),
-          marker: {
-            color: conditionColors[condition],
-            line: { color: "#000000", width: 0.6 }
-          },
-          hovertemplate: `<b>${escapeHtml(condition)}</b><br>%{x}: %{y:.4f}<extra></extra>`
-        }));
-        layout = graphLayout(lang === "ko" ? "샘플" : "Sample",
-          lang === "ko" ? "측정값" : "Measured value", {
-            barmode: "group", bargap: 0.19,
-            xaxis: { ...graphLayout("", "").xaxis,
-              title: { text: lang === "ko" ? "샘플" : "Sample", standoff: 18 },
-              type: "category", categoryorder: "array", categoryarray: d.sampleIds },
-            showlegend: true
-          });
+        traces = d.conditions.map(condition => {
+          const base = {
+            name: condition, x: d.sampleIds, y: d.sampleVectors[condition],
+            hovertemplate: `<b>${escapeHtml(condition)}</b><br>%{x}: %{y:.4f}<extra></extra>`
+          };
+          return isLine ? {
+            ...base, type: "scatter", mode: "lines+markers", connectgaps: false,
+            line: { color: conditionColors[condition], width: 2.4 },
+            marker: { color: conditionColors[condition], size: 6 }
+          } : {
+            ...base, type: "bar",
+            marker: { color: conditionColors[condition], line: { color: "#000000", width: 0.6 } }
+          };
+        });
+        layout = graphLayout(xTitle, yTitle, {
+          barmode: "group", bargap: 0.19, showlegend: true
+        });
+        layout.xaxis = {
+          ...layout.xaxis, type: "category", categoryorder: "array", categoryarray: d.sampleIds
+        };
       } else {
         const stats = d.conditions.map(c => d.stats[c]);
-        traces = [{
-          type: "bar", x: d.conditions, y: stats.map(s => s.mean),
-          marker: {
-            color: d.conditions.map(c => conditionColors[c]),
-            line: { color: "#000000", width: 0.8 }
-          },
-          error_y: {
-            type: "data", array: stats.map(s => Number.isFinite(s.sd) ? s.sd : 0),
-            visible: true, thickness: 2, width: 7, color: "#000000"
-          },
+        const error_y = {
+          type: "data", array: stats.map(s => Number.isFinite(s.sd) ? s.sd : 0),
+          visible: true, thickness: 2, width: 7, color: "#000000"
+        };
+        const base = {
+          x: d.conditions, y: stats.map(s => s.mean), error_y,
           hovertemplate: "<b>%{x}</b><br>Mean=%{y:.4f}<extra></extra>"
+        };
+        traces = [isLine ? {
+          ...base, type: "scatter", mode: "lines+markers",
+          line: { color: "#111827", width: 2.6 },
+          marker: { color: d.conditions.map(c => conditionColors[c]), size: 10,
+            line: { color: "#000000", width: 0.9 } }
+        } : {
+          ...base, type: "bar",
+          marker: { color: d.conditions.map(c => conditionColors[c]),
+            line: { color: "#000000", width: 0.8 } }
         }];
-        layout = graphLayout(lang === "ko" ? "그룹 / 조건" : "Group / condition",
-          lang === "ko" ? "측정값" : "Measured value", {
-            bargap: 0.32, showlegend: false
-          });
+        layout = graphLayout(xTitle, yTitle, { bargap: 0.32, showlegend: false });
       }
-      Plotly.react("basicChart", traces, layout, plotConfig());
+      return { traces, layout };
     }
 
-        function renderBasicTable() {
+    function renderBasicChart() {
+      const spec = buildBasicPlotSpec();
+      if (!spec) return;
+      document.querySelector("#basicPage [data-i18n='basicDesc']").textContent =
+        tr(basicView === "samples" ? "basicSamplesDesc" : "basicDesc");
+      return plotWithAxis("basicChart", spec.traces, spec.layout);
+    }
+
+    function renderBasicTable() {
       const d = getCurrentData();
       if (!d) return;
 
@@ -2159,7 +2352,7 @@
 
           const observedInside =
             values.length && Number.isFinite(lower) && Number.isFinite(upper)
-              ? values.filter(v => v >= lower && v <= upper).length / values.length
+              ? values.reduce((n, v) => n + Number(v >= lower && v <= upper), 0) / values.length
               : NaN;
 
           const expectedInside =
@@ -2234,12 +2427,10 @@
         const color = conditionColors[condition] || "#2563eb";
         const isRef = condition === referenceCondition;
 
-        const rawPdfHeights =
-          Number.isFinite(stats.sd) && stats.sd > 0
+        if (showMeasuredBars) {
+          const rawPdfHeights = Number.isFinite(stats.sd) && stats.sd > 0
             ? values.map(v => gaussianPdf(v, stats.mean, stats.sd))
             : values.map(() => 0);
-
-        if (showMeasuredBars) {
           traces.push({
             type: "bar",
             x: values,
@@ -2341,15 +2532,13 @@
         lang === "ko" ? "정규분포 확률밀도" : "Normal probability density",
         {
           margin: { l: 88, r: 36, t: 90, b: 78 },
-          yaxis: { ...graphLayout("", "").yaxis,
-            title: { text: lang === "ko" ? "정규분포 확률밀도" : "Normal probability density", standoff: 16 },
-            rangemode: "tozero" },
           shapes, annotations, barmode: "overlay", bargap: 0,
           hovermode: "closest", showlegend: true
         }
       );
+      layout.yaxis = { ...layout.yaxis, rangemode: "tozero" };
 
-      Plotly.react("normalChart", traces, layout, plotConfig());
+      plotWithAxis("normalChart", traces, layout);
     }
 
     function renderNormalMetrics(model) {
@@ -2431,6 +2620,7 @@
       renderColorControls();
       if (activeTab === "basic") {
         els.basicViewSelect.value = basicView;
+        els.basicPlotTypeSelect.value = basicPlotType;
         renderBasicChart();
         renderBasicTable();
       } else if (activeTab === "normal") {
@@ -2444,7 +2634,7 @@
 
         function createSortingState(d) {
       return {
-        condition: d.conditions[0] || null, mode: "basic",
+        selectedConditions: d.conditions.slice(0, 1), mode: "basic", plotType: "bar",
         mean: false, max: false, min: false,
         sigmas: [{ id: ++nextSigmaId, n: 3, enabled: false }],
         plotted: false
@@ -2483,8 +2673,12 @@
       const d = getCurrentData();
       if (!d) return;
       const st = getSortingState();
-      if (!d.conditions.includes(st.condition)) st.condition = d.conditions[0] || null;
+      st.selectedConditions = st.selectedConditions.filter(c => d.conditions.includes(c));
+      if (!st.selectedConditions.length && d.conditions.length) {
+        st.selectedConditions = [d.conditions[0]];
+      }
       els.sortMode.value = st.mode;
+      els.sortPlotTypeSelect.value = st.plotType;
       els.sortingSheetList.replaceChildren();
       els.sortingGroupList.replaceChildren();
       const sheetFrag = document.createDocumentFragment();
@@ -2494,9 +2688,15 @@
       els.sortingSheetList.appendChild(sheetFrag);
       const groupFrag = document.createDocumentFragment();
       for (const name of d.conditions) {
-        groupFrag.appendChild(sortingToggleButton(name, name === st.condition, () => {
-          if (st.condition === name) return;
-          st.condition = name;
+        groupFrag.appendChild(sortingToggleButton(name, st.selectedConditions.includes(name), () => {
+          const index = st.selectedConditions.indexOf(name);
+          if (index >= 0) {
+            if (st.selectedConditions.length === 1) return;
+            st.selectedConditions.splice(index, 1);
+          } else {
+            if (st.selectedConditions.length === 2) st.selectedConditions.shift();
+            st.selectedConditions.push(name);
+          }
           st.plotted = false;
           renderSortingControls();
           renderSortingResult();
@@ -2550,85 +2750,122 @@
       els.sortSigmaRows.replaceChildren(fragment);
     }
 
-    function getSortedPairs(d, st) {
-      const pairs = [...d.groupPairs[st.condition]];
-      if (st.mode === "asc") pairs.sort((a, b) => a.value - b.value || a.index - b.index);
-      if (st.mode === "desc") pairs.sort((a, b) => b.value - a.value || a.index - b.index);
+    function getSortedPairs(d, mode, condition) {
+      if (mode === "basic") return d.groupPairs[condition];
+      const key = `${condition}\u0000${mode}`;
+      if (d.sortedCache.has(key)) return d.sortedCache.get(key);
+      const pairs = [...d.groupPairs[condition]];
+      if (mode === "asc") pairs.sort((a, b) => a.value - b.value || a.index - b.index);
+      else if (mode === "desc") pairs.sort((a, b) => b.value - a.value || a.index - b.index);
+      d.sortedCache.set(key, pairs);
       return pairs;
     }
 
-    function sortingReferenceTraces(st, stats, x) {
+    function sortingReferenceTraces(st, stats, x, group, multiple) {
       const traces = [];
-      const makeLine = (label, value, color, dash = "dash") => {
-        if (!Number.isFinite(value)) return;
+      const color = conditionColors[group] || "#2563eb";
+      const sigmaColors = ["#7843ac", "#bc6b16", "#1b8a57", "#b4236c", "#334155"];
+      const makeLine = (label, value, dash = "dash", lineColor = null) => {
+        if (!Number.isFinite(value) || !x.length) return;
+        const name = multiple ? `${group} · ${label}` : label;
         traces.push({
           type: "scatter", mode: "lines", x: [x[0], x[x.length - 1]],
-          y: [value, value], name: `${label}: ${fmt(value, 4)}`,
-          line: { color, width: 3, dash },
-          hovertemplate: `${escapeHtml(label)}: ${fmt(value, 6)}<extra></extra>`
+          y: [value, value], name: `${name}: ${fmt(value, 4)}`,
+          line: { color: multiple ? color : (lineColor || (label === "MAX" ? "#ba3b22" : label === "MIN" ? "#1976a3" : "#111827")),
+            width: 2.5, dash },
+          hovertemplate: `${escapeHtml(name)}: ${fmt(value, 6)}<extra></extra>`
         });
       };
-      if (st.mean) makeLine(lang === "ko" ? "평균" : "Mean", stats.mean, "#111827", "solid");
-      if (st.max) makeLine("MAX", stats.max, "#ba3b22");
-      if (st.min) makeLine("MIN", stats.min, "#1976a3");
-      const unique = [...new Set(st.sigmas.filter(v => v.enabled).map(v => v.n))].sort((a,b) => a-b);
-      const colors = ["#7843ac", "#bc6b16", "#1b8a57", "#b4236c", "#334155"];
+      if (st.mean) makeLine(lang === "ko" ? "평균" : "Mean", stats.mean, "solid");
+      if (st.max) makeLine("MAX", stats.max, "dash");
+      if (st.min) makeLine("MIN", stats.min, "dot");
+      const unique = [...new Set(st.sigmas.filter(v => v.enabled).map(v => v.n))].sort((a, b) => a - b);
       unique.forEach((n, i) => {
-        const color = colors[i % colors.length];
-        makeLine(`Mean + ${n}σ`, stats.mean + n * stats.sd, color);
-        makeLine(`Mean − ${n}σ`, stats.mean - n * stats.sd, color, "dot");
+        makeLine(`Mean + ${n}σ`, stats.mean + n * stats.sd, "longdash", sigmaColors[i % sigmaColors.length]);
+        makeLine(`Mean − ${n}σ`, stats.mean - n * stats.sd, "dashdot", sigmaColors[i % sigmaColors.length]);
       });
       return traces;
     }
 
-    function renderSortingChart() {
-      const d = getCurrentData();const st = getSortingState();
-      if (!d || !st?.plotted || !st.condition) return;
-      const pairs = getSortedPairs(d, st);
-      const x = pairs.map(v => v.sample);
-      if (!x.length) return;
-      const s = d.stats[st.condition];
-      const traces = [{
-        type: "bar", name: st.condition, x, y: pairs.map(v => v.value),
-        marker: { color: conditionColors[st.condition],
-          line: { color: "#000000", width: 0.75 } },
-        hovertemplate: `<b>${escapeHtml(st.condition)}</b><br>%{x}: %{y:.5f}<extra></extra>`
-      }, ...sortingReferenceTraces(st, s, x)];
-      const layout = graphLayout(lang === "ko" ? "샘플" : "Sample",
-        lang === "ko" ? "측정값" : "Measured value", {
-          showlegend: true, bargap: 0.18,
-          margin: { l: 86, r: 40, t: 112, b: 100 },
-          xaxis: { ...graphLayout("", "").xaxis,
-            title: { text: lang === "ko" ? "샘플" : "Sample", standoff: 18 },
-            type: "category", categoryorder: "array", categoryarray: x }
+    function buildSortingPlotSpec(plotType = null) {
+      const d = getCurrentData();
+      const st = getSortingState();
+      if (!d || !st?.selectedConditions?.length) return null;
+      const kind = plotType || st.plotType;
+      const groups = st.selectedConditions;
+      const multiple = groups.length > 1;
+      const useRanks = multiple && st.mode !== "basic";
+      const pairList = groups.map(group => getSortedPairs(d, st.mode, group));
+      const maximum = Math.max(...pairList.map(pairs => pairs.length));
+      const categories = useRanks ? Array.from({ length: maximum }, (_, i) => `R${i + 1}`) :
+        multiple ? d.sampleIds : pairList[0].map(pair => pair.sample);
+      const traces = [];
+      groups.forEach((group, index) => {
+        const pairs = pairList[index];
+        const x = useRanks ? pairs.map((_, i) => `R${i + 1}`) :
+          multiple ? d.sampleIds : pairs.map(p => p.sample);
+        const y = multiple && !useRanks ? d.sampleVectors[group] : pairs.map(p => p.value);
+        const sampleNames = multiple && !useRanks ? d.sampleIds : pairs.map(p => p.sample);
+        const base = {
+          name: group, x, y, customdata: sampleNames,
+          hovertemplate: `<b>${escapeHtml(group)}</b><br>%{x}<br>Sample: %{customdata}<br>Value: %{y:.5f}<extra></extra>`
+        };
+        const color = conditionColors[group] || "#2563eb";
+        traces.push(kind === "line" ? {
+          ...base, type: "scatter", mode: "lines+markers", connectgaps: false,
+          line: { color, width: 2.4 }, marker: { color, size: 6 }
+        } : {
+          ...base, type: "bar", marker: { color, line: { color: "#000000", width: 0.75 } }
         });
+        traces.push(...sortingReferenceTraces(st, d.stats[group], categories, group, multiple));
+      });
+      const xTitle = useRanks ? (lang === "ko" ? "순위" : "Rank") : (lang === "ko" ? "샘플" : "Sample");
+      const layout = graphLayout(xTitle, lang === "ko" ? "측정값" : "Measured value", {
+        showlegend: true, bargap: 0.18, barmode: "group",
+        margin: { l: 86, r: 40, t: 112, b: 100 }
+      });
+      layout.xaxis = { ...layout.xaxis,
+        type: "category", categoryorder: "array", categoryarray: categories };
+      return { traces, layout, maximum };
+    }
+
+    function renderSortingChart() {
+      const st = getSortingState();
+      if (!st?.plotted) return;
+      const spec = buildSortingPlotSpec();
+      if (!spec) return;
       els.sortingBlank.style.display = "none";
       els.sortingChart.style.display = "block";
-      Plotly.react("sortingChart", traces, layout, plotConfig());
+      return plotWithAxis("sortingChart", spec.traces, spec.layout);
     }
 
     function renderSortingTable() {
-      const d = getCurrentData();const st = getSortingState();
-      if (!d || !st?.plotted || !st.condition) return;
-      const stats = d.stats[st.condition];
+      const d = getCurrentData();
+      const st = getSortingState();
+      if (!d || !st?.plotted || !st.selectedConditions.length) return;
       const nMax = Math.max(0, ...st.sigmas.filter(v => v.enabled).map(v => v.n));
       const columns = ["Sheet", "Group", "n", "Mean", "SD", "MAX", "MIN"];
-      const values = [activeSheet, st.condition, stats.n, fmt(stats.mean, 4),
-        fmt(stats.sd, 4), fmt(stats.max, 4), fmt(stats.min, 4)];
-      for (let n = 1; n <= nMax; n++) {
-        columns.push(`Mean − ${n}σ`, `Mean + ${n}σ`);
-        values.push(fmt(stats.mean - n * stats.sd, 4), fmt(stats.mean + n * stats.sd, 4));
-      }
+      for (let n = 1; n <= nMax; n++) columns.push(`Mean − ${n}σ`, `Mean + ${n}σ`);
       const header = document.createElement("tr");
       for (const value of columns) {
-        const th = document.createElement("th");th.textContent = value;header.appendChild(th);
+        const th = document.createElement("th"); th.textContent = value; header.appendChild(th);
       }
-      const row = document.createElement("tr");
-      for (const value of values) {
-        const td = document.createElement("td");td.textContent = value;row.appendChild(td);
+      const rows = document.createDocumentFragment();
+      for (const group of st.selectedConditions) {
+        const stats = d.stats[group];
+        const values = [activeSheet, group, stats.n, fmt(stats.mean, 4),
+          fmt(stats.sd, 4), fmt(stats.max, 4), fmt(stats.min, 4)];
+        for (let n = 1; n <= nMax; n++) {
+          values.push(fmt(stats.mean - n * stats.sd, 4), fmt(stats.mean + n * stats.sd, 4));
+        }
+        const row = document.createElement("tr");
+        for (const value of values) {
+          const td = document.createElement("td"); td.textContent = value; row.appendChild(td);
+        }
+        rows.appendChild(row);
       }
       els.sortingTableHead.replaceChildren(header);
-      els.sortingTableBody.replaceChildren(row);
+      els.sortingTableBody.replaceChildren(rows);
       els.sortingTableCard.style.display = "block";
     }
 
@@ -2649,6 +2886,18 @@
       if (validated) renderBasicChart();
     });
 
+    els.basicPlotTypeSelect.addEventListener("change", () => {
+      basicPlotType = els.basicPlotTypeSelect.value;
+      if (validated) renderBasicChart();
+    });
+
+    els.sortPlotTypeSelect.addEventListener("change", () => {
+      const st = getSortingState();
+      if (!st) return;
+      st.plotType = els.sortPlotTypeSelect.value;
+      updateSortingPlotIfReady();
+    });
+
     els.sortMode.addEventListener("change", () => {
       const st = getSortingState();
       if (!st) return;
@@ -2659,7 +2908,7 @@
 
     els.sortPlotBtn.addEventListener("click", () => {
       const st = getSortingState();
-      if (!st || !st.condition) return;
+      if (!st || !st.selectedConditions.length) return;
       st.mode = els.sortMode.value;
       st.plotted = true;
       renderSortingResult();
@@ -2721,7 +2970,7 @@
         ["Sheet", "ReferenceGroup", "SigmaN", "ReferenceMean", "ReferenceSD", "LowerBound", "UpperBound"],
         [activeSheet, referenceCondition, sigmaN, ref.mean, ref.sd, lower, upper],
         [],
-        ["GroupOrCondition", "n", "Mean", "SD", "Median", "Min", "Max",
+        ["Group", "n", "Mean", "SD", "Median", "Min", "Max",
           "AbsDeltaMean_over_SigmaRef", "ObservedInsideRefRange",
           "GaussianExpectedInsideRefRange", "JarqueBera", "JarqueBera_p", "MeanInsideRefRange"]
       ];
@@ -2736,38 +2985,53 @@
     function makeBasicCsv() {
       const d = getCurrentData();
       if (!d) return null;
-      const lines = [["Sheet", "GroupOrCondition", "n", "Mean", "SD", "Median", "Min", "Max"]];
+      const lines = [["Sheet", "Group", "n", "Mean", "SD", "Median", "Min", "Max"]];
       for (const c of d.conditions) {
         const s = d.stats[c];
         lines.push([activeSheet, c, s.n, s.mean, s.sd, s.median, s.min, s.max]);
       }
       lines.push([], ["Sample", ...d.conditions]);
-      const byGroup = Object.fromEntries(d.conditions.map(c => [c,
-        new Map(d.groupPairs[c].map(p => [p.index, p.value]))]));
       d.sampleIds.forEach((id, index) => {
-        lines.push([id, ...d.conditions.map(c => byGroup[c].get(index) ?? "")]);
+        lines.push([id, ...d.conditions.map(c => d.sampleVectors[c][index] ?? "")]);
       });
       return lines;
     }
 
     function makeSortingCsv() {
-      const d = getCurrentData();const st = getSortingState();
+      const d = getCurrentData(); const st = getSortingState();
       if (!d || !st?.plotted) return null;
-      const s = d.stats[st.condition];
-      const activeSigmas = [...new Set(st.sigmas.filter(v => v.enabled).map(v => v.n))].sort((a,b) => a-b);
+      const groups = st.selectedConditions;
+      const activeSigmas = [...new Set(st.sigmas.filter(v => v.enabled).map(v => v.n))].sort((a, b) => a - b);
       const maxSigma = Math.max(0, ...activeSigmas);
       const header = ["Sheet", "Group", "n", "Mean", "SD", "MAX", "MIN"];
-      const summary = [activeSheet, st.condition, s.n, s.mean, s.sd, s.max, s.min];
-      for (let k = 1; k <= maxSigma; k++) {
-        header.push(`MeanMinus${k}Sigma`, `MeanPlus${k}Sigma`);
-        summary.push(s.mean - k*s.sd, s.mean + k*s.sd);
+      for (let k = 1; k <= maxSigma; k++) header.push(`MeanMinus${k}Sigma`, `MeanPlus${k}Sigma`);
+      const result = [header];
+      for (const group of groups) {
+        const stats = d.stats[group];
+        const summary = [activeSheet, group, stats.n, stats.mean, stats.sd, stats.max, stats.min];
+        for (let k = 1; k <= maxSigma; k++) {
+          summary.push(stats.mean - k * stats.sd, stats.mean + k * stats.sd);
+        }
+        result.push(summary);
       }
-      const pairs = getSortedPairs(d, st);
-      return [header, summary, [],
-        ["SortOrder", st.mode], ["MeanLine", st.mean], ["MaxLine", st.max],
-        ["MinLine", st.min], ["EnabledSigma", activeSigmas.join(";")], [],
-        ["Rank", "Sample", "Value"],
-        ...pairs.map((pair, index) => [index + 1, pair.sample, pair.value])];
+      result.push([], ["SortOrder", st.mode], ["SavedPlotTypes", "bar;line"],
+        ["MeanLine", st.mean], ["MaxLine", st.max], ["MinLine", st.min],
+        ["EnabledSigma", activeSigmas.join(";")], []);
+      if (groups.length === 1) {
+        result.push(["Rank", "Sample", "Value"]);
+        getSortedPairs(d, st.mode, groups[0]).forEach((pair, index) => {
+          result.push([index + 1, pair.sample, pair.value]);
+        });
+      } else {
+        const pairLists = groups.map(group => getSortedPairs(d, st.mode, group));
+        result.push(["Rank", ...groups.flatMap(group => [`${group}_Sample`, `${group}_Value`])]);
+        const longest = Math.max(...pairLists.map(pairs => pairs.length));
+        for (let i = 0; i < longest; i++) {
+          result.push([i + 1, ...pairLists.flatMap(pairs =>
+            pairs[i] ? [pairs[i].sample, pairs[i].value] : ["", ""])]);
+        }
+      }
+      return result;
     }
 
     function csvBlob(rows) {
@@ -2784,51 +3048,100 @@
 
     async function chartPngBlob(chart, n) {
       if (!chart?._fullLayout) throw new Error("Chart not ready");
-      // PNG: use the same on-screen bold black text, axes, and legend.
       const width = Math.min(5200, Math.max(1400, n * 26));
       const dataUrl = await Plotly.toImage(chart, { format: "png", width, height: 850, scale: 2 });
-      const response = await fetch(dataUrl);
-      return response.blob();
+      return (await fetch(dataUrl)).blob();
+    }
+
+    async function plotSpecPngBlob(spec, n, chartId) {
+      if (!spec) throw new Error("Chart specification is missing");
+      const width = Math.min(5200, Math.max(1400, n * 26));
+      const chart = document.createElement("div");
+      chart.style.cssText = `position:fixed;left:-20000px;top:0;width:${width}px;height:850px;visibility:hidden;pointer-events:none`;
+      document.body.appendChild(chart);
+      try {
+        const range = yAxisRanges[chartId];
+        const layout = { ...spec.layout,
+          width, height: 850,
+          yaxis: range ? { ...spec.layout.yaxis, autorange: false, range: [...range] } : spec.layout.yaxis };
+        await Plotly.newPlot(chart, spec.traces, layout, {
+          staticPlot: true, displayModeBar: false, responsive: false
+        });
+        // Render while offscreen, but without visibility:hidden for reliable SVG/PNG capture.
+        chart.style.visibility = "visible";
+        const dataUrl = await Plotly.toImage(chart, { format: "png", width, height: 850, scale: 2 });
+        return (await fetch(dataUrl)).blob();
+      } finally {
+        Plotly.purge(chart);
+        chart.remove();
+      }
+    }
+
+    function safeFileName(value) {
+      return String(value).replace(/[\\/:*?"<>|\x00-\x1f]/g, "_").slice(0, 200);
     }
 
     async function exportCsv() {
       if (!validated || !getCurrentData()) return;
       if (!saveHandle) {
         setStatus("error", tr("needFolder"));
-        updateExportAvailability();return;
+        updateExportAvailability();
+        return;
       }
       const d = getCurrentData();
       const st = activeTab === "sorting" ? getSortingState() : null;
       if (activeTab === "sorting" && !st?.plotted) {
-        setStatus("error", tr("sortBlank"));return;
+        setStatus("error", tr("sortBlank"));
+        return;
       }
-      const chart = document.getElementById(activeTab === "basic" ? "basicChart" :
-        activeTab === "normal" ? "normalChart" : "sortingChart");
       const rows = activeTab === "basic" ? makeBasicCsv() :
         activeTab === "normal" ? makeNormalCsv() : makeSortingCsv();
       if (!rows) return;
-      const base = `${activeTab === "basic" ? "Basic_Plot" :
-        activeTab === "normal" ? "Normalization_Assessment" : "Sorting_Analysis"}_${activeSheet}`
-        .replace(/[\\/:*?"<>|]/g, "_");
+      const base = safeFileName(activeTab === "basic" ? `Basic_Plot_${activeSheet}` :
+        activeTab === "normal" ? `Normalization_Assessment_${activeSheet}` :
+        `Sorting_Analysis_${activeSheet}_${st.mode}_${st.selectedConditions.join("_vs_")}`);
       els.exportBtn.disabled = true;
       setStatus("", tr("exportSaving"));
       try {
-        const png = await chartPngBlob(chart,
-          activeTab === "basic" && basicView === "samples" ? d.sampleIds.length :
-          activeTab === "sorting" ? d.groupPairs[st.condition].length : 40);
         await writeFileToFolder(`${base}.csv`, csvBlob(rows));
-        await writeFileToFolder(`${base}.png`, png);
-        setStatus("success", `${tr("saveDone")} (${base}.csv, ${base}.png)`);
+        let imagesSaved = 0;
+        if (activeTab === "basic") {
+          // Save both view modes and both plot types, not just the currently visible plot.
+          for (const view of ["summary", "samples"]) {
+            for (const type of ["bar", "line"]) {
+              const spec = buildBasicPlotSpec(view, type);
+              const n = view === "samples" ? d.sampleIds.length : 40;
+              const png = await plotSpecPngBlob(spec, n, "basicChart");
+              await writeFileToFolder(`${base}_${view === "summary" ? "Group_Summary" : "Samples_by_Group"}_${type === "bar" ? "Bar" : "Line"}.png`, png);
+              imagesSaved++;
+            }
+          }
+        } else if (activeTab === "sorting") {
+          for (const type of ["bar", "line"]) {
+            const spec = buildSortingPlotSpec(type);
+            const png = await plotSpecPngBlob(spec, spec.maximum, "sortingChart");
+            await writeFileToFolder(`${base}_${type === "bar" ? "Bar" : "Line"}.png`, png);
+            imagesSaved++;
+          }
+        } else {
+          const png = await chartPngBlob(document.getElementById("normalChart"), 40);
+          await writeFileToFolder(`${base}.png`, png);
+          imagesSaved++;
+        }
+        setStatus("success", `${tr("saveDone")} (${base}.csv + ${imagesSaved} PNG)`);
       } catch (err) {
         console.error(err);
         if (err?.name === "NotAllowedError") {
-          saveHandle = null; els.folderName.textContent = tr("notSelected");
+          saveHandle = null;
+          els.folderName.textContent = tr("notSelected");
         }
         setStatus("error", `${tr("saveFailed")} ${err?.message || err}`);
-      } finally { updateExportAvailability(); }
+      } finally {
+        updateExportAvailability();
+      }
     }
 
-        els.exportBtn.addEventListener("click", exportCsv);
+    els.exportBtn.addEventListener("click", exportCsv);
 
     let resizeFrame = 0;
     window.addEventListener("resize", () => {
@@ -2840,6 +3153,7 @@
       });
     });
 
+    setupAxisControls();
     renderLanguage();
   </script>
 </body>
