@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -461,6 +462,16 @@
             <span data-i18n="decomposition">CID Scan Data Decomposition</span>
           </a>
 
+          <a class="tab temperature" href="./Temperature%20Compensation.html">
+            <span class="dot" aria-hidden="true"></span>
+            <span data-i18n="temperature">Temperature Compensation</span>
+          </a>
+
+          <a class="tab notch-phase" href="./Relationship%20between%20notch%20thickness%20and%20phase.html">
+            <span class="dot" aria-hidden="true"></span>
+            <span data-i18n="notchPhase">Relationship between notch thickness and phase</span>
+          </a>
+
         </div>
       </div>
 
@@ -511,17 +522,6 @@
             <span class="dot" aria-hidden="true"></span>
             <span data-i18n="quality">Quality Control</span>
           </a>
-
-          <a class="tab temperature" href="./Temperature%20Compensation.html">
-            <span class="dot" aria-hidden="true"></span>
-            <span data-i18n="temperature">Temperature Compensation</span>
-          </a>
-
-          <a class="tab notch-phase" href="./Relationship%20between%20notch%20thickness%20and%20phase.html">
-            <span class="dot" aria-hidden="true"></span>
-            <span data-i18n="notchPhase">Relationship between notch thickness and phase</span>
-          </a>
-
 
         </div>
       </div>
@@ -578,7 +578,14 @@
 
     const langButton = document.getElementById("langBtn");
     const visitorCountElement = document.getElementById("visitorCount");
-    const groupButtons = document.querySelectorAll(".group-toggle");
+    const translationElements = document.querySelectorAll("[data-i18n]");
+    const menuGroups = Array.from(
+      document.querySelectorAll(".group-toggle"),
+      button => ({
+        button,
+        menu: document.getElementById(button.dataset.menu)
+      })
+    );
 
     function getSavedLanguage() {
       try {
@@ -605,7 +612,7 @@
 
       document.documentElement.lang = lang;
 
-      document.querySelectorAll("[data-i18n]").forEach(el => {
+      translationElements.forEach(el => {
         const translatedText = dictionary[el.dataset.i18n];
 
         if (typeof translatedText === "string") {
@@ -623,11 +630,8 @@
     renderLanguage();
 
     function closeAllMenus(exceptButton = null) {
-      groupButtons.forEach(button => {
+      menuGroups.forEach(({ button, menu }) => {
         if (button === exceptButton) return;
-
-        const menuId = button.dataset.menu;
-        const menu = document.getElementById(menuId);
 
         button.setAttribute("aria-expanded", "false");
         button.classList.remove("active");
@@ -638,26 +642,16 @@
       });
     }
 
-    groupButtons.forEach(button => {
+    menuGroups.forEach(({ button, menu }) => {
+      if (!menu) return;
+
       button.addEventListener("click", () => {
-        const menuId = button.dataset.menu;
-        const menu = document.getElementById(menuId);
-
-        if (!menu) return;
-
-        const isOpen = button.getAttribute("aria-expanded") === "true";
+        const shouldOpen = button.getAttribute("aria-expanded") !== "true";
 
         closeAllMenus(button);
-
-        if (isOpen) {
-          button.setAttribute("aria-expanded", "false");
-          button.classList.remove("active");
-          menu.classList.remove("open");
-        } else {
-          button.setAttribute("aria-expanded", "true");
-          button.classList.add("active");
-          menu.classList.add("open");
-        }
+        button.setAttribute("aria-expanded", String(shouldOpen));
+        button.classList.toggle("active", shouldOpen);
+        menu.classList.toggle("open", shouldOpen);
       });
     });
 
@@ -678,11 +672,13 @@
     const COUNTER_BASE = "https://countapi.mileshilliard.com/api/v1";
     const COUNTER_KEY = "gangmin-shin-github-io-innereye-data-processing-homepage-visitors";
 
+    const visitorNumberFormatter = new Intl.NumberFormat();
+
     function displayVisitorCount(value) {
       const number = Number(value);
 
       visitorCountElement.textContent = Number.isFinite(number)
-        ? new Intl.NumberFormat().format(number)
+        ? visitorNumberFormatter.format(number)
         : "--";
     }
 
