@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -285,6 +284,10 @@
       background:#ea580c;
     }
 
+    .tab.notch-phase .dot{
+      background:#0891b2;
+    }
+
     .homepage-credit{
       position:fixed;
       right:32px;
@@ -514,6 +517,12 @@
             <span data-i18n="temperature">Temperature Compensation</span>
           </a>
 
+          <a class="tab notch-phase" href="./Relationship%20between%20notch%20thickness%20and%20phase.html">
+            <span class="dot" aria-hidden="true"></span>
+            <span data-i18n="notchPhase">Relationship between notch thickness and phase</span>
+          </a>
+
+
         </div>
       </div>
 
@@ -543,7 +552,8 @@
         zr: "ZR rawdata analysis",
         normalization: "Normalization assessment",
         quality: "Quality Control",
-        temperature: "Temperature Compensation"
+        temperature: "Temperature Compensation",
+        notchPhase: "Relationship between notch thickness and phase"
       },
 
       ko: {
@@ -561,7 +571,8 @@
         zr: "ZR rawdata 분석",
         normalization: "정규분포 평가",
         quality: "품질 관리",
-        temperature: "온도 보정"
+        temperature: "온도 보정",
+        notchPhase: "노치 두께와 Phase의 관계"
       }
     };
 
