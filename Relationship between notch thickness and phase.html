@@ -1,9 +1,12 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Relationship between notch thickness and phase</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
@@ -39,7 +42,7 @@ button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.
 
 .result-header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:25px 0 15px}.result-header h2{margin:0;font-size:21px;font-weight:800}.sub{font-size:12px;color:var(--muted);font-weight:600;line-height:1.6;margin-top:5px}.tab-top{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:18px}.tab-reset-btn{width:38px;height:38px;flex-shrink:0;border:1px solid var(--line);border-radius:50%;background:#fff;color:#111827;font-size:21px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(17,24,39,.05);transition:.18s ease}.tab-page[hidden]{display:none!important}
 
-.sort-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:15px 0}.sort-btn{height:36px;border:1px solid var(--line);border-radius:10px;padding:0 11px;background:#fff;font-size:12px;font-weight:800}.sort-btn.active{background:#111827;color:#fff;border-color:#111827}.metrics{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:12px;margin:17px 0}.metric{padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff}.metric .k{font-size:15px;color:#000;font-weight:800}.metric .v{font-size:28px;color:#000;font-weight:800;margin-top:7px;overflow-wrap:anywhere}.plots{display:grid;gap:18px}.plot-card{padding:16px}.plot-title{font-size:18px;font-weight:800;color:#000;margin:3px 4px 14px}.plot{width:100%;height:720px}.table-card{padding:18px;margin:16px 0}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;margin-top:12px;background:#fff;max-height:440px}.result-table{width:100%;border-collapse:collapse;font-size:16px;color:#000}.result-table th,.result-table td{padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:center;vertical-align:middle}.result-table th{position:sticky;top:0;background:#f8f9fb;color:#000;font-weight:800}.inventory-table .date-group{font-weight:800;vertical-align:middle;background:#f8f9fb}.inventory-table tbody tr.date-start td{border-top:3px solid #111827}.inventory-table tbody tr.date-end td{border-bottom:3px solid #111827}.inventory-table td.date-group{border-top:3px solid #111827;border-bottom:3px solid #111827}.inventory-table .notes-cell{min-width:180px;max-width:380px;white-space:normal;overflow-wrap:anywhere;line-height:1.55}.inventory-table .notes-cell div+div{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line)}.desc-plots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:18px}.desc-plots .plot-card{min-width:0}.desc-plots .plot{height:640px}.result-table tr.best td{background:#eaf8f0;font-weight:800}.empty{min-height:160px;border:1px dashed #d5dae1;border-radius:18px;display:flex;align-items:center;justify-content:center;text-align:center;padding:25px;color:var(--muted);font-weight:700;line-height:1.65}.formula{background:#f8f9fb;border:1px solid var(--line);padding:22px;border-radius:14px;color:#000;line-height:1.65;overflow-wrap:anywhere}.formula-heading{display:block;font-size:22px;font-weight:800;color:#000;margin-bottom:12px}.formula-equation{font-size:20px;font-weight:700;color:#000}.formula-definition{font-size:18px;font-weight:600;color:#000;margin-top:8px}.formula sup{font-size:.67em;vertical-align:super;line-height:0}.note{font-size:15px;color:#000;line-height:1.65;margin-top:10px}.warnline{color:#000;font-size:16px;font-weight:700}.check{font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:7px}
+.sort-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:15px 0}.sort-btn{height:36px;border:1px solid var(--line);border-radius:10px;padding:0 11px;background:#fff;font-size:12px;font-weight:800}.sort-btn.active{background:#111827;color:#fff;border-color:#111827}.metrics{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:12px;margin:17px 0}.metric{padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:110px}.metric .k{font-size:15px;color:#000;font-weight:800}.metric .v{font-size:28px;color:#000;font-weight:800;margin-top:7px;overflow-wrap:anywhere}.plots{display:grid;gap:18px}.plot-card{padding:16px}.plot-title{font-size:18px;font-weight:800;color:#000;margin:3px 4px 14px}.plot{width:100%;height:720px}.table-card{padding:18px;margin:16px 0}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;margin-top:12px;background:#fff;max-height:440px}.result-table{width:100%;border-collapse:collapse;font-size:16px;color:#000}.result-table th,.result-table td{padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:center;vertical-align:middle}.result-table th{position:sticky;top:0;background:#f8f9fb;color:#000;font-weight:800}.inventory-table .date-group{font-weight:800;vertical-align:middle;background:#f8f9fb}.inventory-table tbody tr.date-start td{border-top:3px solid #111827}.inventory-table tbody tr.date-end td{border-bottom:3px solid #111827}.inventory-table td.date-group{border-top:3px solid #111827;border-bottom:3px solid #111827}.inventory-table .notes-cell{min-width:180px;max-width:380px;white-space:normal;overflow-wrap:anywhere;line-height:1.55}.inventory-table .notes-cell div+div{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line)}.desc-plots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:18px}.desc-plots .plot-card{min-width:0}.desc-plots .plot{height:640px}.result-table tr.best td{background:#eaf8f0;font-weight:800}.empty{min-height:160px;border:1px dashed #d5dae1;border-radius:18px;display:flex;align-items:center;justify-content:center;text-align:center;padding:25px;color:var(--muted);font-weight:700;line-height:1.65}.formula{background:#f8f9fb;border:1px solid var(--line);padding:22px;border-radius:14px;color:#000;line-height:1.65;overflow-wrap:anywhere}.formula-heading{display:block;font-size:22px;font-weight:800;color:#000;margin-bottom:12px}.formula-equation{font-size:20px;font-weight:700;color:#000}.formula-definition{font-size:18px;font-weight:600;color:#000;margin-top:8px}.formula sup{font-size:.67em;vertical-align:super;line-height:0}.note{font-size:15px;color:#000;line-height:1.65;margin-top:10px}.warnline{color:#000;font-size:16px;font-weight:700}.check{font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:7px}
 
 @media(max-width:1200px){.setup-grid,.control-grid{grid-template-columns:repeat(2,minmax(170px,1fr))}.metrics{grid-template-columns:1fr 1fr}}
 
@@ -48,7 +51,6 @@ button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.
 @media(max-width:780px){.desc-plots{grid-template-columns:1fr}}
 
 @media(max-width:650px){.setup-grid,.control-grid,.metrics{grid-template-columns:1fr}.topbar{height:auto;min-height:82px;padding:16px 18px}.title-wrap h1{font-size:19px}.workspace{padding:10px 12px 50px}.plot{height:420px}.result-header{align-items:flex-start;flex-direction:column}}
-
 
 /* Analysis results: larger black text without changing input/navigation typography. */
 .tab-page .section-title{font-size:24px;color:#000}
@@ -65,6 +67,11 @@ button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.
 .tab-page .result-table .notes-cell{line-height:1.55}
 .tab-page .plot-card{min-width:0}
 .tab-page .plot{min-width:0}
+.relationship-target-field{grid-column:span 2}
+.relationship-target-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.relationship-target-row input[type=number]{flex:1 1 150px;min-width:130px;max-width:240px}
+.tab-page .relationship-target-row .compact-action{height:38px;padding:0 11px;border-radius:10px;font-size:12px;font-weight:800}
+@media(max-width:650px){.relationship-target-field{grid-column:span 1}}
 @media(max-width:1450px){.desc-plots{grid-template-columns:1fr}}
 @media(max-width:650px){.plot,.desc-plots .plot{height:620px}.metric .v{font-size:24px}}
 </style>
@@ -87,18 +94,15 @@ button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.
 </div>
 <div class="read-row"><button type="button" class="primary" id="readExcel" data-i18n="read">Read Excel</button><button type="button" class="secondary" id="templateBtn" data-i18n="template">Download template</button><button type="button" class="secondary" id="defaultBtn">Default</button><span class="status" id="status">Ready</span></div>
 <div class="colors" id="colors" hidden><strong style="font-size:11px" data-i18n="plotColors">Sample plot colors</strong><button type="button" class="secondary" id="colorsDefault">Default</button><div id="colorInputs" class="colors" style="margin:0;padding:0;border:0"></div></div>
-<p class="hint" data-i18n="schema">Workbook columns A–E: Date, Time, SPL, Notch thickness (µm), Phase. Optional column F: 비 고. Multiple measurement rows are preserved.</p>
 </section>
 <section class="result-header"><div><h2 id="resultTitle">Description</h2><div class="sub" id="resultSub">Inspect dates, measurement times, specimens and measured signals.</div></div><div class="actions"><button id="saveBtn" type="button" class="save-btn" data-i18n="save">Save</button></div></section>
 <div id="descriptionPage" class="tab-page"><section class="analysis-card"><div class="tab-top"><h2 class="section-title" style="margin:0" data-i18n="description">Description</h2><button id="resetDescription" class="tab-reset-btn" type="button" aria-label="Reset Description">↻</button></div>
 <div class="control-grid"><div class="field"><label data-i18n="date">Date</label><select id="descDate"></select></div><div class="field"><label data-i18n="time">Measurement time</label><select id="descTime"></select></div></div>
-<div class="sort-row" id="sortRow"><span class="sub" data-i18n="sort">Sort:</span><button class="sort-btn active" data-sort="sample" type="button">Sample ↑</button><button class="sort-btn" data-sort="notchAsc" type="button">Notch ↑</button><button class="sort-btn" data-sort="notchDesc" type="button">Notch ↓</button><button class="sort-btn" data-sort="phaseAsc" type="button">Phase ↑</button><button class="sort-btn" data-sort="phaseDesc" type="button">Phase ↓</button></div>
 <div id="descOutput"><div class="empty">Read an Excel workbook to inspect measurements.</div></div></section></div>
 <div id="relationshipPage" class="tab-page" hidden><section class="analysis-card"><div class="tab-top"><h2 class="section-title" style="margin:0" data-i18n="relationship">Relationship Analysis</h2><button id="resetRelationship" class="tab-reset-btn" type="button" aria-label="Reset Relationship Analysis">↻</button></div>
-<div class="control-grid"><div class="field"><label data-i18n="date">Date</label><select id="relDate"></select></div><div class="field"><label data-i18n="time">Measurement time</label><select id="relTime"></select></div><div class="field"><label data-i18n="target">Target notch difference (µm)</label><input type="number" min="0.001" step="0.1" id="targetDiff" value="3"></div></div>
-<div class="read-row"><button class="primary" type="button" id="analyzeRel" data-i18n="analyze">Analyze models</button><button class="secondary" type="button" id="crossValidate" data-i18n="crossValidate">Cross-validation (other times)</button><label class="check"><input type="checkbox" id="allCurves"><span data-i18n="showAll">Show all model curves</span></label></div>
+<div class="control-grid"><div class="field"><label data-i18n="date">Date</label><select id="relDate"></select></div><div class="field"><label data-i18n="time">Measurement time</label><select id="relTime"></select></div><div class="field relationship-target-field"><label data-i18n="target">Target notch difference (µm)</label><div class="relationship-target-row"><input type="number" min="0.001" step="0.1" id="targetDiff" value="3"><button class="primary compact-action" type="button" id="analyzeRel" data-i18n="analyze">Analyze models</button><button class="secondary compact-action" type="button" id="crossValidate" data-i18n="crossValidate">Cross-validation</button></div></div></div>
+<div class="read-row"><label class="check"><input type="checkbox" id="allCurves"><span data-i18n="showAll">Show all model curves</span></label></div>
 <div id="relOutput"><div class="empty">Read a workbook and run model analysis.</div></div><div id="cvOutput"></div>
-
 </section></div>
 </main>
 <script>
@@ -106,17 +110,11 @@ button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.
 'use strict';
 
 const $=id=>document.getElementById(id);
-
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
 const fmt=v=>Number.isFinite(v)?Number(v).toFixed(3):'N/A';
-
 const valnum=v=>Number.isFinite(v)?Number(v.toFixed(3)):null;
-
 const unq=a=>[...new Set(a)];
-
 const mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
-
 const stdev=a=>{if(a.length<2)return NaN;const m=mean(a);return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/(a.length-1));};
 
 const BASE_COLORS=['#111827','#2563eb','#d97706','#059669','#dc2626','#7c3aed','#0891b2','#be185d','#4d7c0f','#9333ea','#0f766e','#c2410c'];
@@ -126,15 +124,11 @@ function tint(hex){if(!/^#[0-9a-f]{6}$/i.test(hex))return '#cad9e7';return '#'+[
 function defaultColor(i){if(i<BASE_COLORS.length)return BASE_COLORS[i];const h=(i*137.508)%360;const a=.62*Math.min(.43,.57);const f=n=>{const k=(n+h/30)%12;return .43-a*Math.max(-1,Math.min(k-3,9-k,1));};return '#'+[f(0),f(8),f(4)].map(v=>Math.round(v*255).toString(16).padStart(2,'0')).join('');}
 
 const I18N={
-
- en:{module:'Relationship between notch thickness and phase',dockHint:'Select an analysis function.',back:'← Back',home:'🏠 Home',analysis:'Analysis',description:'Description',relationship:'Relationship Analysis',inputSetup:'Input & output setup',groupName:'Calibration group',measureType:'Measurement type',sensor:'Sensor name',operators:'Operators (comma-separated)',excelFile:'Excel workbook',browse:'Browse',savePath:'Save path',read:'Read Excel',template:'Download template',plotColors:'Sample plot colors',schema:'Workbook columns A–E: Date, Time, SPL, Notch thickness (µm), Phase. Optional column F: 비 고. Multiple measurement rows are preserved.',save:'Save',date:'Date',time:'Measurement time',sort:'Sort:',target:'Target notch difference (µm)',analyze:'Analyze models',crossValidate:'Cross-validation (other times)',showAll:'Show all model curves',allTimes:'All times',ready:'Ready',noFile:'No file selected',noFolder:'No folder selected'},
-
- ko:{module:'노치 두께와 Phase의 관계',dockHint:'분석 기능을 선택하세요.',back:'← 뒤로가기',home:'🏠 Home',analysis:'분석',description:'측정 데이터 설명',relationship:'관계 분석',inputSetup:'입력 및 저장 설정',groupName:'교정 그룹 이름',measureType:'측정 방식',sensor:'센서 이름',operators:'측정자 (쉼표로 구분)',excelFile:'입력 Excel 파일',browse:'Browse',savePath:'저장 폴더',read:'Excel 읽기',template:'양식 다운로드',plotColors:'샘플별 그래프 색상',schema:'엑셀 A–E열: Date(날짜), Time(시각), SPL(샘플), Notch thickness(µm), Phase. F열 비 고는 행별 선택 입력 항목입니다. 반복 측정 행도 모두 보존합니다.',save:'저장',date:'날짜',time:'측정 시각',sort:'정렬:',target:'구분할 노치 두께 차이 (µm)',analyze:'관계식 분석',crossValidate:'다른 시각 교차검증',showAll:'전체 모델 곡선 표시',allTimes:'전체 시각',ready:'준비 완료',noFile:'선택된 파일 없음',noFolder:'선택된 폴더 없음'}
-
+ en:{module:'Relationship between notch thickness and phase',dockHint:'Select an analysis function.',back:'← Back',home:'🏠 Home',analysis:'Analysis',description:'Description',relationship:'Relationship Analysis',inputSetup:'Input & output setup',groupName:'Calibration group',measureType:'Measurement type',sensor:'Sensor name',operators:'Operators (comma-separated)',excelFile:'Excel workbook',browse:'Browse',savePath:'Save path',read:'Read Excel',template:'Download template',plotColors:'Sample plot colors',save:'Save',date:'Date',time:'Measurement time',sort:'Sort:',target:'Target notch difference (µm)',analyze:'Analyze models',crossValidate:'Cross-validation',showAll:'Show all model curves',allTimes:'All times',ready:'Ready',noFile:'No file selected',noFolder:'No folder selected'},
+ ko:{module:'노치 두께와 Phase의 관계',dockHint:'분석 기능을 선택하세요.',back:'← 뒤로가기',home:'🏠 Home',analysis:'분석',description:'측정 데이터 설명',relationship:'관계 분석',inputSetup:'입력 및 저장 설정',groupName:'교정 그룹 이름',measureType:'측정 방식',sensor:'센서 이름',operators:'측정자 (쉼표로 구분)',excelFile:'입력 Excel 파일',browse:'Browse',savePath:'저장 폴더',read:'Excel 읽기',template:'양식 다운로드',plotColors:'샘플별 그래프 색상',save:'저장',date:'날짜',time:'측정 시각',sort:'정렬:',target:'구분할 노치 두께 차이 (µm)',analyze:'관계식 분석',crossValidate:'교차검증',showAll:'전체 모델 곡선 표시',allTimes:'전체 시각',ready:'준비 완료',noFile:'선택된 파일 없음',noFolder:'선택된 폴더 없음'}
 };
 
 let lang=localStorage.getItem('innereye_lang')==='ko'?'ko':'en';
-
 const tr=k=>I18N[lang][k]||k;
 
 const state={file:null,dir:null,rows:[],invalid:[],colors:{},tab:'description',sort:'sample',models:[],best:null,training:[],cvRows:[],descriptionRows:[],repeatabilitySigma:NaN,repeatability:null,nestedCV:undefined,cvComputed:false,cvInfo:null,cvFailures:[],savedDefault:null,byDate:new Map(),allDates:[],allSamples:[],inventory:[],inventoryHtml:''};
@@ -184,93 +178,59 @@ function pad(n){return String(n).padStart(2,'0')}
 function dateValue(v){if(v instanceof Date&&!isNaN(v))return `${v.getFullYear()}-${pad(v.getMonth()+1)}-${pad(v.getDate())}`;if(typeof v==='number'){const d=XLSX.SSF.parse_date_code(v);if(d&&d.y&&d.m&&d.d)return `${d.y}-${pad(d.m)}-${pad(d.d)}`}const s=String(v??'').trim();const m=s.match(/^(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/);if(m){const y=+m[1],mo=+m[2],day=+m[3],t=new Date(y,mo-1,day);if(t.getFullYear()===y&&t.getMonth()+1===mo&&t.getDate()===day)return `${y}-${pad(mo)}-${pad(day)}`;}return null;}
 
 function timeValue(v){
-
  if(v instanceof Date&&!isNaN(v))return `${pad(v.getHours())}:${pad(v.getMinutes())}`;
-
  if(typeof v==='number'){
-
   const d=XLSX.SSF.parse_date_code(v);
-
   return d?`${pad(d.H)}:${pad(d.M)}`:null;
-
  }
-
  let s=String(v??'').trim().replace(/\s+/g,' ');
-
  const am=/^(오전|AM)\s*/i.test(s),pm=/^(오후|PM)\s*/i.test(s);
-
  s=s.replace(/^(오전|오후|AM|PM)\s*/i,'');
-
  const m=s.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?$/i);
-
  if(!m)return null;
-
  let h=+m[1];const mi=+m[2],sec=+(m[3]||0),suffix=(m[4]||'').toUpperCase();
-
  const isAm=am||suffix==='AM',isPm=pm||suffix==='PM';
-
  if(isAm||isPm){if(h<1||h>12)return null;h=(h%12)+(isPm?12:0);}
-
  if(h>23||mi>59||sec>59)return null;
-
  return `${pad(h)}:${pad(mi)}`;
-
 }
 
 function sampleNum(s){const m=String(s).match(/^S(\d+)$/i);return m?+m[1]:Infinity;}
-
 function dateSort(a,b){return a.localeCompare(b)}
-
 function samples(rows){return unq(rows.map(r=>r.sample)).sort((a,b)=>sampleNum(a)-sampleNum(b));}
 
 function clearIndexes(){state.byDate=new Map();state.allDates=[];state.allSamples=[];state.inventory=[];state.inventoryHtml='';}
 
 function buildIndexes(){
-
  clearIndexes();
-
  for(const r of state.rows){
-
   let dateGroup=state.byDate.get(r.date);
-
   if(!dateGroup){dateGroup={rows:[],times:new Map(),sortedTimes:[]};state.byDate.set(r.date,dateGroup);}
-
   dateGroup.rows.push(r);
-
   if(!dateGroup.times.has(r.time))dateGroup.times.set(r.time,[]);
-
   dateGroup.times.get(r.time).push(r);
-
  }
-
  state.allDates=[...state.byDate.keys()].sort(dateSort);
-
  state.allSamples=samples(state.rows);
-
  for(const date of state.allDates){
-
   const group=state.byDate.get(date);
-
   group.sortedTimes=[...group.times.keys()].sort(dateSort);
-
   for(const time of group.sortedTimes){
-
    const rows=group.times.get(time),ss=samples(rows);
-
-   const notes=rows.map(r=>r.note).filter(Boolean);
-
+   const notes=[];
+   let previousNote='',previousRow=-1;
+   for(const r of rows){
+    if(r.note&&(r.note!==previousNote||r.row!==previousRow+1))notes.push(r.note);
+    previousNote=r.note;
+    previousRow=r.row;
+   }
    state.inventory.push({date,time,records:rows.length,sampleCount:ss.length,sampleIds:ss.join(', '),notes});
-
   }
-
  }
-
  state.inventoryHtml=inventoryTable(state.inventory);
-
 }
 
 function dates(){return state.allDates;}
-
 function sessions(date){return state.byDate.get(date)?.sortedTimes||[];}
 
 function fillDates(){const opts=dates().map(d=>`<option value="${esc(d)}">${esc(d)}</option>`).join('');for(const id of ['descDate','relDate'])$(id).innerHTML=opts;fillTimes('descDate','descTime');fillTimes('relDate','relTime');}
@@ -288,90 +248,54 @@ $('colorsDefault').onclick=()=>{const all=state.allSamples;const x=Object.fromEn
 $('templateBtn').onclick=()=>{const wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet([['Date','Time','SPL','Notch thickness','Phase','비 고'],['2026-11-16','오후 1:30','S1',70.1,136.221,'']]);ws['!cols']=[{wch:16},{wch:16},{wch:12},{wch:22},{wch:18},{wch:30}];XLSX.utils.book_append_sheet(wb,ws,'Data');XLSX.writeFile(wb,'Notch_Phase_Template.xlsx');};
 
 $('readExcel').onclick=async()=>{
-
  if(!state.file){status('Select an Excel workbook first.','bad');return;}
-
  if(!window.XLSX||!window.Plotly){status('XLSX or Plotly library was not loaded; check internet connectivity.','bad');return;}
-
  status('Reading and validating measurements…');
-
  try{
-
   const wb=XLSX.read(await state.file.arrayBuffer(),{type:'array',cellDates:false});
-
   const ws=wb.Sheets['Data'];
-
   if(!ws)throw Error('The workbook must contain a worksheet named exactly "Data". Available sheets: '+wb.SheetNames.join(', '));
-
   const arr=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null,blankrows:true});
-
   if(!arr.length)throw Error('The "Data" worksheet is empty. Row 1 must contain the required column headers.');
-
   const headers=(arr[0]||[]).slice(0,6).map(v=>String(v??'').replace(/\uFEFF/g,'').trim());
-
   const expected=['Date','Time','SPL','Notch thickness','Phase'];
-
   const invalidHeader=expected.findIndex((label,i)=>headers[i]!==label);
-
   if(invalidHeader>=0)throw Error(`Invalid Data!${String.fromCharCode(65+invalidHeader)}1 header: expected "${expected[invalidHeader]}", found "${headers[invalidHeader]||'(blank)'}".`);
-
   // The workbook may contain visually equivalent spacing in the Korean F1 label.
-
   const noteHeader=(headers[5]||'').replace(/[\s\u00a0]+/g,'');
-
   if(noteHeader&&noteHeader!=='비고')throw Error(`Invalid Data!F1 header: expected "비 고", found "${headers[5]}".`);
-
   const hasNotes=noteHeader==='비고';
-
   const out=[],bad=[];
-
   for(let i=1;i<arr.length;i++){
-
    const r=arr[i]||[];
-
    if(r.slice(0,5).every(v=>v==null||String(v).trim()===''))continue;
-
    const date=dateValue(r[0]),time=timeValue(r[1]),sample=String(r[2]??'').trim().toUpperCase();
-
    const thick=Number(r[3]),phase=Number(r[4]);
-
    if(!date||!time||!/^S\d+$/.test(sample)||r[3]==null||r[4]==null||String(r[3]).trim()===''||String(r[4]).trim()===''||!Number.isFinite(thick)||!Number.isFinite(phase)){
-
     bad.push({Sheet:'Data',Row:i+1,Reason:'Invalid date/time/SPL/thickness/phase'});
-
     continue;
-
    }
-
    out.push({date,time,sample,thickness:thick,phase,note:hasNotes?String(r[5]??'').trim():'',sheet:'Data',row:i+1});
-
   }
-
   if(!out.length)throw Error(`No valid measurements in Data. Invalid rows: ${bad.length}${bad.length?` (first invalid row: ${bad[0].Row})`:''}. Verify Date, Time, SPL, Notch thickness and Phase.`);
-
   state.rows=out;state.invalid=bad;state.models=[];state.best=null;state.colors={};
-
   buildIndexes();renderColorInputs();fillDates();resetRel();resetDesc();
-
   status(`Loaded ${out.length} records from Data, ${dates().length} dates, ${state.allSamples.length} distinct sample labels; invalid rows: ${bad.length}.`,bad.length?'warn':'good');
-
   showTab('description');
-
  }catch(e){status(e.message||String(e),'bad');}
-
 };
-
-
 
 for(const [d,t] of [['descDate','descTime'],['relDate','relTime']]){$(d).onchange=()=>{fillTimes(d,t);if(d==='descDate')renderDesc();else resetRel();};$(t).onchange=()=>{if(t==='descTime')renderDesc();else resetRel();};}
 
-document.querySelectorAll('.sort-btn').forEach(b=>b.onclick=()=>{state.sort=b.dataset.sort;document.querySelectorAll('.sort-btn').forEach(a=>a.classList.toggle('active',a===b));renderDesc();});
+$('descOutput').addEventListener('click',e=>{const b=e.target.closest('.sort-btn');if(!b||!$('descOutput').contains(b))return;state.sort=b.dataset.sort;renderDesc();});
 
 function ordered(rows){let a=rows.slice(),k=state.sort;if(k==='sample')a.sort((x,y)=>sampleNum(x.sample)-sampleNum(y.sample)||x.row-y.row);if(k==='notchAsc')a.sort((x,y)=>x.thickness-y.thickness||sampleNum(x.sample)-sampleNum(y.sample));if(k==='notchDesc')a.sort((x,y)=>y.thickness-x.thickness||sampleNum(x.sample)-sampleNum(y.sample));if(k==='phaseAsc')a.sort((x,y)=>x.phase-y.phase||sampleNum(x.sample)-sampleNum(y.sample));if(k==='phaseDesc')a.sort((x,y)=>y.phase-x.phase||sampleNum(x.sample)-sampleNum(y.sample));return a;}
 
 function table(headers,rows,best=-1){return `<div class="table-wrap"><table class="result-table"><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map((r,i)=>`<tr${i===best?' class="best"':''}>${r.map(v=>`<td>${esc(v??'')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;}
 
 function metrics(items){return `<div class="metrics">${items.map(([k,v])=>`<div class="metric"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join('')}</div>`;}
+
+function sortControls(){const buttons=[['sample','Sample ↑'],['notchAsc','Notch ↑'],['notchDesc','Notch ↓'],['phaseAsc','Phase ↑'],['phaseDesc','Phase ↓']];return `<div class="sort-row" id="sortRow"><span class="sub" data-i18n="sort">${esc(tr('sort'))}</span>${buttons.map(([id,label])=>`<button class="sort-btn${state.sort===id?' active':''}" data-sort="${id}" type="button">${label}</button>`).join('')}</div>`;}
 
 function plotLayout(title,xTitle,yTitle){
  const axis={showline:true,linecolor:'#000',linewidth:3,mirror:false,zeroline:false,automargin:true,ticks:'outside',tickcolor:'#000',tickwidth:2,ticklen:7,tickfont:{size:16,color:'#000'},title:{font:{size:19,color:'#000'},standoff:14}};
@@ -388,110 +312,60 @@ function autoscaleRange(values){
 }
 
 function inventoryTable(items){
-
  const includeNotes=items.some(r=>r.notes.length>0);
-
  const headers=['Date','Time','Records','Distinct samples','Sample IDs',...(includeNotes?['비 고']:[])];
-
  let body='';
-
  for(let i=0;i<items.length;){
-
   let end=i+1;
-
   while(end<items.length&&items[end].date===items[i].date)end++;
-
   for(let k=i;k<end;k++){
-
    const r=items[k];
-
    body+=`<tr class="${k===i?'date-start ':''}${k===end-1?'date-end':''}">`;
-
    if(k===i)body+=`<td class="date-group" rowspan="${end-i}">${esc(r.date)}</td>`;
-
    body+=`<td>${esc(r.time)}</td><td>${r.records}</td><td>${r.sampleCount}</td><td>${esc(r.sampleIds)}</td>`;
-
    if(includeNotes)body+=`<td class="notes-cell">${r.notes.map(v=>`<div>${esc(v)}</div>`).join('')}</td>`;
-
    body+='</tr>';
-
   }
-
   i=end;
-
  }
-
  return `<div class="table-wrap"><table class="result-table inventory-table"><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table></div>`;
-
 }
 
 function renderDesc(){
-
  if(!state.rows.length)return;
-
  const rows=filtered('descDate','descTime'),date=$('descDate').value,time=$('descTime').value;
-
  const distinct=samples(rows),byTime=new Map(),thicknesses=new Map();
-
  for(const r of rows){
-
   if(!byTime.has(r.time))byTime.set(r.time,[]);
-
   byTime.get(r.time).push(r);
-
   const item=thicknesses.get(r.sample);
-
   if(item){item.min=Math.min(item.min,r.thickness);item.max=Math.max(item.max,r.thickness);}
-
   else thicknesses.set(r.sample,{min:r.thickness,max:r.thickness});
-
  }
-
  const times=[...byTime.keys()].sort(dateSort);
-
  const issues=[...thicknesses.entries()].filter(([,v])=>v.max-v.min>1e-9).map(([s])=>s);
-
  state.descriptionRows=rows;
-
  let html=metrics([['Total records',state.rows.length],['Distinct dates',dates().length],['Sessions on date',sessions(date).length],['Samples in selection',distinct.length]]);
-
  if(issues.length)html+=`<p class="warnline">WARNING: The same sample label has inconsistent notch thickness: ${esc(issues.join(', '))}. Verify specimen identity.</p>`;
-
  html+=`<div class="table-card"><div class="plot-title">Date / time inventory</div>${state.inventoryHtml}</div>`;
-
  html+=`<div class="table-card"><div class="plot-title">Measurements · ${esc(date)} ${time==='ALL'?'':esc(time)}</div>`+table(['Date','Time','SPL','Notch thickness (µm)','Phase'],ordered(rows).map(r=>[r.date,r.time,r.sample,fmt(r.thickness),fmt(r.phase)]))+'</div>';
-
- if(times.length)html+='<div class="desc-plots">'+times.map((t,k)=>plotCard(`descPlot${k}`,`${date} · ${t}`)).join('')+'</div>';
-
+ if(times.length)html+=sortControls()+'<div class="desc-plots">'+times.map((t,k)=>plotCard(`descPlot${k}`,`${date} · ${t}`)).join('')+'</div>';
  clearPlot('descOutput');$('descOutput').innerHTML=html;
-
  for(let k=0;k<times.length;k++){
-
   const data=ordered(byTime.get(times[k]));
-
   const counts={},x=data.map(r=>{counts[r.sample]=(counts[r.sample]||0)+1;return counts[r.sample]===1?r.sample:`${r.sample} (${counts[r.sample]})`;});
-
   const cs=data.map(r=>colorFor(r.sample));
-
   const layout=plotLayout(`${date} · ${times[k]}`,'Sample','Phase');
-
   const phaseRange=autoscaleRange(data.map(r=>r.phase));
   const thicknessRange=autoscaleRange(data.map(r=>r.thickness));
   if(phaseRange)layout.yaxis.range=phaseRange;
   layout.yaxis2={...layout.yaxis,title:{...layout.yaxis.title,text:'Notch thickness (µm)'},overlaying:'y',side:'right',showgrid:false,range:thicknessRange};
-
   layout.barmode='group';layout.hovermode='x';
-
   Plotly.newPlot(`descPlot${k}`,[
-
    {x,y:data.map(r=>r.phase-(phaseRange?.[0]??0)),type:'bar',name:'Phase',base:phaseRange?.[0],customdata:data.map(r=>r.phase),marker:{color:cs,line:{color:'#000',width:2}},offsetgroup:'phase',width:.35,offset:-.38,hovertemplate:'%{x}<br>Phase: %{customdata:.3f}<extra></extra>'},
-
    {x,y:data.map(r=>r.thickness-(thicknessRange?.[0]??0)),type:'bar',name:'Notch thickness (µm)',base:thicknessRange?.[0],customdata:data.map(r=>r.thickness),marker:{color:cs.map(tint),line:{color:'#000',width:2}},yaxis:'y2',offsetgroup:'notch',width:.35,offset:.03,hovertemplate:'%{x}<br>Thickness: %{customdata:.3f} µm<extra></extra>'}
-
   ],layout,PLOT_CONFIG);
-
  }
-
 }
 
 /* Model: x phase -> y notch thickness (µm). Specimen-balanced weighted least squares. */
@@ -507,14 +381,14 @@ function fitModel(rows,kind){const spec=KINDS.find(x=>x.id===kind),us=samples(ro
 function predict(m,phase){if(logInput(m.kind)&&phase<=0)return NaN;const q=logInput(m.kind)?Math.log(phase):phase,z=(q-m.c)/m.sc;let v=0;for(let i=m.beta.length-1;i>=0;i--)v=v*z+m.beta[i];return logOutput(m.kind)?Math.exp(v):v;}
 
 function formula(m){
-  const transform=logInput(m.kind)?'ln(Phase)':'Phase';
-  const center=m.c<0?`${transform} + ${fmt(Math.abs(m.c))}`:`${transform} − ${fmt(m.c)}`;
-  const z=`z = (${center}) / ${fmt(m.sc)}`;
-  const poly=m.beta.map((b,i)=>{
-    const term=`${fmt(i===0?b:Math.abs(b))}${i?` × z${i>1?'^'+i:''}`:''}`;
-    return i===0?term:`${b<0?' − ':' + '}${term}`;
-  }).join('');
-  return `${logOutput(m.kind)?`Thickness = exp(${poly})`:`Thickness = ${poly}`} ; ${z}`;
+ const transform=logInput(m.kind)?'ln(Phase)':'Phase';
+ const center=m.c<0?`${transform} + ${fmt(Math.abs(m.c))}`:`${transform} − ${fmt(m.c)}`;
+ const z=`z = (${center}) / ${fmt(m.sc)}`;
+ const poly=m.beta.map((b,i)=>{
+  const term=`${fmt(i===0?b:Math.abs(b))}${i?` × z${i>1?'^'+i:''}`:''}`;
+  return i===0?term:`${b<0?' − ':' + '}${term}`;
+ }).join('');
+ return `${logOutput(m.kind)?`Thickness = exp(${poly})`:`Thickness = ${poly}`} ; ${z}`;
 }
 
 function formatEquation(source){return esc(source).replace(/z\^(\d+)/g,(_,degree)=>`z<sup>${degree}</sup>`);}
@@ -522,42 +396,42 @@ function formatEquation(source){return esc(source).replace(/z\^(\d+)/g,(_,degree
 function score(y,p){const errs=y.map((v,i)=>p[i]-v),rmse=Math.sqrt(mean(errs.map(v=>v*v))),mae=mean(errs.map(Math.abs)),bias=mean(errs),sse=errs.reduce((s,e)=>s+e*e,0),yy=mean(y),sst=y.reduce((s,v)=>s+(v-yy)**2,0);return {rmse,mae,bias,maxAE:Math.max(...errs.map(Math.abs)),r2:sst>1e-15?1-sse/sst:NaN,n:y.length};}
 
 function groupedCV(rows,kind){
-  const gs=samples(rows),spec=KINDS.find(x=>x.id===kind);
-  if(gs.length<spec.p+1)return null;
-  const bySample=new Map(),pred=[],truth=[],per=[],foldDetails=[];
-  for(const r of rows){if(!bySample.has(r.sample))bySample.set(r.sample,[]);bySample.get(r.sample).push(r);}
-  for(const sample of gs){
-    const train=rows.filter(r=>r.sample!==sample),test=bySample.get(sample),m=fitModel(train,kind);
-    if(!m)return null;
-    const ps=test.map(r=>predict(m,r.phase));
-    if(ps.some(x=>!Number.isFinite(x)||Math.abs(x)>1e9))return null;
-    const observed=test.map(r=>r.thickness),fold=score(observed,ps);
-    truth.push(...observed);pred.push(...ps);
-    per.push(mean(ps.map((x,i)=>(x-observed[i])**2)));
-    foldDetails.push({sample,n:test.length,rmse:fold.rmse,mae:fold.mae,r2:fold.r2,bias:fold.bias,maxAE:fold.maxAE});
-  }
-  return {...score(truth,pred),balancedRMSE:Math.sqrt(mean(per)),folds:gs.length,foldDetails};
+ const gs=samples(rows),spec=KINDS.find(x=>x.id===kind);
+ if(gs.length<spec.p+1)return null;
+ const bySample=new Map(),pred=[],truth=[],per=[],foldDetails=[];
+ for(const r of rows){if(!bySample.has(r.sample))bySample.set(r.sample,[]);bySample.get(r.sample).push(r);}
+ for(const sample of gs){
+  const train=rows.filter(r=>r.sample!==sample),test=bySample.get(sample),m=fitModel(train,kind);
+  if(!m)return null;
+  const ps=test.map(r=>predict(m,r.phase));
+  if(ps.some(x=>!Number.isFinite(x)||Math.abs(x)>1e9))return null;
+  const observed=test.map(r=>r.thickness),fold=score(observed,ps);
+  truth.push(...observed);pred.push(...ps);
+  per.push(mean(ps.map((x,i)=>(x-observed[i])**2)));
+  foldDetails.push({sample,n:test.length,rmse:fold.rmse,mae:fold.mae,r2:fold.r2,bias:fold.bias,maxAE:fold.maxAE});
+ }
+ return {...score(truth,pred),balancedRMSE:Math.sqrt(mean(per)),folds:gs.length,foldDetails};
 }
 
 function compareModels(rows){const all=[];for(const k of KINDS){const m=fitModel(rows,k.id);if(!m)continue;const training=score(rows.map(r=>r.thickness),rows.map(r=>predict(m,r.phase))),cv=groupedCV(rows,k.id);all.push({model:m,training,cv});}all.sort((a,b)=>(a.cv?.balancedRMSE??Infinity)-(b.cv?.balancedRMSE??Infinity)||a.model.p-b.model.p);return all;}
 
 function nestedSelectedCV(rows){
-  const ss=samples(rows),pred=[],truth=[],per=[],foldDetails=[];
-  if(ss.length<4)return null;
-  const bySample=new Map();
-  for(const r of rows){if(!bySample.has(r.sample))bySample.set(r.sample,[]);bySample.get(r.sample).push(r);}
-  for(const s of ss){
-    const training=rows.filter(r=>r.sample!==s),held=bySample.get(s);
-    const candidates=compareModels(training),best=candidates.find(c=>c.cv);
-    if(!best)return null;
-    const yy=held.map(r=>predict(best.model,r.phase));
-    if(yy.some(y=>!Number.isFinite(y)))return null;
-    const observed=held.map(r=>r.thickness),fold=score(observed,yy);
-    pred.push(...yy);truth.push(...observed);
-    per.push(mean(yy.map((v,i)=>(v-observed[i])**2)));
-    foldDetails.push({sample:s,model:best.model.label,n:held.length,rmse:fold.rmse,mae:fold.mae,r2:fold.r2,bias:fold.bias});
-  }
-  return {...score(truth,pred),balancedRMSE:Math.sqrt(mean(per)),folds:ss.length,foldDetails};
+ const ss=samples(rows),pred=[],truth=[],per=[],foldDetails=[];
+ if(ss.length<4)return null;
+ const bySample=new Map();
+ for(const r of rows){if(!bySample.has(r.sample))bySample.set(r.sample,[]);bySample.get(r.sample).push(r);}
+ for(const s of ss){
+  const training=rows.filter(r=>r.sample!==s),held=bySample.get(s);
+  const candidates=compareModels(training),best=candidates.find(c=>c.cv);
+  if(!best)return null;
+  const yy=held.map(r=>predict(best.model,r.phase));
+  if(yy.some(y=>!Number.isFinite(y)))return null;
+  const observed=held.map(r=>r.thickness),fold=score(observed,yy);
+  pred.push(...yy);truth.push(...observed);
+  per.push(mean(yy.map((v,i)=>(v-observed[i])**2)));
+  foldDetails.push({sample:s,model:best.model.label,n:held.length,rmse:fold.rmse,mae:fold.mae,r2:fold.r2,bias:fold.bias});
+ }
+ return {...score(truth,pred),balancedRMSE:Math.sqrt(mean(per)),folds:ss.length,foldDetails};
 }
 
 function withinSamplePhase(rows){const group=new Map();for(const r of rows){if(!group.has(r.sample))group.set(r.sample,[]);group.get(r.sample).push(r.phase)}let numerator=0,denominator=0;const items=[];for(const [s,arr] of group){const sd=stdev(arr);items.push({sample:s,n:arr.length,mean:mean(arr),sd});if(arr.length>1){numerator+=(arr.length-1)*sd*sd;denominator+=arr.length-1;}}return {sigma:denominator?Math.sqrt(numerator/denominator):NaN,items,df:denominator};}
@@ -565,70 +439,70 @@ function withinSamplePhase(rows){const group=new Map();for(const r of rows){if(!
 function solveTargetPhase(m,phase0,thicknessDiff){const target=predict(m,phase0)+thicknessDiff;const fn=x=>predict(m,x)-target,range=m.maxPhase-m.minPhase;let roots=[],N=400,last=m.minPhase,flast=fn(last);for(let i=1;i<=N;i++){const x=m.minPhase+range*i/N,f=fn(x);if(Number.isFinite(f)&&Number.isFinite(flast)&&(f===0||flast*f<0)){let a=last,b=x,fa=flast;for(let k=0;k<55;k++){const mid=(a+b)/2,fm=fn(mid);if(fa*fm<=0)b=mid;else{a=mid;fa=fm;}}roots.push((a+b)/2);}last=x;flast=f;}if(!roots.length)return NaN;return roots.sort((a,b)=>Math.abs(a-phase0)-Math.abs(b-phase0))[0]-phase0;}
 
 function derivative(m,phase){
-  if(logInput(m.kind)&&phase<=0)return NaN;
-  const x=logInput(m.kind)?Math.log(phase):phase,z=(x-m.c)/m.sc;
-  let y=m.beta[m.beta.length-1],dy=0;
-  for(let i=m.beta.length-2;i>=0;i--){dy=dy*z+y;y=y*z+m.beta[i];}
-  return (logOutput(m.kind)?Math.exp(y):1)*dy/(m.sc*(logInput(m.kind)?phase:1));
+ if(logInput(m.kind)&&phase<=0)return NaN;
+ const x=logInput(m.kind)?Math.log(phase):phase,z=(x-m.c)/m.sc;
+ let y=m.beta[m.beta.length-1],dy=0;
+ for(let i=m.beta.length-2;i>=0;i--){dy=dy*z+y;y=y*z+m.beta[i];}
+ return (logOutput(m.kind)?Math.exp(y):1)*dy/(m.sc*(logInput(m.kind)?phase:1));
 }
 
 function calibrationDiagnostics(model,sigma){
-  const phase0=(model.minPhase+model.maxPhase)/2;
-  const entered=Number($('targetDiff').value);
-  const target=Number.isFinite(entered)&&entered>0?entered:3;
-  const slope=derivative(model,phase0);
-  const delta=solveTargetPhase(model,phase0,target);
-  const crit=Number.isFinite(sigma)?2.77*sigma:NaN;
-  return {phase0,target,slope,delta,crit,phaseSD:sigma,equivalentThicknessSD:Number.isFinite(sigma)?Math.abs(slope)*sigma:NaN};
+ const phase0=(model.minPhase+model.maxPhase)/2;
+ const entered=Number($('targetDiff').value);
+ const target=Number.isFinite(entered)&&entered>0?entered:3;
+ const slope=derivative(model,phase0);
+ const delta=solveTargetPhase(model,phase0,target);
+ const crit=Number.isFinite(sigma)?2.77*sigma:NaN;
+ return {phase0,target,slope,delta,crit,phaseSD:sigma,equivalentThicknessSD:Number.isFinite(sigma)?Math.abs(slope)*sigma:NaN};
 }
 
 function targetMetrics(model,sigma){
-  const d=calibrationDiagnostics(model,sigma);
-  return metrics([['Reference Phase',fmt(d.phase0)],['Target Δ thickness (µm)',fmt(d.target)],['Required Δ Phase (within range)',fmt(d.delta)],['95% repeatability bound (Phase)',fmt(d.crit)]]);
+ const d=calibrationDiagnostics(model,sigma);
+ return metrics([['Reference Phase',fmt(d.phase0)],['Target Δ thickness (µm)',fmt(d.target)],['Required Δ Phase (within range)',fmt(d.delta)],['95% repeatability bound (Phase)',fmt(d.crit)]]);
 }
 
 function renderModelTable(){const list=state.models;const bestIndex=list.findIndex(x=>x.model===state.best);return table(['Model','Fit RMSE (µm)','Fit MAE (µm)','Fit R²','LOSO CV RMSE (µm)','LOSO CV MAE (µm)'],list.map(c=>[c.model.label,fmt(c.training.rmse),fmt(c.training.mae),fmt(c.training.r2),fmt(c.cv?.balancedRMSE),fmt(c.cv?.mae)]),bestIndex);}
 
 function plotCard(id,title){return `<div class="plot-card"><div class="plot-title">${esc(title)}</div><div class="plot" id="${esc(id)}"></div></div>`;}
 
-function drawModelPlot(){if(!state.best||!$('modelPlot'))return;const m=state.best,rows=state.training,xmin=m.minPhase,xmax=m.maxPhase,span=Math.max(xmax-xmin,1e-6),xs=Array.from({length:220},(_,i)=>xmin+span*i/219),traces=[],bySample=new Map();for(const r of rows){if(!bySample.has(r.sample))bySample.set(r.sample,[]);bySample.get(r.sample).push(r);}for(const sample of samples(rows)){const rr=bySample.get(sample);traces.push({x:rr.map(r=>r.phase),y:rr.map(r=>r.thickness),type:'scatter',mode:'markers',name:sample,marker:{color:colorFor(sample),size:10,line:{color:'#fff',width:1}},hovertemplate:'Phase %{x:.3f}<br>Thickness %{y:.3f} µm<extra>'+sample+'</extra>'});}const shown=state.models.filter(c=>c.model===m||$('allCurves').checked);shown.forEach(c=>traces.push({x:xs,y:xs.map(x=>predict(c.model,x)),type:'scatter',mode:'lines',name:c.model.label+(c.model===m?' (selected)':''),line:{color:c.model===m?'#111827':'#9ca3af',width:c.model===m?3:1.4,dash:c.model===m?'solid':'dash'}}));const layout=plotLayout('Phase-to-notch calibration','Phase','Notch thickness (µm)');layout.hovermode='closest';Plotly.react('modelPlot',traces,layout,PLOT_CONFIG);}
+function drawModelPlot(){if(!state.best||!$('modelPlot'))return;const m=state.best,rows=state.training,xmin=m.minPhase,xmax=m.maxPhase,span=Math.max(xmax-xmin,1e-6),xs=Array.from({length:220},(_,i)=>xmin+span*i/219),traces=[],bySample=new Map();for(const r of rows){if(!bySample.has(r.sample))bySample.set(r.sample,[]);bySample.get(r.sample).push(r);}for(const sample of samples(rows)){const rr=bySample.get(sample);traces.push({x:rr.map(r=>r.phase),y:rr.map(r=>r.thickness),type:'scatter',mode:'markers',name:sample,marker:{color:colorFor(sample),size:10,line:{color:'#fff',width:1}},hovertemplate:'Phase %{x:.3f}<br>Thickness %{y:.3f} µm<extra>'+sample+'</extra>'});}const shown=state.models.filter(c=>c.model===m||$('allCurves').checked);shown.forEach(c=>traces.push({x:xs,y:xs.map(x=>predict(c.model,x)),type:'scatter',mode:'lines',name:c.model.label+(c.model===m?' (selected)':''),line:{color:c.model===m?'#111827':'#9ca3af',width:c.model===m?3:1.4,dash:c.model===m?'solid':'dash'}}));const layout=plotLayout('','Phase','Notch thickness (µm)');delete layout.title;layout.hovermode='closest';Plotly.react('modelPlot',traces,layout,PLOT_CONFIG);}
 
 function computeAnalysis(){
-  if(state.best)return true;
-  const rows=filtered('relDate','relTime');
-  const list=compareModels(rows),best=list.find(x=>x.cv);
-  if(!best)return false;
-  state.training=rows;
-  state.models=list;
-  state.best=best.model;
-  state.repeatability=withinSamplePhase(rows);
-  state.repeatabilitySigma=state.repeatability.sigma;
-  state.nestedCV=undefined; // Nested selection CV is only needed for the Excel export.
-  state.cvRows=[];
-  state.cvFailures=[];
-  state.cvComputed=false;
-  state.cvInfo=null;
-  return true;
+ if(state.best)return true;
+ const rows=filtered('relDate','relTime');
+ const list=compareModels(rows),best=list.find(x=>x.cv);
+ if(!best)return false;
+ state.training=rows;
+ state.models=list;
+ state.best=best.model;
+ state.repeatability=withinSamplePhase(rows);
+ state.repeatabilitySigma=state.repeatability.sigma;
+ state.nestedCV=undefined; // Nested selection CV is only needed for the Excel export.
+ state.cvRows=[];
+ state.cvFailures=[];
+ state.cvComputed=false;
+ state.cvInfo=null;
+ return true;
 }
 
 function analyze(){
-  if(!state.rows.length){status('Read an Excel workbook first.','bad');return;}
-  if(!computeAnalysis()){
-    resetRel();
-    status('Insufficient independent sample labels for valid specimen-held-out model comparison. Add at least three distinct samples with varying phase, and enough samples for the model order.','bad');
-    return;
-  }
-  const rows=state.training,best=state.models.find(x=>x.model===state.best),sigma=state.repeatability;
-  let html='';  // Hidden diagnostics remain available in the Excel export.
-  const [equationText,definitionText]=formula(state.best).split(' ; ');
-  html+=`<div class="formula"><strong class="formula-heading">Selected calibration equation</strong><div class="formula-equation">${formatEquation(equationText)}</div><div class="formula-definition">${formatEquation(definitionText)}</div></div>`;
-  html+=`<div class="table-card"><div class="plot-title">Model comparison</div>${renderModelTable()}</div>`;
-  html+=`<div id="targetMetrics">${targetMetrics(state.best,state.repeatabilitySigma)}</div>`;
-  html+=plotCard('modelPlot','Observed calibration points and fitted model')+`<div class="table-card"><div class="plot-title">Repeated measurements by sample</div>${table(['SPL','N','Mean Phase','Phase SD'],sigma.items.map(x=>[x.sample,x.n,fmt(x.mean),fmt(x.sd)]))}</div>`;
-  html+=`<div class="table-card"><div class="plot-title">Predicted thicknesses using full-precision model</div>${table(['Date','Time','SPL','Measured phase','Actual thickness (µm)','Predicted thickness (µm)','Error (µm)'],rows.map(r=>{const prediction=predict(state.best,r.phase);return [r.date,r.time,r.sample,fmt(r.phase),fmt(r.thickness),fmt(prediction),fmt(prediction-r.thickness)];}))}</div>`;
-  clearPlot('relOutput');$('relOutput').innerHTML=html;
-  drawModelPlot();
-  status(`Selected ${state.best.label}; LOSO CV RMSE ${fmt(best.cv.balancedRMSE)} µm.`,'good');
+ if(!state.rows.length){status('Read an Excel workbook first.','bad');return;}
+ if(!computeAnalysis()){
+  resetRel();
+  status('Insufficient independent sample labels for valid specimen-held-out model comparison. Add at least three distinct samples with varying phase, and enough samples for the model order.','bad');
+  return;
+ }
+ const rows=state.training,best=state.models.find(x=>x.model===state.best),sigma=state.repeatability;
+ let html='';  // Hidden diagnostics remain available in the Excel export.
+ const [equationText,definitionText]=formula(state.best).split(' ; ');
+ html+=`<div class="formula"><strong class="formula-heading">Selected calibration equation</strong><div class="formula-equation">${formatEquation(equationText)}</div><div class="formula-definition">${formatEquation(definitionText)}</div></div>`;
+ html+=`<div class="table-card"><div class="plot-title">Model comparison</div>${renderModelTable()}</div>`;
+ html+=`<div id="targetMetrics">${targetMetrics(state.best,state.repeatabilitySigma)}</div>`;
+ html+=plotCard('modelPlot','Fitted Model')+`<div class="table-card"><div class="plot-title">Repeated measurements by sample</div>${table(['SPL','N','Mean Phase','Phase SD'],sigma.items.map(x=>[x.sample,x.n,fmt(x.mean),fmt(x.sd)]))}</div>`;
+ html+=`<div class="table-card"><div class="plot-title">Predicted thicknesses using full-precision model</div>${table(['Date','Time','SPL','Measured phase','Actual thickness (µm)','Predicted thickness (µm)','Error (µm)'],rows.map(r=>{const prediction=predict(state.best,r.phase);return [r.date,r.time,r.sample,fmt(r.phase),fmt(r.thickness),fmt(prediction),fmt(prediction-r.thickness)];}))}</div>`;
+ clearPlot('relOutput');$('relOutput').innerHTML=html;
+ drawModelPlot();
+ status(`Selected ${state.best.label}; LOSO CV RMSE ${fmt(best.cv.balancedRMSE)} µm.`,'good');
 }
 
 $('analyzeRel').onclick=analyze;
@@ -638,209 +512,209 @@ $('targetDiff').onchange=()=>{if(state.best&&$('targetMetrics'))$('targetMetrics
 // Same-date time validation. A selected time tests other times with a fixed fit;
 // ALL uses leave-one-time-out folds, refitting only on the other times each fold.
 function computeTimeValidation(){
-  if(state.cvComputed)return state.cvRows;
-  state.cvRows=[];
-  state.cvFailures=[];
-  const date=$('relDate').value,selectedTime=$('relTime').value;
-  const dateGroup=state.byDate.get(date),allTimes=dateGroup?.sortedTimes||[];
-  const isLOTO=selectedTime==='ALL';
-  state.cvInfo={date,trainTime:selectedTime,mode:isLOTO?'Leave-one-time-out':'Other-times holdout'};
-  if(allTimes.length<2){
-    state.cvFailures.push({date,time:'',reason:'Fewer than two measurement times on the selected date'});
-    state.cvComputed=true;
-    return state.cvRows;
-  }
-  const testTimes=isLOTO?allTimes:allTimes.filter(t=>t!==selectedTime);
-  for(const testTime of testTimes){
-    const tested=dateGroup.times.get(testTime);
-    const train=isLOTO?dateGroup.rows.filter(r=>r.time!==testTime):state.training;
-    const chosen=isLOTO?compareModels(train).find(c=>c.cv)?.model:state.best;
-    if(!chosen){
-      state.cvFailures.push({date,time:testTime,reason:'Insufficient specimens/variation for training-only model selection'});
-      continue;
-    }
-    const predicted=tested.map(r=>predict(chosen,r.phase));
-    if(predicted.some(p=>!Number.isFinite(p)||Math.abs(p)>1e9)){
-      state.cvFailures.push({date,time:testTime,reason:'Nonfinite/out-of-domain or unstable prediction'});
-      continue;
-    }
-    const measurements=tested.map(r=>r.thickness),s=score(measurements,predicted);
-    state.cvRows.push({date,time:testTime,n:tested.length,samples:samples(tested).length,
-      trainRecords:train.length,trainSamples:samples(train).length,trainTimes:unq(train.map(r=>r.time)).sort().join(', '),
-      model:chosen.label,mode:state.cvInfo.mode,rmse:s.rmse,mae:s.mae,r2:s.r2,bias:s.bias,maxAE:s.maxAE,
-      rows:tested.map((r,i)=>({...r,pred:predicted[i],error:predicted[i]-r.thickness,
-        extrapolation:r.phase<chosen.minPhase||r.phase>chosen.maxPhase?'YES':'NO'}))});
-  }
+ if(state.cvComputed)return state.cvRows;
+ state.cvRows=[];
+ state.cvFailures=[];
+ const date=$('relDate').value,selectedTime=$('relTime').value;
+ const dateGroup=state.byDate.get(date),allTimes=dateGroup?.sortedTimes||[];
+ const isLOTO=selectedTime==='ALL';
+ state.cvInfo={date,trainTime:selectedTime,mode:isLOTO?'Leave-one-time-out':'Other-times holdout'};
+ if(allTimes.length<2){
+  state.cvFailures.push({date,time:'',reason:'Fewer than two measurement times on the selected date'});
   state.cvComputed=true;
   return state.cvRows;
+ }
+ const testTimes=isLOTO?allTimes:allTimes.filter(t=>t!==selectedTime);
+ for(const testTime of testTimes){
+  const tested=dateGroup.times.get(testTime);
+  const train=isLOTO?dateGroup.rows.filter(r=>r.time!==testTime):state.training;
+  const chosen=isLOTO?compareModels(train).find(c=>c.cv)?.model:state.best;
+  if(!chosen){
+   state.cvFailures.push({date,time:testTime,reason:'Insufficient specimens/variation for training-only model selection'});
+   continue;
+  }
+  const predicted=tested.map(r=>predict(chosen,r.phase));
+  if(predicted.some(p=>!Number.isFinite(p)||Math.abs(p)>1e9)){
+   state.cvFailures.push({date,time:testTime,reason:'Nonfinite/out-of-domain or unstable prediction'});
+   continue;
+  }
+  const measurements=tested.map(r=>r.thickness),s=score(measurements,predicted);
+  state.cvRows.push({date,time:testTime,n:tested.length,samples:samples(tested).length,
+   trainRecords:train.length,trainSamples:samples(train).length,trainTimes:unq(train.map(r=>r.time)).sort().join(', '),
+   model:chosen.label,mode:state.cvInfo.mode,rmse:s.rmse,mae:s.mae,r2:s.r2,bias:s.bias,maxAE:s.maxAE,
+   rows:tested.map((r,i)=>({...r,pred:predicted[i],error:predicted[i]-r.thickness,
+    extrapolation:r.phase<chosen.minPhase||r.phase>chosen.maxPhase?'YES':'NO'}))});
+ }
+ state.cvComputed=true;
+ return state.cvRows;
 }
 
 $('crossValidate').onclick=()=>{
-  if(!state.best){status('Run Analyze models first.','bad');return;}
-  const rs=computeTimeValidation();
-  if(!rs.length){
-    $('cvOutput').innerHTML='<div class="empty">No valid other-time holdout fold is available for this date.</div>';
-    status('Other-time validation unavailable; see exported validation status for details.','warn');
-    return;
-  }
-  const info=state.cvInfo;
-  const heading=info.mode==='Leave-one-time-out'
-    ?`Leave-one-time-out validation on ${esc(info.date)} (refitted without each test time)`
-    :`External validation: model trained at ${esc(info.trainTime)} and tested at other times`;
-  let html=`<div class="table-card"><div class="plot-title">${heading}</div>`+
-    table(['Test time','Records','Samples','RMSE (µm)','MAE (µm)','R²','Bias (µm)'],rs.map(r=>[r.time,r.n,r.samples,fmt(r.rmse),fmt(r.mae),fmt(r.r2),fmt(r.bias)]))+
-    '<p class="note">This tests transfer to different times on the same date, not unseen physical specimens. Test-time values are excluded from each fitted model.</p></div>';
-  html+=plotCard('cvPlot','Actual vs predicted thickness at other times');
-  html+='<div class="table-card"><div class="plot-title">Holdout predictions</div>'+
-    table(['Date','Test time','SPL','Phase','Actual (µm)','Predicted (µm)','Error (µm)'],rs.flatMap(r=>r.rows).map(r=>[r.date,r.time,r.sample,fmt(r.phase),fmt(r.thickness),fmt(r.pred),fmt(r.error)]))+'</div>';
-  if(state.cvFailures.length)html+=`<p class="warnline">${state.cvFailures.length} time fold(s) could not be evaluated. See the exported CV status sheet.</p>`;
-  clearPlot('cvOutput');$('cvOutput').innerHTML=html;
-  const rr=rs.flatMap(x=>x.rows),actual=rr.map(r=>r.thickness),pred=rr.map(r=>r.pred),
-    lo=Math.min(...actual,...pred),hi=Math.max(...actual,...pred);
-  const layout=plotLayout('External time validation','Actual thickness (µm)','Predicted thickness (µm)');
-  Plotly.newPlot('cvPlot',[
-    {x:actual,y:pred,mode:'markers',type:'scatter',marker:{color:rr.map(r=>colorFor(r.sample)),size:9},
-      text:rr.map(r=>`${r.time} ${r.sample}`),hovertemplate:'%{text}<br>Actual %{x:.3f}<br>Predicted %{y:.3f}<extra></extra>'},
-    {x:[lo,hi],y:[lo,hi],mode:'lines',type:'scatter',name:'Identity',line:{color:'#111827',dash:'dash'}}
-  ],layout,PLOT_CONFIG);
-  status(`Same-date time validation completed: ${rs.length} successful fold(s).`,state.cvFailures.length?'warn':'good');
+ if(!state.best){status('Run Analyze models first.','bad');return;}
+ const rs=computeTimeValidation();
+ if(!rs.length){
+  $('cvOutput').innerHTML='<div class="empty">No valid other-time holdout fold is available for this date.</div>';
+  status('Other-time validation unavailable; see exported validation status for details.','warn');
+  return;
+ }
+ const info=state.cvInfo;
+ const heading=info.mode==='Leave-one-time-out'
+  ?`Leave-one-time-out validation on ${esc(info.date)} (refitted without each test time)`
+  :`External validation: model trained at ${esc(info.trainTime)} and tested at other times`;
+ let html=`<div class="table-card"><div class="plot-title">${heading}</div>`+
+  table(['Test time','Records','Samples','RMSE (µm)','MAE (µm)','R²','Bias (µm)'],rs.map(r=>[r.time,r.n,r.samples,fmt(r.rmse),fmt(r.mae),fmt(r.r2),fmt(r.bias)]))+
+  '</div>';
+ html+=plotCard('cvPlot','Actual vs predicted thickness at other times');
+ html+='<div class="table-card"><div class="plot-title">Holdout predictions</div>'+
+  table(['Date','Test time','SPL','Phase','Actual (µm)','Predicted (µm)','Error (µm)'],rs.flatMap(r=>r.rows).map(r=>[r.date,r.time,r.sample,fmt(r.phase),fmt(r.thickness),fmt(r.pred),fmt(r.error)]))+'</div>';
+ if(state.cvFailures.length)html+=`<p class="warnline">${state.cvFailures.length} time fold(s) could not be evaluated. See the exported CV status sheet.</p>`;
+ clearPlot('cvOutput');$('cvOutput').innerHTML=html;
+ const rr=rs.flatMap(x=>x.rows),actual=rr.map(r=>r.thickness),pred=rr.map(r=>r.pred),
+  lo=Math.min(...actual,...pred),hi=Math.max(...actual,...pred);
+ const layout=plotLayout('External time validation','Actual thickness (µm)','Predicted thickness (µm)');
+ Plotly.newPlot('cvPlot',[
+  {x:actual,y:pred,mode:'markers',type:'scatter',marker:{color:rr.map(r=>colorFor(r.sample)),size:9},
+   text:rr.map(r=>`${r.time} ${r.sample}`),hovertemplate:'%{text}<br>Actual %{x:.3f}<br>Predicted %{y:.3f}<extra></extra>'},
+  {x:[lo,hi],y:[lo,hi],mode:'lines',type:'scatter',name:'Identity',line:{color:'#111827',dash:'dash'}}
+ ],layout,PLOT_CONFIG);
+ status(`Same-date time validation completed: ${rs.length} successful fold(s).`,state.cvFailures.length?'warn':'good');
 };
 
 function workbookRows(){const cfg=getSettings();return [{Key:'Calibration group',Value:cfg.groupName},{Key:'Measurement type',Value:cfg.measureType},{Key:'Tx sensor',Value:cfg.measureType==='Transmission Type'?cfg.txName:''},{Key:'Rx sensor',Value:cfg.measureType==='Transmission Type'?cfg.rxName:''},{Key:'Scan sensor',Value:cfg.measureType==='Scan Type'?cfg.scanName:''},{Key:'Operators',Value:cfg.operatorList.join(', ')},{Key:'Operator count',Value:cfg.operatorList.length},{Key:'Source workbook',Value:state.file?.name||''},{Key:'Date for Description',Value:$('descDate').value},{Key:'Time for Description',Value:$('descTime').value},{Key:'Date for Relationship',Value:$('relDate').value},{Key:'Time for Relationship',Value:$('relTime').value},{Key:'Model-selection rule',Value:'LOSO specimen-balanced CV RMSE'},{Key:'Fitting coefficient precision',Value:'Full precision in the Coefficients_full_precision sheet; 3 decimals in other tables'}];}
 
 function appendSheet(wb,name,rows,{fullPrecision=false}={}){
-  if(!rows.length)rows=[{Message:'No results'}];
-  const clean=rows.map(row=>Object.fromEntries(Object.entries(row).map(([k,v])=>[k,typeof v==='number'?(fullPrecision?(Number.isFinite(v)?v:null):valnum(v)):v])));
-  const ws=XLSX.utils.json_to_sheet(clean);
-  for(const k of Object.keys(ws)){
-    if(k.startsWith('!'))continue;
-    if(ws[k].t==='n')ws[k].z=fullPrecision?'0.###############':'0.000';
-  }
-  ws['!cols']=Object.keys(clean[0]).map(k=>({wch:Math.min(58,Math.max(15,k.length+3))}));
-  XLSX.utils.book_append_sheet(wb,ws,name.slice(0,31));
+ if(!rows.length)rows=[{Message:'No results'}];
+ const clean=rows.map(row=>Object.fromEntries(Object.entries(row).map(([k,v])=>[k,typeof v==='number'?(fullPrecision?(Number.isFinite(v)?v:null):valnum(v)):v])));
+ const ws=XLSX.utils.json_to_sheet(clean);
+ for(const k of Object.keys(ws)){
+  if(k.startsWith('!'))continue;
+  if(ws[k].t==='n')ws[k].z=fullPrecision?'0.###############':'0.000';
+ }
+ ws['!cols']=Object.keys(clean[0]).map(k=>({wch:Math.min(58,Math.max(15,k.length+3))}));
+ XLSX.utils.book_append_sheet(wb,ws,name.slice(0,31));
 }
 
 async function saveBlob(blob,name){if(state.dir){try{const fh=await state.dir.getFileHandle(name,{create:true}),writer=await fh.createWritable();await writer.write(blob);await writer.close();return}catch(e){status(`Folder save failed (${e.message}); using browser download.`, 'warn')}}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);}
 
 $('saveBtn').onclick=async()=>{
-  if(!state.rows.length){status('Read a workbook before saving.','bad');return;}
-  const settings=getSettings();
-  if(!settings.groupName||!settings.operatorList.length||
-     (settings.measureType==='Transmission Type'&&(!settings.txName||!settings.rxName))||
-     (settings.measureType==='Scan Type'&&!settings.scanName)){
-    status('Enter calibration group, operator names and all required sensor names before saving.','bad');return;
+ if(!state.rows.length){status('Read a workbook before saving.','bad');return;}
+ const settings=getSettings();
+ if(!settings.groupName||!settings.operatorList.length||
+  (settings.measureType==='Transmission Type'&&(!settings.txName||!settings.rxName))||
+  (settings.measureType==='Scan Type'&&!settings.scanName)){
+  status('Enter calibration group, operator names and all required sensor names before saving.','bad');return;
+ }
+ try{
+  status('Preparing workbook, diagnostics and same-date time validation…');
+  // A Save click also analyzes the selected data when Analyze models was not clicked.
+  const analyzed=computeAnalysis();
+  if(analyzed){
+   if(state.nestedCV===undefined)state.nestedCV=nestedSelectedCV(state.training);
+   computeTimeValidation();
   }
-  try{
-    status('Preparing workbook, diagnostics and same-date time validation…');
-    // A Save click also analyzes the selected data when Analyze models was not clicked.
-    const analyzed=computeAnalysis();
-    if(analyzed){
-      if(state.nestedCV===undefined)state.nestedCV=nestedSelectedCV(state.training);
-      computeTimeValidation();
-    }
-    const wb=XLSX.utils.book_new();
-    appendSheet(wb,'Settings',workbookRows());
-    appendSheet(wb,'Observations',state.rows.map(r=>({Date:r.date,Time:r.time,SPL:r.sample,
-      Notch_thickness_um:r.thickness,Phase:r.phase,'비 고':r.note,Worksheet:r.sheet,Excel_row:r.row})));
-    appendSheet(wb,'Data_quality',state.invalid);
-    appendSheet(wb,'Description',state.descriptionRows.map(r=>({Date:r.date,Time:r.time,SPL:r.sample,
-      Thickness_um:r.thickness,Phase:r.phase,'비 고':r.note})));
-    appendSheet(wb,'Sample_colors',state.allSamples.map(s=>({Sample:s,Color:state.colors[s]})));
-    if(analyzed){
-      const selected=state.models.find(c=>c.model===state.best),
-        sigma=state.repeatability,diags=calibrationDiagnostics(state.best,sigma.sigma),
-        specimens=samples(state.training).length;
-      appendSheet(wb,'Model_comparison',state.models.map(c=>({Model:c.model.label,
-        Parameters:c.model.p,Fit_RMSE_um:c.training.rmse,Fit_MAE_um:c.training.mae,
-        Fit_R2:c.training.r2,Fit_Bias_um:c.training.bias,Fit_MaxAE_um:c.training.maxAE,
-        LOSO_folds:c.cv?.folds,LOSO_RMSE_um:c.cv?.balancedRMSE,LOSO_MAE_um:c.cv?.mae,
-        LOSO_R2:c.cv?.r2,LOSO_Bias_um:c.cv?.bias,LOSO_MaxAE_um:c.cv?.maxAE,
-        Selected:c.model===state.best?'YES':'NO'})));
-      appendSheet(wb,'Selected_model',[{Model:state.best.label,Equation:formula(state.best),
-        Training_records:state.training.length,Independent_samples:specimens,
-        LOSO_folds:selected.cv.folds,LOSO_CV_RMSE_um:selected.cv.balancedRMSE,
-        Nested_CV_RMSE_um:state.nestedCV?.balancedRMSE,Phase_repeatability_SD:sigma.sigma,
-        Local_slope_um_per_phase:diags.slope,Equivalent_thickness_SD_um:diags.equivalentThicknessSD,
-        Phase_center:state.best.c,Phase_scale:state.best.sc,
-        Min_phase:state.best.minPhase,Max_phase:state.best.maxPhase,
-        ...Object.fromEntries(state.best.beta.map((c,i)=>['Coefficient_'+i,c]))}]);
-      appendSheet(wb,'Coefficients_full_precision',state.models.flatMap(c=>c.model.beta.map((coefficient,i)=>({
-        Model:c.model.label,Selected:c.model===state.best?'YES':'NO',Index:i,
-        Coefficient:coefficient,Phase_center:c.model.c,Phase_scale:c.model.sc
-      }))),{fullPrecision:true});
-      appendSheet(wb,'Predictions',state.training.map(r=>{const pred=predict(state.best,r.phase);return {
-        Date:r.date,Time:r.time,SPL:r.sample,Phase:r.phase,Actual_thickness_um:r.thickness,
-        Predicted_thickness_um:pred,Error_um:pred-r.thickness};}));
-      appendSheet(wb,'Repeatability',sigma.items.map(x=>({SPL:x.sample,N:x.n,Phase_mean:x.mean,Phase_SD:x.sd})));
-      appendSheet(wb,'Diagnostic_metrics',[
-        {Metric:'Records used',Value:state.training.length,Unit:'records'},
-        {Metric:'Independent sample labels',Value:specimens,Unit:'specimens'},
-        {Metric:'Selected model',Value:state.best.label,Unit:''},
-        {Metric:'Selected fit RMSE',Value:selected.training.rmse,Unit:'µm'},
-        {Metric:'Selected fit MAE',Value:selected.training.mae,Unit:'µm'},
-        {Metric:'Selected fit R²',Value:selected.training.r2,Unit:''},
-        {Metric:'LOSO folds',Value:selected.cv.folds,Unit:'folds'},
-        {Metric:'LOSO CV RMSE (sample-balanced)',Value:selected.cv.balancedRMSE,Unit:'µm'},
-        {Metric:'LOSO CV MAE (record-weighted)',Value:selected.cv.mae,Unit:'µm'},
-        {Metric:'Nested model-choice CV RMSE (sample-balanced)',Value:state.nestedCV?.balancedRMSE,Unit:'µm'},
-        {Metric:'Nested model-choice CV folds',Value:state.nestedCV?.folds,Unit:'folds'},
-        {Metric:'Phase repeatability SD',Value:sigma.sigma,Unit:'Phase'},
-        {Metric:'Repeatability degrees of freedom',Value:sigma.df,Unit:'df'},
-        {Metric:'Equivalent thickness SD',Value:diags.equivalentThicknessSD,Unit:'µm'},
-        {Metric:'Local slope',Value:diags.slope,Unit:'µm/Phase'},
-        {Metric:'Reference Phase',Value:diags.phase0,Unit:'Phase'},
-        {Metric:'Target thickness difference',Value:diags.target,Unit:'µm'},
-        {Metric:'Required Phase difference (measured range)',Value:diags.delta,Unit:'Phase'},
-        {Metric:'95% repeatability bound (2.77 × pooled SD)',Value:diags.crit,Unit:'Phase'}
-      ]);
-      appendSheet(wb,'LOSO_fold_details',state.models.flatMap(c=>c.cv?.foldDetails?.map(f=>({
-        Model:c.model.label,Sample:f.sample,Records:f.n,RMSE_um:f.rmse,MAE_um:f.mae,
-        R2:f.r2,Bias_um:f.bias,MaxAE_um:f.maxAE}))||[]));
-      appendSheet(wb,'Nested_CV',state.nestedCV?[{
-        LOSO_model_choice_folds:state.nestedCV.folds,RMSE_um:state.nestedCV.balancedRMSE,
-        MAE_um:state.nestedCV.mae,R2:state.nestedCV.r2,Bias_um:state.nestedCV.bias,
-        MaxAE_um:state.nestedCV.maxAE}]:[]);
-      appendSheet(wb,'Nested_CV_folds',state.nestedCV?.foldDetails.map(f=>({
-        Held_out_sample:f.sample,Selected_model:f.model,Records:f.n,
-        RMSE_um:f.rmse,MAE_um:f.mae,R2:f.r2,Bias_um:f.bias}))||[]);
-      appendSheet(wb,'Other_time_CV',state.cvRows.map(r=>({
-        Date:r.date,Test_time:r.time,Validation_mode:r.mode,Training_times:r.trainTimes,
-        Training_records:r.trainRecords,Training_samples:r.trainSamples,Selected_model:r.model,
-        Test_records:r.n,Test_samples:r.samples,RMSE_um:r.rmse,MAE_um:r.mae,
-        R2:r.r2,Bias_um:r.bias,MaxAE_um:r.maxAE})));
-      appendSheet(wb,'Other_time_predictions',state.cvRows.flatMap(x=>x.rows).map(r=>({
-        Date:r.date,Time:r.time,SPL:r.sample,Phase:r.phase,Actual_um:r.thickness,
-        Predicted_um:r.pred,Error_um:r.error,Extrapolation:r.extrapolation})));
-      appendSheet(wb,'Other_time_CV_status',[{
-        Date:state.cvInfo?.date,Mode:state.cvInfo?.mode,
-        Selected_training_time:state.cvInfo?.trainTime,Successful_folds:state.cvRows.length,
-        Failed_folds:state.cvFailures.length,
-        Status:state.cvRows.length?(state.cvFailures.length?'PARTIAL':'COMPLETED'):'NOT AVAILABLE',
-        Description:'LOTO excludes each entire test time from fitting and model selection; other-times holdout uses only the selected training time.'
-      }]);
-      appendSheet(wb,'Other_time_CV_failures',state.cvFailures.map(f=>({Date:f.date,Test_time:f.time,Reason:f.reason})));
-    }else{
-      appendSheet(wb,'Analysis_status',[{Status:'NOT AVAILABLE',Reason:'Insufficient independently labeled specimens or insufficient phase variation for a valid grouped calibration.'}]);
-    }
-    appendSheet(wb,'References',[
-      {Paper:'Stone (1974), Cross-validatory choice and assessment of statistical predictions',DOI:'10.1111/j.2517-6161.1974.tb00994.x'},
-      {Paper:'Varma and Simon (2006), Bias in error estimation when using cross-validation for model selection',DOI:'10.1186/1471-2105-7-91'},
-      {Paper:'Bland and Altman (1996), Statistics notes: Measurement error',DOI:'10.1136/bmj.312.7047.1654'}
-    ]);
-    const bytes=XLSX.write(wb,{type:'array',bookType:'xlsx',compression:true});
-    await saveBlob(new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'Notch_Phase_Analysis.xlsx');
-    let savedPlots=0;
-    for(const div of document.querySelectorAll('.js-plotly-plot')){
-      if(!div.id)continue;
-      try{
-        const data=await Plotly.toImage(div,{format:'png',width:1600,height:900,scale:2});
-        const res=await fetch(data);
-        await saveBlob(await res.blob(),`${div.id}.png`);
-        savedPlots++;
-      }catch(e){console.warn('Plot export skipped:',div.id,e);}
-    }
-    status(`Saved Excel (${analyzed?'full diagnostics and same-date time validation':'observations only'}) and ${savedPlots} visible plot(s).`,analyzed?'good':'warn');
-  }catch(e){status('Save failed: '+(e.message||e),'bad');}
+  const wb=XLSX.utils.book_new();
+  appendSheet(wb,'Settings',workbookRows());
+  appendSheet(wb,'Observations',state.rows.map(r=>({Date:r.date,Time:r.time,SPL:r.sample,
+   Notch_thickness_um:r.thickness,Phase:r.phase,'비 고':r.note,Worksheet:r.sheet,Excel_row:r.row})));
+  appendSheet(wb,'Data_quality',state.invalid);
+  appendSheet(wb,'Description',state.descriptionRows.map(r=>({Date:r.date,Time:r.time,SPL:r.sample,
+   Thickness_um:r.thickness,Phase:r.phase,'비 고':r.note})));
+  appendSheet(wb,'Sample_colors',state.allSamples.map(s=>({Sample:s,Color:state.colors[s]})));
+  if(analyzed){
+   const selected=state.models.find(c=>c.model===state.best),
+    sigma=state.repeatability,diags=calibrationDiagnostics(state.best,sigma.sigma),
+    specimens=samples(state.training).length;
+   appendSheet(wb,'Model_comparison',state.models.map(c=>({Model:c.model.label,
+    Parameters:c.model.p,Fit_RMSE_um:c.training.rmse,Fit_MAE_um:c.training.mae,
+    Fit_R2:c.training.r2,Fit_Bias_um:c.training.bias,Fit_MaxAE_um:c.training.maxAE,
+    LOSO_folds:c.cv?.folds,LOSO_RMSE_um:c.cv?.balancedRMSE,LOSO_MAE_um:c.cv?.mae,
+    LOSO_R2:c.cv?.r2,LOSO_Bias_um:c.cv?.bias,LOSO_MaxAE_um:c.cv?.maxAE,
+    Selected:c.model===state.best?'YES':'NO'})));
+   appendSheet(wb,'Selected_model',[{Model:state.best.label,Equation:formula(state.best),
+    Training_records:state.training.length,Independent_samples:specimens,
+    LOSO_folds:selected.cv.folds,LOSO_CV_RMSE_um:selected.cv.balancedRMSE,
+    Nested_CV_RMSE_um:state.nestedCV?.balancedRMSE,Phase_repeatability_SD:sigma.sigma,
+    Local_slope_um_per_phase:diags.slope,Equivalent_thickness_SD_um:diags.equivalentThicknessSD,
+    Phase_center:state.best.c,Phase_scale:state.best.sc,
+    Min_phase:state.best.minPhase,Max_phase:state.best.maxPhase,
+    ...Object.fromEntries(state.best.beta.map((c,i)=>['Coefficient_'+i,c]))}]);
+   appendSheet(wb,'Coefficients_full_precision',state.models.flatMap(c=>c.model.beta.map((coefficient,i)=>({
+    Model:c.model.label,Selected:c.model===state.best?'YES':'NO',Index:i,
+    Coefficient:coefficient,Phase_center:c.model.c,Phase_scale:c.model.sc
+   }))),{fullPrecision:true});
+   appendSheet(wb,'Predictions',state.training.map(r=>{const pred=predict(state.best,r.phase);return {
+    Date:r.date,Time:r.time,SPL:r.sample,Phase:r.phase,Actual_thickness_um:r.thickness,
+    Predicted_thickness_um:pred,Error_um:pred-r.thickness};}));
+   appendSheet(wb,'Repeatability',sigma.items.map(x=>({SPL:x.sample,N:x.n,Phase_mean:x.mean,Phase_SD:x.sd})));
+   appendSheet(wb,'Diagnostic_metrics',[
+    {Metric:'Records used',Value:state.training.length,Unit:'records'},
+    {Metric:'Independent sample labels',Value:specimens,Unit:'specimens'},
+    {Metric:'Selected model',Value:state.best.label,Unit:''},
+    {Metric:'Selected fit RMSE',Value:selected.training.rmse,Unit:'µm'},
+    {Metric:'Selected fit MAE',Value:selected.training.mae,Unit:'µm'},
+    {Metric:'Selected fit R²',Value:selected.training.r2,Unit:''},
+    {Metric:'LOSO folds',Value:selected.cv.folds,Unit:'folds'},
+    {Metric:'LOSO CV RMSE (sample-balanced)',Value:selected.cv.balancedRMSE,Unit:'µm'},
+    {Metric:'LOSO CV MAE (record-weighted)',Value:selected.cv.mae,Unit:'µm'},
+    {Metric:'Nested model-choice CV RMSE (sample-balanced)',Value:state.nestedCV?.balancedRMSE,Unit:'µm'},
+    {Metric:'Nested model-choice CV folds',Value:state.nestedCV?.folds,Unit:'folds'},
+    {Metric:'Phase repeatability SD',Value:sigma.sigma,Unit:'Phase'},
+    {Metric:'Repeatability degrees of freedom',Value:sigma.df,Unit:'df'},
+    {Metric:'Equivalent thickness SD',Value:diags.equivalentThicknessSD,Unit:'µm'},
+    {Metric:'Local slope',Value:diags.slope,Unit:'µm/Phase'},
+    {Metric:'Reference Phase',Value:diags.phase0,Unit:'Phase'},
+    {Metric:'Target thickness difference',Value:diags.target,Unit:'µm'},
+    {Metric:'Required Phase difference (measured range)',Value:diags.delta,Unit:'Phase'},
+    {Metric:'95% repeatability bound (2.77 × pooled SD)',Value:diags.crit,Unit:'Phase'}
+   ]);
+   appendSheet(wb,'LOSO_fold_details',state.models.flatMap(c=>c.cv?.foldDetails?.map(f=>({
+    Model:c.model.label,Sample:f.sample,Records:f.n,RMSE_um:f.rmse,MAE_um:f.mae,
+    R2:f.r2,Bias_um:f.bias,MaxAE_um:f.maxAE}))||[]));
+   appendSheet(wb,'Nested_CV',state.nestedCV?[{
+    LOSO_model_choice_folds:state.nestedCV.folds,RMSE_um:state.nestedCV.balancedRMSE,
+    MAE_um:state.nestedCV.mae,R2:state.nestedCV.r2,Bias_um:state.nestedCV.bias,
+    MaxAE_um:state.nestedCV.maxAE}]:[]);
+   appendSheet(wb,'Nested_CV_folds',state.nestedCV?.foldDetails.map(f=>({
+    Held_out_sample:f.sample,Selected_model:f.model,Records:f.n,
+    RMSE_um:f.rmse,MAE_um:f.mae,R2:f.r2,Bias_um:f.bias}))||[]);
+   appendSheet(wb,'Other_time_CV',state.cvRows.map(r=>({
+    Date:r.date,Test_time:r.time,Validation_mode:r.mode,Training_times:r.trainTimes,
+    Training_records:r.trainRecords,Training_samples:r.trainSamples,Selected_model:r.model,
+    Test_records:r.n,Test_samples:r.samples,RMSE_um:r.rmse,MAE_um:r.mae,
+    R2:r.r2,Bias_um:r.bias,MaxAE_um:r.maxAE})));
+   appendSheet(wb,'Other_time_predictions',state.cvRows.flatMap(x=>x.rows).map(r=>({
+    Date:r.date,Time:r.time,SPL:r.sample,Phase:r.phase,Actual_um:r.thickness,
+    Predicted_um:r.pred,Error_um:r.error,Extrapolation:r.extrapolation})));
+   appendSheet(wb,'Other_time_CV_status',[{
+    Date:state.cvInfo?.date,Mode:state.cvInfo?.mode,
+    Selected_training_time:state.cvInfo?.trainTime,Successful_folds:state.cvRows.length,
+    Failed_folds:state.cvFailures.length,
+    Status:state.cvRows.length?(state.cvFailures.length?'PARTIAL':'COMPLETED'):'NOT AVAILABLE',
+    Description:'LOTO excludes each entire test time from fitting and model selection; other-times holdout uses only the selected training time.'
+   }]);
+   appendSheet(wb,'Other_time_CV_failures',state.cvFailures.map(f=>({Date:f.date,Test_time:f.time,Reason:f.reason})));
+  }else{
+   appendSheet(wb,'Analysis_status',[{Status:'NOT AVAILABLE',Reason:'Insufficient independently labeled specimens or insufficient phase variation for a valid grouped calibration.'}]);
+  }
+  appendSheet(wb,'References',[
+   {Paper:'Stone (1974), Cross-validatory choice and assessment of statistical predictions',DOI:'10.1111/j.2517-6161.1974.tb00994.x'},
+   {Paper:'Varma and Simon (2006), Bias in error estimation when using cross-validation for model selection',DOI:'10.1186/1471-2105-7-91'},
+   {Paper:'Bland and Altman (1996), Statistics notes: Measurement error',DOI:'10.1136/bmj.312.7047.1654'}
+  ]);
+  const bytes=XLSX.write(wb,{type:'array',bookType:'xlsx',compression:true});
+  await saveBlob(new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'Notch_Phase_Analysis.xlsx');
+  let savedPlots=0;
+  for(const div of document.querySelectorAll('.js-plotly-plot')){
+   if(!div.id)continue;
+   try{
+    const data=await Plotly.toImage(div,{format:'png',width:1600,height:900,scale:2});
+    const res=await fetch(data);
+    await saveBlob(await res.blob(),`${div.id}.png`);
+    savedPlots++;
+   }catch(e){console.warn('Plot export skipped:',div.id,e);}
+  }
+  status(`Saved Excel (${analyzed?'full diagnostics and same-date time validation':'observations only'}) and ${savedPlots} visible plot(s).`,analyzed?'good':'warn');
+ }catch(e){status('Save failed: '+(e.message||e),'bad');}
 };
 
 fromDefault();measurementType();language();showTab('description');
